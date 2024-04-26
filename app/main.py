@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
-from .database import SessionLocal, engine, Base
+from .database import get_db
 from . import crud
 from .schema import UserSchema
 
@@ -32,14 +32,7 @@ router = APIRouter(
     tags=['Users']
 )
 
-Base.metadata.create_all(bind=engine)
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @router.post("/", response_model=UserSchema)
 def create_user(user: UserSchema, db: Session = Depends(get_db)):

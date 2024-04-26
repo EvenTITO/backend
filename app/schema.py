@@ -1,13 +1,23 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class UserSchema(BaseModel):
-    id: str = Field(example="asjdfvhjbvnlaksdj")
-    name: str = Field(example="Lio")
-    surname: str = Field(example="Messi")
-    photo: str = Field(description="base64 codified photo.",
-                       example='base64-photo')
-    email: str = Field(example="email@email.com")
+    id: str
+    name: str
+    surname: str
+    photo: str 
+    email: str
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "id": "1234",
+                    "name": "Pepe",
+                    "surname": "Argento",
+                    "photo": "base64-photo",
+                    "email": "email@email.com"
+                }
+            ]
+        }
+    }

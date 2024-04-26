@@ -13,7 +13,7 @@ def get_user_by_email(db: Session, email: str):
     return db.query(UserModel).filter(UserModel.email == email).first()
 
 def create_user(db: Session, user: UserSchema):
-    db_user = UserModel(**user.dict())
+    db_user = UserModel(**user.model_dump())
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

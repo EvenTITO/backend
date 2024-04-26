@@ -1,2 +1,3 @@
-# python-template
-Python Template Repository with FastAPI, Docker, Python Linter Flake8, Tests with Pytest and Test Coverage Codecov.
+[![codecov](https://codecov.io/gh/EvenTITO/users/graph/badge.svg?token=8HYPP8CZJ6)](https://codecov.io/gh/EvenTITO/users)
+
+# Users

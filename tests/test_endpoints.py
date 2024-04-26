@@ -1,38 +1,36 @@
 from .common import client
 
-
-def test_read_main():
-    response = client.get("/")
-    assert response.status_code == 200
-    assert response.json() == {"Hello": "World"}
-
-
 first_user_data = {
-    "name": "Gonza",
-    "lastname": "Sabatino",
-    "description": "I like having fun!",
-    "date_of_birth": "03-03-2000",
-    "photo": "base64-photo",
-    "email": "email@email.com",
-    "id": "ak345sidsdfo12wm192"
+  "id": "aasjdfvhasdvnlaksdj",
+  "name": "Lio",
+  "surname": "Messi",
+  "photo": "base64-photo",
+  "email": "email@email.com"
 }
-
 
 def test_create_user():
     response = client.post("/users/", json=first_user_data)
     assert response.status_code == 200
-    assert response.json() == first_user_data['id']
+    
+    response_data = response.json()
+    assert response_data['id'] == first_user_data['id']
+    assert response_data['name'] == first_user_data['name']
+    assert response_data['surname'] == first_user_data['surname']
+    assert response_data['email'] == first_user_data['email']
+    assert response_data['photo'] == first_user_data['photo']
 
-
-def test_create_then_get_user():
+def test_get_user():
     response = client.get(f"/users/{first_user_data['id']}")
-    print(response.json())
     assert response.status_code == 200
     assert response.json()['name'] == first_user_data['name']
 
+def test_create_again_fails():
+    response = client.post("/users/", json=first_user_data)
+    assert response.status_code == 400
 
-def test_change_user():
-    first_user_data['name'] = 'Mateito'
-    response = client.put("/users/", json=first_user_data)
-    assert response.status_code == 200
-    assert response.json()['name'] == 'Mateito'
+def test_different_id_same_mail_fails():
+    other_user = first_user_data.copy()
+    other_user["id"] = 'other_id'
+    response = client.post("/users/", json=other_user)
+    assert response.status_code == 400
+
