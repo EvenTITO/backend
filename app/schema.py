@@ -5,7 +5,7 @@ class UserSchema(BaseModel):
     id: str
     name: str
     surname: str
-    photo: str 
+    photo: str
     email: str
 
     model_config = {

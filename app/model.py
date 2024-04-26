@@ -10,8 +10,8 @@ class UserModel(Base):
     surname = Column(String, nullable=False)
     photo = Column(String)
 
-
     def __repr__(self):
         return f"User({self.id})"
+
     def __str__(self):
         return f"User({self.id})"

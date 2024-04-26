@@ -15,12 +15,11 @@ Base = declarative_base()
 def get_db():
     if url_database is not None:
         engine = create_engine(url_database)
-        SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+        SessionLocal = sessionmaker(bind=engine,
+                                    autocommit=False, autoflush=False)
         Base.metadata.create_all(bind=engine)
     try:
         db = SessionLocal()
         yield db
     finally:
         db.close()
-
-
