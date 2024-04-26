@@ -3,3 +3,6 @@ uvicorn
 pytest
 pytest-cov
 httpx
+sqlalchemy
+python-dotenv
+psycopg2-binary
