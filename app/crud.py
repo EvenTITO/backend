@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from .model import UserModel
-from .schema import UserSchema
+from eventitolibs.schemas.users import UserSchema
 
 
 def get_user(db: Session, user_id: int):

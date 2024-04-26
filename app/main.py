@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 from .database import get_db
 from . import crud
-from .schema import UserSchema
+from eventitolibs.schemas.users import UserSchema
 
 
 app = FastAPI()
