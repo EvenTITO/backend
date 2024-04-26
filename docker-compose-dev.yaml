@@ -1,0 +1,18 @@
+version: '3.9'
+services:
+  python-template:
+    image: python-template:latest
+    environment:
+      - RUN_MODE=DEV
+      - PORT=12345
+    volumes:
+      - ./app:/code/app
+    restart: on-failure
+    networks:
+      - eventito-dev-network
+
+
+networks:
+  eventito-dev-network:
+    name: eventito-dev-network
+    external: true
