@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String
-from app.database.database import Base
+from app.database.database import Base, engine
 
 
 class UserModel(Base):
@@ -11,3 +11,7 @@ class UserModel(Base):
 
     def __repr__(self):
         return f"User({self.id})"
+
+
+Base.metadata.create_all(engine)
+

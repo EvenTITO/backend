@@ -1,23 +1,21 @@
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.orm import (
-    sessionmaker,
-    declarative_base
-)
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 
 load_dotenv()
 url_database = os.getenv("DATABASE_URL")
 engine = create_engine(url_database)
-SessionLocal = sessionmaker(bind=engine,
-                            autocommit=False, autoflush=False)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
 def get_db():
+    db = SessionLocal()
     try:
-        db = SessionLocal()
         yield db
     finally:
         db.close()
+
