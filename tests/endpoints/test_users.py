@@ -118,7 +118,7 @@ def test_put_user_not_exists():
 def test_delete_user():
     id = first_user_data.id
     response = client.delete(f"/users/{id}")
-    assert response.status_code == 204
+    assert response.status_code == 200
     get_response = client.get(f"/users/{id}")
     assert get_response.status_code == 404
     assert get_response.json()['detail'] == USER_NOT_FOUND_DETAIL

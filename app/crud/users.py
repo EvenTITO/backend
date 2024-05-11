@@ -65,9 +65,10 @@ def update_user(db: Session, user_updated: UserSchema):
 @handle_database_user_error
 def delete_user(db: Session, user_id: str):
     # check if user exists
-    get_user(db, user_id)
+    user = get_user(db, user_id)
+    db.delete(user)
 
-    db.query(UserModel).filter_by(id=user_id).delete()
+    # db.query(UserModel).filter_by(id=user_id).delete()
     db.commit()
 
-    return JSONResponse(status_code=200, content={"message": "User deleted"})
+    return user
