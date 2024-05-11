@@ -1,10 +1,9 @@
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import APIRouter, Depends, FastAPI, HTTPException
-from sqlalchemy.orm import Session
-from .database import get_db
-from . import crud
-from eventitolibs.schemas.users import UserSchema
-
+from fastapi import FastAPI
+from app.routers import (
+    users,
+    events
+)
 
 app = FastAPI()
 
@@ -26,26 +25,5 @@ app.add_middleware(
 )
 
 
-router = APIRouter(
-    prefix="/users",
-    tags=['Users']
-)
-
-
-@router.post("/", response_model=UserSchema)
-def create_user(user: UserSchema, db: Session = Depends(get_db)):
-    try:
-        return crud.create_user(db=db, user=user)
-    except Exception as error:
-        raise HTTPException(status_code=400, detail=str(error))
-
-
-@router.get("/{user_id}", response_model=UserSchema)
-def read_user(user_id: str, db: Session = Depends(get_db)):
-    db_user = crud.get_user(db, user_id=user_id)
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
-
-
-app.include_router(router)
+app.include_router(users.router)
+app.include_router(events.router)
