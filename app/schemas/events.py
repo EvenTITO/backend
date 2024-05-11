@@ -1,43 +1,38 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 from enum import Enum
 
 
-class EVENT_TYPE(Enum):
-    # TODO: ver todos los tipos
-    CONFERENCE = 'CONFERENCE'
-    TALK = 'TALK'
+## EVENT TYPES
+CONFERENCE = 'CONFERENCE'
+TALK = 'TALK'
 
-
-class STATUS(Enum):
-    # TODO: ver todos los estados
-    CREATED = 'CREATED'
-    STARTED = 'STARTED'
-    IN_PROGRESS = 'IN_PROGRESS'
-
+## STATUS
+CREATED = 'CREATED'
+STARTED = 'STARTED'
 
 class EventSchema(BaseModel):
     id: str
-    name: str
+    title: str = Field(min_length=2)
     creation_date: datetime
     start_date: datetime
     end_date: datetime
     description: str
-    event_type: EVENT_TYPE
-    status: STATUS
+    event_type: str
+    status: str
 
     model_config = {
         "json_schema_extra": {
             "examples": [
                 {
                     "id": "1234",
-                    "name": "CONGRESO DE QUIMICA",
+                    "title": "CONGRESO DE QUIMICA",
                     "creation_date": datetime.now(),
                     "start_date": datetime(2024, 8, 1),
                     "end_date": datetime(2024, 8, 3),
                     "description": "Evento en FIUBA",
-                    "event_type": EVENT_TYPE.CONFERENCE,
-                    "status": STATUS.CREATED
+                    "event_type": CONFERENCE,
+                    "status": CREATED
                 }
             ]
         }
