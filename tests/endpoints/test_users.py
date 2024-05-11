@@ -2,14 +2,14 @@ from ..common import client
 from app.schemas.users import UserSchema
 from fastapi.encoders import jsonable_encoder
 from app.crud.users import USER_NOT_FOUND_DETAIL, \
-                EMAIL_ALREADY_EXISTS, ID_ALREADY_EXISTS
+    EMAIL_ALREADY_EXISTS, ID_ALREADY_EXISTS
 
 
 first_user_data = UserSchema(
-  id="aasjdfvhasdvnlaksdj",
-  name="Lio",
-  surname="Messi",
-  email="email@email.com"
+    id="aasjdfvhasdvnlaksdj",
+    name="Lio",
+    surname="Messi",
+    email="email@email.com"
 )
 
 
@@ -113,3 +113,19 @@ def test_put_user_not_exists():
     assert response.status_code == 404
 
 # ------------------------------- DELETE TESTS ------------------------------ #
+
+
+def test_delete_user():
+    id = first_user_data.id
+    response = client.delete(f"/users/{id}")
+    assert response.status_code == 204
+    get_response = client.get(f"/users/{id}")
+    assert get_response.status_code == 404
+    assert get_response.json()['detail'] == USER_NOT_FOUND_DETAIL
+
+
+def test_delete_user_not_exists():
+    id = "this-id-does-not-exist"
+    response = client.delete(f"/users/{id}")
+    assert response.status_code == 404
+    assert response.json()['detail'] == USER_NOT_FOUND_DETAIL

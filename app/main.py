@@ -4,7 +4,9 @@ from app.routers import (
     users,
     events
 )
+from app.database.database import engine, Base
 
+Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 

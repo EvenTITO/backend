@@ -1,12 +1,13 @@
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
-from app.main import app
 from app.database.database import Base, get_db
-
-
+from app.main import app
+from sqlalchemy.pool import StaticPool
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+from fastapi.testclient import TestClient
+import os
 SQLALCHEMY_DATABASE_URL = "sqlite://"
+os.environ["DATABASE_URL"] = SQLALCHEMY_DATABASE_URL
+
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,

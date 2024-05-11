@@ -59,3 +59,11 @@ def update_user(db: Session, user_updated: UserSchema):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+@handle_database_user_error
+def delete_user(db: Session, user_id: str):
+    db_user = get_user(db, user_id)
+    db.delete(db_user)
+    db.commit()
+    db.refresh(db_user)
