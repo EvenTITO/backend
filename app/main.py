@@ -4,8 +4,13 @@ from app.routers import (
     users,
     events
 )
+from app.database.database import Base, engine
+
 
 app = FastAPI()
+
+Base.metadata.create_all(engine)
+
 
 
 origins = [
