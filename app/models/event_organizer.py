@@ -11,7 +11,7 @@ class EventOrganizerModel(Base):
                           primary_key=True,
                           nullable=False)
     id_event = Column(String,
-                      ForeignKey(EventModel.id),
+                      ForeignKey(EventModel.id_event),
                       primary_key=True,
                       nullable=False)
 

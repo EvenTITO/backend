@@ -1,17 +1,36 @@
-from sqlalchemy import Column, String, Date
+from sqlalchemy import Column, String, Date, ForeignKey
 from app.database.database import Base
+from app.models.user import UserModel
+from enum import Enum
+from datetime import datetime
+import uuid
+from sqlalchemy.orm import relationship
+
+
+class EventStatus(str, Enum):
+    CREATED = 'CREATED'
+    STARTED = 'STARTED'
+
+
+class EventType(str, Enum):
+    CONFERENCE = 'CONFERENCE'
+    TALK = 'TALK'
 
 
 class EventModel(Base):
     __tablename__ = "events"
-    id = Column(String, primary_key=True, nullable=False)
+    id_event = Column(String, primary_key=True,
+                      nullable=False, default=lambda: str(uuid.uuid4()))
+    id_creator = Column(String, ForeignKey("users.id"))
     title = Column(String, nullable=False, unique=True)
-    creation_date = Column(String)
-    start_date = Column(String)
-    end_date = Column(String)
+    creation_date = Column(Date, default=lambda: datetime.now())
+    start_date = Column(Date)
+    end_date = Column(Date)
     description = Column(String)
     event_type = Column(String)
     status = Column(String)
+
+    creator = relationship("UserModel", back_populates="events")
 
     def __repr__(self):
         return f"Event({self.id})"

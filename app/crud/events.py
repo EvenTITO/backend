@@ -1,14 +1,17 @@
 
 from sqlalchemy.orm import Session
-from ..models.event import EventModel
-from app.schemas.events import EventSchema
+from app.models.event import EventModel
+from app.models.event_organizer import EventOrganizerModel
+from app.schemas.events import EventSchema, CreateEventSchema
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from fastapi import HTTPException
-
+import logging
 
 EVENT_NOT_FOUND = 'Event not found'
 ID_ALREADY_EXISTS = 'Id already exists'
 TITLE_ALREADY_EXISTS = 'Title of event already exists'
+CREATOR_NOT_EXISTS = 'The Creator does not exist '
+
 
 def handle_database_event_error(handler):
     def wrapper(*args, **kwargs):
@@ -19,9 +22,11 @@ def handle_database_event_error(handler):
             if 'title' in error_info.lower():
                 raise HTTPException(status_code=409,
                                     detail=TITLE_ALREADY_EXISTS)
-            elif 'id' in error_info.lower():
-                raise HTTPException(status_code=409, detail=ID_ALREADY_EXISTS)
+            elif 'id_creator' in error_info.lower():
+                raise HTTPException(status_code=409,
+                                    detail=CREATOR_NOT_EXISTS)
             else:
+                logging.log(logging.ERROR, f'unexpected_error: {str(e)}')
                 raise HTTPException(status_code=409, detail='Unexpected')
         except NoResultFound:
             raise HTTPException(status_code=404, detail=EVENT_NOT_FOUND)
@@ -39,9 +44,16 @@ def get_events(db: Session, skip: int = 0, limit: int = 100):
 
 
 @handle_database_event_error
-def create_event(db: Session, event: EventSchema):
+def create_event(db: Session, event: CreateEventSchema):
     db_event = EventModel(**event.model_dump())
     db.add(db_event)
+    db.flush()
+
+    organizer = EventOrganizerModel(
+        id_organizer=event.id_creator,
+        id_event=db_event.id_event
+    )
+    db.add(organizer)
     db.commit()
     db.refresh(db_event)
     return db_event
@@ -53,17 +65,14 @@ def update_event(db: Session, event_updated: EventSchema):
     for attr, value in event_updated.model_dump().items():
         setattr(db_event, attr, value)
     db.commit()
-    db.refresh(db_event)
+
     return db_event
 
 
 @handle_database_event_error
 def delete_event(db: Session, event_id: str):
-    # check if event exists
     event = get_event(db, event_id)
     db.delete(event)
-
     db.commit()
 
     return event
-

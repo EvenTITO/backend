@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.crud import events
-from app.schemas.events import EventSchema
+from app.schemas.events import EventSchema, CreateEventSchema, ReplyEventSchema
 from fastapi import APIRouter, Depends
 
 
@@ -10,8 +10,9 @@ router = APIRouter(
     tags=['Events']
 )
 
-@router.post("/", response_model=EventSchema)
-def create_event(event: EventSchema, db: Session = Depends(get_db)):
+
+@router.post("/", response_model=ReplyEventSchema)
+def create_event(event: CreateEventSchema, db: Session = Depends(get_db)):
     return events.create_event(db=db, event=event)
 
 
