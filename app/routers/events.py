@@ -5,10 +5,7 @@ from app.schemas.events import EventSchema, CreateEventSchema, ReplyEventSchema
 from fastapi import APIRouter, Depends
 
 
-router = APIRouter(
-    prefix="/events",
-    tags=['Events']
-)
+router = APIRouter(prefix="/events", tags=["Events"])
 
 
 @router.post("/", response_model=ReplyEventSchema)

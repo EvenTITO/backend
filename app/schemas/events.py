@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Field
+from typing import Any
+from pydantic import BaseModel, Field, validator
 from datetime import datetime
 from app.models.event import EventType
 
@@ -23,6 +24,21 @@ class EventSchema(BaseModel):
             ]
         }
     }
+
+    # @validator("end_date")
+    # def check_dates(cls, v: str, values: dict[str, Any]) -> str:
+    #     start_date = values["start_date"]
+    #     end_date = v
+
+    #     if (
+    #         (start_date is None and end_date is not None) or
+    #         (start_date is not None and end_date is None)
+    #     ):
+    #         raise ValueError('You must set both dates')
+    #     elif end_date < start_date:
+    #         raise ValueError('end date should be equal or greater than start date')
+    #     else:
+    #         return v
 
 
 class CreateEventSchema(EventSchema):

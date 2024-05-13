@@ -5,10 +5,7 @@ from app.schemas.users import UserSchema
 from fastapi import APIRouter, Depends
 
 
-router = APIRouter(
-    prefix="/users",
-    tags=['Users']
-)
+router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.post("/", response_model=UserSchema)

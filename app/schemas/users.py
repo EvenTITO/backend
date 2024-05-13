@@ -14,7 +14,7 @@ class UserSchema(BaseModel):
                     "id": "1234",
                     "name": "Pepe",
                     "surname": "Argento",
-                    "email": "email@email.com"
+                    "email": "email@email.com",
                 }
             ]
         }

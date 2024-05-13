@@ -1,4 +1,3 @@
-
 from sqlalchemy.orm import Session
 from app.models.event import EventModel
 from app.models.event_organizer import EventOrganizerModel
@@ -7,10 +6,10 @@ from sqlalchemy.exc import IntegrityError, NoResultFound
 from fastapi import HTTPException
 import logging
 
-EVENT_NOT_FOUND = 'Event not found'
-ID_ALREADY_EXISTS = 'Id already exists'
-TITLE_ALREADY_EXISTS = 'Title of event already exists'
-CREATOR_NOT_EXISTS = 'The Creator does not exist '
+EVENT_NOT_FOUND = "Event not found"
+ID_ALREADY_EXISTS = "Id already exists"
+TITLE_ALREADY_EXISTS = "Title of event already exists"
+CREATOR_NOT_EXISTS = "The Creator does not exist "
 
 
 def handle_database_event_error(handler):
@@ -19,17 +18,17 @@ def handle_database_event_error(handler):
             return handler(*args, **kwargs)
         except IntegrityError as e:
             error_info = str(e.orig)
-            if 'title' in error_info.lower():
-                raise HTTPException(status_code=409,
-                                    detail=TITLE_ALREADY_EXISTS)
-            elif 'id_creator' in error_info.lower():
-                raise HTTPException(status_code=409,
-                                    detail=CREATOR_NOT_EXISTS)
+            if "title" in error_info.lower():
+                raise HTTPException(
+                    status_code=409, detail=TITLE_ALREADY_EXISTS)
+            elif "id_creator" in error_info.lower():
+                raise HTTPException(status_code=409, detail=CREATOR_NOT_EXISTS)
             else:
-                logging.log(logging.ERROR, f'unexpected_error: {str(e)}')
-                raise HTTPException(status_code=409, detail='Unexpected')
+                logging.log(logging.ERROR, f"unexpected_error: {str(e)}")
+                raise HTTPException(status_code=409, detail="Unexpected")
         except NoResultFound:
             raise HTTPException(status_code=404, detail=EVENT_NOT_FOUND)
+
     return wrapper
 
 
@@ -50,9 +49,7 @@ def create_event(db: Session, event: CreateEventSchema):
     db.flush()
 
     organizer = EventOrganizerModel(
-        id_organizer=event.id_creator,
-        id_event=db_event.id
-    )
+        id_organizer=event.id_creator, id_event=db_event.id)
     db.add(organizer)
     db.commit()
     db.refresh(db_event)

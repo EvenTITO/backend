@@ -9,21 +9,19 @@ from sqlalchemy.orm import relationship
 
 
 class EventStatus(str, Enum):
-    CREATED = 'CREATED'
-    STARTED = 'STARTED'
+    CREATED = "CREATED"
+    STARTED = "STARTED"
 
 
 class EventType(str, Enum):
-    CONFERENCE = 'CONFERENCE'
-    TALK = 'TALK'
+    CONFERENCE = "CONFERENCE"
+    TALK = "TALK"
 
 
 class EventModel(ModelTemplate, Base):
     __tablename__ = "events"
-    #id_event = Column(String, primary_key=True,
-    #                  nullable=False, default=lambda: str(uuid.uuid4()))
+
     title = Column(String, nullable=False, unique=True)
-    #creation_date = Column(Date, default=lambda: datetime.now())
     start_date = Column(Date)
     end_date = Column(Date)
     description = Column(String)
