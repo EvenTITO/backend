@@ -51,7 +51,7 @@ def create_event(db: Session, event: CreateEventSchema):
 
     organizer = EventOrganizerModel(
         id_organizer=event.id_creator,
-        id_event=db_event.id_event
+        id_event=db_event.id
     )
     db.add(organizer)
     db.commit()

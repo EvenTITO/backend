@@ -26,13 +26,13 @@ def test_post_event():
         end_date=datetime(2024, 9, 3),
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
-        creator_id=event_creator.id
+        id_creator=event_creator.id
     )
     response = client.post("/events/", json=jsonable_encoder(new_event))
     assert response.status_code == 200
 
     response_data = response.json()
-    assert response_data['id_event'] is not None
+    assert response_data['id'] is not None
 
 
 def test_post_event_invalid_creator():
@@ -42,13 +42,13 @@ def test_post_event_invalid_creator():
         end_date=datetime(2024, 9, 3),
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
-        creator_id="bocaaaa"
+        id_creator="bocaaaa"
     )
 
     response = client.post("/events/",
                            json=jsonable_encoder(invalid_creator_event))
     print(response.json())
-    assert response.status_code == 404
+    assert response.status_code == 409
     assert response.json()['detail'] == CREATOR_NOT_EXISTS
 
 

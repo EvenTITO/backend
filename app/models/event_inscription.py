@@ -1,10 +1,11 @@
 from sqlalchemy import Column, String, ForeignKey
 from app.database.database import Base
+from .models_utils import ModelTemplate
 from app.models.user import UserModel
 from app.models.event import EventModel
 
 
-class EventInscriptionModel(Base):
+class EventInscriptionModel(ModelTemplate, Base):
     __tablename__ = "event_inscription"
     id_inscripted_user = Column(String,
                                 ForeignKey(UserModel.id),

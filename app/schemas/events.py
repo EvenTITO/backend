@@ -26,13 +26,13 @@ class EventSchema(BaseModel):
 
 
 class CreateEventSchema(EventSchema):
-    creator_id: str
+    id_creator: str
 
 
 class ModifyEventSchema(EventSchema):
     id_modifier: str
-    id_event: str
+    id: str
 
 
 class ReplyEventSchema(CreateEventSchema):
-    id_event: str
+    id: str
