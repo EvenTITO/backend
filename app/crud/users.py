@@ -16,15 +16,16 @@ def handle_database_user_error(handler):
             return handler(*args, **kwargs)
         except IntegrityError as e:
             error_info = str(e.orig)
-            if 'email' in error_info.lower():
-                raise HTTPException(status_code=409,
-                                    detail=EMAIL_ALREADY_EXISTS)
-            elif 'id' in error_info.lower():
+            if "email" in error_info.lower():
+                raise HTTPException(
+                    status_code=409, detail=EMAIL_ALREADY_EXISTS)
+            elif "id" in error_info.lower():
                 raise HTTPException(status_code=409, detail=ID_ALREADY_EXISTS)
             else:
-                raise HTTPException(status_code=409, detail='Unexpected')
+                raise HTTPException(status_code=409, detail="Unexpected")
         except NoResultFound:
             raise HTTPException(status_code=404, detail=USER_NOT_FOUND_DETAIL)
+
     return wrapper
 
 

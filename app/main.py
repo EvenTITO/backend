@@ -1,16 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import (
-    users,
-    events
-)
+from app.routers import users, events
 from app.database.database import Base, engine
-
-
-app = FastAPI()
 
 Base.metadata.create_all(engine)
 
+app = FastAPI()
 
 
 origins = [
