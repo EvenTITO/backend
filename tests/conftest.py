@@ -1,4 +1,6 @@
 import pytest
+from app.models.event import EventType
+from app.schemas.events import CreateEventSchema
 from fastapi.testclient import TestClient
 from fastapi.encoders import jsonable_encoder
 from app.database.database import SessionLocal, engine
@@ -38,4 +40,19 @@ def user_data(client):
         email="lio_messi@email.com",
     )
     response = client.post("/users/", json=jsonable_encoder(new_user))
+    return response.json()
+
+
+@pytest.fixture(scope="function")
+def event_data(client, user_data):
+    new_event = CreateEventSchema(
+        title="Event Title",
+        start_date="2024-09-02",
+        end_date="2024-09-04",
+        description="This is a nice event",
+        event_type=EventType.CONFERENCE,
+        id_creator=user_data["id"]
+    )
+
+    response = client.post("/events/", json=jsonable_encoder(new_event))
     return response.json()

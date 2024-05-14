@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.event import EventModel
 from app.models.event_organizer import EventOrganizerModel
-from app.schemas.events import EventSchema, CreateEventSchema
+from app.schemas.events import EventSchema, CreateEventSchema, ModifyEventSchema
 from app.utils.exceptions import DatesException
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from fastapi import HTTPException
@@ -60,7 +60,7 @@ def create_event(db: Session, event: CreateEventSchema):
 
 
 @handle_database_event_error
-def update_event(db: Session, event_updated: EventSchema):
+def update_event(db: Session, event_updated: ModifyEventSchema):
     db_event = get_event(db, event_updated.id)
     for attr, value in event_updated.model_dump().items():
         setattr(db_event, attr, value)

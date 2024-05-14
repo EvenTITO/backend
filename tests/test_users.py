@@ -92,7 +92,7 @@ def test_put_user(client, user_data):
     update_user_data["surname"] = "new surname"
 
     response = client.put("/users/", json=update_user_data)
-    print(response.json())
+
     assert response.status_code == 200
     assert response.json()["name"] == update_user_data["name"]
     assert response.json()["surname"] == update_user_data["surname"]

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.crud import events
-from app.schemas.events import EventSchema, CreateEventSchema, ReplyEventSchema
+from app.schemas.events import EventSchema, CreateEventSchema, ModifyEventSchema, ReplyEventSchema
 from fastapi import APIRouter, Depends
 
 
@@ -19,7 +19,7 @@ def read_event(event_id: str, db: Session = Depends(get_db)):
 
 
 @router.put("/", response_model=EventSchema)
-def update_event(event: EventSchema, db: Session = Depends(get_db)):
+def update_event(event: ModifyEventSchema, db: Session = Depends(get_db)):
     return events.update_event(db=db, event_updated=event)
 
 

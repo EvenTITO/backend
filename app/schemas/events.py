@@ -26,25 +26,6 @@ class EventSchema(BaseModel):
         }
     }
 
-    # @validator("end_date")
-    # def check_dates(cls, v: str, values: dict[str, Any]) -> str:
-    # start_date = values["start_date"]
-    # end_date = v
-    # now = datetime.now()
-#
-    # if (
-    # (start_date is None and end_date is not None) or
-    # (start_date is not None and end_date is None)
-    # ):
-    # raise DatesException()
-    # elif (
-    # (start_date > end_date) or
-    # (start_date > now)
-    # ):
-    # raise DatesException()
-    # else:
-    # return v
-
 
 class CreateEventSchema(EventSchema):
     id_creator: str
