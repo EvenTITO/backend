@@ -26,9 +26,8 @@ def test_create_user(client):
 
 def test_create_same_email_fails(client, user_data):
     new_user_same_email = user_data.copy()
-    new_user_same_email['id'] = "other-id"
-    response = client.post(
-        "/users/", json=new_user_same_email)
+    new_user_same_email["id"] = "other-id"
+    response = client.post("/users/", json=new_user_same_email)
 
     print("test_create_same_email_fails:", response.json())
 
@@ -37,7 +36,7 @@ def test_create_same_email_fails(client, user_data):
 
 
 def test_create_same_user_twice_fails(client, user_data):
-    user_data['email'] = "other-email@email.com"
+    user_data["email"] = "other-email@email.com"
     response = client.post("/users/", json=user_data)
 
     assert response.status_code == 409
@@ -70,7 +69,7 @@ def test_create_invalid_email_fails(client):
 def test_get_user(client, user_data):
     response = client.get(f"/users/{user_data['id']}")
     assert response.status_code == 200
-    assert response.json()["name"] == user_data['name']
+    assert response.json()["name"] == user_data["name"]
 
 
 def test_get_user_not_exists_fails(client):
@@ -86,22 +85,22 @@ def test_get_user_not_exists_fails(client):
 
 def test_put_user(client, user_data):
     update_user_data = user_data.copy()
-    update_user_data['name'] = "new name"
-    update_user_data['surname'] = "new surname"
+    update_user_data["name"] = "new name"
+    update_user_data["surname"] = "new surname"
 
     response = client.put("/users/", json=update_user_data)
     print(response.json())
     assert response.status_code == 200
-    assert response.json()["name"] == update_user_data['name']
-    assert response.json()["surname"] == update_user_data['surname']
+    assert response.json()["name"] == update_user_data["name"]
+    assert response.json()["surname"] == update_user_data["surname"]
 
 
 def test_put_user_not_exists(client, user_data):
     user_changes = user_data.copy()
     different_id = "this-id-does-not-exist"
     new_surname = "Rocuzzo"
-    user_changes['id'] = different_id
-    user_changes['surname'] = new_surname
+    user_changes["id"] = different_id
+    user_changes["surname"] = new_surname
     response = client.put("/users/", json=user_changes)
     assert response.status_code == 404
 
@@ -110,7 +109,7 @@ def test_put_user_not_exists(client, user_data):
 
 
 def test_delete_user(client, user_data):
-    id = user_data['id']
+    id = user_data["id"]
     response = client.delete(f"/users/{id}")
     assert response.status_code == 200
     get_response = client.get(f"/users/{id}")

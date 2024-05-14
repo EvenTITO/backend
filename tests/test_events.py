@@ -15,7 +15,7 @@ def test_post_event(client, user_data):
         end_date=datetime(2024, 9, 3),
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
-        id_creator=user_data['id'],
+        id_creator=user_data["id"],
     )
     response = client.post("/events/", json=jsonable_encoder(new_event))
     assert response.status_code == 200

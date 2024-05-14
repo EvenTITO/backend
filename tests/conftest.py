@@ -32,7 +32,10 @@ def client():
 @pytest.fixture(scope="function")
 def user_data(client):
     new_user = UserSchema(
-        id="iuaealdasldanfasdlasd", name="Lio", surname="Messi", email="lio_messi@email.com"
+        id="iuaealdasldanfasdlasd",
+        name="Lio",
+        surname="Messi",
+        email="lio_messi@email.com",
     )
     response = client.post("/users/", json=jsonable_encoder(new_user))
     return response.json()
