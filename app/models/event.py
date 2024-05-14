@@ -1,8 +1,10 @@
+from datetime import datetime
+from app.utils.exceptions import DatesException
 from sqlalchemy import Column, String, Date, ForeignKey
 from app.database.database import Base
 from .models_utils import ModelTemplate
 from enum import Enum
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, validates
 
 
 class EventStatus(str, Enum):
@@ -27,6 +29,22 @@ class EventModel(ModelTemplate, Base):
     id_creator = Column(String, ForeignKey("users.id"))
 
     creator = relationship("UserModel", back_populates="events")
+
+    @validates("start_date")
+    def validate_start_date(self, key, start_date):
+        if datetime.now() > start_date:
+            raise DatesException()
+        else:
+            return start_date
+
+    @validates("end_date")
+    def validate_end_date(self, key, end_date):
+        if datetime.now() > end_date:
+            raise DatesException()
+        elif self.start_date and end_date <= self.start_date:
+            raise DatesException()
+        else:
+            return end_date
 
     def __repr__(self):
         return f"Event({self.id})"

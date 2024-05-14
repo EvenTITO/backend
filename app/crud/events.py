@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.event import EventModel
 from app.models.event_organizer import EventOrganizerModel
 from app.schemas.events import EventSchema, CreateEventSchema
+from app.utils.exceptions import DatesException
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from fastapi import HTTPException
 import logging
@@ -9,7 +10,7 @@ import logging
 EVENT_NOT_FOUND = "Event not found"
 ID_ALREADY_EXISTS = "Id already exists"
 TITLE_ALREADY_EXISTS = "Title of event already exists"
-CREATOR_NOT_EXISTS = "The Creator does not exist "
+CREATOR_NOT_EXISTS = "The Creator does not exist"
 
 
 def handle_database_event_error(handler):
@@ -28,6 +29,8 @@ def handle_database_event_error(handler):
                 raise HTTPException(status_code=409, detail="Unexpected")
         except NoResultFound:
             raise HTTPException(status_code=404, detail=EVENT_NOT_FOUND)
+        except DatesException as e:
+            raise HTTPException(status_code=400, detail=e.error_message)
 
     return wrapper
 

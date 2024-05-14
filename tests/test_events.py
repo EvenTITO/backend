@@ -40,29 +40,29 @@ def test_post_event_invalid_creator(client):
     assert response.json()["detail"] == CREATOR_NOT_EXISTS
 
 
-# def test_post_event_invalid_end_date():
-#     end_date_in_the_past = CreateEventSchema(
-#         title="Event Title",
-#         start_date="2023-09-02",
-#         end_date="2023-09-04",
-#         description="This is a nice event",
-#         event_type=EventType.CONFERENCE,
-#         id_creator=event_creator.id
-#     )
-#     response = client.post("/events/",
-#                            json=jsonable_encoder(end_date_in_the_past))
-#     assert response.status_code == 422
+def test_post_event_past_dates_fails(client, user_data):
+    end_date_in_the_past = CreateEventSchema(
+        title="Event Title",
+        start_date="2023-09-02",
+        end_date="2023-09-04",
+        description="This is a nice event",
+        event_type=EventType.CONFERENCE,
+        id_creator=user_data["id"]
+    )
+    response = client.post("/events/",
+                           json=jsonable_encoder(end_date_in_the_past))
+    assert response.status_code == 400
 
 
-# def test_post_event_invalid_dates():
-#     end_date_before_start_date = CreateEventSchema(
-#         title="Event Title",
-#         start_date="2024-09-02",
-#         end_date="2024-09-01",
-#         description="This is a nice event",
-#         event_type=EventType.CONFERENCE,
-#         id_creator=event_creator.id
-#     )
-#     response = client.post("/events/",
-#                            json=jsonable_encoder(end_date_before_start_date))
-#     assert response.status_code == 422
+def test_post_event_start_date_gt_end_date_fails(client, user_data):
+    end_date_in_the_past = CreateEventSchema(
+        title="Event Title",
+        start_date="2024-09-02",
+        end_date="2024-09-01",
+        description="This is a nice event",
+        event_type=EventType.CONFERENCE,
+        id_creator=user_data["id"]
+    )
+    response = client.post("/events/",
+                           json=jsonable_encoder(end_date_in_the_past))
+    assert response.status_code == 400
