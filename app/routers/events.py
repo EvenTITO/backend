@@ -1,7 +1,10 @@
 from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.crud import events
-from app.schemas.events import EventSchema, CreateEventSchema, ModifyEventSchema, ReplyEventSchema
+from app.schemas.events import (
+    EventSchema, CreateEventSchema,
+    ModifyEventSchema, ReplyEventSchema
+)
 from fastapi import APIRouter, Depends
 
 
