@@ -12,7 +12,10 @@ from app.crud.users import (
 
 def test_create_user(client):
     user_data = UserSchema(
-        id="aasjdfvhasdvnlaksdj", name="Lio", surname="Messi", email="email@email.com"
+        id="aasjdfvhasdvnlaksdj",
+        name="Lio",
+        surname="Messi",
+        email="email@email.com"
     )
     response = client.post("/users/", json=jsonable_encoder(user_data))
     assert response.status_code == 200

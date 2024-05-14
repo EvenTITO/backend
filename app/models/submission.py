@@ -20,4 +20,7 @@ class SubmissionModel(Base):
     comments = Column(String)
 
     def __repr__(self):
-        return f"Submission(reviewer: {self.id_reviewer}" f" | event: {self.id_event})"
+        return (
+            f"Submission(reviewer: {self.id_reviewer}"
+            f" | event: {self.id_event})"
+        )

@@ -1,5 +1,4 @@
-from typing import Any
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 from datetime import datetime
 from app.models.event import EventType
 
@@ -36,7 +35,7 @@ class EventSchema(BaseModel):
     #     ):
     #         raise ValueError('You must set both dates')
     #     elif end_date < start_date:
-    #         raise ValueError('end date should be equal or greater than start date')
+    #         raise ValueError('')
     #     else:
     #         return v
 

@@ -16,4 +16,7 @@ class ReviewModel(Base):
     work_state = Column(String)  # Approved, Waiting for Review, ...
 
     def __repr__(self):
-        return f"AcademicWork(work_id: {self.work_id}" f" | event: {self.id_event})"
+        return (
+            f"AcademicWork(work_id: {self.work_id}"
+            f" | event: {self.id_event})"
+        )

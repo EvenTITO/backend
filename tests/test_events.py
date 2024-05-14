@@ -1,4 +1,3 @@
-from app.schemas.users import UserSchema
 from app.schemas.events import CreateEventSchema
 from fastapi.encoders import jsonable_encoder
 from app.models.event import EventType

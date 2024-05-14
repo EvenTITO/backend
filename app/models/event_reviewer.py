@@ -15,5 +15,6 @@ class EventReviewerModel(Base):
 
     def __repr__(self):
         return (
-            f"EventReviewer(reviewer: {self.id_reviewer}" f" | event: {self.id_event})"
+            f"EventReviewer(reviewer: {self.id_reviewer}"
+            f" | event: {self.id_event})"
         )

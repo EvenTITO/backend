@@ -1,10 +1,7 @@
 from sqlalchemy import Column, String, Date, ForeignKey
 from app.database.database import Base
 from .models_utils import ModelTemplate
-from app.models.user import UserModel
 from enum import Enum
-from datetime import datetime
-import uuid
 from sqlalchemy.orm import relationship
 
 
