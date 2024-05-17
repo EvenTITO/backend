@@ -29,6 +29,7 @@ class EventModel(ModelTemplate, Base):
     id_creator = Column(String, ForeignKey("users.id"))
 
     creator = relationship("UserModel", back_populates="events")
+    suscriptions = relationship("SuscriptionModel", back_populates="event")
 
     @validates("start_date")
     def validate_start_date(self, key, start_date):

@@ -13,6 +13,8 @@ class UserModel(ModelTemplate, Base):
     surname = Column(String, nullable=False)
 
     events = relationship("EventModel", back_populates="creator")
+    suscriptions = relationship(
+        "SuscriptionModel", back_populates="suscriptor")
 
     def __repr__(self):
         return f"User({self.id})"

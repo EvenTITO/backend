@@ -1,3 +1,4 @@
+from app.schemas.suscriptions import SuscriptionSchema, UserSuscription
 import pytest
 from app.models.event import EventType
 from app.schemas.events import CreateEventSchema
@@ -55,4 +56,13 @@ def event_data(client, user_data):
     )
 
     response = client.post("/events/", json=jsonable_encoder(new_event))
+    return response.json()
+
+
+@pytest.fixture(scope="function")
+def suscription_data(client, user_data, event_data):
+    id_event = event_data['id']
+    user_suscription = UserSuscription(id=user_data['id'])
+    response = client.post(
+        f"/events/{id_event}/suscription", json=jsonable_encoder(user_suscription))
     return response.json()
