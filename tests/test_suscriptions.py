@@ -13,7 +13,7 @@ def test_post_suscription(client, user_data, event_data):
     id_event = event_data['id']
     user_suscription = UserSuscription(id=user_data['id'])
     response = client.post(
-        f"/events/{id_event}/suscription",
+        f"/suscriptions/{id_event}/",
         json=jsonable_encoder(user_suscription)
     )
     assert response.status_code == 200
@@ -32,7 +32,7 @@ def test_post_suscription_without_event_fails(
 
     user_suscription = UserSuscription(id=user_data['id'])
     response = client.post(
-        f"/events/{id_event}/suscription",
+        f"/suscriptions/{id_event}/",
         json=jsonable_encoder(user_suscription)
     )
     assert response.status_code == 409
@@ -43,7 +43,7 @@ def test_post_suscription_without_user_fails(client, event_data):
     id_event = event_data['id']
     user_suscription = UserSuscription(id="user-does-not-exists")
     response = client.post(
-        f"/events/{id_event}/suscription",
+        f"/suscriptions/{id_event}/",
         json=jsonable_encoder(user_suscription)
     )
     assert response.status_code == 409
@@ -55,5 +55,5 @@ def test_post_suscription_without_user_fails(client, event_data):
 
 def test_get_suscription(client, suscription_data):
     id_event = suscription_data['id_event']
-    response = client.get(f"/events/{id_event}/suscriptions")
+    response = client.get(f"/suscriptions/{id_event}/")
     assert response.status_code == 200

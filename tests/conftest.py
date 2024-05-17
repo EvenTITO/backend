@@ -64,7 +64,7 @@ def suscription_data(client, user_data, event_data):
     id_event = event_data['id']
     user_suscription = UserSuscription(id=user_data['id'])
     response = client.post(
-        f"/events/{id_event}/suscription",
+        f"/suscriptions/{id_event}/",
         json=jsonable_encoder(user_suscription)
     )
     return response.json()
