@@ -3,7 +3,10 @@ from sqlalchemy.orm import Session
 from app.models.event import EventModel
 from app.models.event_organizer import EventOrganizerModel
 from app.schemas.events import CreateEventSchema, ModifyEventSchema
-from app.schemas.suscriptions import GetSuscriptionReplySchema, SuscriptionSchema
+from app.schemas.suscriptions import (
+    GetSuscriptionReplySchema,
+    SuscriptionSchema
+)
 from app.utils.exceptions import DatesException
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from fastapi import HTTPException

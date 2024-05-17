@@ -1,4 +1,4 @@
-from app.schemas.suscriptions import SuscriptionSchema, UserSuscription
+from app.schemas.suscriptions import UserSuscription
 import pytest
 from app.models.event import EventType
 from app.schemas.events import CreateEventSchema
@@ -64,5 +64,7 @@ def suscription_data(client, user_data, event_data):
     id_event = event_data['id']
     user_suscription = UserSuscription(id=user_data['id'])
     response = client.post(
-        f"/events/{id_event}/suscription", json=jsonable_encoder(user_suscription))
+        f"/events/{id_event}/suscription",
+        json=jsonable_encoder(user_suscription)
+    )
     return response.json()
