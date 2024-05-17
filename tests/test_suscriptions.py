@@ -4,6 +4,8 @@ from fastapi.encoders import jsonable_encoder
 from app.crud.events import EVENT_NOT_FOUND, USER_NOT_FOUNT
 
 
+PAYMENT_INCOMPLETED = SuscriptionStatus.PAYMENT_INCOMPLETED.value
+
 # ------------------------------- POST TESTS ------------------------------- #
 
 
@@ -19,8 +21,7 @@ def test_post_suscription(client, user_data, event_data):
     response_data = response.json()
     assert response_data["id_event"] == id_event
     assert response_data["id_suscriptor"] == user_data['id']
-    payment_incompleted = SuscriptionStatus.PAYMENT_INCOMPLETED.value
-    assert response_data["status"] == payment_incompleted
+    assert response_data["status"] == PAYMENT_INCOMPLETED
 
 
 def test_post_suscription_without_event_fails(
