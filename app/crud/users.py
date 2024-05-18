@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from ..models.user import UserModel
-from app.schemas.users import UserSchema
+from app.schemas.users import UserSchemaWithId
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from fastapi import HTTPException
 
@@ -45,7 +45,7 @@ def get_user_by_email(db: Session, email: str):
 
 
 @handle_database_user_error
-def create_user(db: Session, user: UserSchema):
+def create_user(db: Session, user: UserSchemaWithId):
     db_user = UserModel(**user.model_dump())
     db.add(db_user)
     db.commit()
@@ -54,7 +54,7 @@ def create_user(db: Session, user: UserSchema):
 
 
 @handle_database_user_error
-def update_user(db: Session, user_updated: UserSchema):
+def update_user(db: Session, user_updated: UserSchemaWithId):
     db_user = get_user(db, user_updated.id)
     for attr, value in user_updated.model_dump().items():
         setattr(db_user, attr, value)

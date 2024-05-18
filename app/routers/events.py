@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
-from app.database.database import get_db
+from app.utils.dependencies import get_db, get_user_id
 from app.crud import events
 from app.schemas.events import (
     EventSchema, CreateEventSchema,
-    ModifyEventSchema, ReplyEventSchema
+    ModifyEventSchema, EventSchemaWithEventId
 )
 from fastapi import APIRouter, Depends
 
@@ -11,19 +11,33 @@ from fastapi import APIRouter, Depends
 router = APIRouter(prefix="/events", tags=["Events"])
 
 
-@router.post("/", response_model=ReplyEventSchema)
-def create_event(event: CreateEventSchema, db: Session = Depends(get_db)):
-    return events.create_event(db=db, event=event)
+@router.post("/", response_model=EventSchemaWithEventId)
+def create_event(
+    event: EventSchema,
+    creator_id: str = Depends(get_user_id),
+    db: Session = Depends(get_db)
+):
+    event_with_creator_id = CreateEventSchema(
+        **event.dict(),
+        id_creator=creator_id
+    )
+    db_event = events.create_event(db=db, event=event_with_creator_id)
+    return db_event
 
 
-@router.get("/{event_id}", response_model=EventSchema)
+@router.get("/{event_id}", response_model=EventSchemaWithEventId)
 def read_event(event_id: str, db: Session = Depends(get_db)):
     return events.get_event(db=db, event_id=event_id)
 
 
-@router.put("/", response_model=EventSchema)
-def update_event(event: ModifyEventSchema, db: Session = Depends(get_db)):
-    return events.update_event(db=db, event_updated=event)
+@router.put("/", response_model=EventSchemaWithEventId)
+def update_event(
+    event: EventSchemaWithEventId,
+    modifier_id: str = Depends(get_user_id),
+    db: Session = Depends(get_db)
+):
+    event_updated = ModifyEventSchema(**event.dict(), id_modifier=modifier_id)
+    return events.update_event(db=db, event_updated=event_updated)
 
 
 @router.delete("/{event_id}", response_model=EventSchema)

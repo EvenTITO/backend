@@ -5,7 +5,7 @@ from app.schemas.suscriptions import (
     UserSuscription
 )
 from sqlalchemy.orm import Session
-from app.database.database import get_db
+from app.utils.dependencies import get_db
 from app.crud import suscriptions
 from fastapi import APIRouter, Depends
 

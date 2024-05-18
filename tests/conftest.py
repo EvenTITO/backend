@@ -5,7 +5,7 @@ from app.schemas.events import CreateEventSchema
 from fastapi.testclient import TestClient
 from fastapi.encoders import jsonable_encoder
 from app.database.database import SessionLocal, engine
-from app.database.database import get_db
+from app.utils.dependencies import get_db
 from app.schemas.users import UserSchema
 from app.main import app
 

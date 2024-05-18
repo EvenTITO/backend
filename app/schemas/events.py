@@ -34,5 +34,20 @@ class ModifyEventSchema(EventSchema):
     id: str
 
 
-class ReplyEventSchema(CreateEventSchema):
+class EventSchemaWithEventId(EventSchema):
     id: str
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "id": "...",
+                    "title": "CONGRESO DE QUIMICA",
+                    "start_date": datetime(2024, 8, 1),
+                    "end_date": datetime(2024, 8, 3),
+                    "description": "Evento en FIUBA",
+                    "event_type": EventType.CONFERENCE,
+                }
+            ]
+        }
+    }

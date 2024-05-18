@@ -5,7 +5,18 @@ from app.database.database import Base, engine
 
 Base.metadata.create_all(engine)
 
-app = FastAPI()
+app = FastAPI(
+    title="Backend API",
+    description="Backend for EvenTITO",
+    version="0.0.1",
+    contact={
+        "name": "EvenTITO",
+        "email": "eventito@gmail.com",
+    },
+    license_info={
+        "name": "MIT",
+    },
+)
 
 
 origins = [

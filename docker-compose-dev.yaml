@@ -1,7 +1,7 @@
 version: '3.9'
 services:
-  users:
-    image: users:latest
+  backend:
+    image: backend:latest
     environment:
       - RUN_MODE=DEV
       - PORT=12345
