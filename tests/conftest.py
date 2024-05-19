@@ -1,7 +1,7 @@
 from app.schemas.suscriptions import UserSuscription
 import pytest
 from app.models.event import EventType
-from app.schemas.events import CreateEventSchema
+from app.schemas.events import EventSchema
 from fastapi.testclient import TestClient
 from fastapi.encoders import jsonable_encoder
 from app.database.database import SessionLocal, engine
@@ -48,7 +48,7 @@ def user_data(client):
 
 @pytest.fixture(scope="function")
 def event_data(client, user_data):
-    new_event = CreateEventSchema(
+    new_event = EventSchema(
         title="Event Title",
         start_date="2024-09-02",
         end_date="2024-09-04",

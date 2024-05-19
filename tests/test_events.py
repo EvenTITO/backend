@@ -1,22 +1,23 @@
-from app.schemas.events import CreateEventSchema
+from app.schemas.events import EventSchema
 from fastapi.encoders import jsonable_encoder
 from app.models.event import EventType
 from app.crud.events import CREATOR_NOT_EXISTS, EVENT_NOT_FOUND
 from datetime import datetime
+from .common import create_headers
 
 # ------------------------------- POST TESTS ------------------------------- #
 
 
 def test_post_event(client, user_data):
-    new_event = CreateEventSchema(
+    new_event = EventSchema(
         title="Event Title",
         start_date=datetime(2024, 9, 2),
         end_date=datetime(2024, 9, 3),
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
-        id_creator=user_data["id"],
     )
-    response = client.post("/events/", json=jsonable_encoder(new_event))
+    response = client.post("/events/", json=jsonable_encoder(new_event),
+                           headers=create_headers(user_data["id"]))
     assert response.status_code == 200
 
     response_data = response.json()
@@ -24,47 +25,47 @@ def test_post_event(client, user_data):
 
 
 def test_post_event_invalid_creator(client):
-    invalid_creator_event = CreateEventSchema(
+    invalid_creator_event = EventSchema(
         title="Another Event Title",
         start_date=datetime(2024, 9, 2),
         end_date=datetime(2024, 9, 3),
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
-        id_creator="bocaaaa",
     )
 
-    response = client.post(
-        "/events/", json=jsonable_encoder(invalid_creator_event))
+    response = client.post("/events/",
+                           json=jsonable_encoder(invalid_creator_event),
+                           headers=create_headers('invalid-creator-id'))
     print(response.json())
     assert response.status_code == 409
     assert response.json()["detail"] == CREATOR_NOT_EXISTS
 
 
 def test_post_event_past_dates_fails(client, user_data):
-    end_date_in_the_past = CreateEventSchema(
+    end_date_in_the_past = EventSchema(
         title="Event Title",
         start_date="2023-09-02",
         end_date="2023-09-04",
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
-        id_creator=user_data["id"]
     )
     response = client.post("/events/",
-                           json=jsonable_encoder(end_date_in_the_past))
+                           json=jsonable_encoder(end_date_in_the_past),
+                           headers=create_headers(user_data["id"]))
     assert response.status_code == 400
 
 
 def test_post_event_start_date_gt_end_date_fails(client, user_data):
-    end_date_in_the_past = CreateEventSchema(
+    end_date_in_the_past = EventSchema(
         title="Event Title",
         start_date="2024-09-02",
         end_date="2024-09-01",
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
-        id_creator=user_data["id"]
     )
     response = client.post("/events/",
-                           json=jsonable_encoder(end_date_in_the_past))
+                           json=jsonable_encoder(end_date_in_the_past),
+                           headers=create_headers(user_data["id"]))
     assert response.status_code == 400
 
 
