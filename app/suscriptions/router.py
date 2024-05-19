@@ -1,18 +1,21 @@
-from app.schemas.suscriptions import (
+from .schemas import (
     GetSuscriptionReplySchema,
     SuscriptionReplySchema,
     SuscriptionSchema
 )
 from sqlalchemy.orm import Session
 from app.utils.dependencies import SessionDep, CallerIdDep
-from app.crud import suscriptions
+from app.suscriptions import crud
 from fastapi import APIRouter
 
 
-router = APIRouter(prefix="/suscriptions", tags=["Suscriptions"])
+suscriptions_router = APIRouter(prefix="/suscriptions", tags=["Suscriptions"])
 
 
-@router.post("/{event_id}/", response_model=SuscriptionReplySchema)
+@suscriptions_router.post(
+    "/{event_id}/",
+    response_model=SuscriptionReplySchema
+)
 def create_suscription(
     event_id: str,
     caller_id: str = CallerIdDep,
@@ -21,11 +24,11 @@ def create_suscription(
     suscription_schema = SuscriptionSchema(
         id_event=event_id, id_suscriptor=caller_id
     )
-    return suscriptions.suscribe_user_to_event(db, suscription_schema)
+    return crud.suscribe_user_to_event(db, suscription_schema)
 
 
-@router.get(
+@suscriptions_router.get(
     "/{event_id}/", response_model=GetSuscriptionReplySchema
 )
 def read_suscriptions(event_id: str, db: Session = SessionDep):
-    return suscriptions.read_event_suscriptions(db, event_id)
+    return crud.read_event_suscriptions(db, event_id)

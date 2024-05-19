@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
-from app.models.event import EventModel
-from app.models.event_organizer import EventOrganizerModel
-from app.schemas.events import (
+from .model import EventModel
+from .schemas import (
     CreateEventSchema,
     ModifyEventSchema,
     PublicEventsSchema
@@ -63,10 +62,10 @@ def create_event(db: Session, event: CreateEventSchema) -> EventModel:
     db.add(db_event)
     db.flush()
 
-    organizer = EventOrganizerModel(
-        id_organizer=event.id_creator, id_event=db_event.id
-    )
-    db.add(organizer)
+    # organizer = EventOrganizerModel(
+    #     id_organizer=event.id_creator, id_event=db_event.id
+    # )
+    # db.add(organizer)
     db.commit()
     db.refresh(db_event)
     return db_event

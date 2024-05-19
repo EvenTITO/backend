@@ -1,5 +1,5 @@
-from app.models.suscriptions import SuscriptionStatus
-from app.crud.events import EVENT_NOT_FOUND, USER_NOT_FOUNT
+from app.suscriptions.model import SuscriptionStatus
+from app.events.crud import EVENT_NOT_FOUND, USER_NOT_FOUNT
 from .common import create_headers
 
 

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from ..models.user import UserModel
-from app.schemas.users import UserSchemaWithId
+from .model import UserModel
+from .schemas import UserSchemaWithId
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from fastapi import HTTPException
 

@@ -1,7 +1,7 @@
-from app.schemas.events import EventSchema
+from app.events.schemas import EventSchema
 from fastapi.encoders import jsonable_encoder
-from app.models.event import EventType
-from app.crud.events import CREATOR_NOT_EXISTS, EVENT_NOT_FOUND
+from app.events.model import EventType
+from app.events.crud import CREATOR_NOT_EXISTS, EVENT_NOT_FOUND
 from datetime import datetime
 from .common import create_headers
 

@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List
 from datetime import datetime
-from app.models.event import EventType
+from .model import EventType
 
 
 class EventSchema(BaseModel):

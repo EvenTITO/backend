@@ -1,6 +1,6 @@
-from app.models.suscriptions import SuscriptionModel
+from .model import SuscriptionModel
 from sqlalchemy.orm import Session
-from app.schemas.suscriptions import (
+from .schemas import (
     GetSuscriptionReplySchema,
     SuscriptionSchema
 )

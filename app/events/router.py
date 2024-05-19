@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.utils.dependencies import SessionDep, CallerIdDep
-from app.crud import events
-from app.schemas.events import (
+from app.events import crud
+from .schemas import (
     EventSchema, CreateEventSchema,
     ModifyEventSchema, EventSchemaWithEventId,
     PublicEventsSchema
@@ -9,10 +9,10 @@ from app.schemas.events import (
 from fastapi import APIRouter, Query
 
 
-router = APIRouter(prefix="/events", tags=["Events"])
+events_router = APIRouter(prefix="/events", tags=["Events"])
 
 
-@router.post("/", response_model=EventSchemaWithEventId)
+@events_router.post("/", response_model=EventSchemaWithEventId)
 def create_event(
     event: EventSchema,
     caller_id: str = CallerIdDep,
@@ -22,25 +22,25 @@ def create_event(
         **event.model_dump(),
         id_creator=caller_id
     )
-    db_event = events.create_event(db=db, event=event_with_creator_id)
+    db_event = crud.create_event(db=db, event=event_with_creator_id)
     return db_event
 
 
-@router.get("/{event_id}", response_model=EventSchemaWithEventId)
+@events_router.get("/{event_id}", response_model=EventSchemaWithEventId)
 def read_event(event_id: str, db: Session = SessionDep):
-    return events.get_event(db=db, event_id=event_id)
+    return crud.get_event(db=db, event_id=event_id)
 
 
-@router.get("/", response_model=PublicEventsSchema)
+@events_router.get("/", response_model=PublicEventsSchema)
 def read_all_events(
     db: Session = SessionDep,
     offset: int = 0,
     limit: int = Query(default=100, le=100)
 ):
-    return events.get_all_events(db=db, offset=offset, limit=limit)
+    return crud.get_all_events(db=db, offset=offset, limit=limit)
 
 
-@router.put("/", response_model=EventSchemaWithEventId)
+@events_router.put("/", response_model=EventSchemaWithEventId)
 def update_event(
     event: EventSchemaWithEventId,
     caller_id: str = CallerIdDep,
@@ -49,9 +49,9 @@ def update_event(
     event_updated = ModifyEventSchema(
         **event.model_dump(), id_modifier=caller_id
     )
-    return events.update_event(db=db, event_updated=event_updated)
+    return crud.update_event(db=db, event_updated=event_updated)
 
 
-@router.delete("/{event_id}", response_model=EventSchema)
+@events_router.delete("/{event_id}", response_model=EventSchema)
 def delete_event(event_id: str, db: Session = SessionDep):
-    return events.delete_event(db=db, event_id=event_id)
+    return crud.delete_event(db=db, event_id=event_id)

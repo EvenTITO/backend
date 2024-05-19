@@ -2,7 +2,7 @@ from datetime import datetime
 from app.utils.exceptions import DatesException
 from sqlalchemy import Column, String, Date, ForeignKey
 from app.database.database import Base
-from .models_utils import ModelTemplate
+from app.utils.models_utils import ModelTemplate
 from enum import Enum
 from sqlalchemy.orm import relationship, validates
 

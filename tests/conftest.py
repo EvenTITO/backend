@@ -1,11 +1,11 @@
 import pytest
-from app.models.event import EventType
-from app.schemas.events import EventSchema
+from app.events.model import EventType
+from app.events.schemas import EventSchema
 from fastapi.testclient import TestClient
 from fastapi.encoders import jsonable_encoder
 from app.database.database import SessionLocal, engine
 from app.utils.dependencies import get_db
-from app.schemas.users import UserSchema
+from app.users.schemas import UserSchema
 from app.main import app
 from .common import create_headers, EVENTS
 
