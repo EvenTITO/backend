@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=UserSchema)
+@router.post("/", response_model=UserSchemaWithId)
 def create_user(
     user: UserSchema,
     db: Session = Depends(get_db),
@@ -25,7 +25,7 @@ def create_user(
     return users.create_user(db=db, user=user_with_id)
 
 
-@router.get("/{user_id}", response_model=UserSchema)
+@router.get("/{user_id}", response_model=UserSchemaWithId)
 def read_user(
     user_id: str,
     db: Session = Depends(get_db)
@@ -33,7 +33,7 @@ def read_user(
     return users.get_user(db, user_id=user_id)
 
 
-@router.put("/", response_model=UserSchema)
+@router.put("/", response_model=UserSchemaWithId)
 def update_user(
     user: UserSchema,
     db: Session = Depends(get_db),
@@ -46,7 +46,7 @@ def update_user(
     return users.update_user(db=db, user_updated=user_with_id)
 
 
-@router.delete("/{user_id}", response_model=UserSchema)
+@router.delete("/{user_id}", response_model=UserSchemaWithId)
 def delete_user(
     user_id: str,
     db: Session = Depends(get_db)

@@ -8,6 +8,7 @@ from app.database.database import SessionLocal, engine
 from app.utils.dependencies import get_db
 from app.schemas.users import UserSchema
 from app.main import app
+from .common import create_headers
 
 
 @pytest.fixture(scope="function")
@@ -35,12 +36,13 @@ def client():
 @pytest.fixture(scope="function")
 def user_data(client):
     new_user = UserSchema(
-        id="iuaealdasldanfasdlasd",
         name="Lio",
         surname="Messi",
         email="lio_messi@email.com",
     )
-    response = client.post("/users/", json=jsonable_encoder(new_user))
+    response = client.post("/users/",
+                           json=jsonable_encoder(new_user),
+                           headers=create_headers("iuaealdasldanfasdlasd"))
     return response.json()
 
 
@@ -51,11 +53,12 @@ def event_data(client, user_data):
         start_date="2024-09-02",
         end_date="2024-09-04",
         description="This is a nice event",
-        event_type=EventType.CONFERENCE,
-        id_creator=user_data["id"]
+        event_type=EventType.CONFERENCE
     )
+    response = client.post("/events/",
+                           json=jsonable_encoder(new_event),
+                           headers=create_headers(user_data["id"]))
 
-    response = client.post("/events/", json=jsonable_encoder(new_event))
     return response.json()
 
 
