@@ -1,4 +1,5 @@
-from fastapi import Header, HTTPException
+from typing import Annotated
+from fastapi import Header, HTTPException, Depends
 from app.database.database import SessionLocal
 
 
@@ -14,3 +15,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+SessionDep = Depends(get_db)
+CallerIdDep = Depends(get_user_id)

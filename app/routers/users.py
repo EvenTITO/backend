@@ -1,22 +1,22 @@
 from sqlalchemy.orm import Session
-from app.utils.dependencies import get_db, get_user_id
+from app.utils.dependencies import SessionDep, CallerIdDep
 from app.crud import users
 from app.schemas.users import UserSchema, UserSchemaWithId
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
 
 router = APIRouter(
     prefix="/users",
     tags=["Users"],
-    dependencies=[Depends(get_user_id), Depends(get_db)]
+    dependencies=[SessionDep, CallerIdDep]
 )
 
 
 @router.post("/", response_model=UserSchemaWithId)
 def create_user(
     user: UserSchema,
-    db: Session = Depends(get_db),
-    user_id: str = Depends(get_user_id)
+    db: Session = SessionDep,
+    user_id: str = CallerIdDep
 ):
     user_with_id = UserSchemaWithId(
         **user.model_dump(),
@@ -28,7 +28,7 @@ def create_user(
 @router.get("/{user_id}", response_model=UserSchemaWithId)
 def read_user(
     user_id: str,
-    db: Session = Depends(get_db)
+    db: Session = SessionDep
 ):
     return users.get_user(db, user_id=user_id)
 
@@ -36,8 +36,8 @@ def read_user(
 @router.put("/", response_model=UserSchemaWithId)
 def update_user(
     user: UserSchema,
-    db: Session = Depends(get_db),
-    user_id: str = Depends(get_user_id)
+    db: Session = SessionDep,
+    user_id: str = CallerIdDep
 ):
     user_with_id = UserSchemaWithId(
         **user.model_dump(),
@@ -49,6 +49,6 @@ def update_user(
 @router.delete("/{user_id}", response_model=UserSchemaWithId)
 def delete_user(
     user_id: str,
-    db: Session = Depends(get_db)
+    db: Session = SessionDep
 ):
     return users.delete_user(db=db, user_id=user_id)
