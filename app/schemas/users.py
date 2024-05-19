@@ -2,7 +2,6 @@ from pydantic import BaseModel, EmailStr, Field
 
 
 class UserSchema(BaseModel):
-    id: str  # TODO: add validation uuid or firebase id.
     name: str = Field(min_length=2)
     surname: str = Field(min_length=2)
     email: EmailStr
@@ -11,7 +10,6 @@ class UserSchema(BaseModel):
         "json_schema_extra": {
             "examples": [
                 {
-                    "id": "1234",
                     "name": "Pepe",
                     "surname": "Argento",
                     "email": "email@email.com",
@@ -19,3 +17,7 @@ class UserSchema(BaseModel):
             ]
         }
     }
+
+
+class UserSchemaWithId(UserSchema):
+    id: str

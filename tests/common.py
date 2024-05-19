@@ -1,18 +1,36 @@
-# from app.main import app
-# from app.database.database import engine, SessionLocal, get_db
-# from fastapi.testclient import TestClient
-
-# def override_get_db():
-#     try:
-#         connection = engine.connect()
-#         transaction = connection.begin()
-#         db = SessionLocal(bind=connection)
-#         yield db
-#     finally:
-#         db.close()
-#         transaction.rollback()
-#         connection.close()
+from app.schemas.events import EventSchema
+from app.models.event import EventType
 
 
-# client = TestClient(app)
-# app.dependency_overrides[get_db] = override_get_db
+def create_headers(user_id):
+    return {
+        "X-User-Id": user_id
+    }
+
+
+EVENTS = [
+    EventSchema(
+        title="Conferencia de química",
+        start_date="2024-09-02",
+        end_date="2024-09-04",
+        description="""
+        Conferencia donde se tratará el tema de hidrocarburos
+        """,
+        event_type=EventType.CONFERENCE
+    ),
+    EventSchema(
+        title="Maratón de proba",
+        start_date="2024-08-01",
+        end_date="2024-08-02",
+        description="Abierta para todos los estudiantes" +
+        "de la materia Probabilidad y Estadística",
+        event_type=EventType.TALK
+    ),
+    EventSchema(
+        title="Conferencia JIAFES",
+        start_date="2024-08-01",
+        end_date="2024-08-05",
+        description="Nueva edición de la conferencia",
+        event_type=EventType.CONFERENCE
+    )
+]

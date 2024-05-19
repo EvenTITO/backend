@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from ..models.user import UserModel
-from app.schemas.users import UserSchema
+from app.schemas.users import UserSchemaWithId
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from fastapi import HTTPException
 
@@ -29,9 +29,30 @@ def handle_database_user_error(handler):
     return wrapper
 
 
+def validate_user_permissions(db, caller_id, user_id=None):
+    if (user_id == caller_id and user_id is not None):
+        return
+
+    db_caller = get_user(db, caller_id)
+    if db_caller.is_superuser:
+        return
+    else:
+        raise HTTPException(
+            status_code=403,
+            detail="Not permission for this method"
+        )
+
+
 @handle_database_user_error
 def get_user(db: Session, user_id: int):
     return db.query(UserModel).filter(UserModel.id == user_id).one()
+
+
+@handle_database_user_error
+def get_user_by_id(db: Session, user_id: str, caller_id: str):
+    validate_user_permissions(db, caller_id, user_id=user_id)
+
+    return get_user(db, user_id)
 
 
 @handle_database_user_error
@@ -45,7 +66,7 @@ def get_user_by_email(db: Session, email: str):
 
 
 @handle_database_user_error
-def create_user(db: Session, user: UserSchema):
+def create_user(db: Session, user: UserSchemaWithId):
     db_user = UserModel(**user.model_dump())
     db.add(db_user)
     db.commit()
@@ -54,7 +75,7 @@ def create_user(db: Session, user: UserSchema):
 
 
 @handle_database_user_error
-def update_user(db: Session, user_updated: UserSchema):
+def update_user(db: Session, user_updated: UserSchemaWithId):
     db_user = get_user(db, user_updated.id)
     for attr, value in user_updated.model_dump().items():
         setattr(db_user, attr, value)
@@ -64,7 +85,9 @@ def update_user(db: Session, user_updated: UserSchema):
 
 
 @handle_database_user_error
-def delete_user(db: Session, user_id: str):
+def delete_user(db: Session, user_id: str, caller_id: str):
+    validate_user_permissions(db, caller_id, user_id=user_id)
+
     # check if user exists
     user = get_user(db, user_id)
     db.delete(user)
