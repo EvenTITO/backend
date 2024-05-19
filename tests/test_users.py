@@ -86,8 +86,8 @@ def test_get_user(client, user_data):
 
 
 def test_get_user_not_exists_fails(client, user_data):
-    id = "this-id-does-not-exist"
-    response = client.get(f"/users/{id}",
+    user_data['id'] = "this-id-does-not-exist"
+    response = client.get(f"/users/{user_data['id']}",
                           headers=create_headers(user_data['id']))
     print(response.json())
     assert response.status_code == 404
@@ -136,8 +136,8 @@ def test_delete_user(client, user_data):
 
 
 def test_delete_user_not_exists(client, user_data):
-    id = "this-id-does-not-exist"
-    response = client.delete(f"/users/{id}",
+    user_data['id'] = "this-id-does-not-exist"
+    response = client.delete(f"/users/{user_data['id']}",
                              headers=create_headers(user_data['id']))
 
     assert response.status_code == 404
