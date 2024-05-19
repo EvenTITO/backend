@@ -10,6 +10,3 @@ url_database = os.getenv("DATABASE_URL")
 engine = create_engine(url_database)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
-
-
-

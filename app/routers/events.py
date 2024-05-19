@@ -36,7 +36,9 @@ def update_event(
     modifier_id: str = Depends(get_user_id),
     db: Session = Depends(get_db)
 ):
-    event_updated = ModifyEventSchema(**event.model_dump(), id_modifier=modifier_id)
+    event_updated = ModifyEventSchema(
+        **event.model_dump(), id_modifier=modifier_id
+    )
     return events.update_event(db=db, event_updated=event_updated)
 
 
