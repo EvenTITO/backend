@@ -49,3 +49,12 @@ class EventModel(ModelTemplate, Base):
 
     def __repr__(self):
         return f"Event({self.id})"
+
+    def to_dict(self):
+        return {
+            "id_event": self.id,
+            "title": self.title,
+            "description": self.description,
+            "start_date": self.start_date,
+            "end_date": self.end_date
+        }

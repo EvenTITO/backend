@@ -3,7 +3,8 @@ from app.utils.dependencies import SessionDep, CallerIdDep
 from app.crud import events
 from app.schemas.events import (
     EventSchema, CreateEventSchema,
-    ModifyEventSchema, EventSchemaWithEventId
+    ModifyEventSchema, EventSchemaWithEventId,
+    PublicEventsSchema
 )
 from fastapi import APIRouter
 
@@ -28,6 +29,11 @@ def create_event(
 @router.get("/{event_id}", response_model=EventSchemaWithEventId)
 def read_event(event_id: str, db: Session = SessionDep):
     return events.get_event(db=db, event_id=event_id)
+
+
+@router.get("/", response_model=PublicEventsSchema)
+def read_all_events(db: Session = SessionDep):
+    return events.get_all_events(db=db)
 
 
 @router.put("/", response_model=EventSchemaWithEventId)

@@ -3,7 +3,8 @@ from app.models.event import EventModel
 from app.models.event_organizer import EventOrganizerModel
 from app.schemas.events import (
     CreateEventSchema,
-    ModifyEventSchema
+    ModifyEventSchema,
+    PublicEventsSchema
 )
 from app.utils.exceptions import DatesException
 from sqlalchemy.exc import IntegrityError, NoResultFound
@@ -45,13 +46,20 @@ def handle_database_event_error(handler):
 
 
 @handle_database_event_error
-def get_event(db: Session, event_id: int):
+def get_event(db: Session, event_id: str):
     return db.query(EventModel).filter(EventModel.id == event_id).one()
 
 
 @handle_database_event_error
 def get_events(db: Session, skip: int = 0, limit: int = 100):
     return db.query(EventModel).offset(skip).limit(limit).all()
+
+
+@handle_database_event_error
+def get_all_events(db: Session):
+    events = db.query(EventModel).all()
+    events_dicts = [event.to_dict() for event in events]
+    return PublicEventsSchema(events=events_dicts)
 
 
 @handle_database_event_error

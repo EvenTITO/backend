@@ -7,7 +7,7 @@ from app.database.database import SessionLocal, engine
 from app.utils.dependencies import get_db
 from app.schemas.users import UserSchema
 from app.main import app
-from .common import create_headers
+from .common import create_headers, EVENTS
 
 
 @pytest.fixture(scope="function")
@@ -59,6 +59,20 @@ def event_data(client, user_data):
                            headers=create_headers(user_data["id"]))
 
     return response.json()
+
+
+@pytest.fixture(scope="function")
+def all_events_data(client, user_data):
+    responses = []
+    for event in EVENTS:
+        response = client.post(
+            "/events",
+            json=jsonable_encoder(event),
+            headers=create_headers(user_data["id"])
+        )
+        responses.append(response.json())
+
+    return responses
 
 
 @pytest.fixture(scope="function")

@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
+from typing import List
 from datetime import datetime
 from app.models.event import EventType
 
@@ -51,3 +52,9 @@ class EventSchemaWithEventId(EventSchema):
             ]
         }
     }
+
+
+class PublicEventsSchema(BaseModel):
+    events: List[dict]
+
+    model_config = ConfigDict(from_attributes=True)

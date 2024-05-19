@@ -86,6 +86,14 @@ def test_get_event_not_exists_fails(client):
     assert response.json()["detail"] == EVENT_NOT_FOUND
 
 
+def test_get_all_events(client, all_events_data):
+    _ = all_events_data
+    response = client.get("/events/")
+
+    assert response.status_code == 200
+    assert len(response.json()["events"]) == 3
+
+
 # ------------------------------- PUT TESTS ------------------------------- #
 
 def test_put_event(client, user_data, event_data):
