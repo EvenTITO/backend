@@ -1,4 +1,3 @@
-from app.utils.authorization import validate_caller
 from sqlalchemy.orm import Session
 from app.utils.dependencies import SessionDep, CallerIdDep
 from app.crud import users
@@ -32,19 +31,22 @@ def read_user(
     caller_id: str = CallerIdDep,
     db: Session = SessionDep
 ):
-    validate_caller(user_id, caller_id)
-    return users.get_user(db, user_id=user_id)
+    return users.get_user_by_id(
+        db,
+        user_id=user_id,
+        caller_id=caller_id
+    )
 
 
 @router.put("/", response_model=UserSchemaWithId)
 def update_user(
     user: UserSchema,
-    user_id: str = CallerIdDep,
+    caller_id: str = CallerIdDep,
     db: Session = SessionDep
 ):
     user_with_id = UserSchemaWithId(
         **user.model_dump(),
-        id=user_id
+        id=caller_id
     )
     return users.update_user(db=db, user_updated=user_with_id)
 
@@ -55,5 +57,4 @@ def delete_user(
     caller_id: str = CallerIdDep,
     db: Session = SessionDep
 ):
-    validate_caller(user_id, caller_id)
-    return users.delete_user(db=db, user_id=user_id)
+    return users.delete_user(db=db, user_id=user_id, caller_id=caller_id)
