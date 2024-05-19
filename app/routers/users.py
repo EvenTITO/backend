@@ -19,7 +19,7 @@ def create_user(
     user_id: str = Depends(get_user_id)
 ):
     user_with_id = UserSchemaWithId(
-        **user.dict(),
+        **user.model_dump(),
         id=user_id
     )
     return users.create_user(db=db, user=user_with_id)
@@ -40,7 +40,7 @@ def update_user(
     user_id: str = Depends(get_user_id)
 ):
     user_with_id = UserSchemaWithId(
-        **user.dict(),
+        **user.model_dump(),
         id=user_id
     )
     return users.update_user(db=db, user_updated=user_with_id)

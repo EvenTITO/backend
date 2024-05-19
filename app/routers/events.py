@@ -18,7 +18,7 @@ def create_event(
     db: Session = Depends(get_db)
 ):
     event_with_creator_id = CreateEventSchema(
-        **event.dict(),
+        **event.model_dump(),
         id_creator=creator_id
     )
     db_event = events.create_event(db=db, event=event_with_creator_id)
@@ -36,7 +36,7 @@ def update_event(
     modifier_id: str = Depends(get_user_id),
     db: Session = Depends(get_db)
 ):
-    event_updated = ModifyEventSchema(**event.dict(), id_modifier=modifier_id)
+    event_updated = ModifyEventSchema(**event.model_dump(), id_modifier=modifier_id)
     return events.update_event(db=db, event_updated=event_updated)
 
 

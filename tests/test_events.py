@@ -92,9 +92,12 @@ def test_put_event(client, user_data, event_data):
     update_event_data = event_data.copy()
     update_event_data["title"] = "new event"
     update_event_data["end_date"] = "2024-09-05T00:00:00"
-    update_event_data["id_modifier"] = user_data["id"]
 
-    response = client.put("/events/", json=update_event_data)
+    response = client.put(
+        "/events/",
+        json=update_event_data,
+        headers=create_headers(user_data["id"])
+    )
 
     assert response.status_code == 200
     assert response.json()["title"] == update_event_data["title"]
@@ -105,9 +108,12 @@ def test_put_event_with_invalid_end_date_fails(client, user_data, event_data):
     update_event_data = event_data.copy()
     # start_date = "2024-09-02"
     update_event_data["end_date"] = "2024-08-05T00:00:00"
-    update_event_data["id_modifier"] = user_data["id"]
 
-    response = client.put("/events/", json=update_event_data)
+    response = client.put(
+        "/events/",
+        json=update_event_data,
+        headers=create_headers(user_data["id"])
+    )
 
     assert response.status_code == 400
 

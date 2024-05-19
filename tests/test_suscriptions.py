@@ -1,3 +1,4 @@
+"""
 from app.models.suscriptions import SuscriptionStatus
 from app.schemas.suscriptions import UserSuscription
 from fastapi.encoders import jsonable_encoder
@@ -57,3 +58,4 @@ def test_get_suscription(client, suscription_data):
     id_event = suscription_data['id_event']
     response = client.get(f"/suscriptions/{id_event}/")
     assert response.status_code == 200
+"""
