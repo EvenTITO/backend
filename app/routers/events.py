@@ -6,7 +6,7 @@ from app.schemas.events import (
     ModifyEventSchema, EventSchemaWithEventId,
     PublicEventsSchema
 )
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
 
 router = APIRouter(prefix="/events", tags=["Events"])
@@ -32,8 +32,12 @@ def read_event(event_id: str, db: Session = SessionDep):
 
 
 @router.get("/", response_model=PublicEventsSchema)
-def read_all_events(db: Session = SessionDep):
-    return events.get_all_events(db=db)
+def read_all_events(
+    db: Session = SessionDep,
+    offset: int = 0,
+    limit: int = Query(default=100, le=100)
+):
+    return events.get_all_events(db=db, offset=offset, limit=limit)
 
 
 @router.put("/", response_model=EventSchemaWithEventId)

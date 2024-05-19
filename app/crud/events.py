@@ -51,13 +51,8 @@ def get_event(db: Session, event_id: str):
 
 
 @handle_database_event_error
-def get_events(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(EventModel).offset(skip).limit(limit).all()
-
-
-@handle_database_event_error
-def get_all_events(db: Session):
-    events = db.query(EventModel).all()
+def get_all_events(db: Session, offset: int, limit: int):
+    events = db.query(EventModel).offset(offset).limit(limit).all()
     events_dicts = [event.to_dict() for event in events]
     return PublicEventsSchema(events=events_dicts)
 
