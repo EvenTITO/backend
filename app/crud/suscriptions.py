@@ -44,8 +44,12 @@ def suscribe_user_to_event(db: Session, suscription: SuscriptionSchema):
 
 @handle_database_event_error
 def read_event_suscriptions(db: Session, event_id: str):
-    suscriptions = db.query(SuscriptionModel).filter(
-        SuscriptionModel.id_event == event_id).all()
+    suscriptions = db \
+        .query(SuscriptionModel) \
+        .filter(
+            SuscriptionModel.id_event == event_id
+        ).all()
+
     suscriptions_dicts = [suscription.to_dict()
                           for suscription in suscriptions]
     return GetSuscriptionReplySchema(suscriptions=suscriptions_dicts)

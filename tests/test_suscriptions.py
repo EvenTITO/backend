@@ -1,8 +1,6 @@
-"""
 from app.models.suscriptions import SuscriptionStatus
-from app.schemas.suscriptions import UserSuscription
-from fastapi.encoders import jsonable_encoder
 from app.crud.events import EVENT_NOT_FOUND, USER_NOT_FOUNT
+from .common import create_headers
 
 
 PAYMENT_INCOMPLETED = SuscriptionStatus.PAYMENT_INCOMPLETED.value
@@ -12,10 +10,9 @@ PAYMENT_INCOMPLETED = SuscriptionStatus.PAYMENT_INCOMPLETED.value
 
 def test_post_suscription(client, user_data, event_data):
     id_event = event_data['id']
-    user_suscription = UserSuscription(id=user_data['id'])
     response = client.post(
         f"/suscriptions/{id_event}/",
-        json=jsonable_encoder(user_suscription)
+        headers=create_headers(user_data["id"])
     )
     assert response.status_code == 200
 
@@ -31,10 +28,9 @@ def test_post_suscription_without_event_fails(
 ):
     id_event = "event-does-not-exists"
 
-    user_suscription = UserSuscription(id=user_data['id'])
     response = client.post(
         f"/suscriptions/{id_event}/",
-        json=jsonable_encoder(user_suscription)
+        headers=create_headers(user_data["id"])
     )
     assert response.status_code == 409
     assert response.json()["detail"] == EVENT_NOT_FOUND
@@ -42,10 +38,10 @@ def test_post_suscription_without_event_fails(
 
 def test_post_suscription_without_user_fails(client, event_data):
     id_event = event_data['id']
-    user_suscription = UserSuscription(id="user-does-not-exists")
+
     response = client.post(
         f"/suscriptions/{id_event}/",
-        json=jsonable_encoder(user_suscription)
+        headers=create_headers('id-user-does-not-exists')
     )
     assert response.status_code == 409
     assert response.json()["detail"] == USER_NOT_FOUNT
@@ -58,4 +54,3 @@ def test_get_suscription(client, suscription_data):
     id_event = suscription_data['id_event']
     response = client.get(f"/suscriptions/{id_event}/")
     assert response.status_code == 200
-"""
