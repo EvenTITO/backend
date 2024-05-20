@@ -72,9 +72,9 @@ def update_permission(db: Session, user_id: str, role: UserPermission):
     db.refresh(db_user)
     return db_user
 
+
 @handle_database_user_error
 def delete_user(db: Session, user_id: str):
-    # check if user exists
     user = get_user(db, user_id)
     db.delete(user)
 

@@ -45,7 +45,7 @@ def get_admin_user(caller_user: CallerUserDep) -> UserModel:
         return caller_user
     else:
         raise HTTPException(status_code=403, detail=NOT_PERMISSION_ERROR)
-    
+
 
 AdminDep = Annotated[UserModel, Depends(get_admin_user)]
 
@@ -58,6 +58,6 @@ def get_creator_user(caller_user: CallerUserDep) -> UserModel:
         return caller_user
     else:
         raise HTTPException(status_code=403, detail=NOT_PERMISSION_ERROR)
-    
+
 
 CreatorDep = Annotated[UserModel, Depends(get_creator_user)]

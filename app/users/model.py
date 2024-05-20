@@ -1,5 +1,5 @@
 from enum import Enum
-from sqlalchemy import Column, String, Boolean
+from sqlalchemy import Column, String
 from app.database.database import Base
 from sqlalchemy.orm import relationship
 from app.utils.models_utils import ModelTemplate

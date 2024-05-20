@@ -39,7 +39,7 @@ def update_user_permission(
     user_id: str,
     role: RoleSchema,
     _: AdminDep,
-    db: SessionDep 
+    db: SessionDep
 ):
     return crud.update_permission(db, user_id, role.role)
 

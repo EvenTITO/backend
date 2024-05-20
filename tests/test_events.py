@@ -3,7 +3,7 @@ from fastapi.encoders import jsonable_encoder
 from app.users.crud import USER_NOT_FOUND_DETAIL
 from app.utils.authorization import NOT_PERMISSION_ERROR
 from app.events.model import EventType
-from app.events.crud import CREATOR_NOT_EXISTS, EVENT_NOT_FOUND
+from app.events.crud import EVENT_NOT_FOUND
 from datetime import datetime
 from .common import create_headers
 

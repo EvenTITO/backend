@@ -17,7 +17,7 @@ def current_session():
     connection = engine.connect()
     transaction = connection.begin()
     db = SessionLocal(bind=connection)
-    
+
     yield db
 
     db.close()
@@ -29,7 +29,7 @@ def current_session():
 
 @pytest.fixture(scope="function")
 def client(current_session):
-    
+
     def get_db_override():
         return current_session
 
@@ -37,7 +37,6 @@ def client(current_session):
 
     with TestClient(app) as c:
         yield c
-    
 
 
 @pytest.fixture(scope="function")
@@ -76,7 +75,7 @@ def admin_data(current_session, client):
 @pytest.fixture(scope="function")
 def event_creator_data(client, admin_data, user_data):
     new_role = RoleSchema(
-        role = UserPermission.EVENT_CREATOR.value
+        role=UserPermission.EVENT_CREATOR.value
     )
     response = client.patch(
         f"/users/permissions/{user_data['id']}",
