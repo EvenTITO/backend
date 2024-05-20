@@ -1,7 +1,17 @@
 from app.utils.authorization import validate_user_permissions
-from app.utils.dependencies import SessionDep, CallerIdDep, CallerUserDep
+from app.utils.dependencies import (
+    SessionDep,
+    CallerIdDep,
+    CallerUserDep,
+    AdminDep
+)
 from app.users import crud
-from .schemas import UserSchema, UserSchemaWithId
+from .schemas import (
+    UserSchema,
+    UserSchemaWithId,
+    RoleSchema,
+    CompleteUser
+)
 from fastapi import APIRouter
 
 
@@ -24,7 +34,17 @@ def create_user(
     return crud.create_user(db=db, user=user_with_id)
 
 
-@users_router.get("/{user_id}", response_model=UserSchemaWithId)
+@users_router.patch("/permissions/{user_id}", response_model=CompleteUser)
+def update_user_permission(
+    user_id: str,
+    role: RoleSchema,
+    _: AdminDep,
+    db: SessionDep 
+):
+    return crud.update_permission(db, user_id, role.role)
+
+
+@users_router.get("/{user_id}", response_model=CompleteUser)
 def read_user(
     user_id: str,
     db: SessionDep

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from .model import UserModel
+from .model import UserModel, UserPermission
 from .schemas import UserSchemaWithId
 from app.utils.crud_utils import get_user
 from sqlalchemy.exc import IntegrityError, NoResultFound
@@ -63,6 +63,14 @@ def update_user(db: Session, user_updated: UserSchemaWithId):
     db.refresh(db_user)
     return db_user
 
+
+@handle_database_user_error
+def update_permission(db: Session, user_id: str, role: UserPermission):
+    db_user = get_user(db, user_id)
+    setattr(db_user, 'role', role)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
 
 @handle_database_user_error
 def delete_user(db: Session, user_id: str):

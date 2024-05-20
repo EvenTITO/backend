@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
+from .model import UserPermission
 
 
 class UserSchema(BaseModel):
@@ -20,4 +21,12 @@ class UserSchema(BaseModel):
 
 
 class UserSchemaWithId(UserSchema):
+    id: str
+
+
+class RoleSchema(BaseModel):
+    role: UserPermission
+
+
+class CompleteUser(UserSchemaWithId, RoleSchema):
     id: str

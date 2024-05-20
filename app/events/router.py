@@ -1,4 +1,8 @@
-from app.utils.dependencies import SessionDep, CallerIdDep
+from app.utils.dependencies import (
+    SessionDep,
+    CallerIdDep,
+    CreatorDep
+)
 from app.events import crud
 from .schemas import (
     EventSchema, CreateEventSchema,
@@ -14,12 +18,12 @@ events_router = APIRouter(prefix="/events", tags=["Events"])
 @events_router.post("/", response_model=EventSchemaWithEventId)
 def create_event(
     event: EventSchema,
-    caller_id: CallerIdDep,
+    caller_user: CreatorDep,
     db: SessionDep
 ):
     event_with_creator_id = CreateEventSchema(
         **event.model_dump(),
-        id_creator=caller_id
+        id_creator=caller_user.id
     )
     db_event = crud.create_event(db=db, event=event_with_creator_id)
     return db_event
