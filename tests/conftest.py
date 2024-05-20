@@ -73,15 +73,40 @@ def admin_data(current_session, client):
 
 
 @pytest.fixture(scope="function")
-def event_creator_data(client, admin_data, user_data):
+def event_creator_data(client, admin_data):
+    event_creator = UserSchema(
+        name="Juan",
+        surname="Martinez",
+        email="jmartinez@email.com",
+    )
+    event_creator_response = client.post(
+        "/users/",
+        json=jsonable_encoder(event_creator),
+        headers=create_headers("lakjsdeuimx213klasmd3")
+    )
     new_role = RoleSchema(
         role=UserPermission.EVENT_CREATOR.value
     )
     response = client.patch(
-        f"/users/permissions/{user_data['id']}",
+        f"/users/permissions/{event_creator_response.json()['id']}",
         json=jsonable_encoder(new_role),
         headers=create_headers(admin_data.id)
     )
+    return response.json()
+
+
+@pytest.fixture(scope="function")
+def event_from_event_creator(client, event_creator_data):
+    new_event = EventSchema(
+        title="Event Creator Event",
+        start_date="2024-09-02",
+        end_date="2024-09-04",
+        description="This is a nice event",
+        event_type=EventType.CONFERENCE
+    )
+    response = client.post("/events/",
+                           json=jsonable_encoder(new_event),
+                           headers=create_headers(event_creator_data["id"]))
     return response.json()
 
 
