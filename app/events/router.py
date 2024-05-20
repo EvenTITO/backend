@@ -1,4 +1,3 @@
-from sqlalchemy.orm import Session
 from app.utils.dependencies import SessionDep, CallerIdDep
 from app.events import crud
 from .schemas import (

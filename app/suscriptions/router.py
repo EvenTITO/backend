@@ -3,7 +3,6 @@ from .schemas import (
     SuscriptionReplySchema,
     SuscriptionSchema
 )
-from sqlalchemy.orm import Session
 from app.utils.dependencies import SessionDep, CallerIdDep
 from app.suscriptions import crud
 from fastapi import APIRouter

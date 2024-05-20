@@ -1,4 +1,3 @@
-from sqlalchemy.orm import Session
 from app.utils.authorization import validate_user_permissions
 from app.utils.dependencies import SessionDep, CallerIdDep, CallerUserDep
 from app.users import crud
