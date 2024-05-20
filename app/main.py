@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.users.router import users_router
 from app.events.router import events_router
 from app.suscriptions.router import suscriptions_router
+from app.organizers.router import organizers_router
 from app.database.database import Base, engine
 
 Base.metadata.create_all(engine)
@@ -41,3 +42,4 @@ app.add_middleware(
 app.include_router(users_router)
 app.include_router(events_router)
 app.include_router(suscriptions_router)
+app.include_router(organizers_router)

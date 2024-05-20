@@ -1,5 +1,5 @@
 from app.utils.dependencies import SessionDep, CallerIdDep
-from app.suscriptions import crud
+from app.organizers import crud
 from .schemas import OrganizerRequestSchema, OrganizerSchema
 from fastapi import APIRouter
 

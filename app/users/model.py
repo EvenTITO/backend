@@ -24,7 +24,7 @@ class UserModel(ModelTemplate, Base):
         "SuscriptionModel", back_populates="suscriptor"
     )
     organizers = relationship(
-        "EventModel", back_populates="organizer"
+        "OrganizerModel", back_populates="organizer"
     )
 
     def __repr__(self):
