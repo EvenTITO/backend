@@ -19,24 +19,22 @@ def handle_database_organizer_error(handler):
     return wrapper
 
 
-@handle_database_organizer_error
-def get_organizer(
+def is_organizer(
     db: Session, event_id: str, caller_id: str
 ):
-    db_organizer = db \
+    return db \
         .query(OrganizerModel) \
         .filter(
             OrganizerModel.id_event == event_id,
             OrganizerModel.id_organizer == caller_id
-        ).one()
-
-    return db_organizer
+        ).first() is not None
 
 
 @handle_database_organizer_error
 def add_organizer_to_event(
     db: Session, new_organizer: OrganizerSchema
 ):
+    new_organizer = OrganizerModel(**new_organizer.model_dump())
     db.add(new_organizer)
     db.commit()
     db.refresh(new_organizer)

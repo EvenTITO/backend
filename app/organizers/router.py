@@ -2,7 +2,7 @@ from app.utils.dependencies import SessionDep, CallerIdDep
 from app.organizers import crud
 from .schemas import OrganizerRequestSchema, OrganizerSchema
 from fastapi import APIRouter
-
+from app.utils.authorization import validate_user_creator_or_organizer
 
 organizers_router = APIRouter(prefix="/organizers", tags=["Organizers"])
 
@@ -17,11 +17,10 @@ def create_organizer(
     caller_id: CallerIdDep,
     db: SessionDep
 ):
-    # validates if caller is organizer
-    crud.get_organizer(db, event_id, caller_id)
+    validate_user_creator_or_organizer(db, event_id, caller_id)
 
     new_organizer = OrganizerSchema(
-        **user.model_dump,
+        **user.model_dump(),
         id_event=event_id
     )
 
