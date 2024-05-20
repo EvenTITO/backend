@@ -23,6 +23,9 @@ class UserModel(ModelTemplate, Base):
     suscriptions = relationship(
         "SuscriptionModel", back_populates="suscriptor"
     )
+    organizers = relationship(
+        "EventModel", back_populates="organizer"
+    )
 
     def __repr__(self):
         return f"User({self.id})"
