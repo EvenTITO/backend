@@ -42,13 +42,30 @@ def get_event_suscriptions(db, event_id):
     )
 
 
+def user_already_suscribed(db, user_id, event_id):
+    try:
+        db.query(SuscriptionModel).filter(
+            SuscriptionModel.id_event == event_id,
+            SuscriptionModel.id_suscriptor == user_id
+        ).one()
+    except NoResultFound:
+        return False
+
+    return True
+
+
 @handle_database_suscription_error
 def suscribe_user_to_event(db: Session, suscription: SuscriptionSchema):
     db_suscription = SuscriptionModel(**suscription.model_dump())
 
-    db.add(db_suscription)
-    db.commit()
-    db.refresh(db_suscription)
+    if not (user_already_suscribed(
+        db,
+        user_id=suscription.id_suscriptor,
+        event_id=suscription.id_event
+    )):
+        db.add(db_suscription)
+        db.commit()
+        db.refresh(db_suscription)
 
     return db_suscription
 
