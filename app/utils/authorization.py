@@ -29,7 +29,8 @@ def validate_superuser(db, caller_id):
 
 
 def validate_user_creator_or_organizer(db, event_id, user_id):
-    if (not is_organizer(db, event_id, user_id) and not is_creator(db, event_id, user_id)):
+    if (not is_organizer(db, event_id, user_id) and
+            not is_creator(db, event_id, user_id)):
         raise HTTPException(
             status_code=404,
             detail=EVENT_ORGANIZER_NOT_FOUND
