@@ -2,7 +2,6 @@ from enum import Enum
 from sqlalchemy import Column, String, ForeignKey
 from app.database.database import Base
 from sqlalchemy.orm import relationship
-from app.utils.models_utils import ModelTemplate
 
 
 class SuscriptionStatus(str, Enum):
@@ -10,11 +9,11 @@ class SuscriptionStatus(str, Enum):
     PAYMENT_COMPLETED = "PAYMENT_COMPLETED"
 
 
-class SuscriptionModel(ModelTemplate, Base):
+class SuscriptionModel(Base):
     __tablename__ = "suscriptions"
 
-    id_suscriptor = Column(String, ForeignKey("users.id"))
-    id_event = Column(String, ForeignKey("events.id"))
+    id_suscriptor = Column(String, ForeignKey("users.id"), primary_key=True)
+    id_event = Column(String, ForeignKey("events.id"), primary_key=True)
     status = Column(
         String, default=SuscriptionStatus.PAYMENT_INCOMPLETED.value
     )
