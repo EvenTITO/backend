@@ -73,7 +73,9 @@ def test_user_suscribes_to_two_events(client, user_data, all_events_data):
     )
 
     assert response.status_code == 200
+
     suscriptions_response = response.json()['suscriptions']
     assert len(suscriptions_response) == 2
     assert suscriptions_response[0]['id_suscriptor'] == user_data['id']
     assert suscriptions_response[0]['id_event'] == all_events_data[0]['id']
+    assert suscriptions_response[1]['id_event'] == all_events_data[1]['id']

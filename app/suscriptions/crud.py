@@ -32,6 +32,16 @@ def handle_database_suscription_error(handler):
     return wrapper
 
 
+def get_event_suscriptions(db, event_id):
+    return (
+        db
+        .query(SuscriptionModel)
+        .filter(
+            SuscriptionModel.id_event == event_id
+        ).all()
+    )
+
+
 @handle_database_suscription_error
 def suscribe_user_to_event(db: Session, suscription: SuscriptionSchema):
     db_suscription = SuscriptionModel(**suscription.model_dump())
@@ -45,12 +55,7 @@ def suscribe_user_to_event(db: Session, suscription: SuscriptionSchema):
 
 @handle_database_suscription_error
 def read_event_suscriptions(db: Session, event_id: str):
-    suscriptions = db \
-        .query(SuscriptionModel) \
-        .filter(
-            SuscriptionModel.id_event == event_id
-        ).all()
-
+    suscriptions = get_event_suscriptions(db, event_id)
     suscriptions_dicts = [suscription.to_dict()
                           for suscription in suscriptions]
     return GetSuscriptionReplySchema(suscriptions=suscriptions_dicts)
@@ -68,4 +73,19 @@ def read_user_suscriptions(db: Session, user_id: str, caller_id: str):
 
     suscriptions_dicts = [suscription.to_dict()
                           for suscription in suscriptions]
+    return GetSuscriptionReplySchema(suscriptions=suscriptions_dicts)
+
+
+@handle_database_suscription_error
+def delete_suscriptions_to_event(db: Session, caller_id: str, event_id: str):
+    validate_user_permissions(db, caller_id)
+
+    suscriptions = get_event_suscriptions(db, event_id)
+    suscriptions_dicts = []
+    for suscription in suscriptions:
+        db.delete(suscription)
+        suscriptions_dicts.append(suscription.to_dict())
+
+    db.commit()
+
     return GetSuscriptionReplySchema(suscriptions=suscriptions_dicts)
