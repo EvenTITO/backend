@@ -4,6 +4,7 @@ from app.events.schemas import EventSchema
 from fastapi.testclient import TestClient
 from fastapi.encoders import jsonable_encoder
 from app.database.database import SessionLocal, engine
+from app.organizers.schemas import OrganizerRequestSchema
 from app.utils.dependencies import get_db
 from app.users.model import UserPermission
 from app.users.schemas import UserSchema, RoleSchema
@@ -148,3 +149,26 @@ def suscription_data(client, user_data, event_data):
         headers=create_headers(user_data["id"])
     )
     return response.json()
+
+
+@pytest.fixture(scope="function")
+def organizer_id_from_event(client, event_creator_data,
+                            event_from_event_creator):
+    organizer = UserSchema(
+        name="Martina",
+        surname="Rodriguez",
+        email="mrodriguez@email.com",
+    )
+    organizer_id = "frlasdvpqqad08jd"
+    client.post(
+        "/users/",
+        json=jsonable_encoder(organizer),
+        headers=create_headers(organizer_id)
+    )
+    request = OrganizerRequestSchema(
+        id_organizer=organizer_id
+    )
+    client.post(f"/organizers/{event_from_event_creator['id']}",
+                json=jsonable_encoder(request),
+                headers=create_headers(event_creator_data["id"]))
+    return organizer_id
