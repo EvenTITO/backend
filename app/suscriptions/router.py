@@ -28,7 +28,18 @@ def create_suscription(
 
 
 @suscriptions_router.get(
-    "/{event_id}/", response_model=GetSuscriptionReplySchema
+    "/events/{event_id}/", response_model=GetSuscriptionReplySchema
 )
-def read_suscriptions(event_id: str, db: Session = SessionDep):
+def read_event_suscriptions(event_id: str, db: Session = SessionDep):
     return crud.read_event_suscriptions(db, event_id)
+
+
+@suscriptions_router.get(
+    "/users/{user_id}/", response_model=GetSuscriptionReplySchema
+)
+def read_user_suscriptions(
+    user_id: str,
+    caller_id: str = CallerIdDep,
+    db: Session = SessionDep
+):
+    return crud.read_user_suscriptions(db, user_id, caller_id)

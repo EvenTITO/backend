@@ -1,3 +1,4 @@
+from app.utils.authorization import validate_user_permissions
 from .model import SuscriptionModel
 from sqlalchemy.orm import Session
 from .schemas import (
@@ -56,7 +57,8 @@ def read_event_suscriptions(db: Session, event_id: str):
 
 
 @handle_database_suscription_error
-def read_user_suscriptions(db: Session, user_id: str):
+def read_user_suscriptions(db: Session, user_id: str, caller_id: str):
+    validate_user_permissions(db, caller_id, user_id=user_id)
     suscriptions = db \
         .query(SuscriptionModel) \
         .filter(

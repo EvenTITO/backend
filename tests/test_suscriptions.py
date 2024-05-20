@@ -52,5 +52,5 @@ def test_post_suscription_without_user_fails(client, event_data):
 
 def test_get_suscription(client, suscription_data):
     id_event = suscription_data['id_event']
-    response = client.get(f"/suscriptions/{id_event}/")
+    response = client.get(f"/suscriptions/events/{id_event}/")
     assert response.status_code == 200
