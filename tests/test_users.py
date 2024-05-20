@@ -1,6 +1,6 @@
-from app.schemas.users import UserSchema
+from app.users.schemas import UserSchema
 from fastapi.encoders import jsonable_encoder
-from app.crud.users import (
+from app.users.crud import (
     USER_NOT_FOUND_DETAIL,
     EMAIL_ALREADY_EXISTS,
     ID_ALREADY_EXISTS,

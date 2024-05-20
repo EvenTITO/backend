@@ -1,9 +1,24 @@
 from fastapi import HTTPException
+from .crud_utils import get_user
+from app.users.model import UserModel
 
 
-def validate_user_from_url(user_id: str, caller_id: str):
-    if user_id != caller_id:
+def validate_user_permissions(user_id, caller_user: UserModel):
+    if (user_id == caller_user.id):
+        return
+    else:
         raise HTTPException(
             status_code=403,
-            detail="No permissions for this method"
+            detail="Not permission for this method"
+        )
+
+
+def validate_superuser(db, caller_id):
+    db_caller = get_user(db, caller_id)
+    if db_caller.is_superuser:
+        return
+    else:
+        raise HTTPException(
+            status_code=403,
+            detail="Not permission for this method"
         )

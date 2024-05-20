@@ -1,5 +1,5 @@
-from app.schemas.events import EventSchema
-from app.models.event import EventType
+from app.events.schemas import EventSchema
+from app.events.model import EventType
 
 
 def create_headers(user_id):
