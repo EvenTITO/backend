@@ -5,7 +5,7 @@ from .schemas import (
 )
 from app.utils.dependencies import SessionDep, CallerIdDep
 from app.suscriptions import crud
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
 
 suscriptions_router = APIRouter(prefix="/suscriptions", tags=["Suscriptions"])
@@ -38,6 +38,8 @@ def read_event_suscriptions(event_id: str, db: SessionDep):
 )
 def read_user_suscriptions(
     caller_id: CallerIdDep,
-    db: SessionDep
+    db: SessionDep,
+    offset: int = 0,
+    limit: int = Query(default=100, le=100)
 ):
-    return crud.read_user_suscriptions(db, caller_id)
+    return crud.read_user_suscriptions(db, caller_id, offset, limit)

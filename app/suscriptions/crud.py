@@ -79,12 +79,12 @@ def read_event_suscriptions(db: Session, event_id: str):
 
 
 @handle_database_suscription_error
-def read_user_suscriptions(db: Session, user_id: str):
+def read_user_suscriptions(db: Session, user_id: str, offset: int, limit: int):
     suscriptions = db \
         .query(SuscriptionModel) \
         .filter(
             SuscriptionModel.id_suscriptor == user_id
-        ).all()
+        ).offset(offset).limit(limit).all()
 
     suscriptions_dicts = [suscription.to_dict()
                           for suscription in suscriptions]

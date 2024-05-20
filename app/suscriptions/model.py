@@ -16,14 +16,14 @@ class SuscriptionModel(ModelTemplate, Base):
     id_suscriptor = Column(String, ForeignKey("users.id"))
     id_event = Column(String, ForeignKey("events.id"))
     status = Column(
-        String, default=SuscriptionStatus.PAYMENT_INCOMPLETED.value)
+        String, default=SuscriptionStatus.PAYMENT_INCOMPLETED.value
+    )
 
     suscriptor = relationship("UserModel", back_populates="suscriptions")
     event = relationship("EventModel", back_populates="suscriptions")
 
     def to_dict(self):
         return {
-            "id_suscriptor": self.id_suscriptor,
             "id_event": self.id_event,
             "status": self.status,
         }
