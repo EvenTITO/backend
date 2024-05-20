@@ -6,9 +6,12 @@ from sqlalchemy.exc import IntegrityError, NoResultFound
 from fastapi import HTTPException
 
 
+MIN_NUMBER_ADMINS = 1
+
 USER_NOT_FOUND_DETAIL = "User not found"
 EMAIL_ALREADY_EXISTS = "Email already exists"
 ID_ALREADY_EXISTS = "Id already exists"
+NOT_ENOUGH_ADMINS_ERROR = "System must have at least 1 admin"
 
 
 def handle_database_user_error(handler):
@@ -64,10 +67,34 @@ def update_user(db: Session, user_updated: UserSchemaWithId):
     return db_user
 
 
+def check_role_changes(db, old_role, new_role):
+    if (
+        (old_role == UserPermission.ADMIN.value) and
+        (new_role != UserPermission.ADMIN.value)
+    ):
+        # get amount of admins
+        list_admins = (
+            db
+            .query(UserModel)
+            .filter(UserModel.role == old_role)
+            .all()
+        )
+        if (len(list_admins) == MIN_NUMBER_ADMINS):
+            raise HTTPException(
+                status_code=409,
+                detail=NOT_ENOUGH_ADMINS_ERROR
+            )
+
+
 @handle_database_user_error
-def update_permission(db: Session, user_id: str, role: UserPermission):
+def update_permission(db: Session, user_id: str, new_role: UserPermission):
     db_user = get_user(db, user_id)
-    setattr(db_user, 'role', role)
+    old_role = db_user.role
+
+    check_role_changes(db, old_role, new_role)
+
+    setattr(db_user, 'role', new_role)
+
     db.commit()
     db.refresh(db_user)
     return db_user

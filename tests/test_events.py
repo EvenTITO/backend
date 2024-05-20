@@ -168,21 +168,4 @@ def test_put_event_with_invalid_end_date_fails(client, admin_data, event_data):
 
     assert response.status_code == 400
 
-# ------------------------------- DELETE TESTS ------------------------------ #
-
-
-# TODO: los de delete los hacemos luego de poner endpoints en los suscriptores
-# y organizadores
-"""
-def test_delete_event(client, event_data):
-
-    response = client.delete(f"/events/{event_data['id']}")
-    assert response.status_code == 200
-
-def test_delete_user_not_exists(client):
-    id = "this-id-does-not-exist"
-    response = client.delete(f"/users/{id}")
-
-    assert response.status_code == 404
-    assert response.json()["detail"] == USER_NOT_FOUND_DETAIL
-"""
+# ------------------------------- PERMISSION TESTS ------------------------------ #

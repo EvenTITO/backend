@@ -183,6 +183,56 @@ def test_change_permission_to_event_creator(admin_data, client, user_data):
     assert response.json()['role'] == UserPermission.EVENT_CREATOR.value
 
 
+def test_admin_deletes_other_admin_permission(admin_data, client, user_data):
+    # changes user_data to ADMIN
+    new_role = RoleSchema(
+        role=UserPermission.ADMIN.value
+    )
+    _ = client.patch(
+        f"/users/permissions/{user_data['id']}",
+        json=jsonable_encoder(new_role),
+        headers=create_headers(admin_data.id)
+    )
+
+    # changes user_data to NO_PERMISSION
+    new_role = RoleSchema(
+        role=UserPermission.NO_PERMISSION.value
+    )
+    response = client.patch(
+        f"/users/permissions/{user_data['id']}",
+        json=jsonable_encoder(new_role),
+        headers=create_headers(admin_data.id)
+    )
+
+    assert response.status_code == 200
+    assert response.json()['role'] == UserPermission.NO_PERMISSION.value
+
+
+def test_admin_deletes_other_event_creator_permission(admin_data, client, user_data):
+    # changes user_data to EVENT_CREATOR
+    new_role = RoleSchema(
+        role=UserPermission.EVENT_CREATOR.value
+    )
+    _ = client.patch(
+        f"/users/permissions/{user_data['id']}",
+        json=jsonable_encoder(new_role),
+        headers=create_headers(admin_data.id)
+    )
+
+    # changes user_data to NO_PERMISSION
+    new_role = RoleSchema(
+        role=UserPermission.NO_PERMISSION.value
+    )
+    response = client.patch(
+        f"/users/permissions/{user_data['id']}",
+        json=jsonable_encoder(new_role),
+        headers=create_headers(admin_data.id)
+    )
+
+    assert response.status_code == 200
+    assert response.json()['role'] == UserPermission.NO_PERMISSION.value
+
+
 def test_not_admin_user_cant_add_admin(client, user_data):
     non_admin_user = UserSchema(
         name="Lio",
@@ -256,3 +306,67 @@ def test_creator_user_cant_add_other_creator(admin_data, client, user_data):
     )
     assert response.status_code == 403
     assert response.json()['detail'] == NOT_PERMISSION_ERROR
+
+
+def test_user_without_permissions_cant_delete_other_admin(admin_data, client, user_data):
+    # user is trying to change admin_data to NO_PERMISSION
+    new_role = RoleSchema(
+        role=UserPermission.NO_PERMISSION.value
+    )
+    response = client.patch(
+        f"/users/permissions/{admin_data.id}",
+        json=jsonable_encoder(new_role),
+        headers=create_headers(user_data['id'])
+    )
+
+    assert response.status_code == 403
+    assert response.json()['detail'] == NOT_PERMISSION_ERROR
+
+
+def test_event_creator_cant_delete_other_admin(admin_data, client, user_data):
+    # changes user_data to EVENT_CREATOR
+    new_role = RoleSchema(
+        role=UserPermission.EVENT_CREATOR.value
+    )
+    _ = client.patch(
+        f"/users/permissions/{user_data['id']}",
+        json=jsonable_encoder(new_role),
+        headers=create_headers(admin_data.id)
+    )
+
+    # user is trying to change admin_data to NO_PERMISSION
+    new_role = RoleSchema(
+        role=UserPermission.NO_PERMISSION.value
+    )
+    response = client.patch(
+        f"/users/permissions/{admin_data.id}",
+        json=jsonable_encoder(new_role),
+        headers=create_headers(user_data['id'])
+    )
+
+    assert response.status_code == 403
+    assert response.json()['detail'] == NOT_PERMISSION_ERROR
+
+
+def test_admin_can_change_self(client, admin_data, user_data):
+    # add another admin
+    new_role = RoleSchema(
+        role=UserPermission.ADMIN.value
+    )
+    _ = client.patch(
+        f"/users/permissions/{user_data['id']}",
+        json=jsonable_encoder(new_role),
+        headers=create_headers(admin_data.id)
+    )
+
+    new_role = RoleSchema(
+        role=UserPermission.NO_PERMISSION.value
+    )
+    response = client.patch(
+        f"/users/permissions/{admin_data.id}",
+        json=jsonable_encoder(new_role),
+        headers=create_headers(admin_data.id)
+    )
+
+    assert response.status_code == 200
+    assert response.json()['role'] == UserPermission.NO_PERMISSION.value
