@@ -12,7 +12,7 @@ EVENT_NOT_FOUND = "Event not found"
 USER_NOT_FOUNT = "User not found"
 
 
-def handle_database_event_error(handler):
+def handle_database_suscription_error(handler):
     def wrapper(*args, **kwargs):
         try:
             return handler(*args, **kwargs)
@@ -31,7 +31,7 @@ def handle_database_event_error(handler):
     return wrapper
 
 
-@handle_database_event_error
+@handle_database_suscription_error
 def suscribe_user_to_event(db: Session, suscription: SuscriptionSchema):
     db_suscription = SuscriptionModel(**suscription.model_dump())
 
@@ -42,12 +42,25 @@ def suscribe_user_to_event(db: Session, suscription: SuscriptionSchema):
     return db_suscription
 
 
-@handle_database_event_error
+@handle_database_suscription_error
 def read_event_suscriptions(db: Session, event_id: str):
     suscriptions = db \
         .query(SuscriptionModel) \
         .filter(
             SuscriptionModel.id_event == event_id
+        ).all()
+
+    suscriptions_dicts = [suscription.to_dict()
+                          for suscription in suscriptions]
+    return GetSuscriptionReplySchema(suscriptions=suscriptions_dicts)
+
+
+@handle_database_suscription_error
+def read_user_suscriptions(db: Session, user_id: str):
+    suscriptions = db \
+        .query(SuscriptionModel) \
+        .filter(
+            SuscriptionModel.id_suscriptor == user_id
         ).all()
 
     suscriptions_dicts = [suscription.to_dict()

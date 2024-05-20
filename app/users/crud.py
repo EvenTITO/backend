@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
 from .model import UserModel
 from .schemas import UserSchemaWithId
+from app.utils.crud_utils import get_user
+from app.utils.authorization import validate_user_permissions
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from fastapi import HTTPException
 
@@ -27,25 +29,6 @@ def handle_database_user_error(handler):
             raise HTTPException(status_code=404, detail=USER_NOT_FOUND_DETAIL)
 
     return wrapper
-
-
-def validate_user_permissions(db, caller_id, user_id=None):
-    if (user_id == caller_id and user_id is not None):
-        return
-
-    db_caller = get_user(db, caller_id)
-    if db_caller.is_superuser:
-        return
-    else:
-        raise HTTPException(
-            status_code=403,
-            detail="Not permission for this method"
-        )
-
-
-@handle_database_user_error
-def get_user(db: Session, user_id: int):
-    return db.query(UserModel).filter(UserModel.id == user_id).one()
 
 
 @handle_database_user_error
