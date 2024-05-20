@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session
 from .model import UserModel
 from .schemas import UserSchemaWithId
 from app.utils.crud_utils import get_user
-from app.utils.authorization import validate_user_permissions
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from fastapi import HTTPException
 
@@ -32,9 +31,7 @@ def handle_database_user_error(handler):
 
 
 @handle_database_user_error
-def get_user_by_id(db: Session, user_id: str, caller_id: str):
-    validate_user_permissions(db, caller_id, user_id=user_id)
-
+def get_user_by_id(db: Session, user_id: str):
     return get_user(db, user_id)
 
 
@@ -68,9 +65,7 @@ def update_user(db: Session, user_updated: UserSchemaWithId):
 
 
 @handle_database_user_error
-def delete_user(db: Session, user_id: str, caller_id: str):
-    validate_user_permissions(db, caller_id, user_id=user_id)
-
+def delete_user(db: Session, user_id: str):
     # check if user exists
     user = get_user(db, user_id)
     db.delete(user)

@@ -1,11 +1,10 @@
+from typing import Annotated
+from sqlalchemy.orm import Session
+from app.users.model import UserModel
+from app.users.crud import USER_NOT_FOUND_DETAIL
+from app.utils.crud_utils import get_user
 from fastapi import Header, HTTPException, Depends
 from app.database.database import SessionLocal
-
-
-def get_user_id(X_User_Id: str = Header(...)):
-    if not X_User_Id:
-        raise HTTPException(status_code=400, detail="X-User-Id missing.")
-    return X_User_Id
 
 
 def get_db():
@@ -16,5 +15,24 @@ def get_db():
         db.close()
 
 
-SessionDep = Depends(get_db)
-CallerIdDep = Depends(get_user_id)
+SessionDep = Annotated[Session, Depends(get_db)]
+
+
+def get_user_id(X_User_Id: str = Header(...)) -> str:
+    if not X_User_Id:
+        raise HTTPException(status_code=400, detail="X-User-Id missing.")
+    return X_User_Id
+
+
+CallerIdDep = Annotated[str, Depends(get_user_id)]
+
+
+def get_caller_user(caller_id: CallerIdDep, db: SessionDep) -> UserModel:
+    try:
+        user = get_user(db, caller_id)
+        return user
+    except:
+        raise HTTPException(status_code=404, detail=USER_NOT_FOUND_DETAIL)
+
+
+CallerUserDep = Annotated[UserModel, Depends(get_caller_user)]

@@ -15,8 +15,8 @@ events_router = APIRouter(prefix="/events", tags=["Events"])
 @events_router.post("/", response_model=EventSchemaWithEventId)
 def create_event(
     event: EventSchema,
-    caller_id: str = CallerIdDep,
-    db: Session = SessionDep
+    caller_id: CallerIdDep,
+    db: SessionDep
 ):
     event_with_creator_id = CreateEventSchema(
         **event.model_dump(),
@@ -27,13 +27,13 @@ def create_event(
 
 
 @events_router.get("/{event_id}", response_model=EventSchemaWithEventId)
-def read_event(event_id: str, db: Session = SessionDep):
+def read_event(event_id: str, db: SessionDep):
     return crud.get_event(db=db, event_id=event_id)
 
 
 @events_router.get("/", response_model=PublicEventsSchema)
 def read_all_events(
-    db: Session = SessionDep,
+    db: SessionDep,
     offset: int = 0,
     limit: int = Query(default=100, le=100)
 ):
@@ -43,8 +43,8 @@ def read_all_events(
 @events_router.put("/", response_model=EventSchemaWithEventId)
 def update_event(
     event: EventSchemaWithEventId,
-    caller_id: str = CallerIdDep,
-    db: Session = SessionDep
+    caller_id: CallerIdDep,
+    db: SessionDep
 ):
     event_updated = ModifyEventSchema(
         **event.model_dump(), id_modifier=caller_id
@@ -53,5 +53,5 @@ def update_event(
 
 
 @events_router.delete("/{event_id}", response_model=EventSchema)
-def delete_event(event_id: str, db: Session = SessionDep):
+def delete_event(event_id: str, db: SessionDep):
     return crud.delete_event(db=db, event_id=event_id)

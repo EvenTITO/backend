@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
-from app.utils.dependencies import SessionDep, CallerIdDep
+from app.utils.authorization import validate_user_permissions
+from app.utils.dependencies import SessionDep, CallerIdDep, CallerUserDep
 from app.users import crud
 from .schemas import UserSchema, UserSchemaWithId
 from fastapi import APIRouter
@@ -8,15 +9,14 @@ from fastapi import APIRouter
 users_router = APIRouter(
     prefix="/users",
     tags=["Users"],
-    dependencies=[SessionDep, CallerIdDep]
 )
 
 
 @users_router.post("/", response_model=UserSchemaWithId)
 def create_user(
     user: UserSchema,
-    db: Session = SessionDep,
-    caller_id: str = CallerIdDep
+    db: SessionDep,
+    caller_id: CallerIdDep,
 ):
     user_with_id = UserSchemaWithId(
         **user.model_dump(),
@@ -28,21 +28,19 @@ def create_user(
 @users_router.get("/{user_id}", response_model=UserSchemaWithId)
 def read_user(
     user_id: str,
-    caller_id: str = CallerIdDep,
-    db: Session = SessionDep
+    db: SessionDep
 ):
     return crud.get_user_by_id(
         db,
-        user_id=user_id,
-        caller_id=caller_id
+        user_id=user_id
     )
 
 
 @users_router.put("/", response_model=UserSchemaWithId)
 def update_user(
     user: UserSchema,
-    caller_id: str = CallerIdDep,
-    db: Session = SessionDep
+    caller_id: CallerIdDep,
+    db: SessionDep
 ):
     user_with_id = UserSchemaWithId(
         **user.model_dump(),
@@ -54,7 +52,8 @@ def update_user(
 @users_router.delete("/{user_id}", response_model=UserSchemaWithId)
 def delete_user(
     user_id: str,
-    caller_id: str = CallerIdDep,
-    db: Session = SessionDep
+    caller_user: CallerUserDep,
+    db: SessionDep
 ):
-    return crud.delete_user(db=db, user_id=user_id, caller_id=caller_id)
+    validate_user_permissions(user_id, caller_user)
+    return crud.delete_user(db=db, user_id=user_id)

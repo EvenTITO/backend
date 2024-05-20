@@ -68,7 +68,7 @@ def test_user_suscribes_to_two_events(client, user_data, all_events_data):
     )
 
     response = client.get(
-        f"/suscriptions/users/{user_data['id']}",
+        f"/suscriptions/users/",
         headers=create_headers(user_data['id'])
     )
 
