@@ -208,7 +208,11 @@ def test_admin_deletes_other_admin_permission(admin_data, client, user_data):
     assert response.json()['role'] == UserPermission.NO_PERMISSION.value
 
 
-def test_admin_deletes_other_event_creator_permission(admin_data, client, user_data):
+def test_admin_deletes_other_event_creator_permission(
+    admin_data,
+    client,
+    user_data
+):
     # changes user_data to EVENT_CREATOR
     new_role = RoleSchema(
         role=UserPermission.EVENT_CREATOR.value
@@ -308,7 +312,11 @@ def test_creator_user_cant_add_other_creator(admin_data, client, user_data):
     assert response.json()['detail'] == NOT_PERMISSION_ERROR
 
 
-def test_user_without_permissions_cant_delete_other_admin(admin_data, client, user_data):
+def test_user_without_permissions_cant_delete_other_admin(
+    admin_data,
+    client,
+    user_data
+):
     # user is trying to change admin_data to NO_PERMISSION
     new_role = RoleSchema(
         role=UserPermission.NO_PERMISSION.value

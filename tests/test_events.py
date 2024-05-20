@@ -168,4 +168,4 @@ def test_put_event_with_invalid_end_date_fails(client, admin_data, event_data):
 
     assert response.status_code == 400
 
-# ------------------------------- PERMISSION TESTS ------------------------------ #
+# ------------------------------- PERMISSION ------------------------------ #
