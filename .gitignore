@@ -162,3 +162,7 @@ cython_debug/
 
 ./data
 pgdata
+
+#Intellij
+.idea
+.DS_Store
