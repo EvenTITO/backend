@@ -1,22 +1,26 @@
+from typing import List
 from app.utils.dependencies import SessionDep, CallerIdDep
 from app.organizers import crud
 from .schemas import OrganizerRequestSchema, OrganizerSchema
 from fastapi import APIRouter
 from app.users.router import users_router
 from app.events.router import events_router
-from app.utils.authorization import validate_user_creator_or_organizer
+from app.utils.authorization import (
+    validate_user_creator_or_organizer,
+    validate_same_user_or_superuser
+)
 
 
 ORGANIZERS_PREFIX = '/organizers'
 
 organizers_events_router = APIRouter(
     prefix=events_router.prefix+"/{event_id}"+ORGANIZERS_PREFIX,
-    tags=["Event Suscriptions"]
+    tags=["Event Organizers"]
 )
 
-suscriptions_users_router = APIRouter(
+organizers_users_router = APIRouter(
     prefix=users_router.prefix+"/{user_id}"+ORGANIZERS_PREFIX,
-    tags=["User Suscriptions"]
+    tags=["User Organizers"]
 )
 
 
@@ -29,51 +33,56 @@ def create_organizer(
 ) -> str:
     validate_user_creator_or_organizer(db, event_id, caller_id)
 
-    new_organizer = OrganizerSchema(
-        **organizer.model_dump(),
+    organizer = crud.add_organizer_to_event(
+        db,
+        OrganizerSchema(
+            **organizer.model_dump(),
+            id_event=event_id
+        )
+    )
+    return organizer.id_organizer
+
+
+@organizers_events_router.get(
+    "", response_model=List[OrganizerSchema]
+)
+def read_event_organizers(
+    event_id: str,
+    caller_id: CallerIdDep,
+    db: SessionDep
+):
+    validate_user_creator_or_organizer(db, event_id, caller_id)
+    return crud.get_organizers_in_event(db, event_id)
+
+
+@organizers_users_router.get(
+    "", response_model=List[OrganizerSchema]
+)
+def read_user_event_organizes(
+    user_id: str,
+    caller_id: CallerIdDep,
+    db: SessionDep
+):
+    validate_same_user_or_superuser(db, user_id, caller_id)
+    return crud.get_user_event_organizes(db, user_id)
+
+
+@organizers_events_router.delete(
+    "/{organizer_id}",
+    status_code=204
+)
+def delete_organizer(
+    event_id: str,
+    organizer_id: str,
+    caller_id: CallerIdDep,
+    db: SessionDep
+):
+    validate_user_creator_or_organizer(db, event_id, caller_id)
+    organizer_in_event = OrganizerSchema(
+        id_organizer=organizer_id,
         id_event=event_id
     )
 
-    return crud.add_organizer_to_event(
-        db, new_organizer
+    crud.delete_organizer(
+        db, organizer_in_event
     )
-
-
-# @organizers_router.delete(
-#     "/{event_id}/",
-#     response_model=OrganizerSchema
-# )
-# def delete_organizer(
-#     event_id: str,
-#     user: OrganizerRequestSchema,
-#     caller_id: CallerIdDep,
-#     db: SessionDep
-# ):
-#     validate_user_creator_or_organizer(db, event_id, caller_id)
-#     organizer_in_event = OrganizerSchema(
-#         **user.model_dump(),
-#         id_event=event_id
-#     )
-
-#     return crud.delete_organizer(
-#         db, organizer_in_event
-#     )
-
-
-# @organizers_router.get(
-#     "/events/{event_id}/", response_model=GetSuscriptionReplySchema
-# )
-# def read_event_suscriptions(event_id: str, db: SessionDep):
-#     return crud.read_event_suscriptions(db, event_id)
-
-
-# @organizers_router.get(
-#     "/users", response_model=GetSuscriptionReplySchema
-# )
-# def read_user_suscriptions(
-#     caller_id: CallerIdDep,
-#     db: SessionDep,
-#     offset: int = 0,
-#     limit: int = Query(default=100, le=100)
-# ):
-#     return crud.read_user_suscriptions(db, caller_id, offset, limit)

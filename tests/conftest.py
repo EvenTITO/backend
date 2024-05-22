@@ -124,7 +124,7 @@ def event_from_event_creator(client, event_creator_data):
         description="This is a nice event",
         event_type=EventType.CONFERENCE
     )
-    response = client.post("/events/",
+    response = client.post("/events",
                            json=jsonable_encoder(new_event),
                            headers=create_headers(event_creator_data["id"]))
     return response.json()
@@ -169,7 +169,7 @@ def suscription_data(client, user_data, event_data):
     id_event = event_data['id']
     suscription = SuscriptorRequestSchema(id_suscriptor=user_data["id"])
     id_suscriptor = client.post(
-        f"events/{id_event}/suscriptions/",
+        f"/events/{id_event}/suscriptions/",
         json=jsonable_encoder(suscription),
         headers=create_headers(user_data["id"])
     ).json()
@@ -194,7 +194,8 @@ def organizer_id_from_event(client, event_creator_data,
     request = OrganizerRequestSchema(
         id_organizer=organizer_id
     )
-    client.post(f"/organizers/{event_from_event_creator['id']}",
+    client.post(f"/events/{event_from_event_creator}/organizers",
                 json=jsonable_encoder(request),
-                headers=create_headers(event_creator_data["id"]))
+                headers=create_headers(event_creator_data['id']))
+
     return organizer_id

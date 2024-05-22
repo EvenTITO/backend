@@ -55,6 +55,28 @@ def get_organizer_in_event(db: Session, event_id: str, organizer_id: str):
 
 
 @handle_database_organizer_error
+def get_organizers_in_event(db: Session, event_id: str):
+    return (
+        db
+        .query(OrganizerModel)
+        .filter(
+            OrganizerModel.id_event == event_id
+        ).all()
+    )
+
+
+@handle_database_organizer_error
+def get_user_event_organizes(db: Session, user_id: str):
+    return (
+        db
+        .query(OrganizerModel)
+        .filter(
+            OrganizerModel.id_organizer == user_id
+        ).all()
+    )
+
+
+@handle_database_organizer_error
 def delete_organizer(
     db: Session, organizer_to_delete: OrganizerSchema
 ):

@@ -6,10 +6,10 @@ from app.suscriptions.router import (
     suscriptions_events_router,
     suscriptions_users_router
 )
-# from app.organizers.router import (
-#     organizers_events_router,
-#     organizers_users_router
-# )
+from app.organizers.router import (
+    organizers_events_router,
+    organizers_users_router
+)
 from app.database.database import Base, engine
 
 Base.metadata.create_all(engine)
@@ -49,5 +49,5 @@ app.include_router(users_router)
 app.include_router(events_router)
 app.include_router(suscriptions_events_router)
 app.include_router(suscriptions_users_router)
-# app.include_router(organizers_users_router)
-# app.include_router(organizers_events_router)
+app.include_router(organizers_users_router)
+app.include_router(organizers_events_router)
