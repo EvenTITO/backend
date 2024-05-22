@@ -1,4 +1,7 @@
-from app.utils.authorization import validate_user_permissions
+from app.utils.authorization import (
+    validate_user_permissions,
+    validate_same_user_or_superuser
+)
 from app.utils.dependencies import (
     SessionDep,
     CallerIdDep,
@@ -13,7 +16,7 @@ from .schemas import (
     CompleteUser
 )
 from fastapi import APIRouter
-
+from typing import List
 
 users_router = APIRouter(
     prefix="/users",
@@ -56,6 +59,16 @@ def read_user(
     )
 
 
+@users_router.get("", response_model=List[CompleteUser])
+def read_all_users(
+    _: AdminDep,
+    db: SessionDep,
+    skip: int = 0,
+    limit: int = 100,
+):
+    return crud.get_users(db, skip, limit)
+
+
 @users_router.put("/{user_id}", status_code=204)
 def update_user(
     user_id: str,
@@ -77,5 +90,5 @@ def delete_user(
     caller_user: CallerUserDep,
     db: SessionDep
 ):
-    validate_user_permissions(user_id, caller_user.id)
+    validate_same_user_or_superuser(db, user_id, caller_user.id)
     crud.delete_user(db=db, user_id=user_id)

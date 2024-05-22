@@ -6,6 +6,12 @@ from app.organizers.crud import is_organizer, EVENT_ORGANIZER_NOT_FOUND
 NOT_PERMISSION_ERROR = "Not permission for this method"
 
 
+def validate_same_user_or_superuser(db, user_id, caller_id: str):
+    if (user_id == caller_id):
+        return
+    validate_superuser(db, caller_id)
+
+
 def validate_user_permissions(user_id, caller_id: str):
     if (user_id == caller_id):
         return

@@ -10,7 +10,8 @@ from app.users.model import UserPermission
 from app.users.schemas import UserSchema, RoleSchema
 from app.users.crud import update_permission
 from app.main import app
-from .common import create_headers, EVENTS, get_user
+from .common import create_headers, EVENTS, get_user, USERS
+from uuid import uuid4
 
 
 @pytest.fixture(scope="function")
@@ -52,6 +53,20 @@ def user_data(client):
                            headers=create_headers("iuaealdasldanfasdlasd"))
     user_data_id = response.json()
     return get_user(client, user_data_id)
+
+
+@pytest.fixture(scope="function")
+def post_users(client):
+    ids = []
+    for user in USERS:
+        id = str(uuid4())
+        _ = client.post(
+            "/users",
+            json=jsonable_encoder(user),
+            headers=create_headers(id)
+        )
+        ids.append(id)
+    return ids
 
 
 @pytest.fixture(scope="function")

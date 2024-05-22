@@ -67,6 +67,7 @@ def update_user(db: Session, user_updated: UserSchemaWithId):
     return db_user
 
 
+# At least MIN_NUMBER_ADMINS must be present in the system.
 def check_role_changes(db, old_role, new_role):
     if (
         (old_role == UserPermission.ADMIN.value) and
