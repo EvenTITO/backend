@@ -103,7 +103,7 @@ def test_admin_deletes_other_event_creator_permission(
 def test_not_admin_user_cant_add_admin(client, user_data):
     non_admin_user = UserSchema(
         name="Lio",
-        surname="Messi",
+        lastname="Messi",
         email="email@email.com"
     )
     non_admin_id = "id-non-admin"
@@ -125,7 +125,7 @@ def test_not_admin_user_cant_add_admin(client, user_data):
 def test_not_admin_user_cant_add_creator(client, user_data):
     non_admin_user = UserSchema(
         name="Lio",
-        surname="Messi",
+        lastname="Messi",
         email="email@email.com"
     )
     non_admin_id = "id-non-admin"
@@ -156,7 +156,7 @@ def test_creator_user_cant_add_other_creator(admin_data, client, user_data):
 
     default_role_user = UserSchema(
         name="Lio",
-        surname="Messi",
+        lastname="Messi",
         email="email@email.com"
     )
     default_user_id = "id-default-user"

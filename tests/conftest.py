@@ -46,7 +46,7 @@ def client(current_session):
 def user_data(client):
     new_user = UserSchema(
         name="Lio",
-        surname="Messi",
+        lastname="Messi",
         email="lio_messi@email.com",
     )
     response = client.post("/users",
@@ -74,7 +74,7 @@ def post_users(client):
 def admin_data(current_session, client):
     new_user = UserSchema(
         name="Jorge",
-        surname="Benitez",
+        lastname="Benitez",
         email="jbenitez@email.com",
     )
     response = client.post(
@@ -94,7 +94,7 @@ def admin_data(current_session, client):
 def event_creator_data(client, admin_data):
     event_creator = UserSchema(
         name="Juan",
-        surname="Martinez",
+        lastname="Martinez",
         email="jmartinez@email.com",
     )
     user_id = client.post(
@@ -182,7 +182,7 @@ def organizer_id_from_event(client, event_creator_data,
                             event_from_event_creator):
     organizer = UserSchema(
         name="Martina",
-        surname="Rodriguez",
+        lastname="Rodriguez",
         email="mrodriguez@email.com",
     )
     organizer_id = "frlasdvpqqad08jd"

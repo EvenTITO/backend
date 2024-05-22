@@ -16,7 +16,7 @@ class UserModel(ModelTemplate, Base):
 
     email = Column(String, nullable=False, unique=True)
     name = Column(String, nullable=False)
-    surname = Column(String, nullable=False)
+    lastname = Column(String, nullable=False)
     role = Column(String, default=UserPermission.NO_PERMISSION.value)
 
     events = relationship("EventModel", back_populates="creator")

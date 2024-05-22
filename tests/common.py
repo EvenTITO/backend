@@ -21,17 +21,17 @@ def create_headers(user_id):
 USERS = [
     UserSchema(
         name="Lucia",
-        surname="Benitez",
+        lastname="Benitez",
         email="lbenitez@email.com",
     ),
     UserSchema(
         name="Marta",
-        surname="Benitez",
+        lastname="Benitez",
         email="mbenitez@email.com",
     ),
     UserSchema(
         name="Pedro",
-        surname="Benitez",
+        lastname="Benitez",
         email="pbenitez@email.com",
     )
 ]

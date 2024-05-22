@@ -13,7 +13,7 @@ def test_create_user(client):
     user_id = "aasjdfvhasdvnlaksdj"
     user_data = UserSchema(
         name="Lio",
-        surname="Messi",
+        lastname="Messi",
         email="email@email.com"
     )
     response = client.post("/users",
@@ -51,7 +51,7 @@ def test_create_same_user_twice_fails(client, user_data):
 
 
 def test_create_empty_user_fails(client):
-    empty_user = {"name": "", "surname": "", "email": ""}
+    empty_user = {"name": "", "lastname": "", "email": ""}
     response = client.post("/users", json=empty_user,
                            headers=create_headers("a-valid-id"))
     print(response.json())
@@ -62,7 +62,7 @@ def test_create_empty_user_fails(client):
 def test_create_invalid_email_fails(client):
     user_invalid_email = {
         "name": "Juan",
-        "surname": "Perez",
+        "lastname": "Perez",
         "email": "invalid_email.com",
     }
     response = client.post("/users", json=user_invalid_email,

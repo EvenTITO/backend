@@ -11,10 +11,8 @@ from app.utils.authorization import (
 )
 
 
-ORGANIZERS_PREFIX = '/organizers'
-
 organizers_events_router = APIRouter(
-    prefix=events_router.prefix+"/{event_id}"+ORGANIZERS_PREFIX,
+    prefix=events_router.prefix+"/{event_id}"+'/organizers',
     tags=["Event Organizers"]
 )
 

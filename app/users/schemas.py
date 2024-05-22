@@ -4,7 +4,7 @@ from .model import UserPermission
 
 class UserSchema(BaseModel):
     name: str = Field(min_length=2)
-    surname: str = Field(min_length=2)
+    lastname: str = Field(min_length=2)
     email: EmailStr
 
     model_config = {
@@ -12,7 +12,7 @@ class UserSchema(BaseModel):
             "examples": [
                 {
                     "name": "Pepe",
-                    "surname": "Argento",
+                    "lastname": "Argento",
                     "email": "email@email.com",
                 }
             ]
