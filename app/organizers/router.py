@@ -19,7 +19,7 @@ organizers_events_router = APIRouter(
 )
 
 organizers_users_router = APIRouter(
-    prefix=users_router.prefix+"/{user_id}"+ORGANIZERS_PREFIX,
+    prefix=users_router.prefix+"/{user_id}"+'/organized-events',
     tags=["User Organizers"]
 )
 
