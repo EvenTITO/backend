@@ -34,7 +34,7 @@ def read_event_suscriptions(event_id: str, db: SessionDep):
 
 
 @suscriptions_router.get(
-    "/users/", response_model=GetSuscriptionReplySchema
+    "/users", response_model=GetSuscriptionReplySchema
 )
 def read_user_suscriptions(
     caller_id: CallerIdDep,

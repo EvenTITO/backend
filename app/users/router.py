@@ -21,27 +21,28 @@ users_router = APIRouter(
 )
 
 
-@users_router.post("/", response_model=UserSchemaWithId)
+@users_router.post("", status_code=201)
 def create_user(
     user: UserSchema,
     db: SessionDep,
     caller_id: CallerIdDep,
-):
+) -> str:
     user_with_id = UserSchemaWithId(
         **user.model_dump(),
         id=caller_id
     )
-    return crud.create_user(db=db, user=user_with_id)
+    user_created = crud.create_user(db=db, user=user_with_id)
+    return user_created.id
 
 
-@users_router.patch("/permissions/{user_id}", response_model=CompleteUser)
+@users_router.patch("/permissions/{user_id}", status_code=204)
 def update_user_permission(
     user_id: str,
     role: RoleSchema,
     _: AdminDep,
     db: SessionDep
 ):
-    return crud.update_permission(db, user_id, role.role)
+    crud.update_permission(db, user_id, role.role)
 
 
 @users_router.get("/{user_id}", response_model=CompleteUser)
@@ -55,24 +56,26 @@ def read_user(
     )
 
 
-@users_router.put("/", response_model=UserSchemaWithId)
+@users_router.put("/{user_id}", status_code=204)
 def update_user(
+    user_id: str,
     user: UserSchema,
     caller_id: CallerIdDep,
     db: SessionDep
 ):
+    validate_user_permissions(user_id, caller_id)
     user_with_id = UserSchemaWithId(
         **user.model_dump(),
-        id=caller_id
+        id=user_id
     )
-    return crud.update_user(db=db, user_updated=user_with_id)
+    crud.update_user(db=db, user_updated=user_with_id)
 
 
-@users_router.delete("/{user_id}", response_model=UserSchemaWithId)
+@users_router.delete("/{user_id}", status_code=204)
 def delete_user(
     user_id: str,
     caller_user: CallerUserDep,
     db: SessionDep
 ):
-    validate_user_permissions(user_id, caller_user)
-    return crud.delete_user(db=db, user_id=user_id)
+    validate_user_permissions(user_id, caller_user.id)
+    crud.delete_user(db=db, user_id=user_id)

@@ -59,7 +59,7 @@ def create_organizer(
 
 
 # @organizers_router.get(
-#     "/users/", response_model=GetSuscriptionReplySchema
+#     "/users", response_model=GetSuscriptionReplySchema
 # )
 # def read_user_suscriptions(
 #     caller_id: CallerIdDep,

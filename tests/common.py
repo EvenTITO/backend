@@ -2,6 +2,15 @@ from app.events.schemas import EventSchema
 from app.events.model import EventType
 
 
+def get_user(client, user_id):
+    response = client.get(
+        f"/users/{user_id}",
+        headers=create_headers(user_id)
+    )
+
+    return response.json()
+
+
 def create_headers(user_id):
     return {
         "X-User-Id": user_id

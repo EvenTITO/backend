@@ -1,14 +1,13 @@
 from fastapi import HTTPException
 from .crud_utils import get_user
-from app.users.model import UserModel
 from app.events.crud import is_creator
 from app.organizers.crud import is_organizer, EVENT_ORGANIZER_NOT_FOUND
 
 NOT_PERMISSION_ERROR = "Not permission for this method"
 
 
-def validate_user_permissions(user_id, caller_user: UserModel):
-    if (user_id == caller_user.id):
+def validate_user_permissions(user_id, caller_id: str):
+    if (user_id == caller_id):
         return
     else:
         raise HTTPException(

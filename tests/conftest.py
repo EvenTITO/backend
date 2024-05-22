@@ -10,7 +10,7 @@ from app.users.model import UserPermission
 from app.users.schemas import UserSchema, RoleSchema
 from app.users.crud import update_permission
 from app.main import app
-from .common import create_headers, EVENTS
+from .common import create_headers, EVENTS, get_user
 
 
 @pytest.fixture(scope="function")
@@ -47,10 +47,11 @@ def user_data(client):
         surname="Messi",
         email="lio_messi@email.com",
     )
-    response = client.post("/users/",
+    response = client.post("/users",
                            json=jsonable_encoder(new_user),
                            headers=create_headers("iuaealdasldanfasdlasd"))
-    return response.json()
+    user_data_id = response.json()
+    return get_user(client, user_data_id)
 
 
 @pytest.fixture(scope="function")
@@ -61,12 +62,12 @@ def admin_data(current_session, client):
         email="jbenitez@email.com",
     )
     response = client.post(
-        "/users/",
+        "/users",
         json=jsonable_encoder(new_user),
         headers=create_headers("iuaealdasldanfas98298329")
     )
 
-    id_admin = response.json()['id']
+    id_admin = response.json()
     user_updated = update_permission(
         current_session, id_admin, UserPermission.ADMIN.value
     )
@@ -81,7 +82,7 @@ def event_creator_data(client, admin_data):
         email="jmartinez@email.com",
     )
     event_creator_response = client.post(
-        "/users/",
+        "/users",
         json=jsonable_encoder(event_creator),
         headers=create_headers("lakjsdeuimx213klasmd3")
     )
@@ -161,7 +162,7 @@ def organizer_id_from_event(client, event_creator_data,
     )
     organizer_id = "frlasdvpqqad08jd"
     client.post(
-        "/users/",
+        "/users",
         json=jsonable_encoder(organizer),
         headers=create_headers(organizer_id)
     )
