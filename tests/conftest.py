@@ -12,6 +12,7 @@ from app.users.crud import update_permission
 from app.main import app
 from .common import create_headers, EVENTS, get_user, USERS
 from uuid import uuid4
+from app.suscriptions.schemas import SuscriptorRequestSchema
 
 
 @pytest.fixture(scope="function")
@@ -96,20 +97,22 @@ def event_creator_data(client, admin_data):
         surname="Martinez",
         email="jmartinez@email.com",
     )
-    event_creator_response = client.post(
+    user_id = client.post(
         "/users",
         json=jsonable_encoder(event_creator),
         headers=create_headers("lakjsdeuimx213klasmd3")
-    )
+    ).json()
     new_role = RoleSchema(
         role=UserPermission.EVENT_CREATOR.value
     )
-    response = client.patch(
-        f"/users/permissions/{event_creator_response.json()['id']}",
+    _ = client.patch(
+        f"/users/permissions/{user_id}",
         json=jsonable_encoder(new_role),
         headers=create_headers(admin_data.id)
     )
-    return response.json()
+
+    event_creator_user = get_user(client, user_id)
+    return event_creator_user
 
 
 @pytest.fixture(scope="function")
@@ -136,35 +139,42 @@ def event_data(client, admin_data):
         description="This is a nice event",
         event_type=EventType.CONFERENCE
     )
-    response = client.post("/events/",
+    event_id = client.post("/events",
                            json=jsonable_encoder(new_event),
-                           headers=create_headers(admin_data.id))
+                           headers=create_headers(admin_data.id)).json()
 
-    return response.json()
+    event_dict = {
+        **new_event.model_dump(),
+        'id': event_id
+    }
+    return event_dict
 
 
 @pytest.fixture(scope="function")
 def all_events_data(client, admin_data):
-    responses = []
+    ids_events = []
     for event in EVENTS:
         response = client.post(
             "/events",
             json=jsonable_encoder(event),
             headers=create_headers(admin_data.id)
         )
-        responses.append(response.json())
+        ids_events.append(response.json())
 
-    return responses
+    return ids_events
 
 
 @pytest.fixture(scope="function")
 def suscription_data(client, user_data, event_data):
     id_event = event_data['id']
-    response = client.post(
-        f"/suscriptions/{id_event}/",
+    suscription = SuscriptorRequestSchema(id_suscriptor=user_data["id"])
+    id_suscriptor = client.post(
+        f"events/{id_event}/suscriptions/",
+        json=jsonable_encoder(suscription),
         headers=create_headers(user_data["id"])
-    )
-    return response.json()
+    ).json()
+
+    return {'id_event': id_event, 'id_suscriptor': id_suscriptor}
 
 
 @pytest.fixture(scope="function")

@@ -1,10 +1,7 @@
-from app.utils.authorization import validate_user_permissions
+# from app.utils.authorization import validate_user_permissions
 from .model import SuscriptionModel
 from sqlalchemy.orm import Session
-from .schemas import (
-    GetSuscriptionReplySchema,
-    SuscriptionSchema
-)
+from .schemas import SuscriptionSchema
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from fastapi import HTTPException
 import logging
@@ -72,35 +69,28 @@ def suscribe_user_to_event(db: Session, suscription: SuscriptionSchema):
 
 @handle_database_suscription_error
 def read_event_suscriptions(db: Session, event_id: str):
-    suscriptions = get_event_suscriptions(db, event_id)
-    suscriptions_dicts = [suscription.to_dict()
-                          for suscription in suscriptions]
-    return GetSuscriptionReplySchema(suscriptions=suscriptions_dicts)
+    return get_event_suscriptions(db, event_id)
 
 
 @handle_database_suscription_error
 def read_user_suscriptions(db: Session, user_id: str, offset: int, limit: int):
-    suscriptions = db \
+    return db \
         .query(SuscriptionModel) \
         .filter(
             SuscriptionModel.id_suscriptor == user_id
         ).offset(offset).limit(limit).all()
 
-    suscriptions_dicts = [suscription.to_dict()
-                          for suscription in suscriptions]
-    return GetSuscriptionReplySchema(suscriptions=suscriptions_dicts)
 
+# @handle_database_suscription_error
+# def delete_suscriptions_to_event(db: Session, caller_id: str, event_id: str):
+#     validate_user_permissions(db, caller_id)
 
-@handle_database_suscription_error
-def delete_suscriptions_to_event(db: Session, caller_id: str, event_id: str):
-    validate_user_permissions(db, caller_id)
+#     suscriptions = get_event_suscriptions(db, event_id)
+#     suscriptions_dicts = []
+#     for suscription in suscriptions:
+#         db.delete(suscription)
+#         suscriptions_dicts.append(suscription.to_dict())
 
-    suscriptions = get_event_suscriptions(db, event_id)
-    suscriptions_dicts = []
-    for suscription in suscriptions:
-        db.delete(suscription)
-        suscriptions_dicts.append(suscription.to_dict())
+#     db.commit()
 
-    db.commit()
-
-    return GetSuscriptionReplySchema(suscriptions=suscriptions_dicts)
+#     return GetSuscriptionReplySchema(suscriptions=suscriptions_dicts)

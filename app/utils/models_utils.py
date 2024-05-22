@@ -5,7 +5,10 @@ from sqlalchemy.orm import declarative_mixin
 
 
 @declarative_mixin
-class ModelTemplate:
-    id = Column(String, default=lambda: str(uuid4()), primary_key=True)
-
+class DateTemplate:
     creation_date = Column(DateTime, default=datetime.now(), nullable=False)
+
+
+@declarative_mixin
+class ModelTemplate(DateTemplate):
+    id = Column(String, default=lambda: str(uuid4()), primary_key=True)

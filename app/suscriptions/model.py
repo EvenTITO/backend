@@ -2,6 +2,7 @@ from enum import Enum
 from sqlalchemy import Column, String, ForeignKey
 from app.database.database import Base
 from sqlalchemy.orm import relationship
+from app.utils.models_utils import DateTemplate
 
 
 class SuscriptionStatus(str, Enum):
@@ -9,7 +10,7 @@ class SuscriptionStatus(str, Enum):
     PAYMENT_COMPLETED = "PAYMENT_COMPLETED"
 
 
-class SuscriptionModel(Base):
+class SuscriptionModel(DateTemplate, Base):
     __tablename__ = "suscriptions"
 
     id_suscriptor = Column(String, ForeignKey("users.id"), primary_key=True)
