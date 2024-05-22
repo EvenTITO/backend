@@ -40,3 +40,29 @@ def add_organizer_to_event(
     db.refresh(new_organizer)
 
     return new_organizer
+
+
+@handle_database_organizer_error
+def get_organizer_in_event(db: Session, event_id: str, organizer_id: str):
+    return (
+        db
+        .query(OrganizerModel)
+        .filter(
+            OrganizerModel.id_event == event_id,
+            OrganizerModel.id_organizer == organizer_id
+        ).one()
+    )
+
+
+@handle_database_organizer_error
+def delete_organizer(
+    db: Session, organizer_to_delete: OrganizerSchema
+):
+    organizer = get_organizer_in_event(
+        db,
+        organizer_to_delete.id_event,
+        organizer_to_delete.id_organizer
+    )
+    db.delete(organizer)
+    db.commit()
+    return organizer

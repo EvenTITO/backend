@@ -85,7 +85,7 @@ def test_event_organizer_tries_remove_event_creator_fails(
     response = client.delete(f"/organizers/{event_from_event_creator['id']}",
                              json=jsonable_encoder(request),
                              headers=create_headers(organizer_id_from_event))
-    assert response.status_code == 404
+    assert response.status_code == 403
 
 
 def test_simple_user_tries_remove_organizer_fails(

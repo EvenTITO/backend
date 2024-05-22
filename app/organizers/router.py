@@ -4,6 +4,7 @@ from .schemas import OrganizerRequestSchema, OrganizerSchema
 from fastapi import APIRouter
 from app.utils.authorization import validate_user_creator_or_organizer
 
+
 organizers_router = APIRouter(prefix="/organizers", tags=["Organizers"])
 
 
@@ -27,6 +28,27 @@ def create_organizer(
     return crud.add_organizer_to_event(
         db, new_organizer
     )
+
+
+# @organizers_router.delete(
+#     "/{event_id}/",
+#     response_model=OrganizerSchema
+# )
+# def delete_organizer(
+#     event_id: str,
+#     user: OrganizerRequestSchema,
+#     caller_id: CallerIdDep,
+#     db: SessionDep
+# ):
+#     validate_user_creator_or_organizer(db, event_id, caller_id)
+#     organizer_in_event = OrganizerSchema(
+#         **user.model_dump(),
+#         id_event=event_id
+#     )
+
+#     return crud.delete_organizer(
+#         db, organizer_in_event
+#     )
 
 
 # @organizers_router.get(
