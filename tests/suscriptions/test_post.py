@@ -7,42 +7,43 @@ from ..common import create_headers
 PAYMENT_INCOMPLETED = SuscriptionStatus.PAYMENT_INCOMPLETED.value
 
 
-def test_post_suscription(client, user_data, event_data):
-    id_event = event_data['id']
-    suscription = SuscriptorRequestSchema(id_suscriptor=user_data["id"])
+def test_post_suscription(client, make_suscription):
+    suscription_dict = make_suscription()
+    id_event = suscription_dict['id_event']
+    id_suscriptor = suscription_dict['id_suscriptor']
+
     response = client.post(
         f"/events/{id_event}/suscriptions",
-        json=jsonable_encoder(suscription),
-        headers=create_headers(user_data["id"])
+        json=suscription_dict['json'],
+        headers=create_headers(id_suscriptor)
     )
     assert response.status_code == 201
-    assert response.json() == user_data['id']
+    assert response.json() == id_suscriptor
 
 
-def test_post_suscription_without_event_fails(
-        client,
-        user_data
-):
-    id_event = "event-does-not-exists"
-    suscription = SuscriptorRequestSchema(id_suscriptor=user_data["id"])
+def test_post_suscription_without_event_fails(client, make_suscription):
+    id_event = 'event-does-not-exists'
+    suscription_dict = make_suscription(id_event)
+    id_suscriptor = suscription_dict['id_suscriptor']
 
     response = client.post(
         f"/events/{id_event}/suscriptions",
-        json=jsonable_encoder(suscription),
-        headers=create_headers(user_data["id"])
+        json=suscription_dict['json'],
+        headers=create_headers(id_suscriptor)
     )
     assert response.status_code == 409
     assert response.json()["detail"] == EVENT_NOT_FOUND
 
 
-def test_post_suscription_without_user_fails(client, event_data):
-    id_event = event_data['id']
-    id_user_not_exists = 'id-user-does-not-exists'
-    suscription = SuscriptorRequestSchema(id_suscriptor=id_user_not_exists)
+def test_post_suscription_without_user_fails(client, make_suscription):
+    id_suscriptor = 'user-does-not-exists'
+    suscription_dict = make_suscription(id_user=id_suscriptor)
+    id_event = suscription_dict['id_event']
+
     response = client.post(
         f"/events/{id_event}/suscriptions",
-        json=jsonable_encoder(suscription),
-        headers=create_headers(id_user_not_exists)
+        json=suscription_dict['json'],
+        headers=create_headers(id_suscriptor)
     )
     assert response.status_code == 409
     assert response.json()["detail"] == USER_NOT_FOUNT
