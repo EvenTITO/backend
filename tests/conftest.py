@@ -8,11 +8,14 @@ from app.organizers.schemas import OrganizerRequestSchema
 from app.utils.dependencies import get_db
 from app.users.model import UserPermission
 from app.users.schemas import UserSchema, RoleSchema
-from app.users.crud import update_permission
 from app.main import app
-from .common import create_headers, EVENTS, get_user, USERS
-from uuid import uuid4
+from .common import create_headers, EVENTS, get_user
 from app.suscriptions.schemas import SuscriptorRequestSchema
+from .fixtures.users import *
+from .fixtures.events import *
+from .fixtures.suscriptions import *
+from .fixtures.organizers import *
+from .fixtures.reviewers import *
 
 
 @pytest.fixture(scope="function")
@@ -32,7 +35,6 @@ def current_session():
 
 @pytest.fixture(scope="function")
 def client(current_session):
-
     def get_db_override():
         return current_session
 
@@ -40,54 +42,6 @@ def client(current_session):
 
     with TestClient(app) as c:
         yield c
-
-
-@pytest.fixture(scope="function")
-def user_data(client):
-    new_user = UserSchema(
-        name="Lio",
-        lastname="Messi",
-        email="lio_messi@email.com",
-    )
-    response = client.post("/users",
-                           json=jsonable_encoder(new_user),
-                           headers=create_headers("iuaealdasldanfasdlasd"))
-    user_data_id = response.json()
-    return get_user(client, user_data_id)
-
-
-@pytest.fixture(scope="function")
-def post_users(client):
-    ids = []
-    for user in USERS:
-        id = str(uuid4())
-        _ = client.post(
-            "/users",
-            json=jsonable_encoder(user),
-            headers=create_headers(id)
-        )
-        ids.append(id)
-    return ids
-
-
-@pytest.fixture(scope="function")
-def admin_data(current_session, client):
-    new_user = UserSchema(
-        name="Jorge",
-        lastname="Benitez",
-        email="jbenitez@email.com",
-    )
-    response = client.post(
-        "/users",
-        json=jsonable_encoder(new_user),
-        headers=create_headers("iuaealdasldanfas98298329")
-    )
-
-    id_admin = response.json()
-    user_updated = update_permission(
-        current_session, id_admin, UserPermission.ADMIN.value
-    )
-    return user_updated
 
 
 @pytest.fixture(scope="function")

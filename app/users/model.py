@@ -23,8 +23,11 @@ class UserModel(ModelTemplate, Base):
     suscriptions = relationship(
         "SuscriptionModel", back_populates="suscriptor"
     )
-    organizers = relationship(
+    organized_events = relationship(
         "OrganizerModel", back_populates="organizer"
+    )
+    assigned_reviews = relationship(
+        "ReviewerModel", back_populates="reviewer"
     )
 
     def __repr__(self):

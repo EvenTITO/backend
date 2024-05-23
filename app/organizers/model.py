@@ -10,5 +10,5 @@ class OrganizerModel(DateTemplate, Base):
     id_organizer = Column(String, ForeignKey("users.id"), primary_key=True)
     id_event = Column(String, ForeignKey("events.id"), primary_key=True)
 
-    organizer = relationship("UserModel", back_populates="organizers")
+    organizer = relationship("UserModel", back_populates="organized_events")
     event = relationship("EventModel", back_populates="organizers")

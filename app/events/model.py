@@ -31,6 +31,9 @@ class EventModel(ModelTemplate, Base):
     creator = relationship("UserModel", back_populates="events")
     suscriptions = relationship("SuscriptionModel", back_populates="event")
     organizers = relationship("OrganizerModel", back_populates="event")
+    reviewers = relationship(
+        "ReviewerModel", back_populates="event"
+    )
 
     @validates("start_date")
     def validate_start_date(self, key, start_date):
