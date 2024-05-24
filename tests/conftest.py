@@ -6,7 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from app.database.database import SessionLocal, engine
 from app.organizers.schemas import OrganizerRequestSchema
 from app.utils.dependencies import get_db
-from app.users.model import UserPermission
+from app.users.model import UserRole
 from app.users.schemas import UserSchema, RoleSchema
 from app.users.crud import update_permission
 from app.main import app
@@ -85,7 +85,7 @@ def admin_data(current_session, client):
 
     id_admin = response.json()
     user_updated = update_permission(
-        current_session, id_admin, UserPermission.ADMIN.value
+        current_session, id_admin, UserRole.ADMIN.value
     )
     return user_updated
 
@@ -103,7 +103,7 @@ def event_creator_data(client, admin_data):
         headers=create_headers("lakjsdeuimx213klasmd3")
     ).json()
     new_role = RoleSchema(
-        role=UserPermission.EVENT_CREATOR.value
+        role=UserRole.EVENT_CREATOR.value
     )
     _ = client.patch(
         f"/users/permissions/{user_id}",

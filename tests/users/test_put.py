@@ -23,3 +23,14 @@ def test_put_user_not_exists(client, user_data):
                           json=user_changes,
                           headers=create_headers(different_id))
     assert response.status_code == 404
+
+
+def test_email_cant_change(client, user_data):
+    update_user_data = user_data.copy()
+    update_user_data["email"] = "nuevo_email@gmail.com"
+    caller_id = update_user_data.pop('id')
+    response = client.put(f"/users/{caller_id}",
+                          json=update_user_data,
+                          headers=create_headers(caller_id))
+
+    assert response.status_code == 409

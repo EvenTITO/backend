@@ -1,7 +1,5 @@
 from app.events.crud import EVENT_NOT_FOUND
 
-# ------------------------------- GET TESTS ------------------------------- #
-
 
 def test_get_event(client, event_data):
     response = client.get(f"/events/{event_data['id']}")

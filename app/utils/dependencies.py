@@ -1,12 +1,10 @@
 from typing import Annotated
 from sqlalchemy.orm import Session
-from .authorization import NOT_PERMISSION_ERROR
-from app.users.model import UserModel, UserPermission
-from app.users.crud import USER_NOT_FOUND_DETAIL
-from app.utils.crud_utils import get_user
+from app.users.model import UserModel, UserRole
+from app.users.crud import get_user_by_id
+from app.users.exceptions import UserNotFound
 from fastapi import Header, HTTPException, Depends
 from app.database.database import SessionLocal
-from sqlalchemy.exc import NoResultFound
 
 
 def get_db():
@@ -30,21 +28,21 @@ CallerIdDep = Annotated[str, Depends(get_user_id)]
 
 
 def get_caller_user(caller_id: CallerIdDep, db: SessionDep) -> UserModel:
-    try:
-        user = get_user(db, caller_id)
-        return user
-    except NoResultFound:
-        raise HTTPException(status_code=404, detail=USER_NOT_FOUND_DETAIL)
+    user = get_user_by_id(db, caller_id)
+    if not user:
+        raise UserNotFound(caller_id)
+
+    return user
 
 
 CallerUserDep = Annotated[UserModel, Depends(get_caller_user)]
 
 
 def get_admin_user(caller_user: CallerUserDep) -> UserModel:
-    if caller_user.role == UserPermission.ADMIN.value:
+    if caller_user.role == UserRole.ADMIN:
         return caller_user
     else:
-        raise HTTPException(status_code=403, detail=NOT_PERMISSION_ERROR)
+        raise HTTPException(status_code=403)
 
 
 AdminDep = Annotated[UserModel, Depends(get_admin_user)]
@@ -52,12 +50,35 @@ AdminDep = Annotated[UserModel, Depends(get_admin_user)]
 
 def get_creator_user(caller_user: CallerUserDep) -> UserModel:
     if (
-        (caller_user.role == UserPermission.ADMIN.value) or
-        (caller_user.role == UserPermission.EVENT_CREATOR.value)
+        (caller_user.role == UserRole.ADMIN) or
+        (caller_user.role == UserRole.EVENT_CREATOR)
     ):
         return caller_user
     else:
-        raise HTTPException(status_code=403, detail=NOT_PERMISSION_ERROR)
+        raise HTTPException(status_code=403)
 
 
 CreatorDep = Annotated[UserModel, Depends(get_creator_user)]
+
+
+class SameUserOrAdmin:
+    def __call__(self, user_id: str, caller_user: CallerUserDep):
+        if user_id != caller_user.id and caller_user.role != UserRole.ADMIN:
+            raise HTTPException(status_code=403)
+
+        return caller_user
+
+
+same_user_or_admin = SameUserOrAdmin()
+SameUserOrAdminDep = Annotated[UserModel, Depends(same_user_or_admin)]
+
+
+class SameUser:
+    def __call__(self, user_id: str, caller_user: CallerUserDep):
+        if user_id != caller_user.id:
+            raise HTTPException(status_code=403)
+        return caller_user
+
+
+same_user = SameUser()
+SameUserDep = Annotated[UserModel, Depends(same_user)]
