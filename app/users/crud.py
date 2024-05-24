@@ -4,12 +4,6 @@ from .schemas import UserSchema
 from app.utils.crud_utils import get_user
 
 
-USER_NOT_FOUND_DETAIL = "User not found"
-EMAIL_ALREADY_EXISTS = "Email already exists"
-ID_ALREADY_EXISTS = "Id already exists"
-NOT_ENOUGH_ADMINS_ERROR = "System must have at least 1 admin"
-
-
 def get_user_by_id(db: Session, user_id: str):
     return db.query(UserModel).filter(UserModel.id == user_id).first()
 
