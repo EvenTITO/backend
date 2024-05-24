@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from .model import UserModel, UserRole
 from .schemas import UserSchema
-from app.utils.crud_utils import get_user
 
 
 def get_user_by_id(db: Session, user_id: str):
@@ -24,14 +23,12 @@ def create_user(db: Session, id: str, user: UserSchema):
     return db_user
 
 
-def update_user(db: Session, id: str, user_to_update: UserSchema):
-    db_user = get_user(db, id)
-
+def update_user(db: Session, current_user: UserModel, user_to_update: UserSchema):
     for attr, value in user_to_update.model_dump().items():
-        setattr(db_user, attr, value)
+        setattr(current_user, attr, value)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(current_user)
+    return current_user
 
 
 def get_amount_admins(db):
@@ -39,13 +36,15 @@ def get_amount_admins(db):
     return db.query(UserModel).filter(UserModel.role == admin_role).count()
 
 
-def update_permission(db: Session, user_id: str, new_role: UserRole):
-    db_user = get_user(db, user_id)
-    setattr(db_user, "role", new_role)
-
+def update_permission(
+    db: Session,
+    current_user: UserModel,
+    new_role: UserRole
+):
+    setattr(current_user, "role", new_role)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(current_user)
+    return current_user
 
 
 def delete_user(db: Session, user: UserModel):

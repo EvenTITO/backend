@@ -1,7 +1,7 @@
 from app.users.model import UserRole
 from app.users.schemas import UserSchema, RoleSchema
 from fastapi.encoders import jsonable_encoder
-from ..common import create_headers, get_user
+from ..common import create_headers, get_user_method
 
 
 def test_basic_user_has_DEFAULT(client, user_data):
@@ -21,7 +21,7 @@ def test_change_permission_to_admin(admin_data, client, user_data):
         headers=create_headers(admin_data.id)
     )
     assert response.status_code == 204
-    user = get_user(client, user_data['id'])
+    user = get_user_method(client, user_data['id'])
 
     assert user['id'] == user_data['id']
     assert user['role'] == UserRole.ADMIN.value
@@ -37,7 +37,7 @@ def test_change_permission_to_event_creator(admin_data, client, user_data):
         headers=create_headers(admin_data.id)
     )
     assert response.status_code == 204
-    user = get_user(client, user_data['id'])
+    user = get_user_method(client, user_data['id'])
     assert user['id'] == user_data['id']
     assert user['role'] == UserRole.EVENT_CREATOR.value
 
@@ -65,7 +65,7 @@ def test_admin_deletes_other_admin_permission(admin_data, client, user_data):
 
     assert response.status_code == 204
 
-    user = get_user(client, user_data['id'])
+    user = get_user_method(client, user_data['id'])
     assert user['role'] == UserRole.DEFAULT.value
 
 
@@ -95,7 +95,7 @@ def test_admin_deletes_other_event_creator_permission(
     )
 
     assert response.status_code == 204
-    user = get_user(client, user_data['id'])
+    user = get_user_method(client, user_data['id'])
     assert user['role'] == UserRole.DEFAULT.value
 
 
@@ -235,5 +235,5 @@ def test_admin_can_change_self(client, admin_data, user_data):
 
     assert response.status_code == 204
 
-    user = get_user(client, admin_data.id)
+    user = get_user_method(client, admin_data.id)
     assert user['role'] == UserRole.DEFAULT.value

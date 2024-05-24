@@ -9,8 +9,9 @@ from app.utils.dependencies import get_db
 from app.users.model import UserRole
 from app.users.schemas import UserSchema, RoleSchema
 from app.users.crud import update_permission
+from app.users.utils import get_user
 from app.main import app
-from .common import create_headers, EVENTS, get_user, USERS
+from .common import create_headers, EVENTS, get_user_method, USERS
 from uuid import uuid4
 from app.suscriptions.schemas import SuscriptorRequestSchema
 
@@ -53,7 +54,7 @@ def user_data(client):
                            json=jsonable_encoder(new_user),
                            headers=create_headers("iuaealdasldanfasdlasd"))
     user_data_id = response.json()
-    return get_user(client, user_data_id)
+    return get_user_method(client, user_data_id)
 
 
 @pytest.fixture(scope="function")
@@ -77,15 +78,18 @@ def admin_data(current_session, client):
         lastname="Benitez",
         email="jbenitez@email.com",
     )
+    id_user = "iuaealdasldanfas98298329"
     response = client.post(
         "/users",
         json=jsonable_encoder(new_user),
-        headers=create_headers("iuaealdasldanfas98298329")
+        headers=create_headers(id_user)
     )
 
-    id_admin = response.json()
+    # id_admin = response.json()
+    user = get_user(current_session, id_user)
+
     user_updated = update_permission(
-        current_session, id_admin, UserRole.ADMIN.value
+        current_session, user, UserRole.ADMIN.value
     )
     return user_updated
 
@@ -111,7 +115,7 @@ def event_creator_data(client, admin_data):
         headers=create_headers(admin_data.id)
     )
 
-    event_creator_user = get_user(client, user_id)
+    event_creator_user = get_user_method(client, user_id)
     return event_creator_user
 
 

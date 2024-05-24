@@ -7,7 +7,7 @@ from app.utils.dependencies import (
     SameUserDep,
 )
 from app.users import crud, validations
-from .utils import get_user
+from app.users.utils import get_user
 from .schemas import UserSchema, RoleSchema, UserReply
 from typing import List
 
@@ -37,7 +37,8 @@ def update_user_permission(
         caller_user,
         role
     )
-    crud.update_permission(db, user_id, role.role)
+    current_user = get_user(db, user_id)
+    crud.update_permission(db, current_user, role.role)
 
 
 @users_router.get("/{user_id}", response_model=UserReply)
@@ -57,10 +58,10 @@ def read_all_users(
 
 @users_router.put("/{user_id}", status_code=204, response_model=None)
 def update_user(
-    user_id: str, user: UserSchema, caller_user: SameUserDep, db: SessionDep
+    user: UserSchema, caller_user: SameUserDep, db: SessionDep
 ):
     validations.validate_user_change(user, caller_user)
-    crud.update_user(db=db, id=user_id, user_to_update=user)
+    crud.update_user(db=db, current_user=caller_user, user_to_update=user)
 
 
 @users_router.delete("/{user_id}", status_code=204, response_model=None)
