@@ -1,10 +1,9 @@
 from sqlalchemy.orm import Session
 from .model import EventModel
 from .schemas import (
-    CreateEventSchema,
-    ModifyEventSchema,
-    PublicEventsSchema
+    EventSchema
 )
+from app.organizers.model import OrganizerModel
 from app.utils.exceptions import DatesException
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from fastapi import HTTPException
@@ -44,46 +43,51 @@ def handle_database_event_error(handler):
     return wrapper
 
 
-@handle_database_event_error
-def get_event(db: Session, event_id: str):
-    return db.query(EventModel).filter(EventModel.id == event_id).one()
+def get_event_by_id(db: Session, event_id: str):
+    return db.query(EventModel).filter(EventModel.id == event_id).first()
 
 
-@handle_database_event_error
+def get_event_by_title(db: Session, event_title: str):
+    return db.query(EventModel).filter(EventModel.title == event_title).first()
+
+
 def get_all_events(db: Session, offset: int, limit: int):
-    events = db.query(EventModel).offset(offset).limit(limit).all()
-    events_dicts = [event.to_dict() for event in events]
-    return PublicEventsSchema(events=events_dicts)
+    return db.query(EventModel).offset(offset).limit(limit).all()
 
 
-@handle_database_event_error
-def create_event(db: Session, event: CreateEventSchema) -> EventModel:
-    db_event = EventModel(**event.model_dump())
+def create_event(db: Session, event: EventSchema, id_creator: str):
+    db_event = EventModel(**event.model_dump(), id_creator=id_creator)
     db.add(db_event)
     db.flush()
 
-    # organizer = EventOrganizerModel(
-    #     id_organizer=event.id_creator, id_event=db_event.id
-    # )
-    # db.add(organizer)
+    db_organizer = OrganizerModel(
+        id_organizer=id_creator,
+        id_event=db_event.id
+    )
+    db.add(db_organizer)
+    db.flush()
+
     db.commit()
     db.refresh(db_event)
     return db_event
 
 
-@handle_database_event_error
-def update_event(db: Session, event_updated: ModifyEventSchema):
-    db_event = get_event(db, event_updated.id)
-    for attr, value in event_updated.model_dump().items():
-        setattr(db_event, attr, value)
+def update_event(
+    db: Session,
+    current_event: EventModel,
+    event_modification: EventSchema
+):
+    for attr, value in event_modification.model_dump().items():
+        setattr(current_event, attr, value)
     db.commit()
+    db.refresh(current_event)
 
-    return db_event
+    return current_event
 
 
 @handle_database_event_error
 def delete_event(db: Session, event_id: str):
-    event = get_event(db, event_id)
+    event = get_event_by_id(db, event_id)
     db.delete(event)
     db.commit()
 

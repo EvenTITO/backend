@@ -24,8 +24,8 @@ def test_get_organizers_with_new_organizer(
     assert response.status_code == 200
 
     organizers_list = response.json()
-    assert len(organizers_list) == 1
-    assert organizers_list[0]['id_organizer'] == user_data['id']
+    assert len(organizers_list) == 2
+    assert organizers_list[1]['id_organizer'] == user_data['id']
 
 
 def test_get_events_with_new_organizer(

@@ -1,6 +1,6 @@
 from fastapi import HTTPException
-from .crud_utils import get_user
 from app.events.crud import is_creator
+from app.users import crud
 from app.organizers.crud import is_organizer, EVENT_ORGANIZER_NOT_FOUND
 
 NOT_PERMISSION_ERROR = "Not permission for this method"
@@ -23,8 +23,8 @@ def validate_user_permissions(user_id, caller_id: str):
 
 
 def validate_superuser(db, caller_id):
-    db_caller = get_user(db, caller_id)
-    if db_caller.is_superuser:
+    db_caller = crud.get_user_by_id(db, caller_id)
+    if db_caller and db_caller.is_superuser:
         return
     else:
         raise HTTPException(

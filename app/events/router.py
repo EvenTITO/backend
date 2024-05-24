@@ -1,40 +1,42 @@
+from typing import List
+from fastapi import APIRouter, Query
 from app.utils.dependencies import (
     SessionDep,
-    CallerIdDep,
-    CreatorDep
+    CallerUserDep
 )
-from app.events import crud
+from app.organizers.dependencies import EventOrganizerDep
+from app.events import crud, validations
+from .utils import get_event
 from .schemas import (
-    EventSchema, CreateEventSchema,
-    ModifyEventSchema, EventSchemaWithEventId,
-    PublicEventsSchema
+    EventSchema,
+    EventSchemaWithEventId
 )
-from fastapi import APIRouter, Query
 
 
 events_router = APIRouter(prefix="/events", tags=["Events"])
 
 
-@events_router.post("", status_code=201)
+@events_router.post("", status_code=201, response_model=str)
 def create_event(
     event: EventSchema,
-    caller_user: CreatorDep,
+    caller_user: CallerUserDep,
     db: SessionDep
-) -> str:
-    event_with_creator_id = CreateEventSchema(
-        **event.model_dump(),
+):
+    validations.validate_event_not_exists(db, event)
+    event_created = crud.create_event(
+        db=db,
+        event=event,
         id_creator=caller_user.id
     )
-    event_created = crud.create_event(db=db, event=event_with_creator_id)
     return event_created.id
 
 
 @events_router.get("/{event_id}", response_model=EventSchemaWithEventId)
 def read_event(event_id: str, db: SessionDep):
-    return crud.get_event(db=db, event_id=event_id)
+    return get_event(db, event_id)
 
 
-@events_router.get("", response_model=PublicEventsSchema)
+@events_router.get("", response_model=List[EventSchemaWithEventId])
 def read_all_events(
     db: SessionDep,
     offset: int = 0,
@@ -43,21 +45,16 @@ def read_all_events(
     return crud.get_all_events(db=db, offset=offset, limit=limit)
 
 
-@events_router.put("/{event_id}", status_code=204)
+@events_router.put("/{event_id}", status_code=204, response_model=None)
 def update_event(
-    event_id: str,
-    event: EventSchema,
-    caller_id: CallerIdDep,
+    current_event: EventOrganizerDep,
+    event_modification: EventSchema,
     db: SessionDep
 ):
-    event_updated = ModifyEventSchema(
-        **event.model_dump(),
-        id=event_id,
-        id_modifier=caller_id
-    )
-    crud.update_event(db=db, event_updated=event_updated)
+    validations.validate_update(db, current_event, event_modification)
+    crud.update_event(db, current_event, event_modification)
 
 
-@events_router.delete("/{event_id}", status_code=204)
-def delete_event(event_id: str, db: SessionDep):
-    crud.delete_event(db=db, event_id=event_id)
+# @events_router.delete("/{event_id}", status_code=204, response_model=None)
+# def delete_event(event_id: str, db: SessionDep):
+#     crud.delete_event(db=db, event_id=event_id)

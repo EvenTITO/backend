@@ -1,33 +1,25 @@
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, model_validator
 from typing import List
 from datetime import datetime
 from .model import EventType
+from typing_extensions import Self
 
 
 class EventSchema(BaseModel):
-    title: str = Field(min_length=2)
-    start_date: datetime
-    end_date: datetime
-    description: str
-    event_type: EventType
+    title: str = Field(min_length=2, max_length=100,
+                       examples=["CONGRESO DE QUIMICA"])
+    start_date: datetime = Field(examples=[datetime(2024, 8, 1)])
+    end_date: datetime = Field(examples=[datetime(2024, 8, 2)])
+    description: str = Field(max_length=1000, examples=["Evento en FIUBA"])
+    event_type: EventType = Field(examples=[EventType.CONFERENCE])
 
-    model_config = {
-        "json_schema_extra": {
-            "examples": [
-                {
-                    "title": "CONGRESO DE QUIMICA",
-                    "start_date": datetime(2024, 8, 1),
-                    "end_date": datetime(2024, 8, 3),
-                    "description": "Evento en FIUBA",
-                    "event_type": EventType.CONFERENCE,
-                }
-            ]
-        }
-    }
-
-
-class CreateEventSchema(EventSchema):
-    id_creator: str
+    @model_validator(mode='after')
+    def check_dates(self) -> Self:
+        start_date = self.start_date
+        end_date = self.end_date
+        if start_date < datetime.now() or end_date < start_date:
+            raise ValueError('Invalid Dates.')
+        return self
 
 
 class ModifyEventSchema(EventSchema):
@@ -36,25 +28,4 @@ class ModifyEventSchema(EventSchema):
 
 
 class EventSchemaWithEventId(EventSchema):
-    id: str
-
-    model_config = {
-        "json_schema_extra": {
-            "examples": [
-                {
-                    "id": "...",
-                    "title": "CONGRESO DE QUIMICA",
-                    "start_date": datetime(2024, 8, 1),
-                    "end_date": datetime(2024, 8, 3),
-                    "description": "Evento en FIUBA",
-                    "event_type": EventType.CONFERENCE,
-                }
-            ]
-        }
-    }
-
-
-class PublicEventsSchema(BaseModel):
-    events: List[dict]
-
-    model_config = ConfigDict(from_attributes=True)
+    id: str = Field(examples=["..."])
