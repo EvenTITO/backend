@@ -4,12 +4,16 @@ from app.events.schemas import EventSchema
 from fastapi.testclient import TestClient
 from fastapi.encoders import jsonable_encoder
 from app.database.database import SessionLocal, engine
+from app.organizers.schemas import OrganizerRequestSchema
 from app.utils.dependencies import get_db
-from app.users.model import UserPermission
+from app.users.model import UserRole
 from app.users.schemas import UserSchema, RoleSchema
 from app.users.crud import update_permission
+from app.users.utils import get_user
 from app.main import app
-from .common import create_headers, EVENTS
+from .common import create_headers, EVENTS, get_user_method, USERS
+from uuid import uuid4
+from app.suscriptions.schemas import SuscriptorRequestSchema
 
 
 @pytest.fixture(scope="function")
@@ -43,45 +47,90 @@ def client(current_session):
 def user_data(client):
     new_user = UserSchema(
         name="Lio",
-        surname="Messi",
+        lastname="Messi",
         email="lio_messi@email.com",
     )
-    response = client.post("/users/",
+    response = client.post("/users",
                            json=jsonable_encoder(new_user),
                            headers=create_headers("iuaealdasldanfasdlasd"))
-    return response.json()
+    user_data_id = response.json()
+    return get_user_method(client, user_data_id)
+
+
+@pytest.fixture(scope="function")
+def post_users(client):
+    ids = []
+    for user in USERS:
+        id = str(uuid4())
+        _ = client.post(
+            "/users",
+            json=jsonable_encoder(user),
+            headers=create_headers(id)
+        )
+        ids.append(id)
+    return ids
 
 
 @pytest.fixture(scope="function")
 def admin_data(current_session, client):
     new_user = UserSchema(
         name="Jorge",
-        surname="Benitez",
+        lastname="Benitez",
         email="jbenitez@email.com",
     )
-    response = client.post(
-        "/users/",
+    id_user = "iuaealdasldanfas98298329"
+    _ = client.post(
+        "/users",
         json=jsonable_encoder(new_user),
-        headers=create_headers("iuaealdasldanfas98298329")
+        headers=create_headers(id_user)
     )
 
-    id_admin = response.json()['id']
+    # id_admin = response.json()
+    user = get_user(current_session, id_user)
+
     user_updated = update_permission(
-        current_session, id_admin, UserPermission.ADMIN.value
+        current_session, user, UserRole.ADMIN.value
     )
     return user_updated
 
 
 @pytest.fixture(scope="function")
-def event_creator_data(client, admin_data, user_data):
-    new_role = RoleSchema(
-        role=UserPermission.EVENT_CREATOR.value
+def event_creator_data(client, admin_data):
+    event_creator = UserSchema(
+        name="Juan",
+        lastname="Martinez",
+        email="jmartinez@email.com",
     )
-    response = client.patch(
-        f"/users/permissions/{user_data['id']}",
+    user_id = client.post(
+        "/users",
+        json=jsonable_encoder(event_creator),
+        headers=create_headers("lakjsdeuimx213klasmd3")
+    ).json()
+    new_role = RoleSchema(
+        role=UserRole.EVENT_CREATOR.value
+    )
+    _ = client.patch(
+        f"/users/permissions/{user_id}",
         json=jsonable_encoder(new_role),
         headers=create_headers(admin_data.id)
     )
+
+    event_creator_user = get_user_method(client, user_id)
+    return event_creator_user
+
+
+@pytest.fixture(scope="function")
+def event_from_event_creator(client, event_creator_data):
+    new_event = EventSchema(
+        title="Event Creator Event",
+        start_date="2024-09-02",
+        end_date="2024-09-04",
+        description="This is a nice event",
+        event_type=EventType.CONFERENCE
+    )
+    response = client.post("/events",
+                           json=jsonable_encoder(new_event),
+                           headers=create_headers(event_creator_data["id"]))
     return response.json()
 
 
@@ -94,32 +143,63 @@ def event_data(client, admin_data):
         description="This is a nice event",
         event_type=EventType.CONFERENCE
     )
-    response = client.post("/events/",
+    event_id = client.post("/events",
                            json=jsonable_encoder(new_event),
-                           headers=create_headers(admin_data.id))
+                           headers=create_headers(admin_data.id)).json()
 
-    return response.json()
+    event_dict = {
+        **new_event.model_dump(),
+        'id': event_id
+    }
+    return event_dict
 
 
 @pytest.fixture(scope="function")
 def all_events_data(client, admin_data):
-    responses = []
+    ids_events = []
     for event in EVENTS:
         response = client.post(
             "/events",
             json=jsonable_encoder(event),
             headers=create_headers(admin_data.id)
         )
-        responses.append(response.json())
+        ids_events.append(response.json())
 
-    return responses
+    return ids_events
 
 
 @pytest.fixture(scope="function")
 def suscription_data(client, user_data, event_data):
     id_event = event_data['id']
-    response = client.post(
-        f"/suscriptions/{id_event}/",
+    suscription = SuscriptorRequestSchema(id_suscriptor=user_data["id"])
+    id_suscriptor = client.post(
+        f"/events/{id_event}/suscriptions/",
+        json=jsonable_encoder(suscription),
         headers=create_headers(user_data["id"])
+    ).json()
+
+    return {'id_event': id_event, 'id_suscriptor': id_suscriptor}
+
+
+@pytest.fixture(scope="function")
+def organizer_id_from_event(client, event_creator_data,
+                            event_from_event_creator):
+    organizer = UserSchema(
+        name="Martina",
+        lastname="Rodriguez",
+        email="mrodriguez@email.com",
     )
-    return response.json()
+    organizer_id = "frlasdvpqqad08jd"
+    client.post(
+        "/users",
+        json=jsonable_encoder(organizer),
+        headers=create_headers(organizer_id)
+    )
+    request = OrganizerRequestSchema(
+        id_organizer=organizer_id
+    )
+    client.post(f"/events/{event_from_event_creator}/organizers",
+                json=jsonable_encoder(request),
+                headers=create_headers(event_creator_data['id']))
+
+    return organizer_id

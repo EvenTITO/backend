@@ -1,18 +1,15 @@
-from app.utils.authorization import validate_user_permissions
+from fastapi import APIRouter
 from app.utils.dependencies import (
     SessionDep,
     CallerIdDep,
-    CallerUserDep,
-    AdminDep
+    AdminDep,
+    SameUserOrAdminDep,
+    SameUserDep,
 )
-from app.users import crud
-from .schemas import (
-    UserSchema,
-    UserSchemaWithId,
-    RoleSchema,
-    CompleteUser
-)
-from fastapi import APIRouter
+from app.users import crud, validations
+from app.users.utils import get_user
+from .schemas import UserSchema, RoleSchema, UserReply
+from typing import List
 
 
 users_router = APIRouter(
@@ -21,58 +18,53 @@ users_router = APIRouter(
 )
 
 
-@users_router.post("/", response_model=UserSchemaWithId)
-def create_user(
-    user: UserSchema,
-    db: SessionDep,
-    caller_id: CallerIdDep,
-):
-    user_with_id = UserSchemaWithId(
-        **user.model_dump(),
-        id=caller_id
-    )
-    return crud.create_user(db=db, user=user_with_id)
+@users_router.post("", status_code=201, response_model=str)
+def create_user(user: UserSchema, db: SessionDep, caller_id: CallerIdDep):
+    validations.validate_user_not_exists(db, caller_id, user.email)
+    user_created = crud.create_user(db=db, id=caller_id, user=user)
+    return user_created.id
 
 
-@users_router.patch("/permissions/{user_id}", response_model=CompleteUser)
+@users_router.patch(
+    "/permissions/{user_id}", status_code=204, response_model=None
+)
 def update_user_permission(
-    user_id: str,
-    role: RoleSchema,
-    _: AdminDep,
-    db: SessionDep
+    user_id: str, role: RoleSchema, caller_user: AdminDep, db: SessionDep
 ):
-    return crud.update_permission(db, user_id, role.role)
-
-
-@users_router.get("/{user_id}", response_model=CompleteUser)
-def read_user(
-    user_id: str,
-    db: SessionDep
-):
-    return crud.get_user_by_id(
+    validations.validate_always_at_least_one_admin(
         db,
-        user_id=user_id
+        user_id,
+        caller_user,
+        role
     )
+    current_user = get_user(db, user_id)
+    crud.update_permission(db, current_user, role.role)
 
 
-@users_router.put("/", response_model=UserSchemaWithId)
+@users_router.get("/{user_id}", response_model=UserReply)
+def read_user(user_id: str, db: SessionDep, _: SameUserOrAdminDep):
+    return get_user(db, user_id)
+
+
+@users_router.get("", response_model=List[UserReply])
+def read_all_users(
+    _: AdminDep,
+    db: SessionDep,
+    skip: int = 0,
+    limit: int = 100
+):
+    return crud.get_users(db, skip, limit)
+
+
+@users_router.put("/{user_id}", status_code=204, response_model=None)
 def update_user(
-    user: UserSchema,
-    caller_id: CallerIdDep,
-    db: SessionDep
+    user: UserSchema, caller_user: SameUserDep, db: SessionDep
 ):
-    user_with_id = UserSchemaWithId(
-        **user.model_dump(),
-        id=caller_id
-    )
-    return crud.update_user(db=db, user_updated=user_with_id)
+    validations.validate_user_change(user, caller_user)
+    crud.update_user(db=db, current_user=caller_user, user_to_update=user)
 
 
-@users_router.delete("/{user_id}", response_model=UserSchemaWithId)
-def delete_user(
-    user_id: str,
-    caller_user: CallerUserDep,
-    db: SessionDep
-):
-    validate_user_permissions(user_id, caller_user)
-    return crud.delete_user(db=db, user_id=user_id)
+@users_router.delete("/{user_id}", status_code=204, response_model=None)
+def delete_user(user_id: str, _: SameUserOrAdminDep, db: SessionDep):
+    user = get_user(db, user_id)
+    crud.delete_user(db=db, user=user)

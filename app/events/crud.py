@@ -88,3 +88,14 @@ def delete_event(db: Session, event_id: str):
     db.commit()
 
     return event
+
+
+def is_creator(
+    db: Session, event_id: str, user_id: str
+):
+    return db \
+        .query(EventModel) \
+        .filter(
+            EventModel.id == event_id,
+            EventModel.id_creator == user_id
+        ).first() is not None

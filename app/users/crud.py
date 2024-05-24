@@ -1,110 +1,57 @@
 from sqlalchemy.orm import Session
-from .model import UserModel, UserPermission
-from .schemas import UserSchemaWithId
-from app.utils.crud_utils import get_user
-from sqlalchemy.exc import IntegrityError, NoResultFound
-from fastapi import HTTPException
+from .model import UserModel, UserRole
+from .schemas import UserSchema
 
 
-MIN_NUMBER_ADMINS = 1
-
-USER_NOT_FOUND_DETAIL = "User not found"
-EMAIL_ALREADY_EXISTS = "Email already exists"
-ID_ALREADY_EXISTS = "Id already exists"
-NOT_ENOUGH_ADMINS_ERROR = "System must have at least 1 admin"
-
-
-def handle_database_user_error(handler):
-    def wrapper(*args, **kwargs):
-        try:
-            return handler(*args, **kwargs)
-        except IntegrityError as e:
-            error_info = str(e.orig)
-            if "email" in error_info.lower():
-                raise HTTPException(
-                    status_code=409, detail=EMAIL_ALREADY_EXISTS)
-            elif "id" in error_info.lower():
-                raise HTTPException(status_code=409, detail=ID_ALREADY_EXISTS)
-            else:
-                raise HTTPException(status_code=409, detail="Unexpected")
-        except NoResultFound:
-            raise HTTPException(status_code=404, detail=USER_NOT_FOUND_DETAIL)
-
-    return wrapper
-
-
-@handle_database_user_error
 def get_user_by_id(db: Session, user_id: str):
-    return get_user(db, user_id)
+    return db.query(UserModel).filter(UserModel.id == user_id).first()
 
 
-@handle_database_user_error
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(UserModel).offset(skip).limit(limit).all()
 
 
-@handle_database_user_error
 def get_user_by_email(db: Session, email: str):
-    return db.query(UserModel).filter(UserModel.email == email).one()
+    return db.query(UserModel).filter(UserModel.email == email).first()
 
 
-@handle_database_user_error
-def create_user(db: Session, user: UserSchemaWithId):
-    db_user = UserModel(**user.model_dump())
+def create_user(db: Session, id: str, user: UserSchema):
+    db_user = UserModel(**user.model_dump(), id=id)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     return db_user
 
 
-@handle_database_user_error
-def update_user(db: Session, user_updated: UserSchemaWithId):
-    db_user = get_user(db, user_updated.id)
-    for attr, value in user_updated.model_dump().items():
-        setattr(db_user, attr, value)
+def update_user(
+    db: Session,
+    current_user: UserModel,
+    user_to_update: UserSchema
+):
+    for attr, value in user_to_update.model_dump().items():
+        setattr(current_user, attr, value)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(current_user)
+    return current_user
 
 
-def check_role_changes(db, old_role, new_role):
-    if (
-        (old_role == UserPermission.ADMIN.value) and
-        (new_role != UserPermission.ADMIN.value)
-    ):
-        # get amount of admins
-        list_admins = (
-            db
-            .query(UserModel)
-            .filter(UserModel.role == old_role)
-            .all()
-        )
-        if (len(list_admins) == MIN_NUMBER_ADMINS):
-            raise HTTPException(
-                status_code=409,
-                detail=NOT_ENOUGH_ADMINS_ERROR
-            )
+def get_amount_admins(db):
+    admin_role = UserRole.ADMIN.value
+    return db.query(UserModel).filter(UserModel.role == admin_role).count()
 
 
-@handle_database_user_error
-def update_permission(db: Session, user_id: str, new_role: UserPermission):
-    db_user = get_user(db, user_id)
-    old_role = db_user.role
-
-    check_role_changes(db, old_role, new_role)
-
-    setattr(db_user, 'role', new_role)
-
+def update_permission(
+    db: Session,
+    current_user: UserModel,
+    new_role: UserRole
+):
+    setattr(current_user, "role", new_role)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(current_user)
+    return current_user
 
 
-@handle_database_user_error
-def delete_user(db: Session, user_id: str):
-    user = get_user(db, user_id)
+def delete_user(db: Session, user: UserModel):
     db.delete(user)
-
     db.commit()
-
     return user

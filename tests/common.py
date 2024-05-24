@@ -1,11 +1,40 @@
+from app.users.schemas import UserSchema
 from app.events.schemas import EventSchema
 from app.events.model import EventType
+
+
+def get_user_method(client, user_id):
+    response = client.get(
+        f"/users/{user_id}",
+        headers=create_headers(user_id)
+    )
+
+    return response.json()
 
 
 def create_headers(user_id):
     return {
         "X-User-Id": user_id
     }
+
+
+USERS = [
+    UserSchema(
+        name="Lucia",
+        lastname="Benitez",
+        email="lbenitez@email.com",
+    ),
+    UserSchema(
+        name="Marta",
+        lastname="Benitez",
+        email="mbenitez@email.com",
+    ),
+    UserSchema(
+        name="Pedro",
+        lastname="Benitez",
+        email="pbenitez@email.com",
+    )
+]
 
 
 EVENTS = [
