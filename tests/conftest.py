@@ -79,7 +79,7 @@ def admin_data(current_session, client):
         email="jbenitez@email.com",
     )
     id_user = "iuaealdasldanfas98298329"
-    response = client.post(
+    _ = client.post(
         "/users",
         json=jsonable_encoder(new_user),
         headers=create_headers(id_user)

@@ -23,7 +23,11 @@ def create_user(db: Session, id: str, user: UserSchema):
     return db_user
 
 
-def update_user(db: Session, current_user: UserModel, user_to_update: UserSchema):
+def update_user(
+    db: Session,
+    current_user: UserModel,
+    user_to_update: UserSchema
+):
     for attr, value in user_to_update.model_dump().items():
         setattr(current_user, attr, value)
     db.commit()
