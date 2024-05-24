@@ -1,5 +1,4 @@
-from pydantic import BaseModel, Field, ConfigDict, model_validator
-from typing import List
+from pydantic import BaseModel, Field, model_validator
 from datetime import datetime
 from .model import EventType
 from typing_extensions import Self

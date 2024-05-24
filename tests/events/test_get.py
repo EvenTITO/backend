@@ -1,4 +1,3 @@
-from app.events.crud import EVENT_NOT_FOUND
 
 
 def test_get_event(client, event_data):

@@ -59,26 +59,3 @@ def get_creator_user(caller_user: CallerUserDep) -> UserModel:
 
 
 CreatorDep = Annotated[UserModel, Depends(get_creator_user)]
-
-
-class SameUserOrAdmin:
-    def __call__(self, user_id: str, caller_user: CallerUserDep):
-        if user_id != caller_user.id and caller_user.role != UserRole.ADMIN:
-            raise HTTPException(status_code=403)
-
-        return caller_user
-
-
-same_user_or_admin = SameUserOrAdmin()
-SameUserOrAdminDep = Annotated[UserModel, Depends(same_user_or_admin)]
-
-
-class SameUser:
-    def __call__(self, user_id: str, caller_user: CallerUserDep):
-        if user_id != caller_user.id:
-            raise HTTPException(status_code=403)
-        return caller_user
-
-
-same_user = SameUser()
-SameUserDep = Annotated[UserModel, Depends(same_user)]

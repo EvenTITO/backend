@@ -2,7 +2,9 @@ from fastapi import APIRouter
 from app.utils.dependencies import (
     SessionDep,
     CallerIdDep,
-    AdminDep,
+    AdminDep
+)
+from .dependencies import (
     SameUserOrAdminDep,
     SameUserDep,
 )
