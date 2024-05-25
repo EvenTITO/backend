@@ -4,15 +4,16 @@ from app.users.model import UserModel, UserRole
 from app.users.crud import get_user_by_id
 from app.users.exceptions import UserNotFound
 from fastapi import Header, HTTPException, Depends
+from typing import AsyncIterator
+from sqlalchemy.ext.asyncio import async_sessionmaker
 from app.database.database import SessionLocal
 
 
-def get_db():
-    db = SessionLocal()
+async def get_db() -> AsyncIterator[async_sessionmaker]:
     try:
-        yield db
-    finally:
-        db.close()
+        yield SessionLocal
+    except Exception as e:
+        print(e)
 
 
 SessionDep = Annotated[Session, Depends(get_db)]

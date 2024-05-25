@@ -9,11 +9,11 @@ from .exceptions import (
 from .model import UserRole
 
 
-def validate_user_not_exists(db, id_user, email):
-    user_in_db = crud.get_user_by_id(db, id_user)
+async def validate_user_not_exists(db, id_user, email):
+    user_in_db = await crud.get_user_by_id(db, id_user)
     if user_in_db:
         raise IdAlreadyExists(id_user)
-    user_in_db = crud.get_user_by_email(db, email)
+    user_in_db = await crud.get_user_by_email(db, email)
     if user_in_db:
         raise EmailAlreadyExists(email)
 

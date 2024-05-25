@@ -5,7 +5,7 @@ services:
     environment:
       - RUN_MODE=DEV
       - PORT=12345
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/
     volumes:
       - ./app:/code/app
       - ./tests:/code/test

@@ -3,19 +3,19 @@ from .model import UserModel, UserRole
 from .schemas import UserSchema
 
 
-def get_user_by_id(db: Session, user_id: str):
+async def get_user_by_id(db: Session, user_id: str):
     return db.query(UserModel).filter(UserModel.id == user_id).first()
 
 
-def get_users(db: Session, skip: int = 0, limit: int = 100):
+async def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(UserModel).offset(skip).limit(limit).all()
 
 
-def get_user_by_email(db: Session, email: str):
+async def get_user_by_email(db: Session, email: str):
     return db.query(UserModel).filter(UserModel.email == email).first()
 
 
-def create_user(db: Session, id: str, user: UserSchema):
+async def create_user(db: Session, id: str, user: UserSchema):
     db_user = UserModel(**user.model_dump(), id=id)
     db.add(db_user)
     db.commit()

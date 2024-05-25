@@ -12,7 +12,8 @@ from app.organizers.router import (
 )
 from app.database.database import Base, engine
 
-Base.metadata.create_all(engine)
+
+# Base.metadata.create_all(engine)
 
 app = FastAPI(
     title="Backend API",

@@ -21,9 +21,9 @@ users_router = APIRouter(
 
 
 @users_router.post("", status_code=201, response_model=str)
-def create_user(user: UserSchema, db: SessionDep, caller_id: CallerIdDep):
-    validations.validate_user_not_exists(db, caller_id, user.email)
-    user_created = crud.create_user(db=db, id=caller_id, user=user)
+async def create_user(user: UserSchema, db: SessionDep, caller_id: CallerIdDep):
+    await validations.validate_user_not_exists(db, caller_id, user.email)
+    user_created = await crud.create_user(db=db, id=caller_id, user=user)
     return user_created.id
 
 
