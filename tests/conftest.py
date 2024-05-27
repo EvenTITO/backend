@@ -5,92 +5,98 @@ from app.events.model import EventType
 from app.events.schemas import EventSchema
 from fastapi.testclient import TestClient
 from fastapi.encoders import jsonable_encoder
-from app.database.database import SessionLocal, engine
 from app.organizers.schemas import OrganizerRequestSchema
 from app.utils.dependencies import get_db
 from app.users.model import UserRole
 from app.users.schemas import UserSchema, RoleSchema
 from app.users.crud import update_permission
 from app.users.utils import get_user
-from app.main import app as main_app
+from app.main import app
+from app.database.database import SessionLocal, engine, Base
 from .common import create_headers, EVENTS, get_user_method, USERS
 from uuid import uuid4
 from app.suscriptions.schemas import SuscriptorRequestSchema
+from httpx import AsyncClient
+
+
+@pytest.fixture(scope="session")
+def anyio_backend():
+    return 'asyncio'
+
+
+@pytest.fixture(scope="session", autouse=True)
+async def setup_database(anyio_backend):
+    print('hooola')
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+    await engine.dispose()
+    yield
+
+
+@pytest.fixture(scope="function", autouse=True)
+async def current_session():
+    print('osaaaaa')
+    async with engine.connect() as connection:
+        async with connection.begin() as transaction:
+            session = SessionLocal(bind=connection)
+            yield session
+            await transaction.rollback()
+            print('rollbackeadooo')
+
+
+# Must be async, because the get_db function is async.
+@pytest.fixture(scope="function", autouse=True)
+async def session_override(current_session):
+    async def get_db_session_override():
+        yield current_session
+
+    app.dependency_overrides[get_db] = get_db_session_override
+    yield
+    app.dependency_overrides[get_db] = get_db
+
+
+@pytest.fixture(scope="function")
+async def client():
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        yield ac
 
 
 # @pytest.fixture(scope="function", autouse=True)
 # async def current_session():
-#     async with engine.begin() as conn:
-#         await conn.run_sync(Base.metadata.create_all)
-#     yield
+#     connection = await engine.connect()
+#     transaction = await connection.begin()
+#     session = SessionLocal(bind=connection)
+
+#     yield session
+
+#     if connection.in_transaction():
+#         await transaction.rollback()
+
+#     await session.close()
+#     await connection.close()
+    # async with engine.begin() as conn:
+    #     await conn.run_sync(Base.metadata.drop_all)
+    #     await conn.run_sync(Base.metadata.create_all)
+    #     yield
+    #     await conn.run_sync(Base.metadata.drop_all)
+
+    # async with SessionLocal() as session:
+    #     try:
+    #         await session.begin()
+    #         yield session
+    #     finally:
+    #         await session.rollback()
 
 
-#     async with AsyncExitStack():
-#         connection = await engine.connect()
-#         transaction = await connection.begin()
-#         session = SessionLocal(bind=connection)
-
-#         yield session
-
-#         if connection.in_transaction():
-#             await transaction.rollback()
-
-#         await session.close()
-#         await connection.close()
-
-
-# @pytest.fixture(scope="function")
-# def client(current_session):
-
-#     async def get_db_override():
+# @pytest.fixture(scope="function", autouse=True)
+# async def session_override(current_session):
+#     async def get_db_session_override():
 #         yield current_session
 
-#     app.dependency_overrides[get_db] = get_db_override
-
-#     with TestClient(app) as c:
-#         yield c
-
-
-@pytest.fixture(autouse=True)
-def app():
-    with ExitStack():
-        yield main_app
-
-
-@pytest.fixture
-def client(app):
-    with TestClient(app) as c:
-        yield c
-
-
-@pytest.fixture(scope="session")
-def event_loop(request):
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
-@pytest.fixture(scope="function", autouse=True)
-async def transactional_session():
-    async with SessionLocal() as session:
-        try:
-            await session.begin()
-            yield session
-        finally:
-            await session.rollback()
-
-
-@pytest.fixture(scope="function")
-async def db_session(transactional_session):
-    yield transactional_session
-
-
-@pytest.fixture(scope="function", autouse=True)
-async def session_override(app, db_session):
-    async def get_db_session_override():
-        yield db_session[0]
-
-    app.dependency_overrides[get_db] = get_db_session_override
+#     app.dependency_overrides[get_db] = get_db_session_override
+#     yield
+#     app.dependency_overrides[get_db] = get_db
 
 
 @pytest.fixture(scope="function")
@@ -104,7 +110,8 @@ def user_data(client):
                            json=jsonable_encoder(new_user),
                            headers=create_headers("iuaealdasldanfasdlasd"))
     user_data_id = response.json()
-    return get_user_method(client, user_data_id)
+    user = get_user_method(client, user_data_id)
+    return user
 
 
 @pytest.fixture(scope="function")

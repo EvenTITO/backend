@@ -1,20 +1,19 @@
 from app.users.schemas import UserSchema
 from fastapi.encoders import jsonable_encoder
 from ..common import create_headers
-
 # ------------------------------- POST TESTS ------------------------------- #
 
 
-def test_create_user(client):
+async def test_create_user(client):
     user_id = "aasjdfvhasdvnlaksdj"
     user_data = UserSchema(
         name="Lio",
         lastname="Messi",
         email="email@email.com"
     )
-    response = client.post("/users",
-                           json=jsonable_encoder(user_data),
-                           headers=create_headers(user_id))
+    response = await client.post("/users",
+                                 json=jsonable_encoder(user_data),
+                                 headers=create_headers(user_id))
     assert response.status_code == 201
 
     response_data = response.json()

@@ -61,3 +61,8 @@ app.include_router(suscriptions_events_router)
 app.include_router(suscriptions_users_router)
 app.include_router(organizers_users_router)
 app.include_router(organizers_events_router)
+
+
+@app.get("/")
+async def hello():
+    return "Hi"
