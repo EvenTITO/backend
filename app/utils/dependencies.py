@@ -1,25 +1,25 @@
 from typing import Annotated
-from sqlalchemy.orm import Session
 from app.users.model import UserModel, UserRole
 from app.users.crud import get_user_by_id
 from app.users.exceptions import UserNotFound
 from fastapi import Header, HTTPException, Depends
-from typing import AsyncIterator
-from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.database import SessionLocal
 
 
-async def get_db() -> AsyncIterator[async_sessionmaker]:
+async def get_db():
+    session = SessionLocal()
     try:
-        yield SessionLocal
-    except Exception as e:
-        print(e)
+        yield session
+    finally:
+        await session.close()
 
 
-SessionDep = Annotated[Session, Depends(get_db)]
+SessionDep = Annotated[AsyncSession, Depends(get_db)]
+# SessionDep = Depends(get_db)
 
 
-def get_user_id(X_User_Id: str = Header(...)) -> str:
+async def get_user_id(X_User_Id: str = Header(...)) -> str:
     if not X_User_Id:
         raise HTTPException(status_code=400, detail="X-User-Id missing.")
     return X_User_Id
@@ -28,8 +28,8 @@ def get_user_id(X_User_Id: str = Header(...)) -> str:
 CallerIdDep = Annotated[str, Depends(get_user_id)]
 
 
-def get_caller_user(caller_id: CallerIdDep, db: SessionDep) -> UserModel:
-    user = get_user_by_id(db, caller_id)
+async def get_caller_user(caller_id: CallerIdDep, db: SessionDep) -> UserModel:
+    user = await get_user_by_id(db, caller_id)
     if not user:
         raise UserNotFound(caller_id)
 

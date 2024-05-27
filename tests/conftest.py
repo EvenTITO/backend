@@ -1,3 +1,5 @@
+import asyncio
+from contextlib import AsyncExitStack, ExitStack
 import pytest
 from app.events.model import EventType
 from app.events.schemas import EventSchema
@@ -10,37 +12,85 @@ from app.users.model import UserRole
 from app.users.schemas import UserSchema, RoleSchema
 from app.users.crud import update_permission
 from app.users.utils import get_user
-from app.main import app
+from app.main import app as main_app
 from .common import create_headers, EVENTS, get_user_method, USERS
 from uuid import uuid4
 from app.suscriptions.schemas import SuscriptorRequestSchema
 
 
-@pytest.fixture(scope="function")
-def current_session():
-    connection = engine.connect()
-    transaction = connection.begin()
-    db = SessionLocal(bind=connection)
-
-    yield db
-
-    db.close()
-    if transaction.is_active:
-        transaction.rollback()
-
-    connection.close()
+# @pytest.fixture(scope="function", autouse=True)
+# async def current_session():
+#     async with engine.begin() as conn:
+#         await conn.run_sync(Base.metadata.create_all)
+#     yield
 
 
-@pytest.fixture(scope="function")
-def client(current_session):
+#     async with AsyncExitStack():
+#         connection = await engine.connect()
+#         transaction = await connection.begin()
+#         session = SessionLocal(bind=connection)
 
-    def get_db_override():
-        return current_session
+#         yield session
 
-    app.dependency_overrides[get_db] = get_db_override
+#         if connection.in_transaction():
+#             await transaction.rollback()
 
+#         await session.close()
+#         await connection.close()
+
+
+# @pytest.fixture(scope="function")
+# def client(current_session):
+
+#     async def get_db_override():
+#         yield current_session
+
+#     app.dependency_overrides[get_db] = get_db_override
+
+#     with TestClient(app) as c:
+#         yield c
+
+
+@pytest.fixture(autouse=True)
+def app():
+    with ExitStack():
+        yield main_app
+
+
+@pytest.fixture
+def client(app):
     with TestClient(app) as c:
         yield c
+
+
+@pytest.fixture(scope="session")
+def event_loop(request):
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture(scope="function", autouse=True)
+async def transactional_session():
+    async with SessionLocal() as session:
+        try:
+            await session.begin()
+            yield session
+        finally:
+            await session.rollback()
+
+
+@pytest.fixture(scope="function")
+async def db_session(transactional_session):
+    yield transactional_session
+
+
+@pytest.fixture(scope="function", autouse=True)
+async def session_override(app, db_session):
+    async def get_db_session_override():
+        yield db_session[0]
+
+    app.dependency_overrides[get_db] = get_db_session_override
 
 
 @pytest.fixture(scope="function")

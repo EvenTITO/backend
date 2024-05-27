@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.users.router import users_router
@@ -13,7 +14,14 @@ from app.organizers.router import (
 from app.database.database import Base, engine
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+# await conn.run_sync(Base.metadata.drop_all)
 # Base.metadata.create_all(engine)
+
 
 app = FastAPI(
     title="Backend API",
@@ -26,6 +34,7 @@ app = FastAPI(
     license_info={
         "name": "MIT",
     },
+    lifespan=lifespan
 )
 
 

@@ -4,7 +4,6 @@ pytest
 pytest-cov
 httpx
 sqlalchemy
+asyncpg
 python-dotenv
-psycopg2-binary
-git+https://github.com/EvenTITO/eventitolibs.git
 pydantic[email]

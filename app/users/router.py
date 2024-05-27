@@ -21,7 +21,8 @@ users_router = APIRouter(
 
 
 @users_router.post("", status_code=201, response_model=str)
-async def create_user(user: UserSchema, db: SessionDep, caller_id: CallerIdDep):
+async def create_user(user: UserSchema,
+                      db: SessionDep, caller_id: CallerIdDep):
     await validations.validate_user_not_exists(db, caller_id, user.email)
     user_created = await crud.create_user(db=db, id=caller_id, user=user)
     return user_created.id
@@ -44,8 +45,8 @@ def update_user_permission(
 
 
 @users_router.get("/{user_id}", response_model=UserReply)
-def read_user(user_id: str, db: SessionDep, _: SameUserOrAdminDep):
-    return get_user(db, user_id)
+async def read_user(user_id: str, db: SessionDep, _: SameUserOrAdminDep):
+    return await get_user(db, user_id)
 
 
 @users_router.get("", response_model=List[UserReply])

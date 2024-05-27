@@ -5,7 +5,7 @@ from app.utils.dependencies import CallerUserDep
 
 
 class SameUserOrAdmin:
-    def __call__(self, user_id: str, caller_user: CallerUserDep):
+    async def __call__(self, user_id: str, caller_user: CallerUserDep):
         if user_id != caller_user.id and caller_user.role != UserRole.ADMIN:
             raise HTTPException(status_code=403)
 
