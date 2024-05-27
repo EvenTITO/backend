@@ -17,7 +17,7 @@ SameUserOrAdminDep = Annotated[UserModel, Depends(same_user_or_admin)]
 
 
 class SameUser:
-    def __call__(self, user_id: str, caller_user: CallerUserDep):
+    async def __call__(self, user_id: str, caller_user: CallerUserDep):
         if user_id != caller_user.id:
             raise HTTPException(status_code=403)
         return caller_user

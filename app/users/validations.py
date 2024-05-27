@@ -18,13 +18,13 @@ async def validate_user_not_exists(db, id_user, email):
         raise EmailAlreadyExists(email)
 
 
-def validate_always_at_least_one_admin(db, user_id, caller_user, role):
+async def validate_always_at_least_one_admin(db, user_id, caller_user, role):
     # One can remove himself from Admin role, but there must be
     # always at least one admin.
     if (
         (caller_user.id == user_id)
         and (role.role != UserRole.ADMIN)
-        and (crud.get_amount_admins(db) == 1)
+        and (await crud.get_amount_admins(db) == 1)
     ):
         raise CantRemoveLastAdmin()
 

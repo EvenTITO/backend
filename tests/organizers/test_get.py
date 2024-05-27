@@ -3,7 +3,7 @@ from ..common import create_headers
 from app.organizers.schemas import OrganizerRequestSchema
 
 
-def test_get_organizers_with_new_organizer(
+async def test_get_organizers_with_new_organizer(
     client,
     user_data,
     event_creator_data,
@@ -12,11 +12,11 @@ def test_get_organizers_with_new_organizer(
     request = OrganizerRequestSchema(
         id_organizer=user_data["id"]
     )
-    _ = client.post(f"/events/{event_from_event_creator}/organizers",
-                    json=jsonable_encoder(request),
-                    headers=create_headers(event_creator_data["id"]))
+    _ = await client.post(f"/events/{event_from_event_creator}/organizers",
+                          json=jsonable_encoder(request),
+                          headers=create_headers(event_creator_data["id"]))
 
-    response = client.get(
+    response = await client.get(
         f"/events/{event_from_event_creator}/organizers",
         headers=create_headers(event_creator_data["id"])
     )
@@ -28,7 +28,7 @@ def test_get_organizers_with_new_organizer(
     assert organizers_list[1]['id_organizer'] == user_data['id']
 
 
-def test_get_events_with_new_organizer(
+async def test_get_events_with_new_organizer(
     client,
     user_data,
     event_creator_data,
@@ -37,11 +37,11 @@ def test_get_events_with_new_organizer(
     request = OrganizerRequestSchema(
         id_organizer=user_data["id"]
     )
-    _ = client.post(f"/events/{event_from_event_creator}/organizers",
-                    json=jsonable_encoder(request),
-                    headers=create_headers(event_creator_data["id"]))
+    _ = await client.post(f"/events/{event_from_event_creator}/organizers",
+                          json=jsonable_encoder(request),
+                          headers=create_headers(event_creator_data["id"]))
 
-    response = client.get(
+    response = await client.get(
         f"/users/{user_data['id']}/organized-events",
         headers=create_headers(user_data["id"])
     )
@@ -52,11 +52,11 @@ def test_get_events_with_new_organizer(
     assert events_list[0]['id_event'] == event_from_event_creator
 
 
-def test_get_events_with_no_organizer(
+async def test_get_events_with_no_organizer(
     client,
     user_data
 ):
-    response = client.get(
+    response = await client.get(
         f"/users/{user_data['id']}/organized-events",
         headers=create_headers(user_data["id"])
     )

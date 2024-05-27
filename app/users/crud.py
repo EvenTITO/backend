@@ -5,17 +5,19 @@ from sqlalchemy.future import select
 
 
 async def get_user_by_id(db: AsyncSession, user_id: str):
-    query = select(UserModel).filter(UserModel.id == user_id)
+    query = select(UserModel).where(UserModel.id == user_id)
     result = await db.execute(query)
     return result.scalars().first()
 
 
 async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100):
-    return db.query(UserModel).offset(skip).limit(limit).all()
+    query = select(UserModel).offset(skip).limit(limit)
+    result = await db.execute(query)
+    return result.scalars().all()
 
 
 async def get_user_by_email(db: AsyncSession, email: str):
-    query = select(UserModel).filter(UserModel.email == email)
+    query = select(UserModel).where(UserModel.email == email)
     result = await db.execute(query)
     return result.scalars().first()
 
@@ -28,35 +30,36 @@ async def create_user(db: AsyncSession, id: str, user: UserSchema):
     return db_user
 
 
-def update_user(
+async def update_user(
     db: AsyncSession,
     current_user: UserModel,
     user_to_update: UserSchema
 ):
     for attr, value in user_to_update.model_dump().items():
         setattr(current_user, attr, value)
-    db.commit()
-    db.refresh(current_user)
+    await db.commit()
+    await db.refresh(current_user)
     return current_user
 
 
-def get_amount_admins(db):
+async def get_amount_admins(db):
     admin_role = UserRole.ADMIN.value
-    return db.query(UserModel).filter(UserModel.role == admin_role).count()
+    query = select(UserModel).where(UserModel.role == admin_role).count()
+    return await db.execute(query)
 
 
-def update_permission(
+async def update_permission(
     db: AsyncSession,
     current_user: UserModel,
     new_role: UserRole
 ):
     setattr(current_user, "role", new_role)
-    db.commit()
-    db.refresh(current_user)
+    await db.commit()
+    await db.refresh(current_user)
     return current_user
 
 
-def delete_user(db: AsyncSession, user: UserModel):
-    db.delete(user)
-    db.commit()
+async def delete_user(db: AsyncSession, user: UserModel):
+    await db.delete(user)
+    await db.commit()
     return user

@@ -3,9 +3,9 @@ from fastapi.encoders import jsonable_encoder
 from ..common import create_headers
 
 
-def test_get_suscription(client, suscription_data):
+async def test_get_suscription(client, suscription_data):
     id_event = suscription_data['id_event']
-    response = client.get(f"/events/{id_event}/suscriptions")
+    response = await client.get(f"/events/{id_event}/suscriptions")
 
     assert response.status_code == 200
     suscriptions = response.json()
@@ -14,21 +14,21 @@ def test_get_suscription(client, suscription_data):
             suscription_data['id_suscriptor'])
 
 
-def test_user_suscribes_to_two_events(client, user_data, all_events_data):
+async def test_user_suscribes_to_two_events(client, user_data, all_events_data):
     suscription = SuscriptorRequestSchema(id_suscriptor=user_data["id"])
-    _ = client.post(
+    _ = await client.post(
         f"/events/{all_events_data[0]}/suscriptions",
         json=jsonable_encoder(suscription),
         headers=create_headers(user_data['id'])
     )
 
-    _ = client.post(
+    _ = await client.post(
         f"/events/{all_events_data[1]}/suscriptions",
         json=jsonable_encoder(suscription),
         headers=create_headers(user_data['id'])
     )
 
-    response = client.get(
+    response = await client.get(
         f"/users/{user_data['id']}/suscriptions",
         headers=create_headers(user_data['id'])
     )
