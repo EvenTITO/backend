@@ -11,23 +11,25 @@ async def test_basic_user_has_DEFAULT(client, user_data):
     assert response.json()["role"] == UserRole.DEFAULT.value
 
 
-async def test_change_permission_to_admin(admin_data, client, user_data):
+async def test_change_permission_to_admin(client, user_data, admin_data):
     new_role = RoleSchema(
         role=UserRole.ADMIN.value
     )
+    print('llega aca', admin_data.id)
     response = await client.patch(
         f"/users/permissions/{user_data['id']}",
         json=jsonable_encoder(new_role),
         headers=create_headers(admin_data.id)
     )
+
     assert response.status_code == 204
-    user = get_user_method(client, user_data['id'])
+    user = await get_user_method(client, user_data['id'])
 
     assert user['id'] == user_data['id']
     assert user['role'] == UserRole.ADMIN.value
 
 
-async def test_change_permission_to_event_creator(admin_data, client, user_data):
+async def test_change_permission_to_event_creator(client, user_data, admin_data):
     new_role = RoleSchema(
         role=UserRole.EVENT_CREATOR.value
     )
@@ -37,12 +39,12 @@ async def test_change_permission_to_event_creator(admin_data, client, user_data)
         headers=create_headers(admin_data.id)
     )
     assert response.status_code == 204
-    user = get_user_method(client, user_data['id'])
+    user = await get_user_method(client, user_data['id'])
     assert user['id'] == user_data['id']
     assert user['role'] == UserRole.EVENT_CREATOR.value
 
 
-async def test_admin_deletes_other_admin_permission(admin_data, client, user_data):
+async def test_admin_deletes_other_admin_permission(client, user_data, admin_data):
     # changes user_data to ADMIN
     new_role = RoleSchema(
         role=UserRole.ADMIN.value
@@ -65,14 +67,14 @@ async def test_admin_deletes_other_admin_permission(admin_data, client, user_dat
 
     assert response.status_code == 204
 
-    user = get_user_method(client, user_data['id'])
+    user = await get_user_method(client, user_data['id'])
     assert user['role'] == UserRole.DEFAULT.value
 
 
 async def test_admin_deletes_other_event_creator_permission(
-    admin_data,
     client,
-    user_data
+    user_data,
+    admin_data
 ):
     # changes user_data to EVENT_CREATOR
     new_role = RoleSchema(
@@ -95,7 +97,7 @@ async def test_admin_deletes_other_event_creator_permission(
     )
 
     assert response.status_code == 204
-    user = get_user_method(client, user_data['id'])
+    user = await get_user_method(client, user_data['id'])
     assert user['role'] == UserRole.DEFAULT.value
 
 
@@ -141,7 +143,7 @@ async def test_not_admin_user_cant_add_creator(client, user_data):
     assert response.status_code == 403
 
 
-async def test_creator_user_cant_add_other_creator(admin_data, client, user_data):
+async def test_creator_user_cant_add_other_creator(client, user_data, admin_data):
     creator_role = RoleSchema(
         role=UserRole.EVENT_CREATOR.value
     )
@@ -172,9 +174,9 @@ async def test_creator_user_cant_add_other_creator(admin_data, client, user_data
 
 
 async def test_user_without_permissions_cant_delete_other_admin(
-    admin_data,
     client,
-    user_data
+    user_data,
+    admin_data
 ):
     # user is trying to change admin_data to DEFAULT
     new_role = RoleSchema(
@@ -189,7 +191,7 @@ async def test_user_without_permissions_cant_delete_other_admin(
     assert response.status_code == 403
 
 
-async def test_event_creator_cant_delete_other_admin(admin_data, client, user_data):
+async def test_event_creator_cant_delete_other_admin(client, user_data, admin_data):
     # changes user_data to EVENT_CREATOR
     new_role = RoleSchema(
         role=UserRole.EVENT_CREATOR.value
@@ -213,7 +215,7 @@ async def test_event_creator_cant_delete_other_admin(admin_data, client, user_da
     assert response.status_code == 403
 
 
-async def test_admin_can_change_self(client, admin_data, user_data):
+async def test_admin_can_change_self(client, user_data, admin_data):
     # add another admin
     new_role = RoleSchema(
         role=UserRole.ADMIN.value
@@ -235,5 +237,5 @@ async def test_admin_can_change_self(client, admin_data, user_data):
 
     assert response.status_code == 204
 
-    user = get_user_method(client, admin_data.id)
+    user = await get_user_method(client, admin_data.id)
     assert user['role'] == UserRole.DEFAULT.value

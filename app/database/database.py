@@ -13,6 +13,7 @@ url_database = os.getenv("DATABASE_URL")
 engine = create_async_engine(url_database, poolclass=NullPool)
 SessionLocal = async_sessionmaker(
     bind=engine,
+    expire_on_commit=False,
     autocommit=False
 )
 Base = declarative_base()
