@@ -23,7 +23,7 @@ organizers_users_router = APIRouter(
 
 
 @organizers_events_router.post("", status_code=201)
-def create_organizer(
+async def create_organizer(
     event_id: str,
     organizer: OrganizerRequestSchema,
     caller_id: CallerIdDep,
@@ -44,7 +44,7 @@ def create_organizer(
 @organizers_events_router.get(
     "", response_model=List[OrganizerSchema]
 )
-def read_event_organizers(
+async def read_event_organizers(
     event_id: str,
     caller_id: CallerIdDep,
     db: SessionDep
@@ -56,7 +56,7 @@ def read_event_organizers(
 @organizers_users_router.get(
     "", response_model=List[OrganizerSchema]
 )
-def read_user_event_organizes(
+async def read_user_event_organizes(
     user_id: str,
     caller_id: CallerIdDep,
     db: SessionDep
@@ -69,7 +69,7 @@ def read_user_event_organizes(
     "/{organizer_id}",
     status_code=204
 )
-def delete_organizer(
+async def delete_organizer(
     event_id: str,
     organizer_id: str,
     caller_id: CallerIdDep,

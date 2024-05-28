@@ -1,9 +1,10 @@
 from fastapi import HTTPException
 from app.events.crud import is_creator
 from app.users import crud
-from app.organizers.crud import is_organizer, EVENT_ORGANIZER_NOT_FOUND
+from app.organizers.crud import is_organizer
 
 NOT_PERMISSION_ERROR = "Not permission for this method"
+EVENT_ORGANIZER_NOT_FOUND = "eVENT oRGANIZER NOT FOUND"
 
 
 def validate_same_user_or_superuser(db, user_id, caller_id: str):
