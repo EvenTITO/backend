@@ -64,7 +64,11 @@ async def update_user(
     user: UserSchema, caller_user: SameUserDep, db: SessionDep
 ):
     validations.validate_user_change(user, caller_user)
-    await crud.update_user(db=db, current_user=caller_user, user_to_update=user)
+    await crud.update_user(
+        db=db,
+        current_user=caller_user,
+        user_to_update=user
+    )
 
 
 @users_router.delete("/{user_id}", status_code=204, response_model=None)

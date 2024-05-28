@@ -64,9 +64,11 @@ async def user_data(client):
         lastname="Messi",
         email="lio_messi@email.com",
     )
-    response = await client.post("/users",
-                                 json=jsonable_encoder(new_user),
-                                 headers=create_headers("iuaealdasldanfasdlasd"))
+    response = await client.post(
+        "/users",
+        json=jsonable_encoder(new_user),
+        headers=create_headers("iuaealdasldanfasdlasd")
+    )
     user_data_id = response.json()
     user = await get_user_method(client, user_data_id)
     return user
@@ -120,7 +122,8 @@ async def event_creator_data(client, admin_data):
         "/users",
         json=jsonable_encoder(event_creator),
         headers=create_headers("lakjsdeuimx213klasmd3")
-    ).json()
+    )
+    user_id = user_id.json()
     new_role = RoleSchema(
         role=UserRole.EVENT_CREATOR.value
     )
@@ -143,9 +146,11 @@ async def event_from_event_creator(client, event_creator_data):
         description="This is a nice event",
         event_type=EventType.CONFERENCE
     )
-    response = await client.post("/events",
-                                 json=jsonable_encoder(new_event),
-                                 headers=create_headers(event_creator_data["id"]))
+    response = await client.post(
+        "/events",
+        json=jsonable_encoder(new_event),
+        headers=create_headers(event_creator_data["id"])
+    )
     return response.json()
 
 
@@ -158,9 +163,12 @@ async def event_data(client, admin_data):
         description="This is a nice event",
         event_type=EventType.CONFERENCE
     )
-    event_id = await client.post("/events",
-                                 json=jsonable_encoder(new_event),
-                                 headers=create_headers(admin_data.id)).json()
+    event_id = await client.post(
+        "/events",
+        json=jsonable_encoder(new_event),
+        headers=create_headers(admin_data.id)
+    )
+    event_id = event_id.json()
 
     event_dict = {
         **new_event.model_dump(),

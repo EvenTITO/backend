@@ -15,12 +15,12 @@ from app.utils.authorization import (
 SUSCRIPTIONS_PREFIX = '/suscriptions'
 
 suscriptions_events_router = APIRouter(
-    prefix=events_router.prefix+"/{event_id}"+SUSCRIPTIONS_PREFIX,
+    prefix=events_router.prefix + "/{event_id}" + SUSCRIPTIONS_PREFIX,
     tags=["Event Suscriptions"]
 )
 
 suscriptions_users_router = APIRouter(
-    prefix=users_router.prefix+"/{user_id}"+SUSCRIPTIONS_PREFIX,
+    prefix=users_router.prefix + "/{user_id}" + SUSCRIPTIONS_PREFIX,
     tags=["User Suscriptions"]
 )
 

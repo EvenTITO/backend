@@ -8,14 +8,14 @@ from app.utils.dependencies import SessionDep
 
 
 class EventOrganizerChecker:
-    def __call__(
+    async def __call__(
         self,
         event_id: str,
         caller_user: CallerUserDep,
         db: SessionDep
     ):
-        event = get_event(db, event_id)
-        if not crud.is_organizer(db, event_id, caller_user.id):
+        event = await get_event(db, event_id)
+        if not await crud.is_organizer(db, event_id, caller_user.id):
             raise HTTPException(status_code=403)
         return event
 

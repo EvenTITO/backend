@@ -6,9 +6,7 @@ from sqlalchemy import func
 
 
 async def get_user_by_id(db: AsyncSession, user_id: str):
-    query = select(UserModel).where(UserModel.id == user_id)
-    result = await db.execute(query)
-    return result.scalars().first()
+    return await db.get(UserModel, user_id)
 
 
 async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100):

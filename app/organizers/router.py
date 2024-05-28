@@ -12,12 +12,12 @@ from app.utils.authorization import (
 
 
 organizers_events_router = APIRouter(
-    prefix=events_router.prefix+"/{event_id}"+'/organizers',
+    prefix=events_router.prefix + "/{event_id}" + '/organizers',
     tags=["Event Organizers"]
 )
 
 organizers_users_router = APIRouter(
-    prefix=users_router.prefix+"/{user_id}"+'/organized-events',
+    prefix=users_router.prefix + "/{user_id}" + '/organized-events',
     tags=["User Organizers"]
 )
 

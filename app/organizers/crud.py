@@ -1,9 +1,9 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.future import select
 from sqlalchemy.exc import NoResultFound
 from fastapi import HTTPException
 from .model import OrganizerModel
 from .schemas import OrganizerSchema
-
+from sqlalchemy.ext.asyncio import AsyncSession
 
 EVENT_ORGANIZER_NOT_FOUND = "Event organizer not found."
 
@@ -19,20 +19,20 @@ def handle_database_organizer_error(handler):
     return wrapper
 
 
-def is_organizer(
-    db: Session, event_id: str, caller_id: str
+async def is_organizer(
+    db: AsyncSession, event_id: str, caller_id: str
 ):
-    return db \
-        .query(OrganizerModel) \
-        .filter(
-            OrganizerModel.id_event == event_id,
-            OrganizerModel.id_organizer == caller_id
-        ).first() is not None
+    query = select(OrganizerModel).where(
+        OrganizerModel.id_event == event_id,
+        OrganizerModel.id_organizer == caller_id
+    )
+    result = await db.execute(query)
+    return result.first() is not None
 
 
 @handle_database_organizer_error
-def add_organizer_to_event(
-    db: Session, new_organizer: OrganizerSchema
+async def add_organizer_to_event(
+    db: AsyncSession, new_organizer: OrganizerSchema
 ):
     new_organizer = OrganizerModel(**new_organizer.model_dump())
     db.add(new_organizer)
@@ -43,7 +43,11 @@ def add_organizer_to_event(
 
 
 @handle_database_organizer_error
-def get_organizer_in_event(db: Session, event_id: str, organizer_id: str):
+async def get_organizer_in_event(
+    db: AsyncSession,
+    event_id: str,
+    organizer_id: str
+):
     return (
         db
         .query(OrganizerModel)
@@ -55,7 +59,7 @@ def get_organizer_in_event(db: Session, event_id: str, organizer_id: str):
 
 
 @handle_database_organizer_error
-def get_organizers_in_event(db: Session, event_id: str):
+async def get_organizers_in_event(db: AsyncSession, event_id: str):
     return (
         db
         .query(OrganizerModel)
@@ -66,7 +70,7 @@ def get_organizers_in_event(db: Session, event_id: str):
 
 
 @handle_database_organizer_error
-def get_user_event_organizes(db: Session, user_id: str):
+async def get_user_event_organizes(db: AsyncSession, user_id: str):
     return (
         db
         .query(OrganizerModel)
@@ -77,8 +81,8 @@ def get_user_event_organizes(db: Session, user_id: str):
 
 
 @handle_database_organizer_error
-def delete_organizer(
-    db: Session, organizer_to_delete: OrganizerSchema
+async def delete_organizer(
+    db: AsyncSession, organizer_to_delete: OrganizerSchema
 ):
     organizer = get_organizer_in_event(
         db,

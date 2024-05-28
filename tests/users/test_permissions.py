@@ -29,7 +29,11 @@ async def test_change_permission_to_admin(client, user_data, admin_data):
     assert user['role'] == UserRole.ADMIN.value
 
 
-async def test_change_permission_to_event_creator(client, user_data, admin_data):
+async def test_change_permission_to_event_creator(
+    client,
+    user_data,
+    admin_data
+):
     new_role = RoleSchema(
         role=UserRole.EVENT_CREATOR.value
     )
@@ -44,7 +48,11 @@ async def test_change_permission_to_event_creator(client, user_data, admin_data)
     assert user['role'] == UserRole.EVENT_CREATOR.value
 
 
-async def test_admin_deletes_other_admin_permission(client, user_data, admin_data):
+async def test_admin_deletes_other_admin_permission(
+    client,
+    user_data,
+    admin_data
+):
     # changes user_data to ADMIN
     new_role = RoleSchema(
         role=UserRole.ADMIN.value
@@ -143,7 +151,11 @@ async def test_not_admin_user_cant_add_creator(client, user_data):
     assert response.status_code == 403
 
 
-async def test_creator_user_cant_add_other_creator(client, user_data, admin_data):
+async def test_creator_user_cant_add_other_creator(
+    client,
+    user_data,
+    admin_data
+):
     creator_role = RoleSchema(
         role=UserRole.EVENT_CREATOR.value
     )
@@ -191,7 +203,11 @@ async def test_user_without_permissions_cant_delete_other_admin(
     assert response.status_code == 403
 
 
-async def test_event_creator_cant_delete_other_admin(client, user_data, admin_data):
+async def test_event_creator_cant_delete_other_admin(
+    client,
+    user_data,
+    admin_data
+):
     # changes user_data to EVENT_CREATOR
     new_role = RoleSchema(
         role=UserRole.EVENT_CREATOR.value

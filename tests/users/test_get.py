@@ -26,7 +26,10 @@ async def test_get_user_not_exists_fails(client, user_data):
 
 
 async def test_get_all_users(client, post_users, admin_data):
-    response = await client.get("/users", headers=create_headers(admin_data.id))
+    response = await client.get(
+        "/users",
+        headers=create_headers(admin_data.id)
+    )
     assert response.status_code == 200
     all_users = response.json()
     ids = post_users
