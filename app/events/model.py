@@ -29,7 +29,7 @@ class EventModel(ModelTemplate, Base):
     id_creator = Column(String, ForeignKey("users.id"))
 
     creator = relationship("UserModel", back_populates="events")
-    suscriptions = relationship("SuscriptionModel", back_populates="event")
+    inscriptions = relationship("InscriptionModel", back_populates="event")
     organizers = relationship("OrganizerModel", back_populates="event")
 
     @validates("start_date")

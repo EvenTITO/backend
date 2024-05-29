@@ -44,10 +44,12 @@ async def read_all_events(
 
 @events_router.put("/{event_id}", status_code=204, response_model=None)
 async def update_event(
-    current_event: EventOrganizerDep,
+    _: EventOrganizerDep,
+    event_id: str,
     event_modification: EventSchema,
     db: SessionDep
 ):
+    current_event = await get_event(db, event_id)
     await validations.validate_update(db, current_event, event_modification)
     await crud.update_event(db, current_event, event_modification)
 

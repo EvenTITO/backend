@@ -20,9 +20,9 @@ class UserModel(ModelTemplate, Base):
     role = Column(String, default=UserRole.DEFAULT.value)
 
     events = relationship("EventModel", back_populates="creator")
-    suscriptions = relationship(
-        "SuscriptionModel",
-        back_populates="suscriptor"
+    inscriptions = relationship(
+        "InscriptionModel",
+        back_populates="inscriptor"
     )
     organizers = relationship(
         "OrganizerModel",

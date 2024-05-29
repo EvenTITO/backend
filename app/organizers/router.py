@@ -22,7 +22,8 @@ organizers_users_router = APIRouter(
 
 @organizers_events_router.post("", status_code=201)
 async def create_organizer(
-    event: EventOrganizerDep,
+    event_id: str,
+    _: EventOrganizerDep,
     organizer: OrganizerRequestSchema,
     db: SessionDep
 ) -> str:
@@ -30,7 +31,7 @@ async def create_organizer(
     organizer = await crud.add_organizer_to_event(
         db,
         organizer_user.id,
-        event.id
+        event_id
     )
     return organizer.id_organizer
 
@@ -40,7 +41,7 @@ async def create_organizer(
 )
 async def read_event_organizers(
     event_id: str,
-    organizer: EventOrganizerDep,
+    _: EventOrganizerDep,
     db: SessionDep
 ):
     return await crud.get_organizers_in_event(db, event_id)

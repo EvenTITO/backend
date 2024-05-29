@@ -12,7 +12,7 @@ from app.main import app
 from app.database.database import SessionLocal, engine, Base
 from .common import create_headers, EVENTS, get_user_method, USERS
 from uuid import uuid4
-from app.suscriptions.schemas import SuscriptorRequestSchema
+from app.inscriptions.schemas import InscriptorRequestSchema
 from httpx import AsyncClient, ASGITransport
 
 
@@ -192,16 +192,17 @@ async def all_events_data(client, admin_data):
 
 
 @pytest.fixture(scope="function")
-async def suscription_data(client, user_data, event_data):
+async def inscription_data(client, user_data, event_data):
     id_event = event_data['id']
-    suscription = SuscriptorRequestSchema(id_suscriptor=user_data["id"])
-    id_suscriptor = await client.post(
-        f"/events/{id_event}/suscriptions/",
-        json=jsonable_encoder(suscription),
+    inscription = InscriptorRequestSchema(id_inscriptor=user_data["id"])
+    response = await client.post(
+        f"/events/{id_event}/inscriptions",
+        json=jsonable_encoder(inscription),
         headers=create_headers(user_data["id"])
-    ).json()
-
-    return {'id_event': id_event, 'id_suscriptor': id_suscriptor}
+    )
+    id_inscriptor = response.json()
+    print('no llegaa')
+    return {'id_event': id_event, 'id_inscriptor': id_inscriptor}
 
 
 @pytest.fixture(scope="function")

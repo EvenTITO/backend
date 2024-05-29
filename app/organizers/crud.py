@@ -1,6 +1,6 @@
-from sqlalchemy.future import select
 from .model import OrganizerModel
 from .schemas import OrganizerSchema
+from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
