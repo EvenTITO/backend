@@ -14,7 +14,9 @@ async def test_get_inscription(client, inscription_data):
             inscription_data['id_inscriptor'])
 
 
-async def test_user_inscribes_to_two_events(client, user_data, all_events_data):
+async def test_user_inscribes_to_two_events(
+        client, user_data, all_events_data
+):
     inscription = InscriptorRequestSchema(id_inscriptor=user_data["id"])
     _ = await client.post(
         f"/events/{all_events_data[0]}/inscriptions",

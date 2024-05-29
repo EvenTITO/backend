@@ -1,5 +1,5 @@
 from typing import List
-from app.users.dependencies import CallerUserDep, SameUserDep, SameUserOrAdminDep
+from app.users.dependencies import CallerUserDep, SameUserOrAdminDep
 from .schemas import (
     InscriptionReplySchema, InscriptorRequestSchema
 )
