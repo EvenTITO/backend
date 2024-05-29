@@ -7,7 +7,7 @@ from fastapi import APIRouter
 from app.users.router import users_router
 from app.events.router import events_router
 from app.organizers.dependencies import EventOrganizerDep
-from app.users.utils import get_user
+from app.users.service import get_user
 
 organizers_events_router = APIRouter(
     prefix=events_router.prefix + "/{event_id}" + '/organizers',

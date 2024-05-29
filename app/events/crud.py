@@ -1,4 +1,4 @@
-from .model import EventModel
+from .model import EventModel, EventStatus
 from .schemas import EventSchema
 from sqlalchemy.future import select
 from app.organizers.model import OrganizerModel
@@ -48,6 +48,17 @@ async def update_event(
     await db.refresh(current_event)
 
     return current_event
+
+
+async def update_status(
+    db: AsyncSession,
+    event: EventModel,
+    status_modification: EventStatus
+):
+    event.status = status_modification
+    await db.commit()
+    await db.refresh(event)
+    return event
 
 
 async def is_creator(

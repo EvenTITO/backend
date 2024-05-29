@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, model_validator
 from datetime import datetime
-from .model import EventType
+from .model import EventType, EventStatus
 from typing_extensions import Self
 
 
@@ -21,10 +21,10 @@ class EventSchema(BaseModel):
         return self
 
 
-class ModifyEventSchema(EventSchema):
-    id_modifier: str
-    id: str
+class ModifyEventStatusSchema(BaseModel):
+    status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
 
 
 class EventSchemaWithEventId(EventSchema):
     id: str = Field(examples=["..."])
+    status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])

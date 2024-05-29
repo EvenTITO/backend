@@ -1,3 +1,4 @@
+from app.events.model import EventStatus
 from ..common import create_headers
 
 
@@ -7,6 +8,7 @@ async def test_get_event(client, event_data, user_data):
 
     assert response.status_code == 200
     assert response.json()["title"] == event_data["title"]
+    assert response.json()["status"] == EventStatus.WAITING_APPROVAL
 
 
 async def test_get_event_not_exists_fails(client, user_data):

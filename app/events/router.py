@@ -7,7 +7,8 @@ from app.events import crud, validations
 from .utils import get_event
 from .schemas import (
     EventSchema,
-    EventSchemaWithEventId
+    EventSchemaWithEventId,
+    ModifyEventStatusSchema
 )
 
 events_router = APIRouter(prefix="/events", tags=["Events"])
@@ -53,6 +54,19 @@ async def update_event(
     await validations.validate_update(db, current_event, event_modification)
     await crud.update_event(db, current_event, event_modification)
 
+
+@events_router.patch("/{event_id}", status_code=204, response_model=None)
+async def change_event_status(
+    caller: CallerUserDep,
+    event_id: str,
+    status_modification: ModifyEventStatusSchema,
+    db: SessionDep
+):
+    event = await get_event(db, event_id)
+    await validations.validate_status_change(
+        db, caller, event, status_modification
+    )
+    await crud.update_status(db, event, status_modification.status)
 
 # @events_router.delete("/{event_id}", status_code=204, response_model=None)
 # async def delete_event(event_id: str, db: SessionDep):

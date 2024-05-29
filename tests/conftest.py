@@ -7,7 +7,7 @@ from app.database.dependencies import get_db
 from app.users.model import UserRole
 from app.users.schemas import UserSchema, RoleSchema
 from app.users.crud import update_permission
-from app.users.utils import get_user
+from app.users.service import get_user
 from app.main import app
 from app.database.database import SessionLocal, engine, Base
 from .common import create_headers, EVENTS, get_user_method, USERS

@@ -17,5 +17,5 @@ class EventOrganizerChecker:
             raise HTTPException(status_code=403)
 
 
-event_organizer_dep = EventOrganizerChecker()
-EventOrganizerDep = Annotated[EventModel, Depends(event_organizer_dep)]
+event_organizer_checker = EventOrganizerChecker()
+EventOrganizerDep = Annotated[EventModel, Depends(event_organizer_checker)]

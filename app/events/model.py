@@ -8,8 +8,13 @@ from sqlalchemy.orm import relationship, validates
 
 
 class EventStatus(str, Enum):
+    WAITING_APPROVAL = "WAITING_APPROVAL"
+    NOT_APPROVED = "NOT_APPROVED"
     CREATED = "CREATED"
     STARTED = "STARTED"
+    SUSPENDED = "SUSPENDED"
+    CANCELED = "CANCELED"
+    BLOCKED = "BLOCKED"
 
 
 class EventType(str, Enum):
@@ -25,7 +30,7 @@ class EventModel(ModelTemplate, Base):
     end_date = Column(Date)
     description = Column(String)
     event_type = Column(String)
-    status = Column(String)
+    status = Column(String, default=EventStatus.WAITING_APPROVAL)
     id_creator = Column(String, ForeignKey("users.id"))
 
     creator = relationship("UserModel", back_populates="events")
