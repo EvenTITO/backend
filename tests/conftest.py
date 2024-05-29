@@ -3,7 +3,7 @@ from app.events.model import EventType
 from app.events.schemas import EventSchema
 from fastapi.encoders import jsonable_encoder
 from app.organizers.schemas import OrganizerRequestSchema
-from app.utils.dependencies import get_db
+from app.database.dependencies import get_db
 from app.users.model import UserRole
 from app.users.schemas import UserSchema, RoleSchema
 from app.users.crud import update_permission

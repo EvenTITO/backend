@@ -1,9 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Query
-from app.utils.dependencies import (
-    SessionDep,
-    CallerUserDep
-)
+from app.database.dependencies import SessionDep
+from app.users.dependencies import CallerUserDep
 from app.organizers.dependencies import EventOrganizerDep
 from app.events import crud, validations
 from .utils import get_event
@@ -11,7 +9,6 @@ from .schemas import (
     EventSchema,
     EventSchemaWithEventId
 )
-
 
 events_router = APIRouter(prefix="/events", tags=["Events"])
 

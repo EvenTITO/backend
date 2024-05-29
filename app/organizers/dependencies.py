@@ -1,10 +1,10 @@
 from typing import Annotated
 from fastapi import HTTPException, Depends
-from app.utils.dependencies import CallerUserDep
+from app.users.dependencies import CallerUserDep
 from app.events.utils import get_event
 from app.organizers import crud
 from app.events.model import EventModel
-from app.utils.dependencies import SessionDep
+from app.database.dependencies import SessionDep
 
 
 class EventOrganizerChecker:

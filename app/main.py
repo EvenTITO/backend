@@ -14,14 +14,12 @@ from app.organizers.router import (
 from app.database.database import Base, engine
 
 
+# TODO: Add migrations.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
-# await conn.run_sync(Base.metadata.drop_all)
-# Base.metadata.create_all(engine)
-
 
 app = FastAPI(
     title="Backend API",
@@ -61,8 +59,3 @@ app.include_router(suscriptions_events_router)
 app.include_router(suscriptions_users_router)
 app.include_router(organizers_users_router)
 app.include_router(organizers_events_router)
-
-
-@app.get("/")
-async def hello():
-    return "Hi"

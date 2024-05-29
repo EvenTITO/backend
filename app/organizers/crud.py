@@ -1,6 +1,4 @@
 from sqlalchemy.future import select
-from sqlalchemy.exc import NoResultFound
-from fastapi import HTTPException
 from .model import OrganizerModel
 from .schemas import OrganizerSchema
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,9 +16,12 @@ async def is_organizer(
 
 
 async def add_organizer_to_event(
-    db: AsyncSession, new_organizer: OrganizerSchema
+    db: AsyncSession, id_organizer: str, id_event: str,
 ):
-    new_organizer = OrganizerModel(**new_organizer.model_dump())
+    new_organizer = OrganizerModel(
+        id_organizer=id_organizer,
+        id_event=id_event
+    )
     db.add(new_organizer)
     await db.commit()
     await db.refresh(new_organizer)

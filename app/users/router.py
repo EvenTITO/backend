@@ -1,9 +1,7 @@
 from fastapi import APIRouter
-from app.utils.dependencies import (
-    SessionDep,
-    CallerIdDep,
-    AdminDep
-)
+from app.utils.dependencies import CallerIdDep
+from app.database.dependencies import SessionDep
+from app.users.dependencies import AdminDep
 from .dependencies import (
     SameUserOrAdminDep,
     SameUserDep,

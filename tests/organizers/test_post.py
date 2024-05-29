@@ -39,5 +39,5 @@ async def test_simple_user_tries_add_organizer_fails(
     response = await client.post(f"/events/{event_from_event_creator}/organizers",
                                  json=jsonable_encoder(request),
                                  headers=create_headers(user_data['id']))
-    assert response.status_code == 404
+    assert response.status_code == 403
     # assert response.json()['detail'] == EVENT_ORGANIZER_NOT_FOUND

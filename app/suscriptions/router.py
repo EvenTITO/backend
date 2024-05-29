@@ -2,14 +2,15 @@ from typing import List
 from .schemas import (
     SuscriptionSchema, SuscriptionReplySchema, SuscriptorRequestSchema
 )
-from app.utils.dependencies import SessionDep, CallerIdDep
+from app.utils.dependencies import CallerIdDep
+from app.database.dependencies import SessionDep
 from app.suscriptions import crud
 from fastapi import APIRouter, Query
 from app.users.router import users_router
 from app.events.router import events_router
-from app.utils.authorization import (
-    validate_same_user_or_superuser, validate_user_permissions
-)
+# from app.utils.authorization import (
+#     validate_same_user_or_superuser, validate_user_permissions
+# )
 
 
 SUSCRIPTIONS_PREFIX = '/suscriptions'
