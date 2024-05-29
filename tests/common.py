@@ -3,8 +3,8 @@ from app.events.schemas import EventSchema
 from app.events.model import EventType
 
 
-def get_user_method(client, user_id):
-    response = client.get(
+async def get_user_method(client, user_id):
+    response = await client.get(
         f"/users/{user_id}",
         headers=create_headers(user_id)
     )

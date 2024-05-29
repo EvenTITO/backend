@@ -5,22 +5,22 @@ from sqlalchemy.orm import relationship
 from app.utils.models_utils import DateTemplate
 
 
-class SuscriptionStatus(str, Enum):
+class inscriptionstatus(str, Enum):
     PAYMENT_INCOMPLETED = "PAYMENT_INCOMPLETED"
     PAYMENT_COMPLETED = "PAYMENT_COMPLETED"
 
 
-class SuscriptionModel(DateTemplate, Base):
-    __tablename__ = "suscriptions"
+class InscriptionModel(DateTemplate, Base):
+    __tablename__ = "inscriptions"
 
-    id_suscriptor = Column(String, ForeignKey("users.id"), primary_key=True)
+    id_inscriptor = Column(String, ForeignKey("users.id"), primary_key=True)
     id_event = Column(String, ForeignKey("events.id"), primary_key=True)
     status = Column(
-        String, default=SuscriptionStatus.PAYMENT_INCOMPLETED.value
+        String, default=inscriptionstatus.PAYMENT_INCOMPLETED.value
     )
 
-    suscriptor = relationship("UserModel", back_populates="suscriptions")
-    event = relationship("EventModel", back_populates="suscriptions")
+    inscriptor = relationship("UserModel", back_populates="inscriptions")
+    event = relationship("EventModel", back_populates="inscriptions")
 
     def to_dict(self):
         return {

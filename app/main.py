@@ -1,10 +1,11 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.users.router import users_router
 from app.events.router import events_router
-from app.suscriptions.router import (
-    suscriptions_events_router,
-    suscriptions_users_router
+from app.inscriptions.router import (
+    inscriptions_events_router,
+    inscriptions_users_router
 )
 from app.organizers.router import (
     organizers_events_router,
@@ -12,8 +13,15 @@ from app.organizers.router import (
 )
 from app.database.database import Base, engine
 
-Base.metadata.create_all(engine)
 
+# TODO: Add migrations.
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+
+# TODO: Change email.
 app = FastAPI(
     title="Backend API",
     description="Backend for EvenTITO",
@@ -25,6 +33,7 @@ app = FastAPI(
     license_info={
         "name": "MIT",
     },
+    lifespan=lifespan
 )
 
 
@@ -47,7 +56,7 @@ app.add_middleware(
 
 app.include_router(users_router)
 app.include_router(events_router)
-app.include_router(suscriptions_events_router)
-app.include_router(suscriptions_users_router)
+app.include_router(inscriptions_events_router)
+app.include_router(inscriptions_users_router)
 app.include_router(organizers_users_router)
 app.include_router(organizers_events_router)

@@ -3,8 +3,8 @@ from .model import UserRole
 
 
 class UserSchema(BaseModel):
-    name: str = Field(min_length=2, examples=["Pepe"])
-    lastname: str = Field(min_length=2, examples=["Argento"])
+    name: str = Field(min_length=2, max_length=100, examples=["Pepe"])
+    lastname: str = Field(min_length=2, max_length=100, examples=["Argento"])
     email: EmailStr = Field(examples=["pepe.argento@email.com"])
 
 
