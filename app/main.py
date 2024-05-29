@@ -21,6 +21,7 @@ async def lifespan(app: FastAPI):
         await conn.run_sync(Base.metadata.create_all)
     yield
 
+# TODO: Change email.
 app = FastAPI(
     title="Backend API",
     description="Backend for EvenTITO",

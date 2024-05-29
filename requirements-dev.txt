@@ -6,4 +6,5 @@ httpx
 sqlalchemy
 asyncpg
 python-dotenv
-pydantic[email]
+pydantic
+psycopg2-binary
