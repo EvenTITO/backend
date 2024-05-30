@@ -7,23 +7,32 @@ from app.utils.dependencies import CallerIdDep
 from app.database.dependencies import SessionDep
 
 
-async def get_caller_user(caller_id: CallerIdDep, db: SessionDep) -> UserModel:
-    user = await get_user_by_id(db, caller_id)
-    if not user:
-        raise UserNotFound(caller_id)
-    return user
-
-CallerUserDep = Annotated[UserModel, Depends(get_caller_user)]
-
-
-def get_admin_user(caller_user: CallerUserDep) -> UserModel:
-    if caller_user.role == UserRole.ADMIN:
-        return caller_user
-    else:
-        raise HTTPException(status_code=403)
+class CallerUser:
+    async def __call__(
+        self,
+        caller_id: CallerIdDep,
+        db: SessionDep
+    ) -> UserModel:
+        user = await get_user_by_id(db, caller_id)
+        if not user:
+            raise UserNotFound(caller_id)
+        return user
 
 
-AdminDep = Annotated[UserModel, Depends(get_admin_user)]
+caller_user_checker = CallerUser()
+CallerUserDep = Annotated[UserModel, Depends(caller_user_checker)]
+
+
+class AdminUser:
+    async def __call__(self, caller_user: CallerUserDep) -> UserModel:
+        if caller_user.role == UserRole.ADMIN:
+            return caller_user
+        else:
+            raise HTTPException(status_code=403)
+
+
+admin_user_checker = AdminUser()
+AdminDep = Annotated[UserModel, Depends(admin_user_checker)]
 
 
 class SameUserOrAdmin:

@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Query
 from app.database.dependencies import SessionDep
+from app.events.dependencies import GetEventsQuerysDep
 from app.users.dependencies import CallerUserDep
 from app.organizers.dependencies import EventOrganizerDep
 from app.events import crud, validations
@@ -37,10 +38,15 @@ async def read_event(event_id: str, db: SessionDep):
 @events_router.get("/", response_model=List[EventSchemaWithEventId])
 async def read_all_events(
     db: SessionDep,
+    status_query: GetEventsQuerysDep,
     offset: int = 0,
-    limit: int = Query(default=100, le=100)
+    limit: int = Query(default=100, le=100),
 ):
-    return await crud.get_all_events(db=db, offset=offset, limit=limit)
+    print('El valor de la query es')
+    print(status_query)
+    return await crud.get_all_events(
+        db=db, offset=offset, limit=limit, status=status_query
+    )
 
 
 @events_router.put("/{event_id}", status_code=204, response_model=None)

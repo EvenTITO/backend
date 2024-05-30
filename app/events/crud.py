@@ -15,8 +15,15 @@ async def get_event_by_title(db: AsyncSession, event_title: str):
     return result.scalars().first()
 
 
-async def get_all_events(db: AsyncSession, offset: int, limit: int):
+async def get_all_events(
+    db: AsyncSession,
+    offset: int,
+    limit: int,
+    status: EventStatus | None
+):
     query = select(EventModel).offset(offset).limit(limit)
+    if status is not None:
+        query = query.where(EventModel.status == status)
     result = await db.execute(query)
     return result.scalars().all()
 
