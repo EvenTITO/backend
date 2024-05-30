@@ -45,7 +45,9 @@ EVENTS = [
         description="""
         Conferencia donde se tratará el tema de hidrocarburos
         """,
-        event_type=EventType.CONFERENCE
+        event_type=EventType.CONFERENCE,
+        location='Paseo Colon 850',
+        tracks='math, chemistry, phisics',
     ),
     EventSchema(
         title="Maratón de proba",
@@ -53,13 +55,17 @@ EVENTS = [
         end_date="2024-08-02",
         description="Abierta para todos los estudiantes" +
         "de la materia Probabilidad y Estadística",
-        event_type=EventType.TALK
+        event_type=EventType.TALK,
+        location='Paseo Colon 850',
+        tracks='math, chemistry, phisics',
     ),
     EventSchema(
         title="Conferencia JIAFES",
         start_date="2024-08-01",
         end_date="2024-08-05",
         description="Nueva edición de la conferencia",
-        event_type=EventType.CONFERENCE
+        event_type=EventType.CONFERENCE,
+        location='Paseo Colon 850',
+        tracks='math, chemistry, phisics',
     )
 ]

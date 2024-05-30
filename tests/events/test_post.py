@@ -12,6 +12,8 @@ async def test_post_event(client, admin_data):
         end_date=datetime(2024, 9, 3),
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
+        location='Paseo Colon 850',
+        tracks='math, chemistry, phisics'
     )
     response = await client.post(
         "/events",
@@ -31,6 +33,8 @@ async def test_post_event_with_event_creator(client, event_creator_data):
         end_date=datetime(2024, 9, 3),
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
+        location='Paseo Colon 850',
+        tracks='math, chemistry, phisics'
     )
     response = await client.post(
         "/events",
@@ -47,6 +51,8 @@ async def test_post_event_invalid_user(client):
         end_date=datetime(2024, 9, 3),
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
+        location='Paseo Colon 850',
+        tracks='math, chemistry, phisics'
     )
 
     response = await client.post("/events",
@@ -64,6 +70,8 @@ async def test_post_event_past_dates_fails(client, admin_data):
         'end_date': "2023-09-04",
         'description': "This is a nice event",
         'event_type': EventType.CONFERENCE,
+        'location': 'Paseo Colon 850',
+        'tracks': 'math, chemistry, phisics'
     })
     response = await client.post("/events",
                                  json=json,
@@ -78,6 +86,8 @@ async def test_post_event_start_date_gt_end_date_fails(client, admin_data):
         'end_date': "2024-09-01",
         'description': "This is a nice event",
         'event_type': EventType.CONFERENCE,
+        'location': 'Paseo Colon 850',
+        'tracks': 'math, chemistry, phisics'
     })
     response = await client.post("/events",
                                  json=json,

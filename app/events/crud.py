@@ -19,11 +19,14 @@ async def get_all_events(
     db: AsyncSession,
     offset: int,
     limit: int,
-    status: EventStatus | None
+    status: EventStatus | None,
+    title_search: str | None
 ):
     query = select(EventModel).offset(offset).limit(limit)
     if status is not None:
         query = query.where(EventModel.status == status)
+    if title_search is not None:
+        query = query.filter(EventModel.title.ilike(f'%{title_search}%'))
     result = await db.execute(query)
     return result.scalars().all()
 

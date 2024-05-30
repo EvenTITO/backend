@@ -144,7 +144,9 @@ async def event_from_event_creator(client, event_creator_data):
         start_date="2024-09-02",
         end_date="2024-09-04",
         description="This is a nice event",
-        event_type=EventType.CONFERENCE
+        event_type=EventType.CONFERENCE,
+        location='Paseo Colon 850',
+        tracks='math, chemistry, phisics',
     )
     response = await client.post(
         "/events",
@@ -161,7 +163,9 @@ async def event_data(client, admin_data):
         start_date="2024-09-02",
         end_date="2024-09-04",
         description="This is a nice event",
-        event_type=EventType.CONFERENCE
+        event_type=EventType.CONFERENCE,
+        location='Paseo Colon 850',
+        tracks='math, chemistry, phisics'
     )
     event_id = await client.post(
         "/events",

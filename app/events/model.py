@@ -32,6 +32,8 @@ class EventModel(ModelTemplate, Base):
     event_type = Column(String)
     status = Column(String, default=EventStatus.WAITING_APPROVAL)
     id_creator = Column(String, ForeignKey("users.id"))
+    location = Column(String)
+    tracks = Column(String)
 
     creator = relationship("UserModel", back_populates="events")
     inscriptions = relationship("InscriptionModel", back_populates="event")

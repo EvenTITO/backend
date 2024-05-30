@@ -41,11 +41,16 @@ async def read_all_events(
     status_query: GetEventsQuerysDep,
     offset: int = 0,
     limit: int = Query(default=100, le=100),
+    search: str | None = None
 ):
     print('El valor de la query es')
     print(status_query)
     return await crud.get_all_events(
-        db=db, offset=offset, limit=limit, status=status_query
+        db=db,
+        offset=offset,
+        limit=limit,
+        status=status_query,
+        title_search=search
     )
 
 
