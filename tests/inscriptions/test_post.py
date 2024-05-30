@@ -1,9 +1,9 @@
 from fastapi.encoders import jsonable_encoder
-from app.inscriptions.model import inscriptionstatus
+from app.inscriptions.model import InscriptionStatus
 from app.inscriptions.schemas import InscriptorRequestSchema
 from ..common import create_headers
 
-PAYMENT_INCOMPLETED = inscriptionstatus.PAYMENT_INCOMPLETED.value
+PAYMENT_INCOMPLETED = InscriptionStatus.PAYMENT_INCOMPLETED.value
 
 
 async def test_post_inscription(client, user_data, event_data):

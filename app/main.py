@@ -36,7 +36,7 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-
+# TODO: Change CORS policy.
 origins = [
     "http://localhost.tiangolo.com",
     "https://localhost.tiangolo.com",

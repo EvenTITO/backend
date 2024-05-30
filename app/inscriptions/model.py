@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from app.utils.models_utils import DateTemplate
 
 
-class inscriptionstatus(str, Enum):
+class InscriptionStatus(str, Enum):
     PAYMENT_INCOMPLETED = "PAYMENT_INCOMPLETED"
     PAYMENT_COMPLETED = "PAYMENT_COMPLETED"
 
@@ -16,7 +16,7 @@ class InscriptionModel(DateTemplate, Base):
     id_inscriptor = Column(String, ForeignKey("users.id"), primary_key=True)
     id_event = Column(String, ForeignKey("events.id"), primary_key=True)
     status = Column(
-        String, default=inscriptionstatus.PAYMENT_INCOMPLETED.value
+        String, default=InscriptionStatus.PAYMENT_INCOMPLETED.value
     )
 
     inscriptor = relationship("UserModel", back_populates="inscriptions")

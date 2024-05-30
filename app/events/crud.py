@@ -1,4 +1,4 @@
-from .model import EventModel
+from .model import EventModel, EventStatus
 from .schemas import EventSchema
 from sqlalchemy.future import select
 from app.organizers.model import OrganizerModel
@@ -15,8 +15,18 @@ async def get_event_by_title(db: AsyncSession, event_title: str):
     return result.scalars().first()
 
 
-async def get_all_events(db: AsyncSession, offset: int, limit: int):
+async def get_all_events(
+    db: AsyncSession,
+    offset: int,
+    limit: int,
+    status: EventStatus | None,
+    title_search: str | None
+):
     query = select(EventModel).offset(offset).limit(limit)
+    if status is not None:
+        query = query.where(EventModel.status == status)
+    if title_search is not None:
+        query = query.filter(EventModel.title.ilike(f'%{title_search}%'))
     result = await db.execute(query)
     return result.scalars().all()
 
@@ -48,6 +58,17 @@ async def update_event(
     await db.refresh(current_event)
 
     return current_event
+
+
+async def update_status(
+    db: AsyncSession,
+    event: EventModel,
+    status_modification: EventStatus
+):
+    event.status = status_modification
+    await db.commit()
+    await db.refresh(event)
+    return event
 
 
 async def is_creator(

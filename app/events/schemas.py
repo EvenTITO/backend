@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, model_validator
 from datetime import datetime
-from .model import EventType
+from .model import EventType, EventStatus
 from typing_extensions import Self
 
 
@@ -11,6 +11,9 @@ class EventSchema(BaseModel):
     end_date: datetime = Field(examples=[datetime(2024, 8, 2)])
     description: str = Field(max_length=1000, examples=["Evento en FIUBA"])
     event_type: EventType = Field(examples=[EventType.CONFERENCE])
+    location: str = Field(max_length=200,
+                          examples=["FIUBA, Av. Paseo Colon 850"])
+    tracks: str = Field(max_length=1000, examples=["track1, track2, track3"])
 
     @model_validator(mode='after')
     def check_dates(self) -> Self:
@@ -21,10 +24,10 @@ class EventSchema(BaseModel):
         return self
 
 
-class ModifyEventSchema(EventSchema):
-    id_modifier: str
-    id: str
+class ModifyEventStatusSchema(BaseModel):
+    status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
 
 
 class EventSchemaWithEventId(EventSchema):
     id: str = Field(examples=["..."])
+    status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])

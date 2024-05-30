@@ -7,7 +7,7 @@ from .dependencies import (
     SameUserDep,
 )
 from app.users import crud, validations
-from app.users.utils import get_user
+from app.users.service import get_user
 from .schemas import UserSchema, RoleSchema, UserReply
 from typing import List
 
