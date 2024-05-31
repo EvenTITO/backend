@@ -11,11 +11,14 @@ async def test_basic_user_has_DEFAULT(client, user_data):
     assert response.json()["role"] == UserRole.DEFAULT.value
 
 
-async def test_change_permission_to_admin(client, user_data, admin_data):
+async def test_admin_can_change_default_permission_to_admin(
+        client,
+        user_data,
+        admin_data
+):
     new_role = RoleSchema(
         role=UserRole.ADMIN.value
     )
-    print('llega aca', admin_data.id)
     response = await client.patch(
         f"/users/permissions/{user_data['id']}",
         json=jsonable_encoder(new_role),
