@@ -1,7 +1,7 @@
 from app.users.schemas import UserSchema
 from fastapi.encoders import jsonable_encoder
 from ..common import create_headers
-# ------------------------------- POST TESTS ------------------------------- #
+from app.users.exceptions import EmailAlreadyExists, IdAlreadyExists
 
 
 async def test_create_user(client):
@@ -15,9 +15,15 @@ async def test_create_user(client):
                                  json=jsonable_encoder(user_data),
                                  headers=create_headers(user_id))
     assert response.status_code == 201
-
     response_data = response.json()
     assert response_data == user_id
+
+    response = await client.get(f"/users/{user_id}",
+                                headers=create_headers(user_id))
+    assert response.status_code == 200
+    assert response.json()["name"] == user_data.name
+    assert response.json()["email"] == user_data.email
+    assert response.json()["lastname"] == user_data.lastname
 
 
 async def test_create_same_email_fails(client, user_data):
@@ -28,10 +34,9 @@ async def test_create_same_email_fails(client, user_data):
                                  json=new_user_same_email,
                                  headers=create_headers(caller_id))
 
-    print("test_create_same_email_fails:", response.json())
-
+    expected_error = EmailAlreadyExists(user_data['email'])
     assert response.status_code == 409
-    # assert response.json()["detail"] == EMAIL_ALREADY_EXISTS
+    assert response.json()["detail"] == expected_error.detail
 
 
 async def test_create_same_user_twice_fails(client, user_data):
@@ -41,12 +46,17 @@ async def test_create_same_user_twice_fails(client, user_data):
                                  json=user_data,
                                  headers=create_headers(caller_id))
 
+    expected_error = IdAlreadyExists(caller_id)
     assert response.status_code == 409
-    # assert response.json()["detail"] == ID_ALREADY_EXISTS
+    assert response.json()["detail"] == expected_error.detail
 
 
 async def test_create_empty_user_fails(client):
-    empty_user = {"name": "", "lastname": "", "email": ""}
+    empty_user = {
+        "name": "",
+        "lastname": "",
+        "email": ""
+    }
     response = await client.post("/users", json=empty_user,
                                  headers=create_headers("a-valid-id"))
     print(response.json())
