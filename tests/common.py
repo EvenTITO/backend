@@ -1,11 +1,40 @@
-from app.schemas.events import EventSchema
-from app.models.event import EventType
+from app.users.schemas import UserSchema
+from app.events.schemas import EventSchema
+from app.events.model import EventType
+
+
+async def get_user_method(client, user_id):
+    response = await client.get(
+        f"/users/{user_id}",
+        headers=create_headers(user_id)
+    )
+
+    return response.json()
 
 
 def create_headers(user_id):
     return {
         "X-User-Id": user_id
     }
+
+
+USERS = [
+    UserSchema(
+        name="Lucia",
+        lastname="Benitez",
+        email="lbenitez@email.com",
+    ),
+    UserSchema(
+        name="Marta",
+        lastname="Benitez",
+        email="mbenitez@email.com",
+    ),
+    UserSchema(
+        name="Pedro",
+        lastname="Benitez",
+        email="pbenitez@email.com",
+    )
+]
 
 
 EVENTS = [
@@ -16,7 +45,9 @@ EVENTS = [
         description="""
         Conferencia donde se tratará el tema de hidrocarburos
         """,
-        event_type=EventType.CONFERENCE
+        event_type=EventType.CONFERENCE,
+        location='Paseo Colon 850',
+        tracks='math, chemistry, phisics',
     ),
     EventSchema(
         title="Maratón de proba",
@@ -24,13 +55,17 @@ EVENTS = [
         end_date="2024-08-02",
         description="Abierta para todos los estudiantes" +
         "de la materia Probabilidad y Estadística",
-        event_type=EventType.TALK
+        event_type=EventType.TALK,
+        location='Paseo Colon 850',
+        tracks='math, chemistry, phisics',
     ),
     EventSchema(
         title="Conferencia JIAFES",
         start_date="2024-08-01",
         end_date="2024-08-05",
         description="Nueva edición de la conferencia",
-        event_type=EventType.CONFERENCE
+        event_type=EventType.CONFERENCE,
+        location='Paseo Colon 850',
+        tracks='math, chemistry, phisics',
     )
 ]
