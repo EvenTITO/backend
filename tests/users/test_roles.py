@@ -11,7 +11,7 @@ async def test_basic_user_has_DEFAULT(client, user_data):
     assert response.json()["role"] == UserRole.DEFAULT.value
 
 
-async def test_admin_can_change_default_permission_to_admin(
+async def test_admin_can_change_default_role_to_admin(
         client,
         user_data,
         admin_data
@@ -20,7 +20,7 @@ async def test_admin_can_change_default_permission_to_admin(
         role=UserRole.ADMIN.value
     )
     response = await client.patch(
-        f"/users/permissions/{user_data['id']}",
+        f"/users/{user_data['id']}/roles",
         json=jsonable_encoder(new_role),
         headers=create_headers(admin_data.id)
     )
@@ -32,7 +32,7 @@ async def test_admin_can_change_default_permission_to_admin(
     assert user['role'] == UserRole.ADMIN.value
 
 
-async def test_change_permission_to_event_creator(
+async def test_change_role_to_event_creator(
     client,
     user_data,
     admin_data
@@ -41,7 +41,7 @@ async def test_change_permission_to_event_creator(
         role=UserRole.EVENT_CREATOR.value
     )
     response = await client.patch(
-        f"/users/permissions/{user_data['id']}",
+        f"/users/{user_data['id']}/roles",
         json=jsonable_encoder(new_role),
         headers=create_headers(admin_data.id)
     )
@@ -51,7 +51,7 @@ async def test_change_permission_to_event_creator(
     assert user['role'] == UserRole.EVENT_CREATOR.value
 
 
-async def test_admin_deletes_other_admin_permission(
+async def test_admin_deletes_other_admin_role(
     client,
     user_data,
     admin_data
@@ -61,7 +61,7 @@ async def test_admin_deletes_other_admin_permission(
         role=UserRole.ADMIN.value
     )
     _ = await client.patch(
-        f"/users/permissions/{user_data['id']}",
+        f"/users/{user_data['id']}/roles",
         json=jsonable_encoder(new_role),
         headers=create_headers(admin_data.id)
     )
@@ -71,7 +71,7 @@ async def test_admin_deletes_other_admin_permission(
         role=UserRole.DEFAULT.value
     )
     response = await client.patch(
-        f"/users/permissions/{user_data['id']}",
+        f"/users/{user_data['id']}/roles",
         json=jsonable_encoder(new_role),
         headers=create_headers(admin_data.id)
     )
@@ -82,7 +82,7 @@ async def test_admin_deletes_other_admin_permission(
     assert user['role'] == UserRole.DEFAULT.value
 
 
-async def test_admin_deletes_other_event_creator_permission(
+async def test_admin_deletes_other_event_creator_role(
     client,
     user_data,
     admin_data
@@ -92,7 +92,7 @@ async def test_admin_deletes_other_event_creator_permission(
         role=UserRole.EVENT_CREATOR.value
     )
     _ = await client.patch(
-        f"/users/permissions/{user_data['id']}",
+        f"/users/{user_data['id']}/roles",
         json=jsonable_encoder(new_role),
         headers=create_headers(admin_data.id)
     )
@@ -102,7 +102,7 @@ async def test_admin_deletes_other_event_creator_permission(
         role=UserRole.DEFAULT.value
     )
     response = await client.patch(
-        f"/users/permissions/{user_data['id']}",
+        f"/users/{user_data['id']}/roles",
         json=jsonable_encoder(new_role),
         headers=create_headers(admin_data.id)
     )
@@ -126,7 +126,7 @@ async def test_not_admin_user_cant_add_admin(client, user_data):
         role=UserRole.ADMIN.value
     )
     response = await client.patch(
-        f"/users/permissions/{user_data['id']}",
+        f"/users/{user_data['id']}/roles",
         json=jsonable_encoder(new_role),
         headers=create_headers(non_admin_id)
     )
@@ -147,7 +147,7 @@ async def test_not_admin_user_cant_add_creator(client, user_data):
         role=UserRole.EVENT_CREATOR.value
     )
     response = await client.patch(
-        f"/users/permissions/{user_data['id']}",
+        f"/users/{user_data['id']}/roles",
         json=jsonable_encoder(new_role),
         headers=create_headers(non_admin_id)
     )
@@ -163,7 +163,7 @@ async def test_creator_user_cant_add_other_creator(
         role=UserRole.EVENT_CREATOR.value
     )
     await client.patch(
-        f"/users/permissions/{user_data['id']}",
+        f"/users/{user_data['id']}/roles",
         json=jsonable_encoder(creator_role),
         headers=create_headers(admin_data.id)
     )
@@ -181,14 +181,14 @@ async def test_creator_user_cant_add_other_creator(
     )
 
     response = await client.patch(
-        f"/users/permissions/{default_user_id}",
+        f"/users/{default_user_id}/roles",
         json=jsonable_encoder(creator_role),
         headers=create_headers(user_data['id'])
     )
     assert response.status_code == 403
 
 
-async def test_user_without_permissions_cant_delete_other_admin(
+async def test_user_without_roles_cant_delete_other_admin(
     client,
     user_data,
     admin_data
@@ -198,7 +198,7 @@ async def test_user_without_permissions_cant_delete_other_admin(
         role=UserRole.DEFAULT.value
     )
     response = await client.patch(
-        f"/users/permissions/{admin_data.id}",
+        f"/users/{admin_data.id}/roles",
         json=jsonable_encoder(new_role),
         headers=create_headers(user_data['id'])
     )
@@ -216,7 +216,7 @@ async def test_event_creator_cant_delete_other_admin(
         role=UserRole.EVENT_CREATOR.value
     )
     _ = await client.patch(
-        f"/users/permissions/{user_data['id']}",
+        f"/users/{user_data['id']}/roles",
         json=jsonable_encoder(new_role),
         headers=create_headers(admin_data.id)
     )
@@ -226,7 +226,7 @@ async def test_event_creator_cant_delete_other_admin(
         role=UserRole.DEFAULT.value
     )
     response = await client.patch(
-        f"/users/permissions/{admin_data.id}",
+        f"/users/{admin_data.id}/roles",
         json=jsonable_encoder(new_role),
         headers=create_headers(user_data['id'])
     )
@@ -240,7 +240,7 @@ async def test_admin_can_change_self(client, user_data, admin_data):
         role=UserRole.ADMIN.value
     )
     _ = await client.patch(
-        f"/users/permissions/{user_data['id']}",
+        f"/users/{user_data['id']}/roles",
         json=jsonable_encoder(new_role),
         headers=create_headers(admin_data.id)
     )
@@ -249,7 +249,7 @@ async def test_admin_can_change_self(client, user_data, admin_data):
         role=UserRole.DEFAULT.value
     )
     response = await client.patch(
-        f"/users/permissions/{admin_data.id}",
+        f"/users/{admin_data.id}/roles",
         json=jsonable_encoder(new_role),
         headers=create_headers(admin_data.id)
     )

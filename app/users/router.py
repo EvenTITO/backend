@@ -27,9 +27,9 @@ async def create_user(user: UserSchema,
 
 
 @users_router.patch(
-    "/permissions/{user_id}", status_code=204, response_model=None
+    "/{user_id}/roles", status_code=204, response_model=None
 )
-async def update_user_permission(
+async def update_user_role(
     user_id: str, role: RoleSchema, caller_user: AdminDep, db: SessionDep
 ):
     await validations.validate_always_at_least_one_admin(
@@ -39,7 +39,7 @@ async def update_user_permission(
         role
     )
     current_user = await get_user(db, user_id)
-    await crud.update_permission(db, current_user, role.role)
+    await crud.update_role(db, current_user, role.role)
 
 
 @users_router.get("/{user_id}", response_model=UserReply)

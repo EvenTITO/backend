@@ -50,7 +50,7 @@ async def read_user_inscriptions(
 
 # # def delete_inscriptions_to_event(db: AsyncSession,
 # caller_id: str, event_id: str):
-#     validate_user_permissions(db, caller_id)
+#     validate_user_roles(db, caller_id)
 
 #     inscriptions = get_event_inscriptions(db, event_id)
 #     inscriptions_dicts = []

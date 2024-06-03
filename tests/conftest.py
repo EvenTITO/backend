@@ -6,7 +6,7 @@ from app.organizers.schemas import OrganizerRequestSchema
 from app.database.dependencies import get_db
 from app.users.model import UserRole
 from app.users.schemas import UserSchema, RoleSchema
-from app.users.crud import update_permission
+from app.users.crud import update_role
 from app.users.service import get_user
 from app.main import app
 from app.database.database import SessionLocal, engine, Base
@@ -105,7 +105,7 @@ async def admin_data(current_session, client):
     # id_admin = response.json()
     user = await get_user(current_session, id_user)
 
-    user_updated = await update_permission(
+    user_updated = await update_role(
         current_session, user, UserRole.ADMIN.value
     )
     return user_updated
@@ -128,7 +128,7 @@ async def event_creator_data(client, admin_data):
         role=UserRole.EVENT_CREATOR.value
     )
     _ = await client.patch(
-        f"/users/permissions/{user_id}",
+        f"/users/{user_id}/roles",
         json=jsonable_encoder(new_role),
         headers=create_headers(admin_data.id)
     )
