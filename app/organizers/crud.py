@@ -1,5 +1,6 @@
+from app.events.model import EventModel
+from app.users.model import UserModel
 from .model import OrganizerModel
-from .schemas import OrganizerSchema
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -43,28 +44,32 @@ async def get_organizer_in_event(
 
 
 async def get_organizers_in_event(db: AsyncSession, event_id: str):
-    query = select(OrganizerModel).where(
-        OrganizerModel.id_event == event_id
+    query = select(UserModel, OrganizerModel).where(
+        OrganizerModel.id_event == event_id,
+        OrganizerModel.id_organizer == UserModel.id
     )
     result = await db.execute(query)
-    return result.scalars().all()
+    return result.fetchall()
 
 
 async def get_user_event_organizes(db: AsyncSession, user_id: str):
-    query = select(OrganizerModel).where(
-        OrganizerModel.id_organizer == user_id
+    query = select(EventModel, OrganizerModel).where(
+        OrganizerModel.id_organizer == user_id,
+        OrganizerModel.id_event == EventModel.id
     )
     result = await db.execute(query)
-    return result.scalars().all()
+    return result.fetchall()
 
 
 async def delete_organizer(
-    db: AsyncSession, organizer_to_delete: OrganizerSchema
+    db: AsyncSession,
+    id_event,
+    id_organizer
 ):
     organizer = await get_organizer_in_event(
         db,
-        organizer_to_delete.id_event,
-        organizer_to_delete.id_organizer
+        id_event,
+        id_organizer
     )
     await db.delete(organizer)
     await db.commit()

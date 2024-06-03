@@ -1,13 +1,19 @@
 from typing import List
+from app.events.schemas import EventSchema
 from app.users.dependencies import SameUserOrAdminDep
 from app.database.dependencies import SessionDep
 from app.organizers import crud
-from .schemas import OrganizerRequestSchema, OrganizerSchema
+from app.users.schemas import UserSchema
+from .schemas import (
+    OrganizationsForUserSchema,
+    OrganizerInEventResponseSchema,
+    OrganizerRequestSchema
+)
 from fastapi import APIRouter
 from app.users.router import users_router
 from app.events.router import events_router
 from app.organizers.dependencies import EventOrganizerDep
-from app.users.service import get_user
+from app.users.service import get_user_by_email
 
 organizers_events_router = APIRouter(
     prefix=events_router.prefix + "/{event_id}" + '/organizers',
@@ -27,7 +33,7 @@ async def create_organizer(
     organizer: OrganizerRequestSchema,
     db: SessionDep
 ) -> str:
-    organizer_user = await get_user(db, organizer.id_organizer)
+    organizer_user = await get_user_by_email(db, organizer.email_organizer)
     organizer = await crud.add_organizer_to_event(
         db,
         organizer_user.id,
@@ -37,26 +43,55 @@ async def create_organizer(
 
 
 @organizers_events_router.get(
-    "", response_model=List[OrganizerSchema]
+    "", response_model=List[OrganizerInEventResponseSchema]
 )
 async def read_event_organizers(
     event_id: str,
     _: EventOrganizerDep,
     db: SessionDep
 ):
-    return await crud.get_organizers_in_event(db, event_id)
+    users_organizers = await crud.get_organizers_in_event(db, event_id)
+    response = []
+    for user, organizer in users_organizers:
+        response.append(OrganizerInEventResponseSchema(
+            id_event=organizer.id_event,
+            id_organizer=organizer.id_organizer,
+            invitation_date=organizer.creation_date,
+            organizer=UserSchema(
+                email=user.email,
+                name=user.name,
+                lastname=user.lastname
+            )
+        ))
+    return response
 
 
 @organizers_users_router.get(
-    "", response_model=List[OrganizerSchema]
+    "", response_model=List[OrganizationsForUserSchema]
 )
 async def read_user_event_organizes(
     user_id: str,
     _: SameUserOrAdminDep,
     db: SessionDep
 ):
-    return await crud.get_user_event_organizes(db, user_id)
-
+    events_organizer = await crud.get_user_event_organizes(db, user_id)
+    response = []
+    for event, organizer in events_organizer:
+        response.append(OrganizationsForUserSchema(
+            id_event=organizer.id_event,
+            id_organizer=organizer.id_organizer,
+            invitation_date=organizer.creation_date,
+            event=EventSchema(
+                title=event.title,
+                start_date=event.start_date,
+                end_date=event.end_date,
+                event_type=event.event_type,
+                description=event.description,
+                location=event.location,
+                tracks=event.tracks,
+            )
+        ))
+    return response
 
 # @organizers_events_router.delete(
 #     "/{organizer_id}",

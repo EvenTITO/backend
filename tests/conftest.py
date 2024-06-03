@@ -224,7 +224,7 @@ async def organizer_id_from_event(client, event_creator_data,
         headers=create_headers(organizer_id)
     )
     request = OrganizerRequestSchema(
-        id_organizer=organizer_id
+        email_organizer=organizer.email
     )
     await client.post(f"/events/{event_from_event_creator}/organizers",
                       json=jsonable_encoder(request),
