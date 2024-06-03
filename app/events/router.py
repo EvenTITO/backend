@@ -66,7 +66,11 @@ async def update_event(
     await crud.update_event(db, current_event, event_modification)
 
 
-@events_router.patch("/{event_id}", status_code=204, response_model=None)
+@events_router.patch(
+    "/{event_id}/status",
+    status_code=204,
+    response_model=None
+)
 async def change_event_status(
     caller: CallerUserDep,
     event_id: str,
