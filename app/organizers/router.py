@@ -2,12 +2,16 @@ from typing import List
 from app.users.dependencies import SameUserOrAdminDep
 from app.database.dependencies import SessionDep
 from app.organizers import crud
-from .schemas import OrganizerRequestSchema, OrganizerSchema
+from .schemas import (
+    OrganizationsForUserSchema,
+    OrganizerInEventResponseSchema,
+    OrganizerRequestSchema
+)
 from fastapi import APIRouter
 from app.users.router import users_router
 from app.events.router import events_router
 from app.organizers.dependencies import EventOrganizerDep
-from app.users.service import get_user
+from app.users.service import get_user_by_email
 
 organizers_events_router = APIRouter(
     prefix=events_router.prefix + "/{event_id}" + '/organizers',
@@ -27,7 +31,7 @@ async def create_organizer(
     organizer: OrganizerRequestSchema,
     db: SessionDep
 ) -> str:
-    organizer_user = await get_user(db, organizer.id_organizer)
+    organizer_user = await get_user_by_email(db, organizer.email_organizer)
     organizer = await crud.add_organizer_to_event(
         db,
         organizer_user.id,
@@ -37,7 +41,7 @@ async def create_organizer(
 
 
 @organizers_events_router.get(
-    "", response_model=List[OrganizerSchema]
+    "", response_model=List[OrganizerInEventResponseSchema]
 )
 async def read_event_organizers(
     event_id: str,
@@ -48,7 +52,7 @@ async def read_event_organizers(
 
 
 @organizers_users_router.get(
-    "", response_model=List[OrganizerSchema]
+    "", response_model=List[OrganizationsForUserSchema]
 )
 async def read_user_event_organizes(
     user_id: str,
@@ -56,7 +60,6 @@ async def read_user_event_organizes(
     db: SessionDep
 ):
     return await crud.get_user_event_organizes(db, user_id)
-
 
 # @organizers_events_router.delete(
 #     "/{organizer_id}",
