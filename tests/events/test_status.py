@@ -22,7 +22,7 @@ async def test_event_created_organizer_cant_change_status(
         status=EventStatus.CREATED
     )
     response = await client.patch(
-        f"/events/{event_data['id']}",
+        f"/events/{event_data['id']}/status",
         json=jsonable_encoder(status_update),
         headers=create_headers(user_data['id'])
     )
@@ -37,7 +37,7 @@ async def test_event_created_admin_can_change_status(
         status=EventStatus.CREATED
     )
     response = await client.patch(
-        f"/events/{event_data['id']}",
+        f"/events/{event_data['id']}/status",
         json=jsonable_encoder(status_update),
         headers=create_headers(admin_data.id)
     )

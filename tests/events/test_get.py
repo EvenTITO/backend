@@ -46,7 +46,7 @@ async def test_get_all_events_admin_query_waiting(
         status=EventStatus.CREATED
     )
     response = await client.patch(
-        f"/events/{all_events_data[0]}",
+        f"/events/{all_events_data[0]}/status",
         json=jsonable_encoder(status_update),
         headers=create_headers(admin_data.id)
     )
@@ -68,7 +68,7 @@ async def test_get_all_events_non_admin_can_query_started(
         status=EventStatus.STARTED
     )
     response = await client.patch(
-        f"/events/{all_events_data[0]}",
+        f"/events/{all_events_data[0]}/status",
         json=jsonable_encoder(status_update),
         headers=create_headers(admin_data.id)
     )
@@ -90,7 +90,7 @@ async def test_get_all_events_non_admin_can_not_query_created(
         status=EventStatus.STARTED
     )
     response = await client.patch(
-        f"/events/{all_events_data[0]}",
+        f"/events/{all_events_data[0]}/status",
         json=jsonable_encoder(status_update),
         headers=create_headers(admin_data.id)
     )

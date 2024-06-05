@@ -44,7 +44,7 @@ async def test_email_cant_change(client, user_data):
     assert response.status_code == 409
 
 
-async def test_update_user_from_other_user_fails_no_permission(
+async def test_update_user_from_other_user_fails_no_role(
         client,
         user_data
 ):
@@ -72,7 +72,7 @@ async def test_update_user_from_other_user_fails_no_permission(
     assert response.status_code == 403
 
 
-async def test_update_user_from_admin_user_fails_no_permission(
+async def test_update_user_from_admin_user_fails_no_role(
         client,
         user_data,
         admin_data

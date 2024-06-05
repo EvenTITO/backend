@@ -1,14 +1,37 @@
+from app.events.model import EventModel
+from app.events.schemas import EventSchema
+from app.inscriptions.schemas import (
+    InscriptionsForUserSchema,
+    InscriptionsInEventResponseSchema
+)
+from app.users.model import UserModel
+from app.users.schemas import UserSchema
 from .model import InscriptionModel
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
 async def get_event_inscriptions(db, event_id):
-    query = select(InscriptionModel).where(
-        InscriptionModel.id_event == event_id
+    query = select(UserModel, InscriptionModel).where(
+        InscriptionModel.id_event == event_id,
+        InscriptionModel.id_inscriptor == UserModel.id
     )
     result = await db.execute(query)
-    return result.scalars().all()
+    users_inscriptions = result.fetchall()
+    response = []
+    for user, inscription in users_inscriptions:
+        response.append(InscriptionsInEventResponseSchema(
+            id_event=inscription.id_event,
+            id_inscriptor=inscription.id_inscriptor,
+            status=inscription.status,
+            creation_date=inscription.creation_date,
+            inscripted_user=UserSchema(
+                email=user.email,
+                name=user.name,
+                lastname=user.lastname
+            )
+        ))
+    return response
 
 
 async def user_already_inscribed(db, user_id, event_id):
@@ -41,16 +64,35 @@ async def read_user_inscriptions(
     offset: int,
     limit: int
 ):
-    query = select(InscriptionModel).where(
-        InscriptionModel.id_inscriptor == user_id
+    query = select(EventModel, InscriptionModel).where(
+        InscriptionModel.id_inscriptor == user_id,
+        InscriptionModel.id_event == EventModel.id
     ).offset(offset).limit(limit)
     result = await db.execute(query)
-    return result.scalars().all()
+    events_inscription = result.fetchall()
+    response = []
+    for event, inscription in events_inscription:
+        response.append(InscriptionsForUserSchema(
+            id_event=inscription.id_event,
+            id_inscriptor=inscription.id_inscriptor,
+            status=inscription.status,
+            creation_date=inscription.creation_date,
+            event=EventSchema(
+                title=event.title,
+                start_date=event.start_date,
+                end_date=event.end_date,
+                event_type=event.event_type,
+                description=event.description,
+                location=event.location,
+                tracks=event.tracks,
+            )
+        ))
+    return response
 
 
 # # def delete_inscriptions_to_event(db: AsyncSession,
 # caller_id: str, event_id: str):
-#     validate_user_permissions(db, caller_id)
+#     validate_user_roles(db, caller_id)
 
 #     inscriptions = get_event_inscriptions(db, event_id)
 #     inscriptions_dicts = []

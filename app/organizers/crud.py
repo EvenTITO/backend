@@ -1,5 +1,10 @@
+from app.events.model import EventModel
+from app.events.schemas import EventSchema
+from app.organizers.schemas import OrganizationsForUserSchema
+from app.organizers.schemas import OrganizerInEventResponseSchema
+from app.users.model import UserModel
+from app.users.schemas import UserSchema
 from .model import OrganizerModel
-from .schemas import OrganizerSchema
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -43,28 +48,62 @@ async def get_organizer_in_event(
 
 
 async def get_organizers_in_event(db: AsyncSession, event_id: str):
-    query = select(OrganizerModel).where(
-        OrganizerModel.id_event == event_id
+    query = select(UserModel, OrganizerModel).where(
+        OrganizerModel.id_event == event_id,
+        OrganizerModel.id_organizer == UserModel.id
     )
     result = await db.execute(query)
-    return result.scalars().all()
+    users_organizers = result.fetchall()
+    response = []
+    for user, organizer in users_organizers:
+        response.append(OrganizerInEventResponseSchema(
+            id_event=organizer.id_event,
+            id_organizer=organizer.id_organizer,
+            invitation_date=organizer.creation_date,
+            organizer=UserSchema(
+                email=user.email,
+                name=user.name,
+                lastname=user.lastname
+            )
+        ))
+    return response
 
 
 async def get_user_event_organizes(db: AsyncSession, user_id: str):
-    query = select(OrganizerModel).where(
-        OrganizerModel.id_organizer == user_id
+    query = select(EventModel, OrganizerModel).where(
+        OrganizerModel.id_organizer == user_id,
+        OrganizerModel.id_event == EventModel.id
     )
     result = await db.execute(query)
-    return result.scalars().all()
+    events_organizer = result.fetchall()
+    response = []
+    for event, organizer in events_organizer:
+        response.append(OrganizationsForUserSchema(
+            id_event=organizer.id_event,
+            id_organizer=organizer.id_organizer,
+            invitation_date=organizer.creation_date,
+            event=EventSchema(
+                title=event.title,
+                start_date=event.start_date,
+                end_date=event.end_date,
+                event_type=event.event_type,
+                description=event.description,
+                location=event.location,
+                tracks=event.tracks,
+            )
+        ))
+    return response
 
 
 async def delete_organizer(
-    db: AsyncSession, organizer_to_delete: OrganizerSchema
+    db: AsyncSession,
+    id_event,
+    id_organizer
 ):
     organizer = await get_organizer_in_event(
         db,
-        organizer_to_delete.id_event,
-        organizer_to_delete.id_organizer
+        id_event,
+        id_organizer
     )
     await db.delete(organizer)
     await db.commit()

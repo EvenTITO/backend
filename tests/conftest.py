@@ -6,13 +6,12 @@ from app.organizers.schemas import OrganizerRequestSchema
 from app.database.dependencies import get_db
 from app.users.model import UserRole
 from app.users.schemas import UserSchema, RoleSchema
-from app.users.crud import update_permission
+from app.users.crud import update_role
 from app.users.service import get_user
 from app.main import app
 from app.database.database import SessionLocal, engine, Base
 from .common import create_headers, EVENTS, get_user_method, USERS
 from uuid import uuid4
-from app.inscriptions.schemas import InscriptorRequestSchema
 from httpx import AsyncClient, ASGITransport
 
 
@@ -105,7 +104,7 @@ async def admin_data(current_session, client):
     # id_admin = response.json()
     user = await get_user(current_session, id_user)
 
-    user_updated = await update_permission(
+    user_updated = await update_role(
         current_session, user, UserRole.ADMIN.value
     )
     return user_updated
@@ -128,7 +127,7 @@ async def event_creator_data(client, admin_data):
         role=UserRole.EVENT_CREATOR.value
     )
     _ = await client.patch(
-        f"/users/permissions/{user_id}",
+        f"/users/{user_id}/roles",
         json=jsonable_encoder(new_role),
         headers=create_headers(admin_data.id)
     )
@@ -198,14 +197,11 @@ async def all_events_data(client, admin_data):
 @pytest.fixture(scope="function")
 async def inscription_data(client, user_data, event_data):
     id_event = event_data['id']
-    inscription = InscriptorRequestSchema(id_inscriptor=user_data["id"])
     response = await client.post(
         f"/events/{id_event}/inscriptions",
-        json=jsonable_encoder(inscription),
         headers=create_headers(user_data["id"])
     )
     id_inscriptor = response.json()
-    print('no llegaa')
     return {'id_event': id_event, 'id_inscriptor': id_inscriptor}
 
 
@@ -224,7 +220,7 @@ async def organizer_id_from_event(client, event_creator_data,
         headers=create_headers(organizer_id)
     )
     request = OrganizerRequestSchema(
-        id_organizer=organizer_id
+        email_organizer=organizer.email
     )
     await client.post(f"/events/{event_from_event_creator}/organizers",
                       json=jsonable_encoder(request),

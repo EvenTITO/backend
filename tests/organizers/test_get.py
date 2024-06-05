@@ -10,7 +10,7 @@ async def test_get_organizers_with_new_organizer(
     event_from_event_creator
 ):
     request = OrganizerRequestSchema(
-        id_organizer=user_data["id"]
+        email_organizer=user_data["email"]
     )
     _ = await client.post(f"/events/{event_from_event_creator}/organizers",
                           json=jsonable_encoder(request),
@@ -25,7 +25,9 @@ async def test_get_organizers_with_new_organizer(
 
     organizers_list = response.json()
     assert len(organizers_list) == 2
-    assert organizers_list[1]['id_organizer'] == user_data['id']
+    organizers_ids = [organizer['id_organizer']
+                      for organizer in organizers_list]
+    assert user_data['id'] in organizers_ids
 
 
 async def test_get_events_with_new_organizer(
@@ -35,7 +37,7 @@ async def test_get_events_with_new_organizer(
     event_from_event_creator
 ):
     request = OrganizerRequestSchema(
-        id_organizer=user_data["id"]
+        email_organizer=user_data["email"]
     )
     _ = await client.post(f"/events/{event_from_event_creator}/organizers",
                           json=jsonable_encoder(request),

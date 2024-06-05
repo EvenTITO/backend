@@ -48,7 +48,7 @@ async def get_amount_admins(db):
     return result.scalar_one()
 
 
-async def update_permission(
+async def update_role(
     db: AsyncSession,
     current_user: UserModel,
     new_role: UserRole
