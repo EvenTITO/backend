@@ -1,7 +1,7 @@
 from typing import List
 from app.users.dependencies import CallerUserDep, SameUserOrAdminDep
 from .schemas import (
-    InscriptionReplySchema, InscriptorRequestSchema
+    InscriptionReplySchema
 )
 from app.database.dependencies import SessionDep
 from app.inscriptions import crud
@@ -28,7 +28,6 @@ inscriptions_users_router = APIRouter(
     status_code=201
 )
 async def create_inscription(
-    inscription: InscriptorRequestSchema,
     event_id: str,
     caller_user: CallerUserDep,
     db: SessionDep
@@ -37,7 +36,7 @@ async def create_inscription(
         db, caller_user.id, event_id
     )
     new_entry = await crud.inscribe_user_to_event(
-        db, event_id, inscription.id_inscriptor
+        db, event_id, caller_user.id
     )
     return new_entry.id_inscriptor
 

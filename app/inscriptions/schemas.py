@@ -1,15 +1,20 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+from app.events.schemas import EventSchema
+from app.users.schemas import UserSchema
 
-class InscriptorRequestSchema(BaseModel):
-    id_inscriptor: str
 
-
-class InscriptionSchema(InscriptorRequestSchema):
+class InscriptionReplySchema(BaseModel):
     id_event: str
-
-
-class InscriptionReplySchema(InscriptionSchema):
+    id_inscriptor: str
     status: str
     creation_date: datetime
+
+
+class InscriptionsInEventResponseSchema(InscriptionReplySchema):
+    inscripted_user: UserSchema
+
+
+class InscriptionsForUserSchema(InscriptionReplySchema):
+    event: EventSchema

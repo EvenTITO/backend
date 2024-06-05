@@ -1,5 +1,9 @@
 from app.events.model import EventModel
+from app.events.schemas import EventSchema
+from app.organizers.schemas import OrganizationsForUserSchema
+from app.organizers.schemas import OrganizerInEventResponseSchema
 from app.users.model import UserModel
+from app.users.schemas import UserSchema
 from .model import OrganizerModel
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -49,7 +53,20 @@ async def get_organizers_in_event(db: AsyncSession, event_id: str):
         OrganizerModel.id_organizer == UserModel.id
     )
     result = await db.execute(query)
-    return result.fetchall()
+    users_organizers = result.fetchall()
+    response = []
+    for user, organizer in users_organizers:
+        response.append(OrganizerInEventResponseSchema(
+            id_event=organizer.id_event,
+            id_organizer=organizer.id_organizer,
+            invitation_date=organizer.creation_date,
+            organizer=UserSchema(
+                email=user.email,
+                name=user.name,
+                lastname=user.lastname
+            )
+        ))
+    return response
 
 
 async def get_user_event_organizes(db: AsyncSession, user_id: str):
@@ -58,7 +75,24 @@ async def get_user_event_organizes(db: AsyncSession, user_id: str):
         OrganizerModel.id_event == EventModel.id
     )
     result = await db.execute(query)
-    return result.fetchall()
+    events_organizer = result.fetchall()
+    response = []
+    for event, organizer in events_organizer:
+        response.append(OrganizationsForUserSchema(
+            id_event=organizer.id_event,
+            id_organizer=organizer.id_organizer,
+            invitation_date=organizer.creation_date,
+            event=EventSchema(
+                title=event.title,
+                start_date=event.start_date,
+                end_date=event.end_date,
+                event_type=event.event_type,
+                description=event.description,
+                location=event.location,
+                tracks=event.tracks,
+            )
+        ))
+    return response
 
 
 async def delete_organizer(

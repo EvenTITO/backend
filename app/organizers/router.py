@@ -1,9 +1,7 @@
 from typing import List
-from app.events.schemas import EventSchema
 from app.users.dependencies import SameUserOrAdminDep
 from app.database.dependencies import SessionDep
 from app.organizers import crud
-from app.users.schemas import UserSchema
 from .schemas import (
     OrganizationsForUserSchema,
     OrganizerInEventResponseSchema,
@@ -50,20 +48,7 @@ async def read_event_organizers(
     _: EventOrganizerDep,
     db: SessionDep
 ):
-    users_organizers = await crud.get_organizers_in_event(db, event_id)
-    response = []
-    for user, organizer in users_organizers:
-        response.append(OrganizerInEventResponseSchema(
-            id_event=organizer.id_event,
-            id_organizer=organizer.id_organizer,
-            invitation_date=organizer.creation_date,
-            organizer=UserSchema(
-                email=user.email,
-                name=user.name,
-                lastname=user.lastname
-            )
-        ))
-    return response
+    return await crud.get_organizers_in_event(db, event_id)
 
 
 @organizers_users_router.get(
@@ -74,24 +59,7 @@ async def read_user_event_organizes(
     _: SameUserOrAdminDep,
     db: SessionDep
 ):
-    events_organizer = await crud.get_user_event_organizes(db, user_id)
-    response = []
-    for event, organizer in events_organizer:
-        response.append(OrganizationsForUserSchema(
-            id_event=organizer.id_event,
-            id_organizer=organizer.id_organizer,
-            invitation_date=organizer.creation_date,
-            event=EventSchema(
-                title=event.title,
-                start_date=event.start_date,
-                end_date=event.end_date,
-                event_type=event.event_type,
-                description=event.description,
-                location=event.location,
-                tracks=event.tracks,
-            )
-        ))
-    return response
+    return await crud.get_user_event_organizes(db, user_id)
 
 # @organizers_events_router.delete(
 #     "/{organizer_id}",

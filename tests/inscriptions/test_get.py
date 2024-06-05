@@ -1,5 +1,3 @@
-from app.inscriptions.schemas import InscriptorRequestSchema
-from fastapi.encoders import jsonable_encoder
 from ..common import create_headers
 
 
@@ -17,16 +15,13 @@ async def test_get_inscription(client, inscription_data):
 async def test_user_inscribes_to_two_events(
         client, user_data, all_events_data
 ):
-    inscription = InscriptorRequestSchema(id_inscriptor=user_data["id"])
     _ = await client.post(
         f"/events/{all_events_data[0]}/inscriptions",
-        json=jsonable_encoder(inscription),
         headers=create_headers(user_data['id'])
     )
 
     _ = await client.post(
         f"/events/{all_events_data[1]}/inscriptions",
-        json=jsonable_encoder(inscription),
         headers=create_headers(user_data['id'])
     )
 
