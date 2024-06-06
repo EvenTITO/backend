@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.users.model import UserRole
 from app.users.router import users_router
 from app.events.router import events_router
 from app.inscriptions.router import (
@@ -12,6 +13,29 @@ from app.organizers.router import (
     organizers_users_router
 )
 from app.database.database import Base, engine
+from app.database.dependencies import get_db
+from app.users.crud import create_user, update_role
+from app.users.schemas import UserSchema
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+async def add_first_admin():
+    db_gen = get_db()
+    db = await anext(db_gen)
+    admin_user = UserSchema(
+        name=os.getenv("ADMIN_NAME"),
+        lastname=os.getenv("ADMIN_LASTNAME"),
+        email=os.getenv("ADMIN_EMAIL")
+    )
+    admin_id = os.getenv("ADMIN_ID")
+    try:
+        db_admin = await create_user(db, admin_id, admin_user)
+        await update_role(db, db_admin, UserRole.ADMIN)
+    except Exception:
+        print('Admin already exists.')
 
 
 # TODO: Add migrations.
@@ -19,6 +43,7 @@ from app.database.database import Base, engine
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    await add_first_admin()
     yield
 
 # TODO: Change email.
