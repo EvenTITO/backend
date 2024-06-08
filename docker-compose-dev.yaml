@@ -6,6 +6,10 @@ services:
       - RUN_MODE=DEV
       - PORT=8080
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/
+      - ADMIN_NAME=Juan
+      - ADMIN_LASTNAME=Admin
+      - ADMIN_EMAIL=string@email.com
+      - ADMIN_ID=azfWgbBRUYXf8xbil9FyXof1gl82
     volumes:
       - ./app:/code/app
       - ./tests:/code/test
