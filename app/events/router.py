@@ -13,53 +13,10 @@ from .schemas import (
     EventProfileWithIdSchema
 )
 
+from .model import EventStatus
+
+
 events_router = APIRouter(prefix="/events", tags=["Events"])
-
-# 3- agregar endpoint GET /events/public que obtenga los eventos en
-# los que estas actualmente. Ahora está el /events de una que habría
-# que cambiarlo >>> este endpoint no traia los eventos publicos?
-@events_router.get("/public", response_model=List[EventSchemaWithEventId])
-async def read_all_events_public(
-    db: SessionDep,
-    status_query: GetEventsQuerysDep,
-    offset: int = 0,
-    limit: int = Query(default=100, le=100),
-    search: str | None = None
-):
-    print('El valor de la query es')
-    print(status_query)
-    return await crud.get_all_events_public(
-        db=db,
-        offset=offset,
-        limit=limit
-    )
-# 2- agregar endpoint GET /events/<eventid>/profile que te diga
-# tu informacion con respecto a ese evento: si estoy inscripto,
-# si soy organizador, etc. >>> Me fijo como seria el response y te digo
-# TODO: Hay que machear los eventos para el User logeado
-@events_router.get("/{event_id}/profile", response_model=EventProfileWithIdSchema)
-async def read_event(event_id: str, db: SessionDep):
-    print('Estoy en /event_id/profile ...')
-    return await get_event(db, event_id)
-
-@events_router.post("", status_code=201, response_model=str)
-async def create_event(
-    event: EventSchema,
-    caller_user: CallerUserDep,
-    db: SessionDep
-):
-    await validations.validate_event_not_exists(db, event)
-    event_created = await crud.create_event(
-        db=db,
-        event=event,
-        id_creator=caller_user.id
-    )
-    return event_created.id
-
-
-@events_router.get("/{event_id}", response_model=EventSchemaWithEventId)
-async def read_event(event_id: str, db: SessionDep):
-    return await get_event(db, event_id)
 
 
 @events_router.get("/", response_model=List[EventSchemaWithEventId])
@@ -79,6 +36,54 @@ async def read_all_events(
         status=status_query,
         title_search=search
     )
+
+
+@events_router.get("/public", response_model=List[EventSchemaWithEventId])
+async def read_all_events_public(
+    db: SessionDep,
+    offset: int = 0,
+    limit: int = Query(default=100, le=100),
+    title_search: str | None = None
+):
+    return await crud.get_all_events(
+        db=db,
+        offset=offset,
+        limit=limit,
+        status=EventStatus.STARTED,
+        title_search=title_search
+    )
+
+# 2- agregar endpoint GET /events/<eventid>/profile que te diga
+# tu informacion con respecto a ese evento: si estoy inscripto,
+# si soy organizador, etc. >>> Me fijo como seria el response y te digo
+# TODO: Hay que machear los eventos para el User logeado
+
+
+@events_router.get("/{event_id}/profile",
+                   response_model=EventProfileWithIdSchema)
+async def read_event_profile(event_id: str, db: SessionDep):
+    print('Estoy en /event_id/profile ...')
+    return await get_event(db, event_id)
+
+
+@events_router.post("", status_code=201, response_model=str)
+async def create_event(
+    event: EventSchema,
+    caller_user: CallerUserDep,
+    db: SessionDep
+):
+    await validations.validate_event_not_exists(db, event)
+    event_created = await crud.create_event(
+        db=db,
+        event=event,
+        id_creator=caller_user.id
+    )
+    return event_created.id
+
+
+@events_router.get("/{event_id}", response_model=EventSchemaWithEventId)
+async def read_event(event_id: str, db: SessionDep):
+    return await get_event(db, event_id)
 
 
 @events_router.put("/{event_id}", status_code=204, response_model=None)

@@ -126,3 +126,37 @@ async def test_get_all_events_query_by_title_contains(
     )
     assert response.status_code == 200
     assert len(response.json()) == 2
+
+
+async def test_get_all_events_public_is_status_created(
+        client, event_started, admin_data
+):
+    response = await client.get(
+        "/events/public",
+        headers=create_headers(admin_data.id)
+    )
+    assert response.status_code == 200
+    assert len(response.json()) == 1
+
+
+async def test_get_all_events_public_is_status_created2(
+        client, all_events_data, admin_data
+):
+    status_update = ModifyEventStatusSchema(
+        status=EventStatus.STARTED
+    )
+    n_events = len(all_events_data)
+
+    for id_event in all_events_data:
+        await client.patch(
+            f"/events/{id_event}/status",
+            json=jsonable_encoder(status_update),
+            headers=create_headers(admin_data.id)
+        )
+
+    response = await client.get(
+        "/events/public",
+        headers=create_headers(admin_data.id)
+    )
+    assert response.status_code == 200
+    assert len(response.json()) == n_events

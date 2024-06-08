@@ -28,16 +28,12 @@ async def get_all_events(
     if title_search is not None:
         query = query.filter(EventModel.title.ilike(f'%{title_search}%'))
     result = await db.execute(query)
-    return result.scalars().all()
+    r = result.scalars().all()
+    print("test")
+    for v in r:
+        print(v)
+    return r
 
-async def get_all_events_public(
-    db: AsyncSession,
-    offset: int,
-    limit: int
-):
-    query = select(EventModel).offset(offset).limit(limit).where(EventModel.status == EventStatus.CREATED)
-    result = await db.execute(query)
-    return result.scalars().all()
 
 async def create_event(db: AsyncSession, event: EventSchema, id_creator: str):
     db_event = EventModel(**event.model_dump(), id_creator=id_creator)
