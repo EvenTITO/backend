@@ -9,11 +9,38 @@ from .utils import get_event
 from .schemas import (
     EventSchema,
     EventSchemaWithEventId,
-    ModifyEventStatusSchema
+    ModifyEventStatusSchema,
+    EventProfileWithIdSchema
 )
 
 events_router = APIRouter(prefix="/events", tags=["Events"])
 
+# 3- agregar endpoint GET /events/public que obtenga los eventos en
+# los que estas actualmente. Ahora está el /events de una que habría
+# que cambiarlo >>> este endpoint no traia los eventos publicos?
+@events_router.get("/public", response_model=List[EventSchemaWithEventId])
+async def read_all_events_public(
+    db: SessionDep,
+    status_query: GetEventsQuerysDep,
+    offset: int = 0,
+    limit: int = Query(default=100, le=100),
+    search: str | None = None
+):
+    print('El valor de la query es')
+    print(status_query)
+    return await crud.get_all_events_public(
+        db=db,
+        offset=offset,
+        limit=limit
+    )
+# 2- agregar endpoint GET /events/<eventid>/profile que te diga
+# tu informacion con respecto a ese evento: si estoy inscripto,
+# si soy organizador, etc. >>> Me fijo como seria el response y te digo
+# TODO: Hay que machear los eventos para el User logeado
+@events_router.get("/{event_id}/profile", response_model=EventProfileWithIdSchema)
+async def read_event(event_id: str, db: SessionDep):
+    print('Estoy en /event_id/profile ...')
+    return await get_event(db, event_id)
 
 @events_router.post("", status_code=201, response_model=str)
 async def create_event(

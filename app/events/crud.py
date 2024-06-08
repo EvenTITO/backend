@@ -30,6 +30,14 @@ async def get_all_events(
     result = await db.execute(query)
     return result.scalars().all()
 
+async def get_all_events_public(
+    db: AsyncSession,
+    offset: int,
+    limit: int
+):
+    query = select(EventModel).offset(offset).limit(limit).where(EventModel.status == EventStatus.CREATED)
+    result = await db.execute(query)
+    return result.scalars().all()
 
 async def create_event(db: AsyncSession, event: EventSchema, id_creator: str):
     db_event = EventModel(**event.model_dump(), id_creator=id_creator)

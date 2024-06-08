@@ -31,3 +31,9 @@ class ModifyEventStatusSchema(BaseModel):
 class EventSchemaWithEventId(EventSchema):
     id: str = Field(examples=["..."])
     status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
+
+
+# TODO: implementar!
+class EventProfileWithIdSchema(EventSchema):
+    id: str = Field(examples=["..."])
+    status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
