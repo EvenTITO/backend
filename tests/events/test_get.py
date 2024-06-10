@@ -132,7 +132,8 @@ async def test_get_all_events_public_is_status_created(
         client, event_started, admin_data
 ):
     response = await client.get(
-        "/events/public",
+        "/events/",
+        params={'status': EventStatus.STARTED.value},
         headers=create_headers(admin_data.id)
     )
     assert response.status_code == 200
@@ -155,7 +156,8 @@ async def test_get_all_events_public_is_status_created2(
         )
 
     response = await client.get(
-        "/events/public",
+        "/events/",
+        params={'status': EventStatus.STARTED.value},
         headers=create_headers(admin_data.id)
     )
     assert response.status_code == 200
