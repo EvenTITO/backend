@@ -7,6 +7,11 @@ from enum import Enum
 from sqlalchemy.orm import relationship, validates
 
 
+class EventRol(str, Enum):
+    ORGANIZER = "ORGANIZER"
+    SUSCRIBER = "SUBSCRIBER"
+
+
 class EventStatus(str, Enum):
     WAITING_APPROVAL = "WAITING_APPROVAL"
     NOT_APPROVED = "NOT_APPROVED"
@@ -66,3 +71,9 @@ class EventModel(ModelTemplate, Base):
             "start_date": self.start_date,
             "end_date": self.end_date
         }
+
+
+class EventModelRol:
+    def __init__(self, eventModel, col_val):
+        self.__dict__ = eventModel.__dict__.copy()
+        self.rol = col_val

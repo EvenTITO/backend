@@ -1,8 +1,27 @@
-from .model import EventModel, EventStatus
+from app.inscriptions.model import InscriptionModel
+from .model import EventModel, EventStatus, EventRol
 from .schemas import EventSchema
 from sqlalchemy.future import select
+from sqlalchemy import union, literal
 from app.organizers.model import OrganizerModel
 from sqlalchemy.ext.asyncio import AsyncSession
+
+
+async def get_all_events_for_user(db: AsyncSession, user_id: str):
+    q = (select(literal(EventRol.SUSCRIBER).label('rol'),
+                EventModel)
+         .join(InscriptionModel, InscriptionModel.id_event == EventModel.id)
+         .where(InscriptionModel.id_inscriptor == user_id))
+
+    p = (select(literal(EventRol.ORGANIZER).label('rol'),
+                EventModel)
+         .join(OrganizerModel, OrganizerModel.id_event == EventModel.id)
+         .where(OrganizerModel.id_organizer == user_id))
+    union_events = union(p, q)
+    events = await db.execute(union_events)
+    events = events.mappings().all()
+
+    return events
 
 
 async def get_event_by_id(db: AsyncSession, event_id: str):
@@ -13,6 +32,12 @@ async def get_event_by_title(db: AsyncSession, event_title: str):
     query = select(EventModel).where(EventModel.title == event_title)
     result = await db.execute(query)
     return result.scalars().first()
+
+
+# async def get_event_by_user_id(db: AsyncSession, user_id: str):
+#     query = select(EventModel).where(EventModel.title == event_title)
+#     result = await db.execute(query)
+#     return result.scalars().first()
 
 
 async def get_all_events(
@@ -28,11 +53,7 @@ async def get_all_events(
     if title_search is not None:
         query = query.filter(EventModel.title.ilike(f'%{title_search}%'))
     result = await db.execute(query)
-    r = result.scalars().all()
-    print("test")
-    for v in r:
-        print(v)
-    return r
+    return result.scalars().all()
 
 
 async def create_event(db: AsyncSession, event: EventSchema, id_creator: str):
