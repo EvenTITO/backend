@@ -33,7 +33,9 @@ class EventSchemaWithEventId(EventSchema):
     status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
 
 
-# TODO: implementar!
-class EventProfileWithIdSchema(EventSchema):
-    id: str = Field(examples=["..."])
-    status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
+# # TODO: implementar!
+# class EventProfileWithIdSchema(EventSchema):
+#     id: str = Field(examples=["..."])
+#     status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
+class EventModelWithRol(EventSchema):
+    rol: str = Field(examples=["ORGANIZER", "SUBSCRIBER"])
