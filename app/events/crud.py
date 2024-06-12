@@ -1,6 +1,6 @@
 from app.inscriptions.model import InscriptionModel
 from .model import EventModel, EventStatus, EventRol
-from .schemas import EventSchema
+from .schemas import EventSchema, ReviewSkeletonSchema
 from sqlalchemy.future import select
 from sqlalchemy import union, literal
 from app.organizers.model import OrganizerModel
@@ -91,6 +91,17 @@ async def update_status(
     status_modification: EventStatus
 ):
     event.status = status_modification
+    await db.commit()
+    await db.refresh(event)
+    return event
+
+
+async def update_review_skeleton(
+    db: AsyncSession,
+    event: EventModel,
+    review_skeleton: ReviewSkeletonSchema
+):
+    event.review_skeleton = review_skeleton.review_skeleton
     await db.commit()
     await db.refresh(event)
     return event
