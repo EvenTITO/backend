@@ -57,7 +57,8 @@ async def get_all_events(
 
 
 async def create_event(db: AsyncSession, event: EventSchema, id_creator: str):
-    db_event = EventModel(**event.model_dump(), id_creator=id_creator)
+    db_event = EventModel(**event.model_dump(), id_creator=id_creator,
+                          status=EventStatus.CREATED)
     db.add(db_event)
     await db.flush()
 

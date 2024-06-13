@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Query
 from app.database.dependencies import SessionDep
 from app.events.dependencies import GetEventsQuerysDep
-from app.users.dependencies import CallerUserDep
+from app.users.dependencies import CallerUserDep, CreatorOrAdminUserDep
 from app.organizers.dependencies import EventOrganizerDep
 from app.events import crud, validations
 from .utils import get_event
@@ -51,7 +51,7 @@ async def read_all_events(
 @events_router.post("", status_code=201, response_model=str)
 async def create_event(
     event: EventSchema,
-    caller_user: CallerUserDep,
+    caller_user: CreatorOrAdminUserDep,
     db: SessionDep
 ):
     await validations.validate_event_not_exists(db, event)
