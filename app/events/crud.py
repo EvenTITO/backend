@@ -1,4 +1,5 @@
 from app.inscriptions.model import InscriptionModel
+from app.users.model import UserModel, UserRole
 from .model import EventModel, EventStatus, EventRol
 from .schemas import EventSchema, ReviewSkeletonSchema
 from sqlalchemy.future import select
@@ -56,13 +57,20 @@ async def get_all_events(
     return result.scalars().all()
 
 
-async def create_event(db: AsyncSession, event: EventSchema, id_creator: str):
-    db_event = EventModel(**event.model_dump(), id_creator=id_creator)
+async def create_event(db: AsyncSession, event: EventSchema,
+                       user: UserModel):
+    if user.role == UserRole.EVENT_CREATOR:
+        status = EventStatus.CREATED
+    else:
+        status = EventStatus.WAITING_APPROVAL
+
+    db_event = EventModel(**event.model_dump(), id_creator=user.id,
+                          status=status)
     db.add(db_event)
     await db.flush()
 
     db_organizer = OrganizerModel(
-        id_organizer=id_creator,
+        id_organizer=user.id,
         id_event=db_event.id
     )
     db.add(db_organizer)

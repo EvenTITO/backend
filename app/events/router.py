@@ -58,7 +58,7 @@ async def create_event(
     event_created = await crud.create_event(
         db=db,
         event=event,
-        id_creator=caller_user.id
+        user=caller_user
     )
     return event_created.id
 
