@@ -12,7 +12,7 @@ async def test_event_created_has_waiting_approved_status(
         f"/events/{event_data['id']}",
         headers=create_headers(user_data['id'])
     )
-    assert response.json()['status'] == EventStatus.CREATED
+    assert response.json()['status'] == EventStatus.WAITING_APPROVAL
 
 
 async def test_event_created_organizer_cant_change_status(
