@@ -4,9 +4,10 @@ from app.organizers.schemas import OrganizationsForUserSchema
 from app.organizers.schemas import OrganizerInEventResponseSchema
 from app.users.model import UserModel
 from app.users.schemas import UserSchema
-from .model import OrganizerModel
+from .model import InvitationStatus, OrganizerModel
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import update
 
 
 async def is_organizer(
@@ -108,3 +109,16 @@ async def delete_organizer(
     await db.delete(organizer)
     await db.commit()
     return organizer
+
+
+async def update_invitation_status(
+        db: AsyncSession,
+        caller_id: str,
+        event_id: str,
+        status_modification: InvitationStatus):
+    query = update(OrganizerModel).where(
+        OrganizerModel.id_event == event_id,
+        OrganizerModel.id_organizer == caller_id
+    ).values(invitation_status=status_modification)
+    await db.execute(query)
+    await db.commit()
