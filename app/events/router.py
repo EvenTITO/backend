@@ -7,10 +7,12 @@ from app.organizers.dependencies import EventOrganizerDep
 from app.events import crud, validations
 from .utils import get_event
 from .schemas import (
+    CompleteEventSchema,
     EventSchema,
     EventSchemaWithEventId,
     ModifyEventStatusSchema,
-    EventModelWithRol
+    EventModelWithRol,
+    ReviewSkeletonSchema
 )
 
 
@@ -56,12 +58,12 @@ async def create_event(
     event_created = await crud.create_event(
         db=db,
         event=event,
-        id_creator=caller_user.id
+        user=caller_user
     )
     return event_created.id
 
 
-@events_router.get("/{event_id}", response_model=EventSchemaWithEventId)
+@events_router.get("/{event_id}", response_model=CompleteEventSchema)
 async def read_event(event_id: str, db: SessionDep):
     return await get_event(db, event_id)
 
@@ -94,6 +96,22 @@ async def change_event_status(
         db, caller, event, status_modification
     )
     await crud.update_status(db, event, status_modification.status)
+
+
+@events_router.patch(
+    "/{event_id}/review-skeleton",
+    status_code=204,
+    response_model=None
+)
+async def change_review_skeleton(
+    _: EventOrganizerDep,
+    event_id: str,
+    review_skeleton: ReviewSkeletonSchema,
+    db: SessionDep
+):
+    event = await get_event(db, event_id)
+    await crud.update_review_skeleton(db, event, review_skeleton)
+
 
 # @events_router.delete("/{event_id}", status_code=204, response_model=None)
 # async def delete_event(event_id: str, db: SessionDep):

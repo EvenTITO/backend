@@ -1,5 +1,6 @@
 from datetime import datetime
-from pydantic import BaseModel
+from app.organizers.model import InvitationStatus
+from pydantic import BaseModel, Field
 from app.events.schemas import EventSchema
 from app.users.schemas import UserSchema
 
@@ -20,3 +21,8 @@ class OrganizerInEventResponseSchema(OrganizerReplySchema):
 
 class OrganizationsForUserSchema(OrganizerReplySchema):
     event: EventSchema
+
+
+class ModifyInvitationStatusSchema(BaseModel):
+    invitation_status: InvitationStatus = Field(
+        examples=[InvitationStatus.INVITED])

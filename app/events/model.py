@@ -1,6 +1,6 @@
 from datetime import datetime
 from app.utils.exceptions import DatesException
-from sqlalchemy import Column, String, Date, ForeignKey
+from sqlalchemy import Column, String, Date, ForeignKey, JSON
 from app.database.database import Base
 from app.utils.models_utils import ModelTemplate
 from enum import Enum
@@ -39,6 +39,7 @@ class EventModel(ModelTemplate, Base):
     id_creator = Column(String, ForeignKey("users.id"))
     location = Column(String)
     tracks = Column(String)
+    review_skeleton = Column(JSON, default=None)
 
     creator = relationship("UserModel", back_populates="events")
     inscriptions = relationship("InscriptionModel", back_populates="event")
