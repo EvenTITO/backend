@@ -31,3 +31,19 @@ class ModifyEventStatusSchema(BaseModel):
 class EventSchemaWithEventId(EventSchema):
     id: str = Field(examples=["..."])
     status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
+
+
+class CompleteEventSchema(EventSchemaWithEventId):
+    review_skeleton: dict | None
+
+
+# # TODO: implementar!
+# class EventProfileWithIdSchema(EventSchema):
+#     id: str = Field(examples=["..."])
+#     status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
+class EventModelWithRol(EventSchema):
+    rol: str = Field(examples=["ORGANIZER", "SUBSCRIBER"])
+
+
+class ReviewSkeletonSchema(BaseModel):
+    review_skeleton: dict

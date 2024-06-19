@@ -2,7 +2,9 @@ from typing import List
 from app.users.dependencies import SameUserOrAdminDep
 from app.database.dependencies import SessionDep
 from app.organizers import crud
+from app.utils.dependencies import CallerIdDep
 from .schemas import (
+    ModifyInvitationStatusSchema,
     OrganizationsForUserSchema,
     OrganizerInEventResponseSchema,
     OrganizerRequestSchema
@@ -51,6 +53,21 @@ async def read_event_organizers(
     return await crud.get_organizers_in_event(db, event_id)
 
 
+@organizers_events_router.patch("", status_code=200)
+async def update_status_organizer(
+    caller_id: CallerIdDep,
+    event_id: str,
+    _: EventOrganizerDep,
+    status_modification: ModifyInvitationStatusSchema,
+    db: SessionDep
+):
+    await crud.update_invitation_status(db,
+                                        caller_id,
+                                        event_id,
+                                        status_modification.invitation_status)
+    return
+
+
 @organizers_users_router.get(
     "", response_model=List[OrganizationsForUserSchema]
 )
@@ -60,6 +77,7 @@ async def read_user_event_organizes(
     db: SessionDep
 ):
     return await crud.get_user_event_organizes(db, user_id)
+
 
 # @organizers_events_router.delete(
 #     "/{organizer_id}",

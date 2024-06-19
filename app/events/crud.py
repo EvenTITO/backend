@@ -1,8 +1,28 @@
-from .model import EventModel, EventStatus
-from .schemas import EventSchema
+from app.inscriptions.model import InscriptionModel
+from app.users.model import UserModel, UserRole
+from .model import EventModel, EventStatus, EventRol
+from .schemas import EventSchema, ReviewSkeletonSchema
 from sqlalchemy.future import select
+from sqlalchemy import union, literal
 from app.organizers.model import OrganizerModel
 from sqlalchemy.ext.asyncio import AsyncSession
+
+
+async def get_all_events_for_user(db: AsyncSession, user_id: str):
+    q = (select(literal(EventRol.SUSCRIBER).label('rol'),
+                EventModel)
+         .join(InscriptionModel, InscriptionModel.id_event == EventModel.id)
+         .where(InscriptionModel.id_inscriptor == user_id))
+
+    p = (select(literal(EventRol.ORGANIZER).label('rol'),
+                EventModel)
+         .join(OrganizerModel, OrganizerModel.id_event == EventModel.id)
+         .where(OrganizerModel.id_organizer == user_id))
+    union_events = union(p, q)
+    events = await db.execute(union_events)
+    events = events.mappings().all()
+
+    return events
 
 
 async def get_event_by_id(db: AsyncSession, event_id: str):
@@ -13,6 +33,12 @@ async def get_event_by_title(db: AsyncSession, event_title: str):
     query = select(EventModel).where(EventModel.title == event_title)
     result = await db.execute(query)
     return result.scalars().first()
+
+
+# async def get_event_by_user_id(db: AsyncSession, user_id: str):
+#     query = select(EventModel).where(EventModel.title == event_title)
+#     result = await db.execute(query)
+#     return result.scalars().first()
 
 
 async def get_all_events(
@@ -31,13 +57,20 @@ async def get_all_events(
     return result.scalars().all()
 
 
-async def create_event(db: AsyncSession, event: EventSchema, id_creator: str):
-    db_event = EventModel(**event.model_dump(), id_creator=id_creator)
+async def create_event(db: AsyncSession, event: EventSchema,
+                       user: UserModel):
+    if user.role == UserRole.EVENT_CREATOR:
+        status = EventStatus.CREATED
+    else:
+        status = EventStatus.WAITING_APPROVAL
+
+    db_event = EventModel(**event.model_dump(), id_creator=user.id,
+                          status=status)
     db.add(db_event)
     await db.flush()
 
     db_organizer = OrganizerModel(
-        id_organizer=id_creator,
+        id_organizer=user.id,
         id_event=db_event.id
     )
     db.add(db_organizer)
@@ -66,6 +99,17 @@ async def update_status(
     status_modification: EventStatus
 ):
     event.status = status_modification
+    await db.commit()
+    await db.refresh(event)
+    return event
+
+
+async def update_review_skeleton(
+    db: AsyncSession,
+    event: EventModel,
+    review_skeleton: ReviewSkeletonSchema
+):
+    event.review_skeleton = review_skeleton.review_skeleton
     await db.commit()
     await db.refresh(event)
     return event

@@ -1,6 +1,6 @@
 import pytest
-from app.events.model import EventType
-from app.events.schemas import EventSchema
+from app.events.model import EventStatus, EventType
+from app.events.schemas import EventSchema, ModifyEventStatusSchema
 from fastapi.encoders import jsonable_encoder
 from app.organizers.schemas import OrganizerRequestSchema
 from app.database.dependencies import get_db
@@ -227,3 +227,18 @@ async def organizer_id_from_event(client, event_creator_data,
                       headers=create_headers(event_creator_data['id']))
 
     return organizer_id
+
+
+@pytest.fixture(scope="function")
+async def event_started(
+        client, event_data, admin_data
+):
+    status_update = ModifyEventStatusSchema(
+        status=EventStatus.STARTED
+    )
+    await client.patch(
+        f"/events/{event_data['id']}/status",
+        json=jsonable_encoder(status_update),
+        headers=create_headers(admin_data.id)
+    )
+    return event_data['id']
