@@ -1,10 +1,15 @@
 from datetime import datetime
 from app.utils.exceptions import DatesException
-from sqlalchemy import Column, String, Date, ForeignKey
+from sqlalchemy import Column, String, Date, ForeignKey, JSON
 from app.database.database import Base
 from app.utils.models_utils import ModelTemplate
 from enum import Enum
 from sqlalchemy.orm import relationship, validates
+
+
+class EventRol(str, Enum):
+    ORGANIZER = "ORGANIZER"
+    SUSCRIBER = "SUBSCRIBER"
 
 
 class EventStatus(str, Enum):
@@ -34,6 +39,7 @@ class EventModel(ModelTemplate, Base):
     id_creator = Column(String, ForeignKey("users.id"))
     location = Column(String)
     tracks = Column(String)
+    review_skeleton = Column(JSON, default=None)
 
     creator = relationship("UserModel", back_populates="events")
     inscriptions = relationship("InscriptionModel", back_populates="event")
@@ -66,3 +72,9 @@ class EventModel(ModelTemplate, Base):
             "start_date": self.start_date,
             "end_date": self.end_date
         }
+
+
+class EventModelRol:
+    def __init__(self, eventModel, col_val):
+        self.__dict__ = eventModel.__dict__.copy()
+        self.rol = col_val
