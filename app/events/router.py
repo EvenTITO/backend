@@ -22,11 +22,11 @@ events_router = APIRouter(prefix="/events", tags=["Events"])
 @events_router.get("/my-events", response_model=List[EventModelWithRol])
 async def read_my_events(
     db: SessionDep,
-    user_id: str,
+    caller_user: CallerUserDep,
     offset: int = 0,
     limit: int = Query(default=100, le=100)
 ):
-    return await crud.get_all_events_for_user(db, user_id)
+    return await crud.get_all_events_for_user(db, caller_user.id)
 
 
 @events_router.get("/", response_model=List[EventSchemaWithEventId])
