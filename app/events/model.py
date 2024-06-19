@@ -9,7 +9,7 @@ from sqlalchemy.orm import relationship, validates
 
 class EventRol(str, Enum):
     ORGANIZER = "ORGANIZER"
-    SUSCRIBER = "SUBSCRIBER"
+    INSCRIPTED = "INSCRIPTED"
 
 
 class EventStatus(str, Enum):
