@@ -47,6 +47,8 @@ class EventModel(ModelTemplate, Base):
 
     @validates("start_date")
     def validate_start_date(self, key, start_date):
+        if start_date is None:
+            return start_date
         if datetime.now() > start_date:
             raise DatesException()
         else:
@@ -54,6 +56,8 @@ class EventModel(ModelTemplate, Base):
 
     @validates("end_date")
     def validate_end_date(self, key, end_date):
+        if end_date is None:
+            return end_date
         if datetime.now() > end_date:
             raise DatesException()
         elif self.start_date and end_date <= self.start_date:
