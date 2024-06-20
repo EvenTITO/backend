@@ -1,6 +1,7 @@
 from datetime import datetime
 from fastapi.encoders import jsonable_encoder
-from app.events.model import EventType, EventRol
+from app.events.model import EventType
+from app.events.schemas import EventRol
 from app.events.schemas import EventSchema
 from ..common import create_headers
 

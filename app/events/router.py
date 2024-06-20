@@ -1,7 +1,8 @@
 from typing import List
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Header, Query
 from app.database.dependencies import SessionDep
 from app.events.dependencies import GetEventsQuerysDep
+from app.organizers.crud import is_organizer
 from app.users.dependencies import CallerUserDep
 from app.organizers.dependencies import EventOrganizerDep
 from app.events import crud, validations
@@ -12,7 +13,8 @@ from .schemas import (
     EventSchemaWithEventId,
     ModifyEventStatusSchema,
     EventModelWithRol,
-    ReviewSkeletonSchema
+    ReviewSkeletonSchema,
+    EventRol
 )
 
 
@@ -64,8 +66,15 @@ async def create_event(
 
 
 @events_router.get("/{event_id}", response_model=CompleteEventSchema)
-async def read_event(event_id: str, db: SessionDep):
-    return await get_event(db, event_id)
+async def read_event(event_id: str, db: SessionDep,
+                     X_User_Id: str = Header(...)):
+    event = await get_event(db, event_id)
+    event = CompleteEventSchema.model_validate(event)
+    if not X_User_Id:
+        return event
+    if await is_organizer(db, event_id, X_User_Id):
+        event.roles.append(EventRol.ORGANIZER)
+    return event
 
 
 @events_router.put("/{event_id}", status_code=204, response_model=None)
