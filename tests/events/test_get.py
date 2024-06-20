@@ -11,6 +11,7 @@ async def test_get_event(client, event_data, user_data):
     assert response.status_code == 200
     assert response.json()["title"] == event_data["title"]
     assert response.json()["status"] == EventStatus.WAITING_APPROVAL
+    assert len(response.json()["roles"]) == 0
 
 
 async def test_get_event_not_exists_fails(client, user_data):

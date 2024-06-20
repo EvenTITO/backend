@@ -1,7 +1,13 @@
-from pydantic import BaseModel, Field, model_validator
+from enum import Enum
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from datetime import datetime
 from .model import EventType, EventStatus
 from typing_extensions import Self
+
+
+class EventRol(str, Enum):
+    ORGANIZER = "ORGANIZER"
+    INSCRIPTED = "INSCRIPTED"
 
 
 class EventSchema(BaseModel):
@@ -43,16 +49,18 @@ class EventSchemaWithEventId(EventSchema):
     status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
 
 
-class CompleteEventSchema(EventSchemaWithEventId):
-    review_skeleton: dict | None
-
-
 # # TODO: implementar!
 # class EventProfileWithIdSchema(EventSchema):
 #     id: str = Field(examples=["..."])
 #     status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
 class EventModelWithRol(EventSchemaWithEventId):
-    roles: list[str] = Field(examples=[["ORGANIZER", "SUBSCRIBER"]])
+    model_config = ConfigDict(from_attributes=True)
+    roles: list[str] = Field(examples=[["ORGANIZER", "SUBSCRIBER"]],
+                             default=[])
+
+
+class CompleteEventSchema(EventModelWithRol):
+    review_skeleton: dict | None
 
 
 class ReviewSkeletonSchema(BaseModel):
