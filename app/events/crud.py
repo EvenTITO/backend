@@ -1,6 +1,7 @@
 from app.inscriptions.model import InscriptionModel
 from app.users.model import UserModel, UserRole
-from .model import EventModel, EventStatus, EventRol
+from .model import EventModel, EventStatus
+from .schemas import EventRol
 from .schemas import EventModelWithRol, EventSchema, ReviewSkeletonSchema
 from sqlalchemy.future import select
 from app.organizers.model import OrganizerModel
