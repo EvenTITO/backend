@@ -4,7 +4,7 @@ from .model import EventModel, EventStatus
 from .schemas import EventRol
 from .schemas import EventModelWithRol, EventSchema, ReviewSkeletonSchema
 from sqlalchemy.future import select
-from app.organizers.model import OrganizerModel
+from app.organizers.model import InvitationStatus, OrganizerModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -91,7 +91,8 @@ async def create_event(db: AsyncSession, event: EventSchema,
 
     db_organizer = OrganizerModel(
         id_organizer=user.id,
-        id_event=db_event.id
+        id_event=db_event.id,
+        invitation_status=InvitationStatus.ACCEPTED,
     )
     db.add(db_organizer)
 
