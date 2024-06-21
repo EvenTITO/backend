@@ -9,6 +9,12 @@ from .exceptions import (
 from .model import UserRole
 
 
+async def validate_user_exists_with_id(db, id_user):
+    user = await crud.get_user_by_id(db, id_user)
+    if not user:
+        raise UserNotFound(id_user)
+
+
 async def validate_user_not_exists(db, id_user, email):
     user_in_db = await crud.get_user_by_id(db, id_user)
     if user_in_db:
@@ -22,9 +28,9 @@ async def validate_always_at_least_one_admin(db, user_id, caller_user, role):
     # One can remove himself from Admin role, but there must be
     # always at least one admin.
     if (
-        (caller_user.id == user_id)
-        and (role.role != UserRole.ADMIN)
-        and (await crud.get_amount_admins(db) == 1)
+            (caller_user.id == user_id)
+            and (role.role != UserRole.ADMIN)
+            and (await crud.get_amount_admins(db) == 1)
     ):
         raise CantRemoveLastAdmin()
 
