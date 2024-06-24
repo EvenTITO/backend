@@ -14,30 +14,29 @@ from .schemas import (
     ModifyEventStatusSchema,
     EventModelWithRol,
     ReviewSkeletonSchema,
-    EventRol
+    EventRol, ReviewerSchema, ReviewerSchemaComplete
 )
-
 
 events_router = APIRouter(prefix="/events", tags=["Events"])
 
 
 @events_router.get("/my-events", response_model=List[EventModelWithRol])
 async def read_my_events(
-    db: SessionDep,
-    caller_user: CallerUserDep,
-    offset: int = 0,
-    limit: int = Query(default=100, le=100)
+        db: SessionDep,
+        caller_user: CallerUserDep,
+        offset: int = 0,
+        limit: int = Query(default=100, le=100)
 ):
     return await crud.get_all_events_for_user(db, caller_user.id)
 
 
 @events_router.get("/", response_model=List[EventSchemaWithEventId])
 async def read_all_events(
-    db: SessionDep,
-    status_query: GetEventsQuerysDep,
-    offset: int = 0,
-    limit: int = Query(default=100, le=100),
-    search: str | None = None
+        db: SessionDep,
+        status_query: GetEventsQuerysDep,
+        offset: int = 0,
+        limit: int = Query(default=100, le=100),
+        search: str | None = None
 ):
     print('El valor de la query es')
     print(status_query)
@@ -52,9 +51,9 @@ async def read_all_events(
 
 @events_router.post("", status_code=201, response_model=str)
 async def create_event(
-    event: EventSchema,
-    caller_user: CallerUserDep,
-    db: SessionDep
+        event: EventSchema,
+        caller_user: CallerUserDep,
+        db: SessionDep
 ):
     await validations.validate_event_not_exists(db, event)
     event_created = await crud.create_event(
@@ -79,10 +78,10 @@ async def read_event(event_id: str, db: SessionDep,
 
 @events_router.put("/{event_id}", status_code=204, response_model=None)
 async def update_event(
-    _: EventOrganizerDep,
-    event_id: str,
-    event_modification: EventSchema,
-    db: SessionDep
+        _: EventOrganizerDep,
+        event_id: str,
+        event_modification: EventSchema,
+        db: SessionDep
 ):
     current_event = await get_event(db, event_id)
     await validations.validate_update(db, current_event, event_modification)
@@ -95,10 +94,10 @@ async def update_event(
     response_model=None
 )
 async def change_event_status(
-    caller: CallerUserDep,
-    event_id: str,
-    status_modification: ModifyEventStatusSchema,
-    db: SessionDep
+        caller: CallerUserDep,
+        event_id: str,
+        status_modification: ModifyEventStatusSchema,
+        db: SessionDep
 ):
     event = await get_event(db, event_id)
     await validations.validate_status_change(
@@ -113,10 +112,10 @@ async def change_event_status(
     response_model=None
 )
 async def change_review_skeleton(
-    _: EventOrganizerDep,
-    event_id: str,
-    review_skeleton: ReviewSkeletonSchema,
-    db: SessionDep
+        _: EventOrganizerDep,
+        event_id: str,
+        review_skeleton: ReviewSkeletonSchema,
+        db: SessionDep
 ):
     event = await get_event(db, event_id)
     await crud.update_review_skeleton(db, event, review_skeleton)
@@ -125,3 +124,33 @@ async def change_review_skeleton(
 # @events_router.delete("/{event_id}", status_code=204, response_model=None)
 # async def delete_event(event_id: str, db: SessionDep):
 #     crud.delete_event(db=db, event_id=event_id)
+
+
+@events_router.post("/{event_id}/reviewer/{user_id}", status_code=201)
+async def create_reviewer(
+        event_id: str,
+        user_id: str,
+        reviewer: ReviewerSchema,
+        _: EventOrganizerDep,
+        db: SessionDep
+):
+    await validations.validate_unique_reviewer(db, event_id, user_id)
+
+    reviewer_created = await crud.create_reviewer(
+        db=db,
+        reviewer=reviewer,
+        event_id=event_id,
+        user_id=user_id
+    )
+    return reviewer_created
+
+
+@events_router.get(
+    "/{event_id}/reviewer",
+    response_model=List[ReviewerSchemaComplete])
+async def get_reviewer(
+        event_id: str,
+        db: SessionDep,
+        _: EventOrganizerDep
+):
+    return await crud.get_all_reviewer(db, event_id)

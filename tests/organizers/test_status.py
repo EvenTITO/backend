@@ -18,3 +18,5 @@ async def test_event_creator_can_add_other_user_as_event_organizer(
     )
     print(response.json())
     assert response.status_code == 200
+
+# TODO: add more test for patch and event status & expiration date

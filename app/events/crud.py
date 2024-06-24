@@ -1,10 +1,10 @@
 from app.inscriptions.model import InscriptionModel
 from app.users.model import UserModel, UserRole
-from .model import EventModel, EventStatus
-from .schemas import EventRol
+from .model import EventModel, EventStatus, ReviewerModel
+from .schemas import EventRol, ReviewerSchema
 from .schemas import EventModelWithRol, EventSchema, ReviewSkeletonSchema
 from sqlalchemy.future import select
-from app.organizers.model import OrganizerModel
+from app.organizers.model import InvitationStatus, OrganizerModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -91,7 +91,8 @@ async def create_event(db: AsyncSession, event: EventSchema,
 
     db_organizer = OrganizerModel(
         id_organizer=user.id,
-        id_event=db_event.id
+        id_event=db_event.id,
+        invitation_status=InvitationStatus.ACCEPTED,
     )
     db.add(db_organizer)
 
@@ -144,3 +145,35 @@ async def is_creator(
     )
     result = await db.execute(query)
     return result.scalars().first() is not None
+
+
+# TODO: revisar porque en caso de dup PK se obtiene un error
+async def create_reviewer(db: AsyncSession, reviewer: ReviewerSchema,
+                          event_id: str, user_id: str):
+    new_reviewer = ReviewerModel(**reviewer.model_dump(),
+                                 id_user=user_id, id_event=event_id)
+    db.add(new_reviewer)
+
+    await db.commit()
+    await db.refresh(new_reviewer)
+
+    return new_reviewer
+
+
+async def get_reviewer(db: AsyncSession, event_id: str, user_id: str):
+    query = select(ReviewerModel).where(
+        ReviewerModel.id_event == event_id,
+        ReviewerModel.id_user == user_id
+    )
+
+    result = await db.execute(query)
+    return result.scalars().first()
+
+
+async def get_all_reviewer(db: AsyncSession, event_id: str):
+    query = select(ReviewerModel).where(
+        ReviewerModel.id_event == event_id
+    )
+    result = await db.execute(query)
+
+    return result.scalars().all()
