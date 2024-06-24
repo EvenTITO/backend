@@ -2,10 +2,12 @@ from typing import List
 from fastapi import APIRouter, Header, Query
 from app.database.dependencies import SessionDep
 from app.events.dependencies import GetEventsQuerysDep
+from app.events.model import EventStatus
 from app.organizers.crud import is_organizer
 from app.users.dependencies import CallerUserDep
 from app.organizers.dependencies import EventOrganizerDep
 from app.events import crud, validations
+import app.notifications.events as notifications
 from .utils import get_event
 from .schemas import (
     CompleteEventSchema,
@@ -61,6 +63,10 @@ async def create_event(
         event=event,
         user=caller_user
     )
+    if event_created.status == EventStatus.WAITING_APPROVAL:
+        await notifications.request_approve_event(
+            db, caller_user, event_created
+        )
     return event_created.id
 
 
@@ -119,11 +125,6 @@ async def change_review_skeleton(
 ):
     event = await get_event(db, event_id)
     await crud.update_review_skeleton(db, event, review_skeleton)
-
-
-# @events_router.delete("/{event_id}", status_code=204, response_model=None)
-# async def delete_event(event_id: str, db: SessionDep):
-#     crud.delete_event(db=db, event_id=event_id)
 
 
 @events_router.post("/{event_id}/reviewer/{user_id}", status_code=201)
