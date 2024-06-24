@@ -2,14 +2,9 @@ from datetime import datetime
 from app.utils.exceptions import DatesException
 from sqlalchemy import Column, String, Date, ForeignKey, JSON
 from app.database.database import Base
-from app.utils.models_utils import ModelTemplate
+from app.utils.models_utils import ModelTemplate, DateTemplate
 from enum import Enum
 from sqlalchemy.orm import relationship, validates
-
-
-class EventRol(str, Enum):
-    ORGANIZER = "ORGANIZER"
-    SUSCRIBER = "SUBSCRIBER"
 
 
 class EventStatus(str, Enum):
@@ -25,6 +20,26 @@ class EventStatus(str, Enum):
 class EventType(str, Enum):
     CONFERENCE = "CONFERENCE"
     TALK = "TALK"
+
+
+class ReviewerModel(DateTemplate, Base):
+    __tablename__ = "reviewer"
+
+    id_user = Column(String, primary_key=True)
+    id_event = Column(String, primary_key=True)
+
+    invitation_expiration_date = Column(Date)
+    invitation_status = Column(String, nullable=False)
+    tracks = Column(String)
+
+    @validates("invitation_expiration_date")
+    def validate_date(self, key, invitation_expiration_date):
+        if invitation_expiration_date is None:
+            return datetime.now()
+        if datetime.now() > invitation_expiration_date:
+            raise DatesException()
+        else:
+            return invitation_expiration_date
 
 
 class EventModel(ModelTemplate, Base):
@@ -47,6 +62,8 @@ class EventModel(ModelTemplate, Base):
 
     @validates("start_date")
     def validate_start_date(self, key, start_date):
+        if start_date is None:
+            return start_date
         if datetime.now() > start_date:
             raise DatesException()
         else:
@@ -54,6 +71,8 @@ class EventModel(ModelTemplate, Base):
 
     @validates("end_date")
     def validate_end_date(self, key, end_date):
+        if end_date is None:
+            return end_date
         if datetime.now() > end_date:
             raise DatesException()
         elif self.start_date and end_date <= self.start_date:
@@ -63,15 +82,6 @@ class EventModel(ModelTemplate, Base):
 
     def __repr__(self):
         return f"Event({self.id})"
-
-    def to_dict(self):
-        return {
-            "id_event": self.id,
-            "title": self.title,
-            "description": self.description,
-            "start_date": self.start_date,
-            "end_date": self.end_date
-        }
 
 
 class EventModelRol:

@@ -1,28 +1,54 @@
 from app.inscriptions.model import InscriptionModel
 from app.users.model import UserModel, UserRole
-from .model import EventModel, EventStatus, EventRol
-from .schemas import EventSchema, ReviewSkeletonSchema
+from .model import EventModel, EventStatus, ReviewerModel
+from .schemas import EventRol, ReviewerSchema
+from .schemas import EventModelWithRol, EventSchema, ReviewSkeletonSchema
 from sqlalchemy.future import select
-from sqlalchemy import union, literal
-from app.organizers.model import OrganizerModel
+from app.organizers.model import InvitationStatus, OrganizerModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
 async def get_all_events_for_user(db: AsyncSession, user_id: str):
-    q = (select(literal(EventRol.SUSCRIBER).label('rol'),
-                EventModel)
-         .join(InscriptionModel, InscriptionModel.id_event == EventModel.id)
-         .where(InscriptionModel.id_inscriptor == user_id))
+    inscriptions_q = (select(EventModel)
+                      .join(InscriptionModel,
+                            InscriptionModel.id_event == EventModel.id)
+                      .where(InscriptionModel.id_inscriptor == user_id))
 
-    p = (select(literal(EventRol.ORGANIZER).label('rol'),
-                EventModel)
-         .join(OrganizerModel, OrganizerModel.id_event == EventModel.id)
-         .where(OrganizerModel.id_organizer == user_id))
-    union_events = union(p, q)
-    events = await db.execute(union_events)
-    events = events.mappings().all()
+    organizations_q = (select(EventModel)
+                       .join(OrganizerModel,
+                             OrganizerModel.id_event == EventModel.id)
+                       .where(OrganizerModel.id_organizer == user_id))
 
-    return events
+    inscr = db.execute(inscriptions_q)
+    org = db.execute(organizations_q)
+    inscr_result = await inscr
+    org_result = await org
+    inscriptions = inscr_result.scalars().all()
+    organizations = org_result.scalars().all()
+
+    def add_events(role, events, response):
+        for event in events:
+            print(event)
+            if event.id in response:
+                response[event.id].roles.append(role)
+            else:
+                response[event.id] = EventModelWithRol(
+                    id=event.id,
+                    title=event.title,
+                    start_date=event.start_date,
+                    end_date=event.end_date,
+                    description=event.description,
+                    event_type=event.event_type,
+                    location=event.location,
+                    tracks=event.tracks,
+                    status=event.status,
+                    roles=[role]
+                )
+        return response
+    response = {}
+    response = add_events(EventRol.INSCRIPTED, inscriptions, response)
+    response = add_events(EventRol.ORGANIZER, organizations, response)
+    return list(response.values())
 
 
 async def get_event_by_id(db: AsyncSession, event_id: str):
@@ -33,12 +59,6 @@ async def get_event_by_title(db: AsyncSession, event_title: str):
     query = select(EventModel).where(EventModel.title == event_title)
     result = await db.execute(query)
     return result.scalars().first()
-
-
-# async def get_event_by_user_id(db: AsyncSession, user_id: str):
-#     query = select(EventModel).where(EventModel.title == event_title)
-#     result = await db.execute(query)
-#     return result.scalars().first()
 
 
 async def get_all_events(
@@ -71,7 +91,8 @@ async def create_event(db: AsyncSession, event: EventSchema,
 
     db_organizer = OrganizerModel(
         id_organizer=user.id,
-        id_event=db_event.id
+        id_event=db_event.id,
+        invitation_status=InvitationStatus.ACCEPTED,
     )
     db.add(db_organizer)
 
@@ -126,9 +147,33 @@ async def is_creator(
     return result.scalars().first() is not None
 
 
-# async def delete_event(db: Session, event_id: str):
-#     event = get_event_by_id(db, event_id)
-#     db.delete(event)
-#     db.commit()
+# TODO: revisar porque en caso de dup PK se obtiene un error
+async def create_reviewer(db: AsyncSession, reviewer: ReviewerSchema,
+                          event_id: str, user_id: str):
+    new_reviewer = ReviewerModel(**reviewer.model_dump(),
+                                 id_user=user_id, id_event=event_id)
+    db.add(new_reviewer)
 
-#     return event
+    await db.commit()
+    await db.refresh(new_reviewer)
+
+    return new_reviewer
+
+
+async def get_reviewer(db: AsyncSession, event_id: str, user_id: str):
+    query = select(ReviewerModel).where(
+        ReviewerModel.id_event == event_id,
+        ReviewerModel.id_user == user_id
+    )
+
+    result = await db.execute(query)
+    return result.scalars().first()
+
+
+async def get_all_reviewer(db: AsyncSession, event_id: str):
+    query = select(ReviewerModel).where(
+        ReviewerModel.id_event == event_id
+    )
+    result = await db.execute(query)
+
+    return result.scalars().all()

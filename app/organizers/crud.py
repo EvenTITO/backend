@@ -1,5 +1,6 @@
 from app.events.model import EventModel
 from app.events.schemas import EventSchema
+from app.organizers.exceptions import ExpirationDateException
 from app.organizers.schemas import OrganizationsForUserSchema
 from app.organizers.schemas import OrganizerInEventResponseSchema
 from app.users.model import UserModel
@@ -7,7 +8,7 @@ from app.users.schemas import UserSchema
 from .model import InvitationStatus, OrganizerModel
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import update
+from sqlalchemy import update, func
 
 
 async def is_organizer(
@@ -118,7 +119,12 @@ async def update_invitation_status(
         status_modification: InvitationStatus):
     query = update(OrganizerModel).where(
         OrganizerModel.id_event == event_id,
-        OrganizerModel.id_organizer == caller_id
+        OrganizerModel.id_organizer == caller_id,
+        OrganizerModel.invitation_expiration_date > func.now()
     ).values(invitation_status=status_modification)
-    await db.execute(query)
+    result = await db.execute(query)
+
     await db.commit()
+    # Check if update was OK
+    if result.rowcount < 1:
+        raise ExpirationDateException()

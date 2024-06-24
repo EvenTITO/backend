@@ -79,6 +79,34 @@ async def test_post_event_past_dates_fails(client, admin_data):
     assert response.status_code == 422
 
 
+async def test_post_event_same_dates_fails(client, admin_data):
+    json = jsonable_encoder({
+        'title': "Event Title",
+        'start_date': "2023-09-02",
+        'end_date': "2023-09-02",
+        'description': "This is a nice event",
+        'event_type': EventType.CONFERENCE,
+        'location': 'Paseo Colon 850',
+        'tracks': 'math, chemistry, phisics'
+    })
+    response = await client.post("/events",
+                                 json=json,
+                                 headers=create_headers(admin_data.id))
+    assert response.status_code == 422
+
+
+async def test_post_event_same_without_optional_args(client, admin_data):
+    json = jsonable_encoder({
+        'title': "Event Title",
+        'description': "This is a nice event",
+        'event_type': EventType.CONFERENCE,
+    })
+    response = await client.post("/events",
+                                 json=json,
+                                 headers=create_headers(admin_data.id))
+    assert response.status_code == 201
+
+
 async def test_post_event_start_date_gt_end_date_fails(client, admin_data):
     json = jsonable_encoder({
         'title': "Event Title",
