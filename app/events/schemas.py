@@ -68,13 +68,13 @@ class CompleteEventSchema(EventModelWithRol):
 class ReviewSkeletonSchema(BaseModel):
     review_skeleton: dict
 
-
 # title: str = Field(min_length=2, max_length=100,
 #                    examples=["CONGRESO DE QUIMICA"])
 # description: str = Field(max_length=1000, examples=["Evento en FIUBA"])
 # event_type: EventType = Field(examples=[EventType.CONFERENCE])
 # start_date: datetime | None = Field(examples=[datetime(2024, 8, 1)],
 #                                     default=None)
+
 
 class ReviewerSchema(BaseModel):
     invitation_expiration_date: datetime | None = \

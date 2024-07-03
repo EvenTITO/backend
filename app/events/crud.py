@@ -8,6 +8,16 @@ from app.organizers.model import InvitationStatus, OrganizerModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
+async def get_review_sckeletor(db: AsyncSession, event_id: str, user_id: str):
+    query = select(EventModel.review_skeleton).where(
+        EventModel.id == event_id,
+        EventModel.id_creator == user_id
+    )
+
+    result = await db.execute(query)
+    return result.scalars().first()
+
+
 async def get_all_events_for_user(db: AsyncSession, user_id: str):
     inscriptions_q = (select(EventModel)
                       .join(InscriptionModel,

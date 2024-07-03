@@ -112,6 +112,19 @@ async def change_event_status(
     await crud.update_status(db, event, status_modification.status)
 
 
+@events_router.get(
+    "/{event_id}/review-skeleton",
+    status_code=200
+)
+async def get_review_skeleton(
+        _: EventOrganizerDep,
+        caller: CallerUserDep,
+        event_id: str,
+        db: SessionDep
+):
+    return await crud.get_review_sckeletor(db, event_id, caller.id)
+
+
 @events_router.patch(
     "/{event_id}/review-skeleton",
     status_code=204,
