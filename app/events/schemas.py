@@ -65,9 +65,16 @@ class CompleteEventSchema(EventModelWithRol):
     review_skeleton: dict | None
 
 
+class DatesSchema(BaseModel):
+    dates: dict
+
+
+class PricingSchema(BaseModel):
+    pricing: dict
+
+
 class ReviewSkeletonSchema(BaseModel):
     review_skeleton: dict
-
 
 # title: str = Field(min_length=2, max_length=100,
 #                    examples=["CONGRESO DE QUIMICA"])
@@ -76,6 +83,7 @@ class ReviewSkeletonSchema(BaseModel):
 # start_date: datetime | None = Field(examples=[datetime(2024, 8, 1)],
 #                                     default=None)
 
+
 class ReviewerSchema(BaseModel):
     invitation_expiration_date: datetime | None = \
         Field(examples=[datetime(2024, 12, 9)], default=None)
@@ -83,6 +91,12 @@ class ReviewerSchema(BaseModel):
     tracks: str | None = Field(max_length=1000,
                                examples=["track1, track2, track3"],
                                default=None)
+
+    @model_validator(mode='after')
+    def check_dates(self) -> Self:
+        if self.invitation_expiration_date <= datetime.now():
+            raise ValueError('Invalid invitation expiration date.')
+        return self
 
 
 class ReviewerSchemaComplete(ReviewerSchema):

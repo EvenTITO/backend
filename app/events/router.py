@@ -2,10 +2,12 @@ from typing import List
 from fastapi import APIRouter, Header, Query
 from app.database.dependencies import SessionDep
 from app.events.dependencies import GetEventsQuerysDep
+from app.events.model import EventStatus
 from app.organizers.crud import is_organizer
 from app.users.dependencies import CallerUserDep
 from app.organizers.dependencies import EventOrganizerDep
 from app.events import crud, validations
+import app.notifications.events as notifications
 from .utils import get_event
 from .schemas import (
     CompleteEventSchema,
@@ -14,7 +16,8 @@ from .schemas import (
     ModifyEventStatusSchema,
     EventModelWithRol,
     ReviewSkeletonSchema,
-    EventRol, ReviewerSchema, ReviewerSchemaComplete
+    EventRol, ReviewerSchema, ReviewerSchemaComplete,
+    PricingSchema, DatesSchema
 )
 
 events_router = APIRouter(prefix="/events", tags=["Events"])
@@ -61,6 +64,10 @@ async def create_event(
         event=event,
         user=caller_user
     )
+    if event_created.status == EventStatus.WAITING_APPROVAL:
+        await notifications.request_approve_event(
+            db, caller_user, event_created
+        )
     return event_created.id
 
 
@@ -106,6 +113,19 @@ async def change_event_status(
     await crud.update_status(db, event, status_modification.status)
 
 
+@events_router.get(
+    "/{event_id}/review-skeleton",
+    status_code=200
+)
+async def get_review_skeleton(
+        _: EventOrganizerDep,
+        caller: CallerUserDep,
+        event_id: str,
+        db: SessionDep
+):
+    return await crud.get_review_sckeletor(db, event_id, caller.id)
+
+
 @events_router.patch(
     "/{event_id}/review-skeleton",
     status_code=204,
@@ -119,11 +139,6 @@ async def change_review_skeleton(
 ):
     event = await get_event(db, event_id)
     await crud.update_review_skeleton(db, event, review_skeleton)
-
-
-# @events_router.delete("/{event_id}", status_code=204, response_model=None)
-# async def delete_event(event_id: str, db: SessionDep):
-#     crud.delete_event(db=db, event_id=event_id)
 
 
 @events_router.post("/{event_id}/reviewer/{user_id}", status_code=201)
@@ -154,3 +169,57 @@ async def get_reviewer(
         _: EventOrganizerDep
 ):
     return await crud.get_all_reviewer(db, event_id)
+
+
+@events_router.get(
+    "/{event_id}/pricing",
+    status_code=200
+)
+async def get_pricing(
+        _: EventOrganizerDep,
+        caller: CallerUserDep,
+        event_id: str,
+        db: SessionDep
+):
+    return await crud.get_pricing(db, event_id, caller.id)
+
+
+@events_router.patch(
+    "/{event_id}/pricing",
+    status_code=204,
+    response_model=None
+)
+async def change_pricing(
+        _: EventOrganizerDep,
+        event_id: str,
+        pricing: PricingSchema,
+        db: SessionDep
+):
+    await crud.update_pricing(db, event_id, pricing)
+
+
+@events_router.get(
+    "/{event_id}/dates",
+    status_code=200
+)
+async def get_dates(
+        _: EventOrganizerDep,
+        caller: CallerUserDep,
+        event_id: str,
+        db: SessionDep
+):
+    return await crud.get_dates(db, event_id, caller.id)
+
+
+@events_router.patch(
+    "/{event_id}/dates",
+    status_code=204,
+    response_model=None
+)
+async def change_dates(
+        _: EventOrganizerDep,
+        event_id: str,
+        dates: DatesSchema,
+        db: SessionDep
+):
+    await crud.update_pricing(db, event_id, dates)
