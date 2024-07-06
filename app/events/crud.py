@@ -1,11 +1,78 @@
 from app.inscriptions.model import InscriptionModel
 from app.users.model import UserModel, UserRole
 from .model import EventModel, EventStatus, ReviewerModel
-from .schemas import EventRol, ReviewerSchema
+from .schemas import EventRol, ReviewerSchema, PricingSchema, DatesSchema
 from .schemas import EventModelWithRol, EventSchema, ReviewSkeletonSchema
 from sqlalchemy.future import select
 from app.organizers.model import InvitationStatus, OrganizerModel
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from .utils import get_event
+
+
+async def update_pricing(
+        db: AsyncSession,
+        event_id: str,
+        pricing: PricingSchema
+):
+    event = await get_event(db, event_id)
+    event.pricing = pricing.pricing
+    await db.commit()
+    await db.refresh(event)
+    return event
+
+
+async def update_dates(
+        db: AsyncSession,
+        event_id: str,
+        dates: DatesSchema
+):
+    event = await get_event(db, event_id)
+    event.dates = dates.dates
+    await db.commit()
+    await db.refresh(event)
+    return event
+
+
+# async def update_review_skeleton(
+#         db: AsyncSession,
+#         event: EventModel,
+#         review_skeleton: ReviewSkeletonSchema
+# ):
+#     event.review_skeleton = review_skeleton.review_skeleton
+#     await db.commit()
+#     await db.refresh(event)
+#     return event
+
+
+async def get_dates(db: AsyncSession, event_id: str, user_id: str):
+    query = select(EventModel.dates).where(
+        EventModel.id == event_id,
+        EventModel.id_creator == user_id
+    )
+
+    result = await db.execute(query)
+    return result.scalars().first()
+
+
+async def get_pricing(db: AsyncSession, event_id: str, user_id: str):
+    query = select(EventModel.pricing).where(
+        EventModel.id == event_id,
+        EventModel.id_creator == user_id
+    )
+
+    result = await db.execute(query)
+    return result.scalars().first()
+
+
+async def get_review_sckeletor(db: AsyncSession, event_id: str, user_id: str):
+    query = select(EventModel.review_skeleton).where(
+        EventModel.id == event_id,
+        EventModel.id_creator == user_id
+    )
+
+    result = await db.execute(query)
+    return result.scalars().first()
 
 
 async def get_all_events_for_user(db: AsyncSession, user_id: str):

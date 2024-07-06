@@ -55,6 +55,8 @@ class EventModel(ModelTemplate, Base):
     location = Column(String)
     tracks = Column(String)
     review_skeleton = Column(JSON, default=None)
+    pricing = Column(JSON, default=None)
+    dates = Column(JSON, default=None)
 
     creator = relationship("UserModel", back_populates="events")
     inscriptions = relationship("InscriptionModel", back_populates="event")

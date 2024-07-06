@@ -16,7 +16,8 @@ from .schemas import (
     ModifyEventStatusSchema,
     EventModelWithRol,
     ReviewSkeletonSchema,
-    EventRol, ReviewerSchema, ReviewerSchemaComplete
+    EventRol, ReviewerSchema, ReviewerSchemaComplete,
+    PricingSchema, DatesSchema
 )
 
 events_router = APIRouter(prefix="/events", tags=["Events"])
@@ -112,6 +113,19 @@ async def change_event_status(
     await crud.update_status(db, event, status_modification.status)
 
 
+@events_router.get(
+    "/{event_id}/review-skeleton",
+    status_code=200
+)
+async def get_review_skeleton(
+        _: EventOrganizerDep,
+        caller: CallerUserDep,
+        event_id: str,
+        db: SessionDep
+):
+    return await crud.get_review_sckeletor(db, event_id, caller.id)
+
+
 @events_router.patch(
     "/{event_id}/review-skeleton",
     status_code=204,
@@ -155,3 +169,57 @@ async def get_reviewer(
         _: EventOrganizerDep
 ):
     return await crud.get_all_reviewer(db, event_id)
+
+
+@events_router.get(
+    "/{event_id}/pricing",
+    status_code=200
+)
+async def get_pricing(
+        _: EventOrganizerDep,
+        caller: CallerUserDep,
+        event_id: str,
+        db: SessionDep
+):
+    return await crud.get_pricing(db, event_id, caller.id)
+
+
+@events_router.patch(
+    "/{event_id}/pricing",
+    status_code=204,
+    response_model=None
+)
+async def change_pricing(
+        _: EventOrganizerDep,
+        event_id: str,
+        pricing: PricingSchema,
+        db: SessionDep
+):
+    await crud.update_pricing(db, event_id, pricing)
+
+
+@events_router.get(
+    "/{event_id}/dates",
+    status_code=200
+)
+async def get_dates(
+        _: EventOrganizerDep,
+        caller: CallerUserDep,
+        event_id: str,
+        db: SessionDep
+):
+    return await crud.get_dates(db, event_id, caller.id)
+
+
+@events_router.patch(
+    "/{event_id}/dates",
+    status_code=204,
+    response_model=None
+)
+async def change_dates(
+        _: EventOrganizerDep,
+        event_id: str,
+        dates: DatesSchema,
+        db: SessionDep
+):
+    await crud.update_pricing(db, event_id, dates)
