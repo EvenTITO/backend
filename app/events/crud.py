@@ -34,17 +34,6 @@ async def update_dates(
     return event
 
 
-# async def update_review_skeleton(
-#         db: AsyncSession,
-#         event: EventModel,
-#         review_skeleton: ReviewSkeletonSchema
-# ):
-#     event.review_skeleton = review_skeleton.review_skeleton
-#     await db.commit()
-#     await db.refresh(event)
-#     return event
-
-
 async def get_dates(db: AsyncSession, event_id: str, user_id: str):
     query = select(EventModel.dates).where(
         EventModel.id == event_id,
