@@ -65,6 +65,14 @@ class CompleteEventSchema(EventModelWithRol):
     review_skeleton: dict | None
 
 
+class DatesSchema(BaseModel):
+    dates: dict
+
+
+class PricingSchema(BaseModel):
+    pricing: dict
+
+
 class ReviewSkeletonSchema(BaseModel):
     review_skeleton: dict
 
