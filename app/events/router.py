@@ -1,4 +1,6 @@
 from typing import List
+from app.storage.events_storage import EventsStaticFiles, get_upload_url
+from app.storage.schemas import UploadURLSchema
 from fastapi import APIRouter, Header, Query
 from app.database.dependencies import SessionDep
 from app.events.dependencies import GetEventsQuerysDep
@@ -93,6 +95,31 @@ async def update_event(
     current_event = await get_event(db, event_id)
     await validations.validate_update(db, current_event, event_modification)
     await crud.update_event(db, current_event, event_modification)
+
+
+@events_router.get("/{event_id}/upload_url/main_image")
+async def get_main_image_upload_url(
+    _: EventOrganizerDep,
+    event_id: str,
+) -> UploadURLSchema:
+    return get_upload_url(event_id, EventsStaticFiles.MAIN_IMAGE)
+
+
+@events_router.get("/{event_id}/upload_url/banner_image")
+async def get_banner_image_upload_url(
+    _: EventOrganizerDep,
+    event_id: str,
+) -> UploadURLSchema:
+    return get_upload_url(event_id, EventsStaticFiles.BANNER_IMAGE)
+
+
+@events_router.get("/{event_id}/upload_url/brochure")
+async def get_brochure_upload_url(
+    _: EventOrganizerDep,
+    event_id: str,
+) -> UploadURLSchema:
+    return get_upload_url(event_id, EventsStaticFiles.BROCHURE)
+
 
 
 @events_router.patch(

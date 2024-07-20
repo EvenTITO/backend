@@ -10,7 +10,7 @@ from datetime import datetime
 from .model import EventType, EventStatus
 from typing_extensions import Self
 from ..organizers.model import InvitationStatus
-from storage.events_storage import EventsStaticFiles, get_public_event_url
+from app.storage.events_storage import EventsStaticFiles, get_public_event_url
 
 
 class EventRol(str, Enum):
@@ -58,15 +58,15 @@ class EventSchemaWithEventId(EventSchema):
 
     @computed_field
     def main_image_url(self) -> str:
-        return get_public_event_url(EventsStaticFiles.MAIN_IMAGE)
+        return get_public_event_url(id, EventsStaticFiles.MAIN_IMAGE)
 
     @computed_field
     def banner_image_url(self) -> str:
-        return get_public_event_url(EventsStaticFiles.BANNER_IMAGE)
+        return get_public_event_url(id, EventsStaticFiles.BANNER_IMAGE)
 
     @computed_field
     def brochure_url(self) -> str:
-        return get_public_event_url(EventsStaticFiles.BROCHURE)
+        return get_public_event_url(id, EventsStaticFiles.BROCHURE)
 
 
 # # TODO: implementar!
