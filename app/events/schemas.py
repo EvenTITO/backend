@@ -1,10 +1,16 @@
 from enum import Enum
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    model_validator,
+    computed_field
+)
 from datetime import datetime
 from .model import EventType, EventStatus
 from typing_extensions import Self
-
 from ..organizers.model import InvitationStatus
+from app.storage.events_storage import EventsStaticFiles, get_public_event_url
 
 
 class EventRol(str, Enum):
@@ -49,6 +55,18 @@ class ModifyEventStatusSchema(BaseModel):
 class EventSchemaWithEventId(EventSchema):
     id: str = Field(examples=["..."])
     status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
+
+    @computed_field
+    def main_image_url(self) -> str:
+        return get_public_event_url(id, EventsStaticFiles.MAIN_IMAGE)
+
+    @computed_field
+    def banner_image_url(self) -> str:
+        return get_public_event_url(id, EventsStaticFiles.BANNER_IMAGE)
+
+    @computed_field
+    def brochure_url(self) -> str:
+        return get_public_event_url(id, EventsStaticFiles.BROCHURE)
 
 
 # # TODO: implementar!

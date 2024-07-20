@@ -10,6 +10,9 @@ services:
       - ADMIN_LASTNAME=Admin
       - ADMIN_EMAIL=string@email.com
       - ADMIN_ID=azfWgbBRUYXf8xbil9FyXof1gl82
+      - GCP_CREDENTIALS=${GCP_CREDENTIALS}
+      - EVENTS_BUCKET=${EVENTS_BUCKET}
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL}
     volumes:
       - ./app:/code/app
       - ./tests:/code/test

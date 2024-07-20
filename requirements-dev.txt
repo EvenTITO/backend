@@ -7,3 +7,5 @@ sqlalchemy
 asyncpg
 python-dotenv
 pydantic
+google-cloud-storage
+pydantic-settings
