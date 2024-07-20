@@ -121,7 +121,6 @@ async def get_brochure_upload_url(
     return get_upload_url(event_id, EventsStaticFiles.BROCHURE)
 
 
-
 @events_router.patch(
     "/{event_id}/status",
     status_code=204,
