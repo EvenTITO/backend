@@ -58,15 +58,15 @@ class EventSchemaWithEventId(EventSchema):
 
     @computed_field
     def main_image_url(self) -> str:
-        return get_public_event_url(id, EventsStaticFiles.MAIN_IMAGE)
+        return get_public_event_url(self.id, EventsStaticFiles.MAIN_IMAGE)
 
     @computed_field
     def banner_image_url(self) -> str:
-        return get_public_event_url(id, EventsStaticFiles.BANNER_IMAGE)
+        return get_public_event_url(self.id, EventsStaticFiles.BANNER_IMAGE)
 
     @computed_field
     def brochure_url(self) -> str:
-        return get_public_event_url(id, EventsStaticFiles.BROCHURE)
+        return get_public_event_url(self.id, EventsStaticFiles.BROCHURE)
 
 
 # # TODO: implementar!
