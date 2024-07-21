@@ -18,6 +18,12 @@ users_router = APIRouter(
 )
 
 
+@users_router.get("/echo", status_code=200, response_model=None)
+async def echo():
+    print("echo test OK!")
+    return
+
+
 @users_router.post("", status_code=201, response_model=str)
 async def create_user(user: UserSchema,
                       db: SessionDep, caller_id: CallerIdDep):
