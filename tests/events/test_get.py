@@ -1,11 +1,11 @@
 from fastapi.encoders import jsonable_encoder
 from app.events.model import EventStatus
-from app.events.schemas import ModifyEventStatusSchema
+from app.events.schemas import EventStatusSchema
 from ..common import create_headers, EVENTS
 
 
 async def test_get_event(client, event_data, user_data):
-    response = await client.get(f"/events/{event_data['id']}/general",
+    response = await client.get(f"/events/{event_data['id']}/public",
                                 headers=create_headers(user_data['id']))
 
     assert response.status_code == 200
@@ -16,7 +16,7 @@ async def test_get_event(client, event_data, user_data):
 
 async def test_get_event_not_exists_fails(client, user_data):
     id = "this-id-does-not-exist"
-    response = await client.get(f"/events/{id}/general",
+    response = await client.get(f"/events/{id}/public",
                                 headers=create_headers(user_data['id']))
 
     assert response.status_code == 404
@@ -43,7 +43,7 @@ async def test_get_all_events_admin_gets_all(
 # async def test_get_all_events_admin_status_waiting_approval_is_zero(
 #         client, all_events_data, admin_data
 # ):
-#     status_update = ModifyEventStatusSchema(
+#     status_update = EventStatusSchema(
 #         status=EventStatus.CREATED
 #     )
 #     response = await client.patch(
@@ -65,7 +65,7 @@ async def test_get_all_events_admin_gets_all(
 async def test_get_all_events_non_admin_can_query_started(
         client, all_events_data, admin_data, user_data
 ):
-    status_update = ModifyEventStatusSchema(
+    status_update = EventStatusSchema(
         status=EventStatus.STARTED
     )
     response = await client.patch(
@@ -87,7 +87,7 @@ async def test_get_all_events_non_admin_can_query_started(
 async def test_get_all_events_non_admin_can_not_query_created(
         client, all_events_data, admin_data, user_data
 ):
-    status_update = ModifyEventStatusSchema(
+    status_update = EventStatusSchema(
         status=EventStatus.STARTED
     )
     response = await client.patch(
@@ -144,7 +144,7 @@ async def test_get_all_events_public_is_status_created(
 async def test_get_all_events_public_is_status_created2(
         client, all_events_data, admin_data
 ):
-    status_update = ModifyEventStatusSchema(
+    status_update = EventStatusSchema(
         status=EventStatus.STARTED
     )
     n_events = len(all_events_data)

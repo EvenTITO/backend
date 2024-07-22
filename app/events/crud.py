@@ -2,7 +2,6 @@ from app.inscriptions.model import InscriptionModel
 from app.users.model import UserModel, UserRole
 from .model import EventModel, EventStatus, ReviewerModel
 from .schemas import EventRol, ReviewerSchema, PricingSchema
-from .schemas import GeneralEventSchemaUpdateAll
 from .schemas import EventModelWithRol, EventSchema, ReviewSkeletonSchema
 from sqlalchemy.future import select
 from app.organizers.model import InvitationStatus, OrganizerModel
@@ -161,7 +160,7 @@ async def create_event(db: AsyncSession, event: EventSchema,
 async def update_general_event(
         db: AsyncSession,
         current_event: EventModel,
-        event_modification: GeneralEventSchemaUpdateAll
+        event_modification
 ):
     orig_title = current_event.title
     for attr, value in event_modification.model_dump().items():

@@ -6,7 +6,7 @@ async def test_get_event_contains_event_public_url(
     event_data,
     user_data
 ):
-    response = await client.get(f"/events/{event_data['id']}/general",
+    response = await client.get(f"/events/{event_data['id']}/public",
                                 headers=create_headers(user_data['id']))
 
     assert response.status_code == 200
