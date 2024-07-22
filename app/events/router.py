@@ -87,10 +87,10 @@ async def read_event_general(event_id: str, db: SessionDep,
 
 @events_router.put("/{event_id}/general", status_code=204, response_model=None)
 async def update_general_event(
-        _: EventOrganizerDep,
-        event_id: str,
-        event_modification: GeneralEventSchema,
-        db: SessionDep
+    _: EventOrganizerDep,
+    event_id: str,
+    event_modification: GeneralEventSchema,
+    db: SessionDep
 ):
     current_event = await get_event(db, event_id)
     await validations.validate_update(db, current_event, event_modification)
@@ -99,23 +99,24 @@ async def update_general_event(
 
 @events_router.put("/{event_id}/dates", status_code=204, response_model=None)
 async def update_dates_event(
-        _: EventOrganizerDep,
-        event_id: str,
-        event_modification: DatesCompleteSchema,
-        db: SessionDep
+    _: EventOrganizerDep,
+    event_id: str,
+    dates_modification: DatesCompleteSchema,
+    db: SessionDep
 ):
     current_event = await get_event(db, event_id)
-    await crud.update_general_event(db, current_event, event_modification)
+    await crud.update_dates(db, current_event, dates_modification)
 
 
 @events_router.put("/{event_id}/pricing", status_code=204, response_model=None)
 async def update_pricing_event(
-        _: EventOrganizerDep,
-        event_id: str,
-        pricing_modification: PricingRateSchema,
-        db: SessionDep
+    _: EventOrganizerDep,
+    event_id: str,
+    pricing_modification: PricingRateSchema,
+    db: SessionDep
 ):
     current_event = await get_event(db, event_id)
+    print('por hacer el update')
     await crud.update_pricing(db, current_event, pricing_modification)
 
 
@@ -179,7 +180,6 @@ async def get_review_skeleton(
     status_code=200
 )
 async def get_pricing(
-        _: EventOrganizerDep,
         caller: CallerUserDep,
         event_id: str,
         db: SessionDep
@@ -192,7 +192,6 @@ async def get_pricing(
     status_code=200
 )
 async def get_dates(
-        _: EventOrganizerDep,
         caller: CallerUserDep,
         event_id: str,
         db: SessionDep

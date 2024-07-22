@@ -1,7 +1,12 @@
 from app.inscriptions.model import InscriptionModel
 from app.users.model import UserModel, UserRole
 from .model import EventModel, EventStatus, ReviewerModel
-from .schemas import EventRol, PricingRateSchema, ReviewerSchema
+from .schemas import (
+    DatesCompleteSchema,
+    EventRol,
+    PricingRateSchema,
+    ReviewerSchema
+)
 from .schemas import EventModelWithRol, EventSchema, ReviewSkeletonSchema
 from sqlalchemy.future import select
 from app.organizers.model import InvitationStatus, OrganizerModel
@@ -178,6 +183,19 @@ async def update_pricing(
     pricing: PricingRateSchema
 ):
     event.pricing = pricing.model_dump()
+    await db.commit()
+    await db.refresh(event)
+    return event
+
+
+async def update_dates(
+    db: AsyncSession,
+    event: EventModel,
+    dates: DatesCompleteSchema
+):
+    event.start_date = dates.start_date
+    event.end_date = dates.end_date
+    event.dates = dates.model_dump(mode='json')
     await db.commit()
     await db.refresh(event)
     return event
