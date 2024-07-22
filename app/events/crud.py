@@ -1,7 +1,8 @@
 from app.inscriptions.model import InscriptionModel
 from app.users.model import UserModel, UserRole
 from .model import EventModel, EventStatus, ReviewerModel
-from .schemas import EventRol, ReviewerSchema, PricingSchema, DatesSchema
+from .schemas import EventRol, ReviewerSchema, PricingSchema
+from .schemas import GeneralEventSchemaUpdateAll
 from .schemas import EventModelWithRol, EventSchema, ReviewSkeletonSchema
 from sqlalchemy.future import select
 from app.organizers.model import InvitationStatus, OrganizerModel
@@ -22,16 +23,16 @@ async def update_pricing(
     return event
 
 
-async def update_dates(
-        db: AsyncSession,
-        event_id: str,
-        dates: DatesSchema
-):
-    event = await get_event(db, event_id)
-    event.dates = dates.dates
-    await db.commit()
-    await db.refresh(event)
-    return event
+# async def update_dates(
+#         db: AsyncSession,
+#         event_id: str,
+#         dates: DatesSchema
+# ):
+#     event = await get_event(db, event_id)
+#     event.dates = dates.dates
+#     await db.commit()
+#     await db.refresh(event)
+#     return event
 
 
 async def get_dates(db: AsyncSession, event_id: str, user_id: str):
@@ -157,13 +158,30 @@ async def create_event(db: AsyncSession, event: EventSchema,
     return db_event
 
 
+async def update_general_event(
+        db: AsyncSession,
+        current_event: EventModel,
+        event_modification: GeneralEventSchemaUpdateAll
+):
+    orig_title = current_event.title
+    for attr, value in event_modification.model_dump().items():
+        setattr(current_event, attr, value)
+    current_event.title = orig_title
+    await db.commit()
+    await db.refresh(current_event)
+
+    return current_event
+
+
 async def update_event(
     db: AsyncSession,
     current_event: EventModel,
     event_modification: EventSchema
 ):
+    orig_title = current_event.title
     for attr, value in event_modification.model_dump().items():
         setattr(current_event, attr, value)
+    current_event.title = orig_title
     await db.commit()
     await db.refresh(current_event)
 

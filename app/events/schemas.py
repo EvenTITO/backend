@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import Enum
 from pydantic import (
     BaseModel,
@@ -18,6 +20,11 @@ class EventRol(str, Enum):
     INSCRIPTED = "INSCRIPTED"
 
 
+class BasicEventSchema(BaseModel):
+    title: str = Field(min_length=2, max_length=100,
+                       examples=["Congreso de Quimica"], default=None)
+
+
 class EventSchema(BaseModel):
     title: str = Field(min_length=2, max_length=100,
                        examples=["CONGRESO DE QUIMICA"])
@@ -30,9 +37,12 @@ class EventSchema(BaseModel):
     location: str | None = Field(max_length=200,
                                  examples=["FIUBA, Av. Paseo Colon 850"],
                                  default=None)
-    tracks: str | None = Field(max_length=1000,
-                               examples=["track1, track2, track3"],
-                               default=None)
+    tracks: list[str] | None = Field(max_length=1000,
+                                     examples=[["track1", "track2", "track3"]],
+                                     default=None)
+    notification_mails: list[str] | None = Field(examples=[["foo@gmail.com",
+                                                            "bar@gmail.com"]],
+                                                 default=None)
 
     @model_validator(mode='after')
     def check_dates(self) -> Self:
@@ -49,6 +59,11 @@ class EventSchema(BaseModel):
 
 
 class ModifyEventStatusSchema(BaseModel):
+    status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
+
+
+class EventSchemaWithStatusAndId(EventSchema):
+    id: str = Field(examples=["..."])
     status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
 
 
@@ -69,10 +84,6 @@ class EventSchemaWithEventId(EventSchema):
         return get_public_event_url(id, EventsStaticFiles.BROCHURE)
 
 
-# # TODO: implementar!
-# class EventProfileWithIdSchema(EventSchema):
-#     id: str = Field(examples=["..."])
-#     status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
 class EventModelWithRol(EventSchemaWithEventId):
     model_config = ConfigDict(from_attributes=True)
     roles: list[str] = Field(examples=[["ORGANIZER", "SUBSCRIBER"]],
@@ -83,23 +94,82 @@ class CompleteEventSchema(EventModelWithRol):
     review_skeleton: dict | None
 
 
-class DatesSchema(BaseModel):
-    dates: dict
+class ImgSchema(BaseModel):
+    name: str = Field(max_length=100, examples=["main_image_url"])
+    url: str = Field(max_length=1000, examples=["https://go.com/img.png"])
 
 
-class PricingSchema(BaseModel):
-    pricing: dict
+class GeneralEventSchema(EventSchemaWithStatusAndId):
+
+    model_config = ConfigDict(from_attributes=True)
+    roles: list[str] = Field(examples=[["ORGANIZER", "SUBSCRIBER"]],
+                             default=[])
+
+    contact: str | None = Field(max_length=100, examples=["Pepe"])
+    organized_by: str | None = Field(max_length=100, examples=["Pepe Argento"])
+    review_skeleton: dict | None
+    media: list[ImgSchema] | None
+
+
+class GeneralEventSchemaUpdate(BaseModel):
+    title: str = Field(min_length=2, max_length=100,
+                       examples=["Congreso de Quimica"], default=None)
+
+    location: str | None = Field(max_length=200,
+                                 examples=["FIUBA, Av. Paseo Colon 850"],
+                                 default=None)
+    contact: str | None = Field(max_length=100,
+                                examples=["Pepe"], default=None)
+    organized_by: str | None = Field(max_length=100,
+                                     examples=["Pepe Argento"], default=None)
+    review_skeleton: dict | None = Field(examples=['{"foo":"bar"}'],
+                                         default=None)
+    tracks: list[str] | None = Field(max_length=1000,
+                                     examples=[["track1", "track2", "track3"]],
+                                     default=None)
+    media: list[ImgSchema] | None = Field(default=None)
+
+
+# class DatesSchema(BaseModel):
+#     dates: dict
+
+class CustomDateSchema(BaseModel):
+    name: str = Field(min_length=2, max_length=100,
+                      examples=["Presentacion trabajos"], default=None)
+    description: str = Field(min_length=2, max_length=100,
+                             examples=["Inicio fecha"],
+                             default=None)
+    value: str = Field(examples=["2023-07-20T15:30:00"], default=None)
+
+
+class DatesCompleteSchema(BaseModel):
+    start_date: str | None = Field(examples=["2023-07-20T15:30:00"],
+                                   default=None)
+    end_date: str | None = Field(examples=["2023-07-20T15:30:00"],
+                                 default=None)
+    deadline_submission_date: str | None = Field(
+        examples=["2023-07-20T15:30:00"], default=None)
+    custom_dates: list[CustomDateSchema]
+
+
+class DateSchema(BaseModel):
+    dates: DatesCompleteSchema
+
+
+class PricingRateSchema(BaseModel):
+    rates: list[dict] = Field(examples=[[{"name": "nombre de la tarifa",
+                                          "description": "desc de la tarifa",
+                                          "value": "50", "currency": "ARS",
+                                          "need_verification": "true"}]],
+                              default=None)
+
+
+class PricingSchema(BasicEventSchema):
+    pricing: PricingRateSchema
 
 
 class ReviewSkeletonSchema(BaseModel):
     review_skeleton: dict
-
-# title: str = Field(min_length=2, max_length=100,
-#                    examples=["CONGRESO DE QUIMICA"])
-# description: str = Field(max_length=1000, examples=["Evento en FIUBA"])
-# event_type: EventType = Field(examples=[EventType.CONFERENCE])
-# start_date: datetime | None = Field(examples=[datetime(2024, 8, 1)],
-#                                     default=None)
 
 
 class ReviewerSchema(BaseModel):
@@ -119,3 +189,36 @@ class ReviewerSchema(BaseModel):
 
 class ReviewerSchemaComplete(ReviewerSchema):
     id_user: str = Field(examples=["..."])
+
+
+class GeneralEventSchemaUpdateAll(BasicEventSchema):
+    rates: list[dict] | None = Field(examples=[[{"name": "nom de la tarifa",
+                                                 "description": "desc tarifa",
+                                                 "value": "50",
+                                                 "currency": "ARS",
+                                                 "need_verification":
+                                                     "true"}]],
+                                     default=None),
+    dates: DatesCompleteSchema | None = Field(examples=[
+        {"start_date": "2023-07-20T15:30:00",
+         "end_date": "2023-07-20T15:30:00",
+         "deadline_submission_date": "2023-07-20T15:30:00",
+         "custom_dates":
+             [{"name": "nombre de la fecha", "description": "desc de la fecha",
+               "value": "2023-07-20T15:30:00"}]}], default=None)
+    review_skeleton: dict | None = Field(examples=['{"foo":"bar"}'],
+                                         default=None)
+
+
+class ConfigurationEventSchema(GeneralEventSchema):
+    rates: list[dict] | None = Field(examples=[[{
+        "name": "nombre de la tarifa", "description": "desc de la tarifa",
+        "value": "50", "currency": "ARS", "need_verification": "true"}]],
+        default=None)
+    dates: DatesCompleteSchema | None = Field(examples=[{
+        "start_date": "2023-07-20T15:30:00", "end_date": "2023-07-20T15:30:00",
+        "deadline_submission_date": "2023-07-20T15:30:00", "custom_dates":
+            [{"name": "nombre de la fecha", "description": "desc de la fecha",
+              "value": "2023-07-20T15:30:00"}]}], default=None)
+    review_skeleton: dict | None = Field(examples=[
+        '{"foo":"bar"}'], default=None)
