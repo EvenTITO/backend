@@ -22,7 +22,7 @@ async def test_get_event_upload_url_must_be_event_organizer(
     event_from_event_creator,
     mocker,
 ):
-    mock_storage_functions(mocker)
+    mocks_functions = mock_storage_functions(mocker)  # noqa
     response = await client.get(
         f"events/{event_from_event_creator}/upload_url/main_image",
         headers=create_headers(organizer_id_from_event)
