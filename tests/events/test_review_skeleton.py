@@ -1,26 +1,29 @@
-from app.events.schemas import ReviewSkeletonSchema
+from app.events.schemas import (
+    ReviewSkeletonSchema,
+    MultipleChoiceQuestion,
+    SimpleQuestion
+)
 from fastapi.encoders import jsonable_encoder
 from ..common import create_headers
 
 
 async def test_patch_review_skeleton(client, admin_data, event_data):
+    first_question = 'This is a simple question that has a str answer'
     review_skeleton = ReviewSkeletonSchema(
-        review_skeleton={
-            "questions": [
-                {
-                    "first_question": "This is a normal question"
-                },
-                {
-                    "multiple_choice": {
-                        "question": "This is the question",
-                        "answers": ["first", "second", "third"],
-                        "can_choose_many": False,
-                    }
-                }
-            ]
-        }
+        questions=[
+            SimpleQuestion(
+                type_question='simple_question',
+                question=first_question
+            ),
+            MultipleChoiceQuestion(
+                type_question='multiple_choice',
+                question='This is the question',
+                options=['first answer', 'second answer', 'third answer'],
+                more_than_one_answer_allowed=False
+            )
+        ]
     )
-    response = await client.patch(
+    response = await client.put(
         f"/events/{event_data['id']}/review-skeleton",
         json=jsonable_encoder(review_skeleton),
         headers=create_headers(admin_data.id)
@@ -28,13 +31,10 @@ async def test_patch_review_skeleton(client, admin_data, event_data):
     assert response.status_code == 204
 
     response = await client.get(
-        f"/events/{event_data['id']}",
+        f"/events/{event_data['id']}/review-skeleton",
         headers=create_headers(admin_data.id)
     )
 
     assert response.status_code == 200
-    first_question = \
-        response.json()['review_skeleton']["questions"][0]["first_question"]
-
-    assert first_question == \
-        review_skeleton.review_skeleton["questions"][0]["first_question"]
+    print(response.json())
+    assert response.json()["questions"][0]["question"] == first_question

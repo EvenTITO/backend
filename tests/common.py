@@ -54,7 +54,7 @@ EVENTS = [
         """,
         event_type=EventType.CONFERENCE,
         location='Paseo Colon 850',
-        tracks='math, chemistry, phisics',
+        tracks=['math', 'chemistry', 'phisics'],
     ),
     EventSchema(
         title="Maratón de proba",
@@ -64,7 +64,7 @@ EVENTS = [
         "de la materia Probabilidad y Estadística",
         event_type=EventType.TALK,
         location='Paseo Colon 850',
-        tracks='math, chemistry, phisics',
+        tracks=['math', 'chemistry', 'phisics'],
     ),
     EventSchema(
         title="Conferencia JIAFES",
@@ -73,6 +73,6 @@ EVENTS = [
         description="Nueva edición de la conferencia",
         event_type=EventType.CONFERENCE,
         location='Paseo Colon 850',
-        tracks='math, chemistry, phisics',
+        tracks=['math', 'chemistry', 'phisics'],
     )
 ]

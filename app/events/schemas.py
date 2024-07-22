@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
+from typing import Literal, Union
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -168,10 +169,6 @@ class PricingSchema(BasicEventSchema):
     pricing: PricingRateSchema
 
 
-class ReviewSkeletonSchema(BaseModel):
-    review_skeleton: dict
-
-
 class ReviewerSchema(BaseModel):
     invitation_expiration_date: datetime | None = \
         Field(examples=[datetime(2024, 12, 9)], default=None)
@@ -222,3 +219,21 @@ class ConfigurationEventSchema(GeneralEventSchema):
               "value": "2023-07-20T15:30:00"}]}], default=None)
     review_skeleton: dict | None = Field(examples=[
         '{"foo":"bar"}'], default=None)
+
+
+class MultipleChoiceQuestion(BaseModel):
+    type_question: Literal['multiple_choice']
+    question: str
+    options: list[str] = Field(examples=[
+        ['first answer', 'second answer', 'third answer']
+    ], min_length=2, max_length=20)
+    more_than_one_answer_allowed: bool = False
+
+
+class SimpleQuestion(BaseModel):
+    type_question: Literal['simple_question']
+    question: str
+
+
+class ReviewSkeletonSchema(BaseModel):
+    questions: list[Union[MultipleChoiceQuestion, SimpleQuestion]]

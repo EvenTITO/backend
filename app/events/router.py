@@ -17,7 +17,8 @@ from .schemas import (
     EventSchemaWithEventId,
     ModifyEventStatusSchema,
     EventModelWithRol,
-    EventRol, ReviewerSchema, ReviewerSchemaComplete,
+    EventRol,
+    ReviewSkeletonSchema, ReviewerSchema, ReviewerSchemaComplete,
     GeneralEventSchemaUpdate, GeneralEventSchemaUpdateAll,
     ConfigurationEventSchema
 )
@@ -43,8 +44,6 @@ async def read_all_events(
         limit: int = Query(default=100, le=100),
         search: str | None = None
 ):
-    print('El valor de la query es')
-    print(status_query)
     return await crud.get_all_events(
         db=db,
         offset=offset,
@@ -311,16 +310,16 @@ async def get_dates(
 # ):
 #     await crud.update_general_event(db, event_id, dates)
 
-# @events_router.patch(
-#     "/{event_id}/review-skeleton",
-#     status_code=204,
-#     response_model=None
-# )
-# async def change_review_skeleton(
-#         _: EventOrganizerDep,
-#         event_id: str,
-#         review_skeleton: ReviewSkeletonSchema,
-#         db: SessionDep
-# ):
-#     event = await get_event(db, event_id)
-#     await crud.update_review_skeleton(db, event, review_skeleton)
+@events_router.put(
+    "/{event_id}/review-skeleton",
+    status_code=204,
+    response_model=None
+)
+async def change_review_skeleton(
+        _: EventOrganizerDep,
+        event_id: str,
+        review_skeleton: ReviewSkeletonSchema,
+        db: SessionDep
+):
+    event = await get_event(db, event_id)
+    await crud.update_review_skeleton(db, event, review_skeleton)

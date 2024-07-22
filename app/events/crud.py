@@ -204,7 +204,7 @@ async def update_review_skeleton(
     event: EventModel,
     review_skeleton: ReviewSkeletonSchema
 ):
-    event.review_skeleton = review_skeleton.review_skeleton
+    event.review_skeleton = review_skeleton.model_dump()
     await db.commit()
     await db.refresh(event)
     return event
