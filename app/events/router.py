@@ -15,6 +15,7 @@ from .schemas import (
     DatesCompleteSchema,
     EventSchema,
     EventSchemaWithEventId,
+    FullEventSchema,
     PricingRateSchema,
     EventStatusSchema,
     EventModelWithRol,
@@ -85,6 +86,16 @@ async def read_event_general(event_id: str, db: SessionDep,
     return event
 
 
+@events_router.get("/{event_id}/configuration")
+async def get_event_configuration(
+    _: EventOrganizerDep,
+    event_id: str,
+    db: SessionDep
+) -> FullEventSchema:
+    event = await get_event(db, event_id)
+    return event
+
+
 @events_router.put("/{event_id}/general", status_code=204, response_model=None)
 async def update_general_event(
     _: EventOrganizerDep,
@@ -116,32 +127,7 @@ async def update_pricing_event(
     db: SessionDep
 ):
     current_event = await get_event(db, event_id)
-    print('por hacer el update')
     await crud.update_pricing(db, current_event, pricing_modification)
-
-
-@events_router.get("/{event_id}/upload_url/main_image")
-async def get_main_image_upload_url(
-    _: EventOrganizerDep,
-    event_id: str,
-) -> UploadURLSchema:
-    return get_upload_url(event_id, EventsStaticFiles.MAIN_IMAGE)
-
-
-@events_router.get("/{event_id}/upload_url/banner_image")
-async def get_banner_image_upload_url(
-    _: EventOrganizerDep,
-    event_id: str,
-) -> UploadURLSchema:
-    return get_upload_url(event_id, EventsStaticFiles.BANNER_IMAGE)
-
-
-@events_router.get("/{event_id}/upload_url/brochure")
-async def get_brochure_upload_url(
-    _: EventOrganizerDep,
-    event_id: str,
-) -> UploadURLSchema:
-    return get_upload_url(event_id, EventsStaticFiles.BROCHURE)
 
 
 @events_router.patch(
@@ -171,7 +157,7 @@ async def get_review_skeleton(
         caller: CallerUserDep,
         event_id: str,
         db: SessionDep
-):
+) -> ReviewSkeletonSchema:
     return await crud.get_review_sckeletor(db, event_id, caller.id)
 
 
@@ -183,7 +169,7 @@ async def get_pricing(
         caller: CallerUserDep,
         event_id: str,
         db: SessionDep
-):
+) -> PricingRateSchema:
     return await crud.get_pricing(db, event_id, caller.id)
 
 
@@ -195,7 +181,7 @@ async def get_dates(
         caller: CallerUserDep,
         event_id: str,
         db: SessionDep
-):
+) -> DatesCompleteSchema:
     return await crud.get_dates(db, event_id, caller.id)
 
 
@@ -212,6 +198,30 @@ async def change_review_skeleton(
 ):
     event = await get_event(db, event_id)
     await crud.update_review_skeleton(db, event, review_skeleton)
+
+
+@events_router.get("/{event_id}/upload_url/main_image")
+async def get_main_image_upload_url(
+    _: EventOrganizerDep,
+    event_id: str,
+) -> UploadURLSchema:
+    return get_upload_url(event_id, EventsStaticFiles.MAIN_IMAGE)
+
+
+@events_router.get("/{event_id}/upload_url/banner_image")
+async def get_banner_image_upload_url(
+    _: EventOrganizerDep,
+    event_id: str,
+) -> UploadURLSchema:
+    return get_upload_url(event_id, EventsStaticFiles.BANNER_IMAGE)
+
+
+@events_router.get("/{event_id}/upload_url/brochure")
+async def get_brochure_upload_url(
+    _: EventOrganizerDep,
+    event_id: str,
+) -> UploadURLSchema:
+    return get_upload_url(event_id, EventsStaticFiles.BROCHURE)
 
 
 @events_router.post("/{event_id}/reviewer/{user_id}", status_code=201)

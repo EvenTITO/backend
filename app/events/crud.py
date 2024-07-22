@@ -4,6 +4,7 @@ from .model import EventModel, EventStatus, ReviewerModel
 from .schemas import (
     DatesCompleteSchema,
     EventRol,
+    GeneralEventSchema,
     PricingRateSchema,
     ReviewerSchema
 )
@@ -154,7 +155,7 @@ async def update_general_event(
 async def update_event(
     db: AsyncSession,
     current_event: EventModel,
-    event_modification: EventSchema
+    event_modification: GeneralEventSchema
 ):
     orig_title = current_event.title
     for attr, value in event_modification.model_dump().items():

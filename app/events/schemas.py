@@ -102,6 +102,12 @@ class GeneralEventSchema(EventSchema):
     notification_mails: list[str]
 
 
+class FullEventSchema(GeneralEventSchema):
+    dates: DatesCompleteSchema | None
+    pricing: PricingRateSchema | None
+    review_skeleton: ReviewSkeletonSchema | None
+
+
 class CustomDateSchema(BaseModel):
     name: str = Field(min_length=2, max_length=100,
                       examples=["Presentacion trabajos"], default=None)
@@ -121,10 +127,6 @@ class DatesCompleteSchema(BaseModel):
     custom_dates: list[CustomDateSchema]
 
 
-class DateSchema(BaseModel):
-    dates: DatesCompleteSchema
-
-
 class FeeSchema(BaseModel):
     name: str = Field(examples=['Students Only Fee']),
     description: str = Field(examples=['Only Students with certificate']),
@@ -140,8 +142,22 @@ class PricingRateSchema(BaseModel):
     rates: list[FeeSchema]
 
 
-class PricingSchema(BaseModel):
-    pricing: PricingRateSchema
+class MultipleChoiceQuestion(BaseModel):
+    type_question: Literal['multiple_choice']
+    question: str
+    options: list[str] = Field(examples=[
+        ['first answer', 'second answer', 'third answer']
+    ], min_length=2, max_length=20)
+    more_than_one_answer_allowed: bool = False
+
+
+class SimpleQuestion(BaseModel):
+    type_question: Literal['simple_question']
+    question: str
+
+
+class ReviewSkeletonSchema(BaseModel):
+    questions: list[Union[MultipleChoiceQuestion, SimpleQuestion]]
 
 
 class ReviewerSchema(BaseModel):
@@ -161,21 +177,3 @@ class ReviewerSchema(BaseModel):
 
 class ReviewerSchemaComplete(ReviewerSchema):
     id_user: str = Field(examples=["..."])
-
-
-class MultipleChoiceQuestion(BaseModel):
-    type_question: Literal['multiple_choice']
-    question: str
-    options: list[str] = Field(examples=[
-        ['first answer', 'second answer', 'third answer']
-    ], min_length=2, max_length=20)
-    more_than_one_answer_allowed: bool = False
-
-
-class SimpleQuestion(BaseModel):
-    type_question: Literal['simple_question']
-    question: str
-
-
-class ReviewSkeletonSchema(BaseModel):
-    questions: list[Union[MultipleChoiceQuestion, SimpleQuestion]]
