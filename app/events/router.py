@@ -12,9 +12,9 @@ from app.events import crud, validations
 import app.notifications.events as notifications
 from .utils import get_event
 from .schemas import (
-    CompleteEventSchema,
     EventSchema,
     EventSchemaWithEventId,
+    GeneralEventSchema,
     ModifyEventStatusSchema,
     EventModelWithRol,
     EventRol,
@@ -72,24 +72,12 @@ async def create_event(
     return event_created.id
 
 
-# @events_router.get("/{event_id}/general", response_model=GeneralEventSchema)
-# async def read_event_general(event_id: str, db: SessionDep,
-#                              X_User_Id: str = Header(...)):
-#     event = await get_event(db, event_id)
-#     event.roles = []
-#     event = GeneralEventSchema.model_validate(event)
-#     if not X_User_Id:
-#         return event
-#     if await is_organizer(db, event_id, X_User_Id):
-#         event.roles.append(EventRol.ORGANIZER)
-#     return event
-
-
-@events_router.get("/{event_id}", response_model=CompleteEventSchema)
-async def read_event(event_id: str, db: SessionDep,
-                     X_User_Id: str = Header(...)):
+@events_router.get("/{event_id}/general", response_model=GeneralEventSchema)
+async def read_event_general(event_id: str, db: SessionDep,
+                             X_User_Id: str = Header(...)):
     event = await get_event(db, event_id)
-    event = CompleteEventSchema.model_validate(event)
+    event.roles = []
+    event = GeneralEventSchema.model_validate(event)
     if not X_User_Id:
         return event
     if await is_organizer(db, event_id, X_User_Id):

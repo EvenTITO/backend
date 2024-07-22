@@ -9,7 +9,7 @@ async def test_event_created_has_waiting_approved_status(
         client, event_data, user_data
 ):
     response = await client.get(
-        f"/events/{event_data['id']}",
+        f"/events/{event_data['id']}/general",
         headers=create_headers(user_data['id'])
     )
     assert response.json()['status'] == EventStatus.WAITING_APPROVAL
@@ -43,7 +43,7 @@ async def test_event_created_admin_can_change_status(
     )
     assert response.status_code == 204
     response = await client.get(
-        f"/events/{event_data['id']}",
+        f"/events/{event_data['id']}/general",
         headers=create_headers(admin_data.id)
     )
     assert response.json()['status'] == status_update.status

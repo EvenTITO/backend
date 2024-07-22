@@ -5,7 +5,7 @@ from ..common import create_headers, EVENTS
 
 
 async def test_get_event(client, event_data, user_data):
-    response = await client.get(f"/events/{event_data['id']}",
+    response = await client.get(f"/events/{event_data['id']}/general",
                                 headers=create_headers(user_data['id']))
 
     assert response.status_code == 200
@@ -16,7 +16,7 @@ async def test_get_event(client, event_data, user_data):
 
 async def test_get_event_not_exists_fails(client, user_data):
     id = "this-id-does-not-exist"
-    response = await client.get(f"/events/{id}",
+    response = await client.get(f"/events/{id}/general",
                                 headers=create_headers(user_data['id']))
 
     assert response.status_code == 404

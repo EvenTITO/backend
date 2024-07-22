@@ -41,9 +41,6 @@ class EventSchema(BaseModel):
     tracks: list[str] | None = Field(max_length=1000,
                                      examples=[["track1", "track2", "track3"]],
                                      default=None)
-    notification_mails: list[str] | None = Field(examples=[["foo@gmail.com",
-                                                            "bar@gmail.com"]],
-                                                 default=None)
 
     @model_validator(mode='after')
     def check_dates(self) -> Self:
@@ -60,11 +57,6 @@ class EventSchema(BaseModel):
 
 
 class ModifyEventStatusSchema(BaseModel):
-    status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
-
-
-class EventSchemaWithStatusAndId(EventSchema):
-    id: str = Field(examples=["..."])
     status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
 
 
@@ -85,31 +77,38 @@ class EventSchemaWithEventId(EventSchema):
         return get_public_event_url(self.id, EventsStaticFiles.BROCHURE)
 
 
-class EventModelWithRol(EventSchemaWithEventId):
-    model_config = ConfigDict(from_attributes=True)
-    roles: list[str] = Field(examples=[["ORGANIZER", "SUBSCRIBER"]],
-                             default=[])
-
-
-class CompleteEventSchema(EventModelWithRol):
-    review_skeleton: dict | None
-
-
 class ImgSchema(BaseModel):
     name: str = Field(max_length=100, examples=["main_image_url"])
     url: str = Field(max_length=1000, examples=["https://go.com/img.png"])
 
 
-class GeneralEventSchema(EventSchemaWithStatusAndId):
-
+class EventModelWithRol(EventSchemaWithEventId):
     model_config = ConfigDict(from_attributes=True)
     roles: list[str] = Field(examples=[["ORGANIZER", "SUBSCRIBER"]],
                              default=[])
 
+    @computed_field
+    def media(self) -> list[ImgSchema]:
+        return [
+            ImgSchema(
+                name='main_image_url',
+                url=get_public_event_url(self.id, EventsStaticFiles.MAIN_IMAGE)
+            ),
+            ImgSchema(
+                name='brochure_url',
+                url=get_public_event_url(self.id, EventsStaticFiles.BROCHURE)
+            ),
+            ImgSchema(
+                name='banner_image_url',
+                url=get_public_event_url(
+                    self.id, EventsStaticFiles.BANNER_IMAGE),
+            )
+        ]
+
+
+class GeneralEventSchema(EventModelWithRol):
     contact: str | None = Field(max_length=100, examples=["Pepe"])
     organized_by: str | None = Field(max_length=100, examples=["Pepe Argento"])
-    review_skeleton: dict | None
-    media: list[ImgSchema] | None
 
 
 class GeneralEventSchemaUpdate(BaseModel):
