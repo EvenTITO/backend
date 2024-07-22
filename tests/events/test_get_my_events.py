@@ -21,7 +21,7 @@ async def test_get_my_events(client, event_data, user_data):
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
         location='Paseo Colon 850',
-        tracks='math, chemistry, phisics'
+        tracks=['math', 'chemistry', 'phisics']
     )
     response = await client.post(
         "/events",

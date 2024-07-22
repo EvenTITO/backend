@@ -1,7 +1,7 @@
 from fastapi.encoders import jsonable_encoder
 
 from app.events.model import EventStatus
-from app.events.schemas import ModifyEventStatusSchema
+from app.events.schemas import EventStatusSchema
 from ..common import create_headers
 
 
@@ -9,7 +9,7 @@ async def test_event_created_has_waiting_approved_status(
         client, event_data, user_data
 ):
     response = await client.get(
-        f"/events/{event_data['id']}",
+        f"/events/{event_data['id']}/public",
         headers=create_headers(user_data['id'])
     )
     assert response.json()['status'] == EventStatus.WAITING_APPROVAL
@@ -18,7 +18,7 @@ async def test_event_created_has_waiting_approved_status(
 async def test_event_created_organizer_cant_change_status(
         client, event_data, user_data
 ):
-    status_update = ModifyEventStatusSchema(
+    status_update = EventStatusSchema(
         status=EventStatus.CREATED
     )
     response = await client.patch(
@@ -33,7 +33,7 @@ async def test_event_created_organizer_cant_change_status(
 async def test_event_created_admin_can_change_status(
         client, event_data, admin_data
 ):
-    status_update = ModifyEventStatusSchema(
+    status_update = EventStatusSchema(
         status=EventStatus.CREATED
     )
     response = await client.patch(
@@ -43,7 +43,7 @@ async def test_event_created_admin_can_change_status(
     )
     assert response.status_code == 204
     response = await client.get(
-        f"/events/{event_data['id']}",
+        f"/events/{event_data['id']}/public",
         headers=create_headers(admin_data.id)
     )
     assert response.json()['status'] == status_update.status

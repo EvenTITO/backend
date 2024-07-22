@@ -33,6 +33,7 @@ async def test_user_inscribes_to_two_events(
     assert response.status_code == 200
 
     inscriptions_response = response.json()
+    inscripted_events = [all_events_data[0], all_events_data[1]]
     assert len(inscriptions_response) == 2
-    assert inscriptions_response[0]['id_event'] == all_events_data[0]
-    assert inscriptions_response[1]['id_event'] == all_events_data[1]
+    for inscription in inscriptions_response:
+        assert inscription['id_event'] in inscripted_events

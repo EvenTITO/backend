@@ -1,37 +1,17 @@
 from app.inscriptions.model import InscriptionModel
 from app.users.model import UserModel, UserRole
 from .model import EventModel, EventStatus, ReviewerModel
-from .schemas import EventRol, ReviewerSchema, PricingSchema, DatesSchema
+from .schemas import (
+    DatesCompleteSchema,
+    EventRol,
+    GeneralEventSchema,
+    PricingRateSchema,
+    ReviewerSchema
+)
 from .schemas import EventModelWithRol, EventSchema, ReviewSkeletonSchema
 from sqlalchemy.future import select
 from app.organizers.model import InvitationStatus, OrganizerModel
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from .utils import get_event
-
-
-async def update_pricing(
-        db: AsyncSession,
-        event_id: str,
-        pricing: PricingSchema
-):
-    event = await get_event(db, event_id)
-    event.pricing = pricing.pricing
-    await db.commit()
-    await db.refresh(event)
-    return event
-
-
-async def update_dates(
-        db: AsyncSession,
-        event_id: str,
-        dates: DatesSchema
-):
-    event = await get_event(db, event_id)
-    event.dates = dates.dates
-    await db.commit()
-    await db.refresh(event)
-    return event
 
 
 async def get_dates(db: AsyncSession, event_id: str, user_id: str):
@@ -157,13 +137,30 @@ async def create_event(db: AsyncSession, event: EventSchema,
     return db_event
 
 
+async def update_general_event(
+        db: AsyncSession,
+        current_event: EventModel,
+        event_modification
+):
+    orig_title = current_event.title
+    for attr, value in event_modification.model_dump().items():
+        setattr(current_event, attr, value)
+    current_event.title = orig_title
+    await db.commit()
+    await db.refresh(current_event)
+
+    return current_event
+
+
 async def update_event(
     db: AsyncSession,
     current_event: EventModel,
-    event_modification: EventSchema
+    event_modification: GeneralEventSchema
 ):
+    orig_title = current_event.title
     for attr, value in event_modification.model_dump().items():
         setattr(current_event, attr, value)
+    current_event.title = orig_title
     await db.commit()
     await db.refresh(current_event)
 
@@ -181,12 +178,36 @@ async def update_status(
     return event
 
 
+async def update_pricing(
+    db: AsyncSession,
+    event: EventModel,
+    pricing: PricingRateSchema
+):
+    event.pricing = pricing.model_dump()
+    await db.commit()
+    await db.refresh(event)
+    return event
+
+
+async def update_dates(
+    db: AsyncSession,
+    event: EventModel,
+    dates: DatesCompleteSchema
+):
+    event.start_date = dates.start_date
+    event.end_date = dates.end_date
+    event.dates = dates.model_dump(mode='json')
+    await db.commit()
+    await db.refresh(event)
+    return event
+
+
 async def update_review_skeleton(
     db: AsyncSession,
     event: EventModel,
     review_skeleton: ReviewSkeletonSchema
 ):
-    event.review_skeleton = review_skeleton.review_skeleton
+    event.review_skeleton = review_skeleton.model_dump()
     await db.commit()
     await db.refresh(event)
     return event
