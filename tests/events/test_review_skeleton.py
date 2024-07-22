@@ -7,7 +7,7 @@ from fastapi.encoders import jsonable_encoder
 from ..common import create_headers
 
 
-async def test_patch_review_skeleton(client, admin_data, event_data):
+async def test_put_review_skeleton(client, admin_data, event_data):
     first_question = 'This is a simple question that has a str answer'
     review_skeleton = ReviewSkeletonSchema(
         questions=[

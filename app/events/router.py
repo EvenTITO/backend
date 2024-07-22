@@ -97,19 +97,6 @@ async def update_general_event(
     await crud.update_event(db, current_event, event_modification)
 
 
-@events_router.put("/{event_id}/review_skeleton", status_code=204,
-                   response_model=None)
-async def update_review_skeleton_event(
-        _: EventOrganizerDep,
-        event_id: str,
-        event_modification: ReviewSkeletonSchema,
-        db: SessionDep
-):
-    current_event = await get_event(db, event_id)
-    await validations.validate_update(db, current_event, event_modification)
-    await crud.update_general_event(db, current_event, event_modification)
-
-
 @events_router.put("/{event_id}/dates", status_code=204, response_model=None)
 async def update_dates_event(
         _: EventOrganizerDep,
@@ -118,7 +105,6 @@ async def update_dates_event(
         db: SessionDep
 ):
     current_event = await get_event(db, event_id)
-    await validations.validate_update(db, current_event, event_modification)
     await crud.update_general_event(db, current_event, event_modification)
 
 
@@ -126,12 +112,11 @@ async def update_dates_event(
 async def update_pricing_event(
         _: EventOrganizerDep,
         event_id: str,
-        event_modification: PricingRateSchema,
+        pricing_modification: PricingRateSchema,
         db: SessionDep
 ):
     current_event = await get_event(db, event_id)
-    await validations.validate_update(db, current_event, event_modification)
-    await crud.update_general_event(db, current_event, event_modification)
+    await crud.update_pricing(db, current_event, pricing_modification)
 
 
 @events_router.get("/{event_id}/upload_url/main_image")
@@ -189,36 +174,6 @@ async def get_review_skeleton(
     return await crud.get_review_sckeletor(db, event_id, caller.id)
 
 
-@events_router.post("/{event_id}/reviewer/{user_id}", status_code=201)
-async def create_reviewer(
-        event_id: str,
-        user_id: str,
-        reviewer: ReviewerSchema,
-        _: EventOrganizerDep,
-        db: SessionDep
-):
-    await validations.validate_unique_reviewer(db, event_id, user_id)
-
-    reviewer_created = await crud.create_reviewer(
-        db=db,
-        reviewer=reviewer,
-        event_id=event_id,
-        user_id=user_id
-    )
-    return reviewer_created
-
-
-@events_router.get(
-    "/{event_id}/reviewer",
-    response_model=List[ReviewerSchemaComplete])
-async def get_reviewer(
-        event_id: str,
-        db: SessionDep,
-        _: EventOrganizerDep
-):
-    return await crud.get_all_reviewer(db, event_id)
-
-
 @events_router.get(
     "/{event_id}/pricing",
     status_code=200
@@ -258,3 +213,33 @@ async def change_review_skeleton(
 ):
     event = await get_event(db, event_id)
     await crud.update_review_skeleton(db, event, review_skeleton)
+
+
+@events_router.post("/{event_id}/reviewer/{user_id}", status_code=201)
+async def create_reviewer(
+        event_id: str,
+        user_id: str,
+        reviewer: ReviewerSchema,
+        _: EventOrganizerDep,
+        db: SessionDep
+):
+    await validations.validate_unique_reviewer(db, event_id, user_id)
+
+    reviewer_created = await crud.create_reviewer(
+        db=db,
+        reviewer=reviewer,
+        event_id=event_id,
+        user_id=user_id
+    )
+    return reviewer_created
+
+
+@events_router.get(
+    "/{event_id}/reviewer",
+    response_model=List[ReviewerSchemaComplete])
+async def get_reviewer(
+        event_id: str,
+        db: SessionDep,
+        _: EventOrganizerDep
+):
+    return await crud.get_all_reviewer(db, event_id)

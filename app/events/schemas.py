@@ -125,12 +125,19 @@ class DateSchema(BaseModel):
     dates: DatesCompleteSchema
 
 
+class FeeSchema(BaseModel):
+    name: str = Field(examples=['Students Only Fee']),
+    description: str = Field(examples=['Only Students with certificate']),
+    value: int = Field(examples=[50]),
+    currency: str = Field(examples=['ARS'], default='ARS')
+    need_verification: bool = Field(
+        description='If it is set to True,'
+        ' a validation file must be added in the inscription form'
+    )
+
+
 class PricingRateSchema(BaseModel):
-    rates: list[dict] = Field(examples=[[{"name": "nombre de la tarifa",
-                                          "description": "desc de la tarifa",
-                                          "value": "50", "currency": "ARS",
-                                          "need_verification": "true"}]],
-                              default=None)
+    rates: list[FeeSchema]
 
 
 class PricingSchema(BaseModel):
