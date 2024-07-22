@@ -1,6 +1,6 @@
 import pytest
 from app.events.model import EventStatus, EventType
-from app.events.schemas import EventSchema, ModifyEventStatusSchema
+from app.events.schemas import EventSchema, EventStatusSchema
 from fastapi.encoders import jsonable_encoder
 from app.organizers.schemas import OrganizerRequestSchema
 from app.database.dependencies import get_db
@@ -145,7 +145,7 @@ async def event_from_event_creator(client, event_creator_data):
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
         location='Paseo Colon 850',
-        tracks='math, chemistry, phisics',
+        tracks=['math', 'chemistry', 'phisics'],
     )
     response = await client.post(
         "/events",
@@ -164,7 +164,7 @@ async def event_data(client, admin_data):
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
         location='Paseo Colon 850',
-        tracks='math, chemistry, phisics'
+        tracks=['math', 'chemistry', 'phisics']
     )
     event_id = await client.post(
         "/events",
@@ -233,7 +233,7 @@ async def organizer_id_from_event(client, event_creator_data,
 async def event_started(
         client, event_data, admin_data
 ):
-    status_update = ModifyEventStatusSchema(
+    status_update = EventStatusSchema(
         status=EventStatus.STARTED
     )
     await client.patch(

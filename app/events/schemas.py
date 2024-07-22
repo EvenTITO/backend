@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from enum import Enum
+from typing import Literal, Union
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -30,9 +33,19 @@ class EventSchema(BaseModel):
     location: str | None = Field(max_length=200,
                                  examples=["FIUBA, Av. Paseo Colon 850"],
                                  default=None)
-    tracks: str | None = Field(max_length=1000,
-                               examples=["track1, track2, track3"],
-                               default=None)
+    tracks: list[str] | None = Field(max_length=1000,
+                                     examples=[["track1", "track2", "track3"]],
+                                     default=None)
+    contact: str | None = Field(
+        max_length=100,
+        examples=["Pepe"],
+        default=None
+    )
+    organized_by: str | None = Field(
+        max_length=100,
+        examples=["Pepe Argento"],
+        default=None
+    )
 
     @model_validator(mode='after')
     def check_dates(self) -> Self:
@@ -48,58 +61,103 @@ class EventSchema(BaseModel):
         return self
 
 
-class ModifyEventStatusSchema(BaseModel):
+class EventStatusSchema(BaseModel):
     status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
 
 
-class EventSchemaWithEventId(EventSchema):
+class EventSchemaWithEventId(EventSchema, EventStatusSchema):
     id: str = Field(examples=["..."])
-    status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
-
-    @computed_field
-    def main_image_url(self) -> str:
-        return get_public_event_url(id, EventsStaticFiles.MAIN_IMAGE)
-
-    @computed_field
-    def banner_image_url(self) -> str:
-        return get_public_event_url(id, EventsStaticFiles.BANNER_IMAGE)
-
-    @computed_field
-    def brochure_url(self) -> str:
-        return get_public_event_url(id, EventsStaticFiles.BROCHURE)
 
 
-# # TODO: implementar!
-# class EventProfileWithIdSchema(EventSchema):
-#     id: str = Field(examples=["..."])
-#     status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
+class ImgSchema(BaseModel):
+    name: str = Field(max_length=100, examples=["main_image_url"])
+    url: str = Field(max_length=1000, examples=["https://go.com/img.png"])
+
+
 class EventModelWithRol(EventSchemaWithEventId):
     model_config = ConfigDict(from_attributes=True)
     roles: list[str] = Field(examples=[["ORGANIZER", "SUBSCRIBER"]],
                              default=[])
 
+    @computed_field
+    def media(self) -> list[ImgSchema]:
+        return [
+            ImgSchema(
+                name='main_image_url',
+                url=get_public_event_url(self.id, EventsStaticFiles.MAIN_IMAGE)
+            ),
+            ImgSchema(
+                name='brochure_url',
+                url=get_public_event_url(self.id, EventsStaticFiles.BROCHURE)
+            ),
+            ImgSchema(
+                name='banner_image_url',
+                url=get_public_event_url(
+                    self.id, EventsStaticFiles.BANNER_IMAGE),
+            )
+        ]
 
-class CompleteEventSchema(EventModelWithRol):
-    review_skeleton: dict | None
+
+class GeneralEventSchema(EventSchema):
+    notification_mails: list[str]
 
 
-class DatesSchema(BaseModel):
-    dates: dict
+class FullEventSchema(GeneralEventSchema):
+    dates: DatesCompleteSchema | None
+    pricing: PricingRateSchema | None
+    review_skeleton: ReviewSkeletonSchema | None
 
 
-class PricingSchema(BaseModel):
-    pricing: dict
+class CustomDateSchema(BaseModel):
+    name: str = Field(min_length=2, max_length=100,
+                      examples=["Presentacion trabajos"], default=None)
+    description: str = Field(min_length=2, max_length=100,
+                             examples=["Inicio fecha"],
+                             default=None)
+    value: datetime = Field(examples=["2023-07-20T15:30:00"], default=None)
+
+
+class DatesCompleteSchema(BaseModel):
+    start_date: datetime | None = Field(examples=["2023-07-20T15:30:00"],
+                                        default=None)
+    end_date: datetime | None = Field(examples=["2023-07-20T15:30:00"],
+                                      default=None)
+    deadline_submission_date: datetime | None = Field(
+        examples=["2023-07-20T15:30:00"], default=None)
+    custom_dates: list[CustomDateSchema]
+
+
+class FeeSchema(BaseModel):
+    name: str = Field(examples=['Students Only Fee']),
+    description: str = Field(examples=['Only Students with certificate']),
+    value: int = Field(examples=[50]),
+    currency: str = Field(examples=['ARS'], default='ARS')
+    need_verification: bool = Field(
+        description='If it is set to True,'
+        ' a validation file must be added in the inscription form'
+    )
+
+
+class PricingRateSchema(BaseModel):
+    rates: list[FeeSchema]
+
+
+class MultipleChoiceQuestion(BaseModel):
+    type_question: Literal['multiple_choice']
+    question: str
+    options: list[str] = Field(examples=[
+        ['first answer', 'second answer', 'third answer']
+    ], min_length=2, max_length=20)
+    more_than_one_answer_allowed: bool = False
+
+
+class SimpleQuestion(BaseModel):
+    type_question: Literal['simple_question']
+    question: str
 
 
 class ReviewSkeletonSchema(BaseModel):
-    review_skeleton: dict
-
-# title: str = Field(min_length=2, max_length=100,
-#                    examples=["CONGRESO DE QUIMICA"])
-# description: str = Field(max_length=1000, examples=["Evento en FIUBA"])
-# event_type: EventType = Field(examples=[EventType.CONFERENCE])
-# start_date: datetime | None = Field(examples=[datetime(2024, 8, 1)],
-#                                     default=None)
+    questions: list[Union[MultipleChoiceQuestion, SimpleQuestion]]
 
 
 class ReviewerSchema(BaseModel):

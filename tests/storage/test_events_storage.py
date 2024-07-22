@@ -6,12 +6,12 @@ async def test_get_event_contains_event_public_url(
     event_data,
     user_data
 ):
-    response = await client.get(f"/events/{event_data['id']}",
+    response = await client.get(f"/events/{event_data['id']}/public",
                                 headers=create_headers(user_data['id']))
 
     assert response.status_code == 200
     assert response.json()["title"] == event_data["title"]
-    assert response.json()["main_image_url"] is not None
+    assert response.json()["media"][0]["name"] == 'main_image_url'
     assert len(response.json()["roles"]) == 0
 
 
