@@ -99,7 +99,7 @@ class EventModelWithRol(EventSchemaWithEventId):
 
 
 class GeneralEventSchema(EventSchema):
-    notification_mails: list[str]
+    notification_mails: list[str] = Field(default_factory=list)
 
 
 class FullEventSchema(GeneralEventSchema):
