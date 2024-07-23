@@ -21,11 +21,14 @@ class EventRol(str, Enum):
     INSCRIPTED = "INSCRIPTED"
 
 
-class EventSchema(BaseModel):
+class StaticEventSchema(BaseModel):
     title: str = Field(min_length=2, max_length=100,
                        examples=["CONGRESO DE QUIMICA"])
     description: str = Field(max_length=1000, examples=["Evento en FIUBA"])
     event_type: EventType = Field(examples=[EventType.CONFERENCE])
+
+
+class DynamicEventSchema(BaseModel):
     start_date: datetime | None = Field(examples=[datetime(2024, 8, 1)],
                                         default=None)
     end_date: datetime | None = Field(examples=[datetime(2024, 8, 2)],
@@ -59,6 +62,10 @@ class EventSchema(BaseModel):
         if start_date < datetime.now() or end_date < start_date:
             raise ValueError('Invalid Dates.')
         return self
+
+
+class EventSchema(StaticEventSchema, DynamicEventSchema):
+    pass
 
 
 class EventStatusSchema(BaseModel):
@@ -98,11 +105,11 @@ class EventModelWithRol(EventSchemaWithEventId):
         ]
 
 
-class GeneralEventSchema(EventSchema):
+class GeneralEventSchema(DynamicEventSchema):
     notification_mails: list[str] = Field(default_factory=list)
 
 
-class FullEventSchema(GeneralEventSchema):
+class FullEventSchema(GeneralEventSchema, StaticEventSchema):
     dates: DatesCompleteSchema | None
     pricing: PricingRateSchema | None
     review_skeleton: ReviewSkeletonSchema | None
