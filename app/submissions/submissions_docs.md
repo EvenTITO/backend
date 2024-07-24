@@ -1,4 +1,4 @@
-## Flujo de trabajos
+jj## Flujo de trabajos
 
 1) se suben trabajos hasta la fecha limite de entrega de trabajos.
 durante ese período, el dueño del trabajo puede hacer todas las modificaciones que quiera y al modificar el archivo, lo pisa.
@@ -7,7 +7,7 @@ durante ese período, el dueño del trabajo puede hacer todas las modificaciones
 
 3) el/los ORGANIZADORES asignan UN SOLO reviewer principal a cada trabajo. En principio no hay segundas opiniones ni nada (de ultima que lo manejen por mail entre ellos).
 
-4) el REVIEWER pasa una correccion con su puntaje estimado y estado: ACEPTADO, REVISAR, RECHAZADO
+4) el REVIEWER pasa una correccion con su puntaje estimado y estado: ACEPTADO, REVISAR, RECHAZADO (estado propuesto por el reviewer, pregunta fija para orientar al organizor)
 
 5) los ORGANIZADORES mandan la corrección (nunca lo hace un reviewer). Pueden modificar el ESTADO: ACEPTADO, REVISAR, RECHAZADO y decidir qué campos de la corrección son visibles. Para los REVISADO, definen un DEADLINE.
 
@@ -18,43 +18,67 @@ durante ese período, el dueño del trabajo puede hacer todas las modificaciones
 8) SE REPITEN PASOS 4 - 7
 
 
-POST /events/{event_id}/works -> crea el trabajo principal
+POST /events/{event_id}/works -> crea el trabajo principal.
 
-PUT /events/{event_id}/works/{work_id} -> no guardamos historial de abstract, etc. Pisamos el valor. Lo unico que guardamos con versionado es el archivo.
+PUT /events/{event_id}/works/{work_id} -> guardamos historial de todo. Se modifica el latest.
 
-GET /events/{event_id}/works/{work_id}/upload_url/submission_file -> segun la etapa se devuelve un url a un path nuevo, o a un path a pisar.
+GET /events/{event_id}/works/{work_id}/submissions/{submission_id}/upload_url -> segun la etapa se devuelve un url a un path nuevo, o a un path a pisar.
+El submission_id se obtiene del estado del work.
 
+GET /events/{event_id}/my-works -> un presentador quiere obtener sus trabajos y su estado. No deben verse las revisiones intermedias, solo la de organizer.
+Cosas a devolver: titulo, fecha ult modificacion, estado, track.
+
+GET /events/{event_id}/works/{work_id} -> usado por autos, estan en my-works y elegis ver un trabajo de los mios de la lista
+
+
+GET /events/{event_id}/works/{work_id}/submissions/{submission_id}/download_url
+
+GET /events/{event_id}/my-reviews -> un reviewer quiere obtener sus reviews
+GET /events/{event_id}/works/{work_id}/reviews (validado en back que el usuario sea REVIEWER o ORGANIZER de dicho trabajo)
+
+
+GET /events/{event_id}/works -> ORGANIZER pide lista de trabajos con el fin de ver datos basicos.
 
 ---------------------
 
-PUT /events/{event_id}/review-assignments
+// organizer
+
+PATCH /events/{event_id}/reviews/assignments (ORGANIZER para poder agregar un reviewer a un work)
 
 {
     assignments: [
         {
-            user_id: 'asdasd',
+            reviewer_id: 'asdasd',
             work_id: 1
         }
     ]
-
 }
 
 
 -----------------------
 
+// reviewers
+
 POST /events/{event_id}/works/{work_id}/reviews --> llama el reviewer para mandar la correccion y el PUT para actualizar esa misma correccion.
 
-PUT /events/{event_id}/works/{work_id}/reviews/{review_id}
+PUT /events/{event_id}/works/{work_id}/reviews/{review_id} //el review por defecto tiene que tener estado y comentario general. 
 
+
+
+// organizer
 
 PATCH /events/{event_id}/works/{work_id}/reviews/state --> llama el organizador si quiere modificar lo puesto por el corrector: ACEPTADO, RECHAZADO, REVISAR.
+{
+    state: 'RECHAZADO',
+    commentary: 'Esta mal el abstract'
+}
 
 ----------------------
 
-POST /events/{event_id}/reviews -> organizador manda los reviews a los usuarios que el quiere
+POST /events/{event_id}/reviews/publish -> ORGANIZER manda los reviews a los usuarios que el quiere
 
 {
-    reviews_to_send: [3, 4, 7, 8, 9] // aca solo esta mandando algunos reviews.
+    work_ids: [3, 4, 7, 8, 9] // aca solo esta mandando algunos reviews.
     revision_deadline_date: '2024-10-08' // a los que se los manda a revision, tienen hasta este dia para corregir todo.
 }
 

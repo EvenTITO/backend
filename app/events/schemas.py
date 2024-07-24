@@ -110,7 +110,7 @@ class GeneralEventSchema(DynamicEventSchema):
 
 
 class FullEventSchema(GeneralEventSchema, StaticEventSchema):
-    dates: DatesCompleteSchema | None
+    dates: DatesCompleteSchema | None  # TODO: AGREGAR DEFAULT EN VEZ DE NONE.
     pricing: PricingRateSchema | None
     review_skeleton: ReviewSkeletonSchema | None
 
