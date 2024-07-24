@@ -28,11 +28,6 @@ def validate_event_exists(event, event_id):
         raise EventNotFound(event_id)
 
 
-async def validate_update(db, current_event, event_modification):
-    if current_event.title != event_modification.title:
-        await validate_event_not_exists(db, event_modification)
-
-
 async def validate_status_change(db, caller, event, status_modification):
     if caller.role == UserRole.ADMIN:
         return

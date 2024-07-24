@@ -104,7 +104,6 @@ async def update_general_event(
     db: SessionDep
 ):
     current_event = await get_event(db, event_id)
-    await validations.validate_update(db, current_event, event_modification)
     await crud.update_event(db, current_event, event_modification)
 
 

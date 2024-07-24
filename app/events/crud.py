@@ -157,10 +157,8 @@ async def update_event(
     current_event: EventModel,
     event_modification: GeneralEventSchema
 ):
-    orig_title = current_event.title
     for attr, value in event_modification.model_dump().items():
         setattr(current_event, attr, value)
-    current_event.title = orig_title
     await db.commit()
     await db.refresh(current_event)
 
