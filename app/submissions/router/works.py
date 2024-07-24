@@ -4,8 +4,8 @@ from app.submissions.schemas.work import Work, WorkWithState, BasicWorkInfo
 works_router = APIRouter(prefix="/events/{event_id}/works", tags=["Works"])
 
 
-@works_router.post("", status_code=201, response_model=str)
-async def create_work(work: Work):
+@works_router.post("", status_code=201)
+async def create_work(work: Work) -> str:
     """
     Creates the Work. This call is made by the work author.
     """

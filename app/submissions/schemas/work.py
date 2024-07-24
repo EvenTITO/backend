@@ -2,7 +2,6 @@ from typing import Union
 from pydantic import BaseModel
 from app.submissions.schemas.work_stages import (
     BeforeDeadline,
-    NumberSubmissions,
     WaitingDecision,
     DeterminedDecision,
     ReSubmitDecision,
@@ -29,7 +28,10 @@ class WorkWithState(Work):
     ]
 
 
-class BasicWorkInfo(StaticWorkInfo, WorkStage, NumberSubmissions):
-    main_author_name: str
+class BasicWorkInfoForAuthor(StaticWorkInfo, WorkStage):
     id: str
+
+
+class BasicWorkInfo(BasicWorkInfoForAuthor):
+    main_author_name: str
     reviewer_name: str | None = None

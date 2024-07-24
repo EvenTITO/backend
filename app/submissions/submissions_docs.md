@@ -1,4 +1,4 @@
-jj## Flujo de trabajos
+## Flujo de trabajos
 
 1) se suben trabajos hasta la fecha limite de entrega de trabajos.
 durante ese período, el dueño del trabajo puede hacer todas las modificaciones que quiera y al modificar el archivo, lo pisa.
