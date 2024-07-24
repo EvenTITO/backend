@@ -1,16 +1,17 @@
-from typing import Literal
+from enum import Enum
+from typing import Literal, Union
 from app.submissions.schemas.work_review import PublicReview, ReviewDecision
 from pydantic import BaseModel
 from datetime import datetime
 
 
-class StageEnum(ReviewDecision):
+class NoReviewStages(str, Enum):
     NO_DECISION = 'NO_DECISION'
     BEFORE_DEADLINE = 'BEFORE_DEADLINE'
 
 
 class WorkStage(BaseModel):
-    stage: StageEnum
+    stage: Union[ReviewDecision, NoReviewStages]
 
 
 class MustSubmit(BaseModel):
@@ -26,17 +27,19 @@ class LatestReview(BaseModel):
 
 
 class BeforeDeadline(WorkStage, MustSubmit):
-    stage: Literal[StageEnum.BEFORE_DEADLINE] = StageEnum.BEFORE_DEADLINE
+    stage: Literal[
+        NoReviewStages.BEFORE_DEADLINE
+    ] = NoReviewStages.BEFORE_DEADLINE
 
 
 class WaitingDecision(WorkStage, NumberSubmissions):
-    stage: Literal[StageEnum.NO_DECISION] = StageEnum.NO_DECISION
+    stage: Literal[NoReviewStages.NO_DECISION] = NoReviewStages.NO_DECISION
 
 
 class DeterminedDecision(WorkStage, NumberSubmissions):
-    stage: Literal[StageEnum.ACCEPTED, StageEnum.REJECTED]
+    stage: Literal[ReviewDecision.ACCEPTED, ReviewDecision.REJECTED]
 
 
 class ReSubmitDecision(WorkStage, MustSubmit, NumberSubmissions):
-    stage: Literal[StageEnum.RESUBMIT] = StageEnum.RESUBMIT
+    stage: Literal[ReviewDecision.RESUBMIT] = ReviewDecision.RESUBMIT
     deadline_date: datetime

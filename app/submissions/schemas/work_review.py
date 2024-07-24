@@ -2,7 +2,7 @@ from enum import Enum
 from pydantic import BaseModel
 
 
-class ReviewDecision(Enum, str):
+class ReviewDecision(str, Enum):
     ACCEPTED = 'ACCEPTED'
     REJECTED = 'REJECTED'
     RESUBMIT = 'RESUBMIT'
