@@ -58,4 +58,9 @@ async def read_user_inscriptions(
     offset: int = 0,
     limit: int = Query(default=100, le=100)
 ):
-    return await inscriptions_crud.read_user_inscriptions(db, user_id, offset, limit)
+    return await inscriptions_crud.read_user_inscriptions(
+        db,
+        user_id,
+        offset,
+        limit
+    )

@@ -61,10 +61,12 @@ async def update_status_organizer(
     status_modification: ModifyInvitationStatusSchema,
     db: SessionDep
 ):
-    await organizers_crud.update_invitation_status(db,
-                                                   caller_id,
-                                                   event_id,
-                                                   status_modification.invitation_status)
+    await organizers_crud.update_invitation_status(
+        db,
+        caller_id,
+        event_id,
+        status_modification.invitation_status
+    )
     return
 
 
