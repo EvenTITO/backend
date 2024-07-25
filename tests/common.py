@@ -1,6 +1,6 @@
 from app.users.schemas import UserSchema
 from app.events.schemas import EventSchema
-from app.events.model import EventType
+from app.models.event import EventType
 
 
 async def get_user_method(client, user_id):

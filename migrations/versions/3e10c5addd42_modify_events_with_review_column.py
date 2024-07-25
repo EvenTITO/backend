@@ -6,7 +6,7 @@ Create Date: 2024-06-19 12:27:05.549758
 
 """
 from typing import Sequence, Union
-from app.organizers.model import InvitationStatus
+from app.models.organizer import InvitationStatus
 from alembic import op
 import sqlalchemy as sa
 from datetime import datetime

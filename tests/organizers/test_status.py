@@ -1,4 +1,4 @@
-from app.organizers.model import InvitationStatus
+from app.models.organizer import InvitationStatus
 from fastapi.encoders import jsonable_encoder
 from app.organizers.schemas import ModifyInvitationStatusSchema
 from ..common import create_headers_organization

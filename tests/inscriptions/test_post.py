@@ -1,4 +1,4 @@
-from app.inscriptions.model import InscriptionStatus
+from app.models.inscription import InscriptionStatus
 from ..common import create_headers
 
 PAYMENT_INCOMPLETED = InscriptionStatus.PAYMENT_INCOMPLETED.value
