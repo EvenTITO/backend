@@ -5,7 +5,7 @@ from pydantic import (
 )
 from datetime import datetime
 from typing_extensions import Self
-from app.organizers.model import InvitationStatus
+from app.models.organizer import InvitationStatus
 
 
 class ReviewerSchema(BaseModel):

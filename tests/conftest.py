@@ -1,11 +1,11 @@
 from app.storage.schemas import DownloadURLSchema, UploadURLSchema
 import pytest
-from app.events.model import EventStatus, EventType
+from app.models.event import EventStatus, EventType
 from app.events.schemas import EventSchema, EventStatusSchema
 from fastapi.encoders import jsonable_encoder
 from app.organizers.schemas import OrganizerRequestSchema
 from app.database.dependencies import get_db
-from app.users.model import UserRole
+from app.models.user import UserRole
 from app.users.schemas import UserSchema, RoleSchema
 from app.users.crud import update_role
 from app.users.service import get_user

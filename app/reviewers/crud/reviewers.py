@@ -1,4 +1,4 @@
-from app.reviewers.models.reviewer import ReviewerModel
+from app.models.reviewer import ReviewerModel
 from app.reviewers.schemas.reviewer import (
     ReviewerSchema
 )

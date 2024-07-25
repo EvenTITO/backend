@@ -1,5 +1,5 @@
 from app.reviewers.schemas.reviewer import ReviewerSchema
-from app.organizers.model import InvitationStatus
+from app.models.organizer import InvitationStatus
 from fastapi.encoders import jsonable_encoder
 from ..common import create_headers
 from datetime import datetime, timedelta

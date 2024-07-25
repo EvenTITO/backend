@@ -71,9 +71,3 @@ class EventModel(ModelTemplate, Base):
 
     def __repr__(self):
         return f"Event({self.id})"
-
-
-class EventModelRol:
-    def __init__(self, eventModel, col_val):
-        self.__dict__ = eventModel.__dict__.copy()
-        self.rol = col_val

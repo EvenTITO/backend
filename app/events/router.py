@@ -4,7 +4,7 @@ from app.storage.schemas import UploadURLSchema
 from fastapi import APIRouter, Header, Query
 from app.database.dependencies import SessionDep
 from app.events.dependencies import GetEventsQuerysDep
-from app.events.model import EventStatus
+from app.models.event import EventStatus
 from app.organizers.crud import is_organizer
 from app.users.dependencies import CallerUserDep
 from app.organizers.dependencies import EventOrganizerDep

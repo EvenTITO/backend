@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import HTTPException, Depends
 from app.users.dependencies import CallerUserDep
 from app.organizers import crud
-from app.events.model import EventModel
+from app.models.event import EventModel
 from app.database.dependencies import SessionDep
 
 
