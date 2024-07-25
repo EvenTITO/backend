@@ -20,7 +20,7 @@ from .schemas import (
     EventStatusSchema,
     EventModelWithRol,
     EventRol,
-    ReviewSkeletonSchema, ReviewerSchema, ReviewerSchemaComplete,
+    ReviewSkeletonSchema,
     GeneralEventSchema
 )
 
@@ -221,33 +221,3 @@ async def get_brochure_upload_url(
     event_id: str,
 ) -> UploadURLSchema:
     return get_upload_url(event_id, EventsStaticFiles.BROCHURE)
-
-
-@events_router.post("/{event_id}/reviewer/{user_id}", status_code=201)
-async def create_reviewer(
-        event_id: str,
-        user_id: str,
-        reviewer: ReviewerSchema,
-        _: EventOrganizerDep,
-        db: SessionDep
-):
-    await validations.validate_unique_reviewer(db, event_id, user_id)
-
-    reviewer_created = await crud.create_reviewer(
-        db=db,
-        reviewer=reviewer,
-        event_id=event_id,
-        user_id=user_id
-    )
-    return reviewer_created
-
-
-@events_router.get(
-    "/{event_id}/reviewer",
-    response_model=List[ReviewerSchemaComplete])
-async def get_reviewer(
-        event_id: str,
-        db: SessionDep,
-        _: EventOrganizerDep
-):
-    return await crud.get_all_reviewer(db, event_id)

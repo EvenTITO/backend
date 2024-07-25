@@ -1,5 +1,6 @@
 from fastapi import HTTPException
 from app.events import crud
+from app.reviewers.crud import reviewers as reviewers_crud
 from app.events.model import EventStatus
 from app.users.model import UserRole
 from .schemas import EventSchema
@@ -45,7 +46,7 @@ async def validate_unique_reviewer(db, event_id, user_id):
     await validate_event_exists_with_id(db, event_id)
     await validate_user_exists_with_id(db, user_id)
 
-    reviewer = await crud.get_reviewer(db, event_id, user_id)
+    reviewer = await reviewers_crud.get_reviewer(db, event_id, user_id)
     print(reviewer)
     if reviewer:
         raise ReviewerFound(event_id, user_id)

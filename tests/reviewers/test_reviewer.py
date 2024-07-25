@@ -1,4 +1,4 @@
-from app.events.schemas import ReviewerSchema
+from app.reviewers.schemas.reviewer import ReviewerSchema
 from app.organizers.model import InvitationStatus
 from fastapi.encoders import jsonable_encoder
 from ..common import create_headers
@@ -17,7 +17,7 @@ async def test_create_reviewer_auto_invited_OK(client, event_data, admin_data):
     )
 
     response = await client.post(
-        f"/events/{event_data['id']}/reviewer/{admin_data.id}",
+        f"/events/{event_data['id']}/reviewers/{admin_data.id}",
         json=jsonable_encoder(reviewer_schema),
         headers=create_headers(admin_data.id)
     )
@@ -47,7 +47,7 @@ async def test_create_reviewer_not_organizer_FAIL(client, event_data,
     )
 
     response = await client.post(
-        f"/events/{event_data['id']}/reviewer/{admin_data.id}",
+        f"/events/{event_data['id']}/reviewers/{admin_data.id}",
         json=jsonable_encoder(reviewer_schema),
         headers=create_headers(user_data['id'])
     )
