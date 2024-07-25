@@ -6,7 +6,7 @@ from .exceptions import (
     UserNotFound,
     EmailCantChange
 )
-from .model import UserRole
+from ..models.user import UserRole
 
 
 async def validate_user_exists_with_id(db, id_user):

@@ -2,7 +2,7 @@ from datetime import datetime
 from app.utils.exceptions import DatesException
 from sqlalchemy import Column, String, Date, ForeignKey, JSON, ARRAY
 from app.database.database import Base
-from app.utils.models_utils import ModelTemplate, DateTemplate
+from app.utils.models_utils import ModelTemplate
 from enum import Enum
 from sqlalchemy.orm import relationship, validates
 
@@ -22,26 +22,6 @@ class EventType(str, Enum):
     TALK = "TALK"
 
 
-class ReviewerModel(DateTemplate, Base):
-    __tablename__ = "reviewer"
-
-    id_user = Column(String, primary_key=True)
-    id_event = Column(String, primary_key=True)
-
-    invitation_expiration_date = Column(Date)
-    invitation_status = Column(String, nullable=False)
-    tracks = Column(String)
-
-    @validates("invitation_expiration_date")
-    def validate_date(self, key, invitation_expiration_date):
-        if invitation_expiration_date is None:
-            return datetime.now()
-        if datetime.now() > invitation_expiration_date:
-            raise DatesException()
-        else:
-            return invitation_expiration_date
-
-
 class EventModel(ModelTemplate, Base):
     __tablename__ = "events"
 
@@ -55,7 +35,7 @@ class EventModel(ModelTemplate, Base):
     location = Column(String)
     tracks = Column(ARRAY(String))
 
-    notification_mails = Column(ARRAY(String))
+    notification_mails = Column(ARRAY(String), default='{}')
 
     review_skeleton = Column(JSON, default=None)
     pricing = Column(JSON, default=None)
@@ -91,9 +71,3 @@ class EventModel(ModelTemplate, Base):
 
     def __repr__(self):
         return f"Event({self.id})"
-
-
-class EventModelRol:
-    def __init__(self, eventModel, col_val):
-        self.__dict__ = eventModel.__dict__.copy()
-        self.rol = col_val

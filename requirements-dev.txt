@@ -9,4 +9,4 @@ python-dotenv
 pydantic
 google-cloud-storage
 pydantic-settings
-pytest-mock
+pytest-mock==3.14.0

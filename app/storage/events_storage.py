@@ -1,6 +1,6 @@
 
 from enum import Enum
-from .storage import get_public_url, generate_signed_upload_url
+from app.storage.storage import get_public_url, generate_signed_upload_url
 from app.settings.settings import StorageSettings
 
 

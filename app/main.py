@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.users.model import UserRole
+from app.models.user import UserRole
 from app.users.router import users_router
 from app.events.router import events_router
 from app.inscriptions.router import (
@@ -12,6 +12,14 @@ from app.organizers.router import (
     organizers_events_router,
     organizers_users_router
 )
+from app.submissions.router.my_reviews import my_reviews_router
+from app.submissions.router.my_works import my_works_router
+from app.submissions.router.works import works_router
+from app.submissions.router.submissions import submissions_router
+from app.submissions.router.reviews import reviews_router
+from app.submissions.router.reviews_management import review_management_router
+from app.reviewers.routers.reviewer import reviewers_router
+
 from app.database.database import Base, engine
 from app.database.dependencies import get_db
 from app.users.crud import create_user, update_role
@@ -87,3 +95,13 @@ app.include_router(inscriptions_events_router)
 app.include_router(inscriptions_users_router)
 app.include_router(organizers_users_router)
 app.include_router(organizers_events_router)
+app.include_router(reviewers_router)
+
+
+# Submissions Routers
+app.include_router(my_reviews_router)
+app.include_router(my_works_router)
+app.include_router(works_router)
+app.include_router(submissions_router)
+app.include_router(reviews_router)
+app.include_router(review_management_router)

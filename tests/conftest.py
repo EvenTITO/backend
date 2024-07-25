@@ -1,10 +1,11 @@
+from app.storage.schemas import DownloadURLSchema, UploadURLSchema
 import pytest
-from app.events.model import EventStatus, EventType
+from app.models.event import EventStatus, EventType
 from app.events.schemas import EventSchema, EventStatusSchema
 from fastapi.encoders import jsonable_encoder
 from app.organizers.schemas import OrganizerRequestSchema
 from app.database.dependencies import get_db
-from app.users.model import UserRole
+from app.models.user import UserRole
 from app.users.schemas import UserSchema, RoleSchema
 from app.users.crud import update_role
 from app.users.service import get_user
@@ -47,6 +48,28 @@ async def session_override(current_session):
     app.dependency_overrides[get_db] = get_db_session_override
     yield
     app.dependency_overrides[get_db] = get_db
+
+
+@pytest.fixture(scope="function")
+async def mock_storage(mocker):
+    generate_upload_url_mock = mocker.patch(
+        'app.storage.events_storage.generate_signed_upload_url'
+    )
+    generate_upload_url_mock.return_value = UploadURLSchema(
+        upload_url='mocked-url-upload',
+        expiration_time_seconds=3600,
+        max_upload_size_mb=5
+    )
+
+    generate_download_url_mock = mocker.patch(
+        'app.storage.storage.generate_signed_read_url'
+    )
+    generate_download_url_mock.return_value = DownloadURLSchema(
+        download_url='mocked-url-download',
+        expiration_time_seconds=3600,
+    )
+
+    yield
 
 
 @pytest.fixture(scope="function")

@@ -1,12 +1,12 @@
-from app.events.model import EventModel
+from app.models.event import EventModel
 from app.events.schemas import EventSchema
 from app.inscriptions.schemas import (
     InscriptionsForUserSchema,
     InscriptionsInEventResponseSchema
 )
-from app.users.model import UserModel
+from app.models.user import UserModel
 from app.users.schemas import UserSchema
-from .model import InscriptionModel
+from ..models.inscription import InscriptionModel
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from enum import Enum
 from typing import Literal, Union
 from pydantic import (
@@ -10,9 +8,8 @@ from pydantic import (
     computed_field
 )
 from datetime import datetime
-from .model import EventType, EventStatus
+from ..models.event import EventType, EventStatus
 from typing_extensions import Self
-from ..organizers.model import InvitationStatus
 from app.storage.events_storage import EventsStaticFiles, get_public_event_url
 
 
@@ -21,11 +18,14 @@ class EventRol(str, Enum):
     INSCRIPTED = "INSCRIPTED"
 
 
-class EventSchema(BaseModel):
+class StaticEventSchema(BaseModel):
     title: str = Field(min_length=2, max_length=100,
                        examples=["CONGRESO DE QUIMICA"])
     description: str = Field(max_length=1000, examples=["Evento en FIUBA"])
     event_type: EventType = Field(examples=[EventType.CONFERENCE])
+
+
+class DynamicEventSchema(BaseModel):
     start_date: datetime | None = Field(examples=[datetime(2024, 8, 1)],
                                         default=None)
     end_date: datetime | None = Field(examples=[datetime(2024, 8, 2)],
@@ -59,6 +59,10 @@ class EventSchema(BaseModel):
         if start_date < datetime.now() or end_date < start_date:
             raise ValueError('Invalid Dates.')
         return self
+
+
+class EventSchema(StaticEventSchema, DynamicEventSchema):
+    pass
 
 
 class EventStatusSchema(BaseModel):
@@ -98,14 +102,8 @@ class EventModelWithRol(EventSchemaWithEventId):
         ]
 
 
-class GeneralEventSchema(EventSchema):
-    notification_mails: list[str]
-
-
-class FullEventSchema(GeneralEventSchema):
-    dates: DatesCompleteSchema | None
-    pricing: PricingRateSchema | None
-    review_skeleton: ReviewSkeletonSchema | None
+class GeneralEventSchema(DynamicEventSchema):
+    notification_mails: list[str] = Field(default_factory=list)
 
 
 class CustomDateSchema(BaseModel):
@@ -160,20 +158,7 @@ class ReviewSkeletonSchema(BaseModel):
     questions: list[Union[MultipleChoiceQuestion, SimpleQuestion]]
 
 
-class ReviewerSchema(BaseModel):
-    invitation_expiration_date: datetime | None = \
-        Field(examples=[datetime(2024, 12, 9)], default=None)
-    invitation_status: str = Field(examples=[InvitationStatus.INVITED])
-    tracks: str | None = Field(max_length=1000,
-                               examples=["track1, track2, track3"],
-                               default=None)
-
-    @model_validator(mode='after')
-    def check_dates(self) -> Self:
-        if self.invitation_expiration_date <= datetime.now():
-            raise ValueError('Invalid invitation expiration date.')
-        return self
-
-
-class ReviewerSchemaComplete(ReviewerSchema):
-    id_user: str = Field(examples=["..."])
+class FullEventSchema(GeneralEventSchema, StaticEventSchema):
+    dates: DatesCompleteSchema | None  # TODO: AGREGAR DEFAULT EN VEZ DE NONE.
+    pricing: PricingRateSchema | None
+    review_skeleton: ReviewSkeletonSchema | None

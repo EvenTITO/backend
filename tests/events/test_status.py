@@ -1,6 +1,6 @@
 from fastapi.encoders import jsonable_encoder
 
-from app.events.model import EventStatus
+from app.models.event import EventStatus
 from app.events.schemas import EventStatusSchema
 from ..common import create_headers
 

@@ -1,7 +1,7 @@
 from typing import Annotated
 from app.users.crud import get_user_by_id
 from app.users.exceptions import UserNotFound
-from app.users.model import UserModel, UserRole
+from app.models.user import UserModel, UserRole
 from fastapi import HTTPException, Depends
 from app.utils.dependencies import CallerIdDep
 from app.database.dependencies import SessionDep

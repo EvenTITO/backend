@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
-from .model import UserRole
+from ..models.user import UserRole
 
 
 class UserSchema(BaseModel):
