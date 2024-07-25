@@ -1,5 +1,4 @@
 from enum import Enum
-from app.submissions.schemas.work import Work
 from pydantic import BaseModel
 
 
