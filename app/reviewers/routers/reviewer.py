@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter
 from app.database.dependencies import SessionDep
 from app.organizers.dependencies import EventOrganizerDep
-from app.reviewers.crud import reviewers as crud
+from app.repository import reviewers_crud as crud
 from app.events import validations
 from app.reviewers.schemas.reviewer import (
     ReviewerSchema,

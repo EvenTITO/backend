@@ -4,7 +4,7 @@ from .schemas import (
     InscriptionReplySchema
 )
 from app.database.dependencies import SessionDep
-from app.inscriptions import crud
+from app.repository import inscriptions_crud
 from fastapi import APIRouter, Query
 from app.users.router import users_router
 from app.events.router import events_router
@@ -35,7 +35,7 @@ async def create_inscription(
     await validations.validate_inscription_not_exists(
         db, caller_user.id, event_id
     )
-    new_entry = await crud.inscribe_user_to_event(
+    new_entry = await inscriptions_crud.inscribe_user_to_event(
         db, event_id, caller_user.id
     )
     return new_entry.id_inscriptor
@@ -45,7 +45,7 @@ async def create_inscription(
     "", response_model=List[InscriptionReplySchema]
 )
 async def read_event_inscriptions(event_id: str, db: SessionDep):
-    return await crud.get_event_inscriptions(db, event_id)
+    return await inscriptions_crud.get_event_inscriptions(db, event_id)
 
 
 @inscriptions_users_router.get(
@@ -58,4 +58,4 @@ async def read_user_inscriptions(
     offset: int = 0,
     limit: int = Query(default=100, le=100)
 ):
-    return await crud.read_user_inscriptions(db, user_id, offset, limit)
+    return await inscriptions_crud.read_user_inscriptions(db, user_id, offset, limit)

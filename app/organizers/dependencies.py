@@ -1,7 +1,7 @@
 from typing import Annotated
 from fastapi import HTTPException, Depends
 from app.users.dependencies import CallerUserDep
-from app.organizers import crud
+from app.repository import organizers_crud
 from app.models.event import EventModel
 from app.database.dependencies import SessionDep
 
@@ -13,7 +13,7 @@ class EventOrganizerChecker:
         caller_user: CallerUserDep,
         db: SessionDep
     ):
-        if not await crud.is_organizer(db, event_id, caller_user.id):
+        if not await organizers_crud.is_organizer(db, event_id, caller_user.id):
             raise HTTPException(status_code=403)
 
 

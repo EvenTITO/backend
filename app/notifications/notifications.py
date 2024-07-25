@@ -3,7 +3,7 @@ import ssl
 from email.message import EmailMessage
 import os
 from dotenv import load_dotenv
-from app.users.crud import get_admin_emails
+from app.repository.users_crud import get_admin_emails
 
 load_dotenv()
 
@@ -11,7 +11,7 @@ SMTPS_PORT = 465
 EMAIL_PASSWORD = os.getenv('NOTIFICATIONS_EMAIL_PASSWORD')
 SENDER_EMAIL = os.getenv('NOTIFICATIONS_EMAIL')
 ENABLE_SEND_EMAILS = os.getenv('ENABLE_SEND_EMAILS', 'False') \
-                                in ["True", "true"]
+    in ["True", "true"]
 FRONTEND_URL = os.getenv('FRONTEND_URL')
 
 SLL_DEFAULT_CONTEXT = ssl.create_default_context()

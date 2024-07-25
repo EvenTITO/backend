@@ -1,13 +1,17 @@
 from app.models.inscription import InscriptionModel
 from app.models.user import UserModel, UserRole
 from ..models.event import EventModel, EventStatus
-from .schemas import (
+from ..events.schemas import (
     DatesCompleteSchema,
     EventRol,
     GeneralEventSchema,
     PricingRateSchema,
 )
-from .schemas import EventModelWithRol, EventSchema, ReviewSkeletonSchema
+from ..events.schemas import (
+    EventModelWithRol,
+    EventSchema,
+    ReviewSkeletonSchema
+)
 from sqlalchemy.future import select
 from app.models.organizer import InvitationStatus, OrganizerModel
 from sqlalchemy.ext.asyncio import AsyncSession

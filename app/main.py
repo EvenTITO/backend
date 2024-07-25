@@ -22,7 +22,7 @@ from app.reviewers.routers.reviewer import reviewers_router
 
 from app.database.database import Base, engine
 from app.database.dependencies import get_db
-from app.users.crud import create_user, update_role
+from app.repository.users_crud import create_user, update_role
 from app.users.schemas import UserSchema
 import os
 from dotenv import load_dotenv

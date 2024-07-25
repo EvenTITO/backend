@@ -7,7 +7,7 @@ from app.organizers.schemas import OrganizerRequestSchema
 from app.database.dependencies import get_db
 from app.models.user import UserRole
 from app.users.schemas import UserSchema, RoleSchema
-from app.users.crud import update_role
+from app.repository.users_crud import update_role
 from app.users.service import get_user
 from app.main import app
 from app.database.database import SessionLocal, engine, Base

@@ -1,14 +1,15 @@
 from typing import List
+from app.repository import events_crud
 from app.storage.events_storage import EventsStaticFiles, get_upload_url
 from app.storage.schemas import UploadURLSchema
 from fastapi import APIRouter, Header, Query
 from app.database.dependencies import SessionDep
 from app.events.dependencies import GetEventsQuerysDep
 from app.models.event import EventStatus
-from app.organizers.crud import is_organizer
+from app.repository.organizers_crud import is_organizer
 from app.users.dependencies import CallerUserDep
 from app.organizers.dependencies import EventOrganizerDep
-from app.events import crud, validations
+from app.events import validations
 import app.notifications.events as notifications
 from .utils import get_event
 from .schemas import (
@@ -34,7 +35,7 @@ async def read_my_events(
         offset: int = 0,
         limit: int = Query(default=100, le=100)
 ):
-    return await crud.get_all_events_for_user(db, caller_user.id)
+    return await events_crud.get_all_events_for_user(db, caller_user.id)
 
 
 @events_router.get("/", response_model=List[EventSchemaWithEventId])
@@ -45,7 +46,7 @@ async def read_all_events(
         limit: int = Query(default=100, le=100),
         search: str | None = None
 ):
-    return await crud.get_all_events(
+    return await events_crud.get_all_events(
         db=db,
         offset=offset,
         limit=limit,
@@ -61,7 +62,7 @@ async def create_event(
         db: SessionDep
 ):
     await validations.validate_event_not_exists(db, event)
-    event_created = await crud.create_event(
+    event_created = await events_crud.create_event(
         db=db,
         event=event,
         user=caller_user
@@ -104,7 +105,7 @@ async def update_general_event(
     db: SessionDep
 ):
     current_event = await get_event(db, event_id)
-    await crud.update_event(db, current_event, event_modification)
+    await events_crud.update_event(db, current_event, event_modification)
 
 
 @events_router.put("/{event_id}/dates", status_code=204, response_model=None)
@@ -115,7 +116,7 @@ async def update_dates_event(
     db: SessionDep
 ):
     current_event = await get_event(db, event_id)
-    await crud.update_dates(db, current_event, dates_modification)
+    await events_crud.update_dates(db, current_event, dates_modification)
 
 
 @events_router.put("/{event_id}/pricing", status_code=204, response_model=None)
@@ -126,7 +127,7 @@ async def update_pricing_event(
     db: SessionDep
 ):
     current_event = await get_event(db, event_id)
-    await crud.update_pricing(db, current_event, pricing_modification)
+    await events_crud.update_pricing(db, current_event, pricing_modification)
 
 
 @events_router.patch(
@@ -144,7 +145,7 @@ async def change_event_status(
     await validations.validate_status_change(
         db, caller, event, status_modification
     )
-    await crud.update_status(db, event, status_modification.status)
+    await events_crud.update_status(db, event, status_modification.status)
 
 
 @events_router.get(
@@ -157,7 +158,7 @@ async def get_review_skeleton(
         event_id: str,
         db: SessionDep
 ) -> ReviewSkeletonSchema:
-    return await crud.get_review_sckeletor(db, event_id, caller.id)
+    return await events_crud.get_review_sckeletor(db, event_id, caller.id)
 
 
 @events_router.get(
@@ -169,7 +170,7 @@ async def get_pricing(
         event_id: str,
         db: SessionDep
 ) -> PricingRateSchema:
-    return await crud.get_pricing(db, event_id, caller.id)
+    return await events_crud.get_pricing(db, event_id, caller.id)
 
 
 @events_router.get(
@@ -181,7 +182,7 @@ async def get_dates(
         event_id: str,
         db: SessionDep
 ) -> DatesCompleteSchema:
-    return await crud.get_dates(db, event_id, caller.id)
+    return await events_crud.get_dates(db, event_id, caller.id)
 
 
 @events_router.put(
@@ -196,7 +197,7 @@ async def change_review_skeleton(
         db: SessionDep
 ):
     event = await get_event(db, event_id)
-    await crud.update_review_skeleton(db, event, review_skeleton)
+    await events_crud.update_review_skeleton(db, event, review_skeleton)
 
 
 @events_router.get("/{event_id}/upload_url/main_image")

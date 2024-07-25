@@ -1,6 +1,6 @@
 from fastapi import HTTPException
-from app.events import crud
-from app.reviewers.crud import reviewers as reviewers_crud
+from app.repository import events_crud
+from app.repository import reviewers_crud as reviewers_crud
 from app.models.event import EventStatus
 from app.models.user import UserRole
 from .schemas import EventSchema
@@ -13,13 +13,13 @@ from ..users.validations import validate_user_exists_with_id
 
 
 async def validate_event_exists_with_id(db, event_id):
-    event = await crud.get_event_by_id(db, event_id)
+    event = await events_crud.get_event_by_id(db, event_id)
     if not event:
         raise EventNotFound(event_id)
 
 
 async def validate_event_not_exists(db, event: EventSchema):
-    other_event = await crud.get_event_by_title(db, event.title)
+    other_event = await events_crud.get_event_by_title(db, event.title)
     if other_event:
         raise InvalidEventSameTitle(event.title)
 
