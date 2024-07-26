@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.models.user import UserRole
 from app.routers.users.users import users_router
-from app.events.router import events_router
+from app.routers.events.router import events_router
 from app.inscriptions.router import (
     inscriptions_events_router,
     inscriptions_users_router

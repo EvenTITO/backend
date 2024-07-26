@@ -11,7 +11,7 @@ from ...users.schemas import RoleSchema
 
 user_roles_router = APIRouter(
     prefix="/{user_id}/roles",
-    tags=["User Roles"],
+    tags=["Users: Roles"],
 )
 
 

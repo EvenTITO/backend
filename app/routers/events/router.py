@@ -11,8 +11,8 @@ from app.users.dependencies import CallerUserDep
 from app.organizers.dependencies import EventOrganizerDep
 from app.events import validations
 import app.notifications.events as notifications
-from .utils import get_event
-from .schemas import (
+from ...events.utils import get_event
+from ...events.schemas import (
     DatesCompleteSchema,
     EventSchema,
     EventSchemaWithEventId,
