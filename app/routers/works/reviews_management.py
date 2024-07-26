@@ -1,4 +1,4 @@
-from app.submissions.schemas.review_management import (
+from app.schemas.works.review_management import (
     ReviewAssignment,
     PublishReviews
 )

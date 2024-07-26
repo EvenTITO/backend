@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.work import WorkModel
-from app.submissions.schemas.work import WorkSchema
+from app.schemas.works.work import WorkSchema
 from datetime import datetime
 
 

@@ -1,6 +1,6 @@
 from typing import Union
 from pydantic import BaseModel
-from app.submissions.schemas.work_stages import (
+from app.schemas.works.work_stages import (
     BeforeDeadline,
     WaitingDecision,
     DeterminedDecision,

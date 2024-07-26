@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from app.submissions.schemas.submission import Submission, SubmissionWithId
-from app.submissions.schemas.author import AuthorInformation
+from app.schemas.works.submission import Submission, SubmissionWithId
+from app.schemas.works.author import AuthorInformation
 
 submissions_router = APIRouter(
     prefix="/events/{event_id}/works/submissions",

@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 from datetime import datetime
 from app.database.dependencies import SessionDep
-from app.submissions.schemas.work import WorkSchema, WorkWithState, BasicWorkInfo
+from app.schemas.works.work import WorkSchema, WorkWithState, BasicWorkInfo
 from app.services.works import works_service
-from app.submissions.schemas.work_stages import BeforeDeadline, NoReviewStages
+from app.schemas.works.work_stages import BeforeDeadline, NoReviewStages
 from app.models.work import WorkModel  # noqa
 from app.models.submission import SubmissionModel  # noqa
 from app.models.review import ReviewModel  # noqa

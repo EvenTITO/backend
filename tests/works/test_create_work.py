@@ -1,8 +1,8 @@
 import asyncio
 from fastapi.encoders import jsonable_encoder
 
-from app.submissions.schemas.author import AuthorInformation
-from app.submissions.schemas.work import WorkSchema
+from app.schemas.works.author import AuthorInformation
+from app.schemas.works.work import WorkSchema
 from ..common import create_headers
 
 
