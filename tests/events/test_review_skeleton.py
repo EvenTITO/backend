@@ -24,7 +24,7 @@ async def test_put_review_skeleton(client, admin_data, event_data):
         ]
     )
     response = await client.put(
-        f"/events/{event_data['id']}/review-skeleton",
+        f"/events/{event_data['id']}/configuration/review-skeleton",
         json=jsonable_encoder(review_skeleton),
         headers=create_headers(admin_data.id)
     )

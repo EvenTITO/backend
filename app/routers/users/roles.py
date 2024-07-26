@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 
-
 from app.repository import users_crud
 from app.database.dependencies import SessionDep
 from app.users.dependencies import AdminDep
@@ -15,9 +14,7 @@ user_roles_router = APIRouter(
 )
 
 
-@user_roles_router.patch(
-    "", status_code=204, response_model=None
-)
+@user_roles_router.patch("", status_code=204, response_model=None)
 async def update_user_role(
     user_id: str, role: RoleSchema, caller_user: AdminDep, db: SessionDep
 ):

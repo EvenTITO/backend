@@ -1,8 +1,6 @@
+from fastapi import APIRouter, Header, Query
 from typing import List
 from app.repository import events_crud
-from app.storage.events_storage import EventsStaticFiles, get_upload_url
-from app.storage.schemas import UploadURLSchema
-from fastapi import APIRouter, Header, Query
 from app.database.dependencies import SessionDep
 from app.events.dependencies import GetEventsQuerysDep
 from app.models.event import EventStatus
@@ -11,21 +9,24 @@ from app.users.dependencies import CallerUserDep
 from app.organizers.dependencies import EventOrganizerDep
 from app.events import validations
 import app.notifications.events as notifications
-from ...events.utils import get_event
-from ...events.schemas import (
+from app.events.utils import get_event
+from app.events.schemas import (
     DatesCompleteSchema,
     EventSchema,
     EventSchemaWithEventId,
-    FullEventSchema,
     PricingRateSchema,
-    EventStatusSchema,
     EventModelWithRol,
     EventRol,
     ReviewSkeletonSchema,
-    GeneralEventSchema
 )
+from app.routers.events.media import events_media_router
+from app.routers.events.configuration.configuration import events_configuration_router
+from app.routers.events.administration import events_admin_router
 
 events_router = APIRouter(prefix="/events", tags=["Events"])
+events_router.include_router(events_media_router)
+events_router.include_router(events_configuration_router)
+events_router.include_router(events_admin_router)
 
 
 @events_router.get("/my-events", response_model=List[EventModelWithRol])
@@ -87,67 +88,6 @@ async def read_event_general(event_id: str, db: SessionDep,
     return event
 
 
-@events_router.get("/{event_id}/configuration")
-async def get_event_configuration(
-    _: EventOrganizerDep,
-    event_id: str,
-    db: SessionDep
-) -> FullEventSchema:
-    event = await get_event(db, event_id)
-    return event
-
-
-@events_router.put("/{event_id}/general", status_code=204, response_model=None)
-async def update_general_event(
-    _: EventOrganizerDep,
-    event_id: str,
-    event_modification: GeneralEventSchema,
-    db: SessionDep
-):
-    current_event = await get_event(db, event_id)
-    await events_crud.update_event(db, current_event, event_modification)
-
-
-@events_router.put("/{event_id}/dates", status_code=204, response_model=None)
-async def update_dates_event(
-    _: EventOrganizerDep,
-    event_id: str,
-    dates_modification: DatesCompleteSchema,
-    db: SessionDep
-):
-    current_event = await get_event(db, event_id)
-    await events_crud.update_dates(db, current_event, dates_modification)
-
-
-@events_router.put("/{event_id}/pricing", status_code=204, response_model=None)
-async def update_pricing_event(
-    _: EventOrganizerDep,
-    event_id: str,
-    pricing_modification: PricingRateSchema,
-    db: SessionDep
-):
-    current_event = await get_event(db, event_id)
-    await events_crud.update_pricing(db, current_event, pricing_modification)
-
-
-@events_router.patch(
-    "/{event_id}/status",
-    status_code=204,
-    response_model=None
-)
-async def change_event_status(
-        caller: CallerUserDep,
-        event_id: str,
-        status_modification: EventStatusSchema,
-        db: SessionDep
-):
-    event = await get_event(db, event_id)
-    await validations.validate_status_change(
-        db, caller, event, status_modification
-    )
-    await events_crud.update_status(db, event, status_modification.status)
-
-
 @events_router.get(
     "/{event_id}/review-skeleton",
     status_code=200
@@ -183,42 +123,3 @@ async def get_dates(
         db: SessionDep
 ) -> DatesCompleteSchema:
     return await events_crud.get_dates(db, event_id, caller.id)
-
-
-@events_router.put(
-    "/{event_id}/review-skeleton",
-    status_code=204,
-    response_model=None
-)
-async def change_review_skeleton(
-        _: EventOrganizerDep,
-        event_id: str,
-        review_skeleton: ReviewSkeletonSchema,
-        db: SessionDep
-):
-    event = await get_event(db, event_id)
-    await events_crud.update_review_skeleton(db, event, review_skeleton)
-
-
-@events_router.get("/{event_id}/upload_url/main_image")
-async def get_main_image_upload_url(
-    _: EventOrganizerDep,
-    event_id: str,
-) -> UploadURLSchema:
-    return get_upload_url(event_id, EventsStaticFiles.MAIN_IMAGE)
-
-
-@events_router.get("/{event_id}/upload_url/banner_image")
-async def get_banner_image_upload_url(
-    _: EventOrganizerDep,
-    event_id: str,
-) -> UploadURLSchema:
-    return get_upload_url(event_id, EventsStaticFiles.BANNER_IMAGE)
-
-
-@events_router.get("/{event_id}/upload_url/brochure")
-async def get_brochure_upload_url(
-    _: EventOrganizerDep,
-    event_id: str,
-) -> UploadURLSchema:
-    return get_upload_url(event_id, EventsStaticFiles.BROCHURE)

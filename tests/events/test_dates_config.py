@@ -1,9 +1,9 @@
+from fastapi.encoders import jsonable_encoder
 from datetime import datetime
 from app.events.schemas import (
     DatesCompleteSchema,
     CustomDateSchema
 )
-from fastapi.encoders import jsonable_encoder
 from ..common import create_headers
 
 
@@ -21,7 +21,7 @@ async def test_put_dates_config(client, admin_data, event_data):
         ]
     )
     response = await client.put(
-        f"/events/{event_data['id']}/dates",
+        f"/events/{event_data['id']}/configuration/dates",
         json=jsonable_encoder(dates),
         headers=create_headers(admin_data.id)
     )

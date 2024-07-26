@@ -1,8 +1,8 @@
+from fastapi.encoders import jsonable_encoder
 from app.events.schemas import (
     FeeSchema,
     PricingRateSchema
 )
-from fastapi.encoders import jsonable_encoder
 from ..common import create_headers
 
 
@@ -21,7 +21,7 @@ async def test_put_pricing_config(client, admin_data, event_data):
     )
 
     response = await client.put(
-        f"/events/{event_data['id']}/pricing",
+        f"/events/{event_data['id']}/configuration/pricing",
         json=jsonable_encoder(pricing_config),
         headers=create_headers(admin_data.id)
     )
