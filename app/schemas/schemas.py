@@ -45,7 +45,7 @@ class StaticEventSchema(BaseModel):
     event_type: EventType = Field(examples=[EventType.CONFERENCE])
 
 
-class DynamicEventSchema(BaseModel):
+class DynamicGeneralEventSchema(BaseModel):
     start_date: datetime | None = Field(examples=[datetime(2024, 8, 1)],
                                         default=None)
     end_date: datetime | None = Field(examples=[datetime(2024, 8, 2)],
@@ -66,8 +66,6 @@ class DynamicEventSchema(BaseModel):
         examples=["Pepe Argento"],
         default=None
     )
-    dates: DatesCompleteSchema | None = None  # TODO: AGREGAR DEFAULT EN VEZ DE NONE.
-    pricing: PricingSchema | None = None
 
     @model_validator(mode='after')
     def check_dates(self) -> Self:
@@ -81,6 +79,11 @@ class DynamicEventSchema(BaseModel):
         if start_date < datetime.now() or end_date < start_date:
             raise ValueError('Invalid Dates.')
         return self
+
+
+class DynamicEventSchema(DynamicGeneralEventSchema):
+    dates: DatesCompleteSchema | None = None  # TODO: AGREGAR DEFAULT EN VEZ DE NONE.
+    pricing: PricingSchema | None = None
 
 
 class EventSchema(StaticEventSchema, DynamicEventSchema):
@@ -124,7 +127,7 @@ class EventModelWithRol(EventSchemaWithEventId):
                              default=[])
 
 
-class GeneralEventSchema(DynamicEventSchema):
+class GeneralEventSchema(DynamicGeneralEventSchema):
     notification_mails: list[str] = Field(default_factory=list)
 
 
