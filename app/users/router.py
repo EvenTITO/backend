@@ -1,5 +1,5 @@
-from app.repository import users_crud
 from fastapi import APIRouter
+from app.repository import users_crud
 from app.utils.dependencies import CallerIdDep
 from app.database.dependencies import SessionDep
 from app.users.dependencies import AdminDep

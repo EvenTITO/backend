@@ -48,6 +48,7 @@ class EventModel(ModelTemplate, Base):
     creator = relationship("UserModel", back_populates="events")
     inscriptions = relationship("InscriptionModel", back_populates="event")
     organizers = relationship("OrganizerModel", back_populates="event")
+    works = relationship("WorkModel", back_populates="event")
 
     @validates("start_date")
     def validate_start_date(self, key, start_date):
@@ -68,6 +69,3 @@ class EventModel(ModelTemplate, Base):
             raise DatesException()
         else:
             return end_date
-
-    def __repr__(self):
-        return f"Event({self.id})"
