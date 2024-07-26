@@ -10,7 +10,7 @@ from .schemas import (
     OrganizerRequestSchema
 )
 from fastapi import APIRouter
-from app.users.router import users_router
+from app.routers.users.users import users_router
 from app.events.router import events_router
 from app.organizers.dependencies import EventOrganizerDep
 from app.users.service import get_user_by_email

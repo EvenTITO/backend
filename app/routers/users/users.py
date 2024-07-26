@@ -3,13 +3,15 @@ from app.repository import users_crud
 from app.utils.dependencies import CallerIdDep
 from app.database.dependencies import SessionDep
 from app.users.dependencies import AdminDep
-from .dependencies import (
+from app.routers.users.roles import user_roles_router
+from app.routers.users.echo import echo_router
+from ...users.dependencies import (
     SameUserOrAdminDep,
     SameUserDep,
 )
 from app.users import validations
 from app.users.service import get_user
-from .schemas import UserSchema, RoleSchema, UserReply
+from ...users.schemas import UserSchema, UserReply
 from typing import List
 
 
@@ -18,11 +20,8 @@ users_router = APIRouter(
     tags=["Users"],
 )
 
-
-@users_router.get("/echo", status_code=200, response_model=None)
-async def echo():
-    print("echo test OK!")
-    return
+users_router.include_router(user_roles_router)
+users_router.include_router(echo_router)
 
 
 @users_router.post("", status_code=201, response_model=str)
@@ -31,22 +30,6 @@ async def create_user(user: UserSchema,
     await validations.validate_user_not_exists(db, caller_id, user.email)
     user_created = await users_crud.create_user(db=db, id=caller_id, user=user)
     return user_created.id
-
-
-@users_router.patch(
-    "/{user_id}/roles", status_code=204, response_model=None
-)
-async def update_user_role(
-    user_id: str, role: RoleSchema, caller_user: AdminDep, db: SessionDep
-):
-    await validations.validate_always_at_least_one_admin(
-        db,
-        user_id,
-        caller_user,
-        role
-    )
-    current_user = await get_user(db, user_id)
-    await users_crud.update_role(db, current_user, role.role)
 
 
 @users_router.get("/{user_id}", response_model=UserReply)
