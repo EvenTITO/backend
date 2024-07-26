@@ -9,7 +9,7 @@ from app.database.dependencies import get_db
 from app.models.user import UserRole
 from app.schemas.users.user_role import UserRoleSchema
 from app.repository.users_crud import update_role
-from app.users.service import get_user
+from app.services.users.users_service import get_user_by_id
 from app.main import app
 from app.database.database import SessionLocal, engine, Base
 from .common import create_headers, EVENTS, get_user_method, USERS
@@ -126,7 +126,7 @@ async def admin_data(current_session, client):
     )
 
     # id_admin = response.json()
-    user = await get_user(current_session, id_user)
+    user = await get_user_by_id(current_session, id_user)
 
     user_updated = await update_role(
         current_session, user, UserRole.ADMIN.value

@@ -3,8 +3,8 @@ from fastapi import APIRouter
 from app.repository import users_crud
 from app.database.dependencies import SessionDep
 from app.dependencies.user_roles.admin_user_dep import AdminDep
-from app.users import validations
-from app.users.service import get_user
+from app.services.users import validations
+from app.services.users.users_service import get_user_by_id
 from app.schemas.users.user_role import UserRoleSchema
 
 
@@ -24,5 +24,5 @@ async def update_user_role(
         caller_user,
         role
     )
-    current_user = await get_user(db, user_id)
+    current_user = await get_user_by_id(db, user_id)
     await users_crud.update_role(db, current_user, role.role)

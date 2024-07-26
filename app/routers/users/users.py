@@ -5,8 +5,8 @@ from app.routers.users.echo import echo_router
 from app.repository import users_crud
 from app.utils.dependencies import CallerIdDep
 from app.database.dependencies import SessionDep
-from app.users import validations
-from app.users.service import get_user
+from app.services.users import validations
+from app.services.users.users_service import get_user_by_id
 from app.schemas.users.user import UserReply
 from app.dependencies.user_roles.admin_user_dep import AdminDep
 from app.dependencies.user_roles.same_user_or_admin_dep import SameUserOrAdminDep
@@ -27,7 +27,7 @@ users_router.include_router(user_roles_router)
     tags=["Users: General"]
 )
 async def read_user(user_id: str, db: SessionDep, _: SameUserOrAdminDep):
-    return await get_user(db, user_id)
+    return await get_user_by_id(db, user_id)
 
 
 @users_router.post(
@@ -67,7 +67,7 @@ async def update_user(
     tags=["Users: General"]
 )
 async def delete_user(user_id: str, _: SameUserOrAdminDep, db: SessionDep):
-    user = await get_user(db, user_id)
+    user = await get_user_by_id(db, user_id)
     await users_crud.delete_user(db=db, user=user)
 
 

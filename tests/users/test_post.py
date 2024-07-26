@@ -1,7 +1,7 @@
 from app.schemas.users.user import UserSchema
 from fastapi.encoders import jsonable_encoder
 from ..common import create_headers
-from app.users.exceptions import EmailAlreadyExists, IdAlreadyExists
+from app.services.users.exceptions import EmailAlreadyExists, IdAlreadyExists
 
 
 async def test_create_user(client):

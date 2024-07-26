@@ -6,7 +6,7 @@ from .exceptions import (
     UserNotFound,
     EmailCantChange
 )
-from ..models.user import UserRole
+from ...models.user import UserRole
 
 
 async def validate_user_exists_with_id(db, id_user):
@@ -33,11 +33,6 @@ async def validate_always_at_least_one_admin(db, user_id, caller_user, role):
             and (await users_crud.get_amount_admins(db) == 1)
     ):
         raise CantRemoveLastAdmin()
-
-
-def validate_user_exists(user, user_id):
-    if not user:
-        raise UserNotFound(user_id)
 
 
 def validate_user_change(user, caller_user):
