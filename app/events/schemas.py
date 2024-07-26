@@ -123,19 +123,13 @@ class EventStatusSchema(BaseModel):
     status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
 
 
-class EventSchemaWithEventId(EventSchema, EventStatusSchema):
-    id: str = Field(examples=["..."])
-
-
 class ImgSchema(BaseModel):
     name: str = Field(max_length=100, examples=["main_image_url"])
     url: str = Field(max_length=1000, examples=["https://go.com/img.png"])
 
 
-class EventModelWithRol(EventSchemaWithEventId):
-    model_config = ConfigDict(from_attributes=True)
-    roles: list[str] = Field(examples=[["ORGANIZER"]],
-                             default=[])
+class EventSchemaWithEventId(EventSchema, EventStatusSchema):
+    id: str = Field(examples=["..."])
 
     @computed_field
     def media(self) -> list[ImgSchema]:
@@ -154,6 +148,12 @@ class EventModelWithRol(EventSchemaWithEventId):
                     self.id, EventsStaticFiles.BANNER_IMAGE),
             )
         ]
+
+
+class EventModelWithRol(EventSchemaWithEventId):
+    model_config = ConfigDict(from_attributes=True)
+    roles: list[str] = Field(examples=[["ORGANIZER"]],
+                             default=[])
 
 
 class GeneralEventSchema(DynamicEventSchema):

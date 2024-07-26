@@ -30,7 +30,7 @@ async def read_my_events(
         db: SessionDep,
         caller_user: CallerUserDep,
         offset: int = 0,
-        limit: int = Query(default=100, le=100)
+        limit: int = Query(default=100, le=100)  # TODO: use offset & limit.
 ):
     return await events_crud.get_all_events_for_user(db, caller_user.id)
 
