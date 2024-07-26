@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.users.dependencies import CallerUserDep
+from app.dependencies.caller_user_dep import CallerUserDep
 from app.repository import events_crud
 from app.database.dependencies import SessionDep
 from app.organizers.dependencies import EventOrganizerDep

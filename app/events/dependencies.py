@@ -3,7 +3,8 @@ from fastapi import Depends, Header
 from app.database.dependencies import SessionDep
 from app.models.event import EventModel
 from app.models.event import EventStatus
-from app.users.dependencies import admin_user_checker, caller_user_checker
+from app.dependencies.admin_user_dep import admin_user_checker
+from app.dependencies.caller_user_dep import caller_user_checker
 from app.utils.dependencies import get_user_id
 
 

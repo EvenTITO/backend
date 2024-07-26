@@ -5,14 +5,12 @@ from app.routers.users.echo import echo_router
 from app.repository import users_crud
 from app.utils.dependencies import CallerIdDep
 from app.database.dependencies import SessionDep
-from app.users.dependencies import (
-    SameUserOrAdminDep,
-    SameUserDep,
-)
 from app.users import validations
 from app.users.service import get_user
 from app.schemas.users.user import UserReply
-from app.users.dependencies import AdminDep
+from app.dependencies.admin_user_dep import AdminDep
+from app.dependencies.same_user_or_admin_dep import SameUserOrAdminDep
+from app.dependencies.same_user_dep import SameUserDep
 
 
 users_router = APIRouter(
