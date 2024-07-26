@@ -8,9 +8,9 @@ from app.database.dependencies import SessionDep
 from app.users import validations
 from app.users.service import get_user
 from app.schemas.users.user import UserReply
-from app.dependencies.admin_user_dep import AdminDep
-from app.dependencies.same_user_or_admin_dep import SameUserOrAdminDep
-from app.dependencies.same_user_dep import SameUserDep
+from app.dependencies.user_roles.admin_user_dep import AdminDep
+from app.dependencies.user_roles.same_user_or_admin_dep import SameUserOrAdminDep
+from app.dependencies.user_roles.same_user_dep import SameUserDep
 
 
 users_router = APIRouter(

@@ -1,7 +1,7 @@
 from typing import Annotated
 from app.models.user import UserModel, UserRole
 from fastapi import HTTPException, Depends
-from app.dependencies.caller_user_dep import CallerUserDep
+from app.dependencies.user_roles.caller_user_dep import CallerUserDep
 
 
 class CreatorOrAdminUser:
@@ -13,4 +13,4 @@ class CreatorOrAdminUser:
 
 
 creator_or_admin_user = CreatorOrAdminUser()
-CreatorOrAdminUserDep = Annotated[UserModel, Depends(creator_or_admin_user)]
+EventCreatorDep = Annotated[UserModel, Depends(creator_or_admin_user)]

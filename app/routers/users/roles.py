@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from app.repository import users_crud
 from app.database.dependencies import SessionDep
-from app.dependencies.admin_user_dep import AdminDep
+from app.dependencies.user_roles.admin_user_dep import AdminDep
 from app.users import validations
 from app.users.service import get_user
 from app.schemas.users.user_role import UserRoleSchema

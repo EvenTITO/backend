@@ -1,7 +1,7 @@
 from typing import Annotated
 from app.models.user import UserModel, UserRole
 from fastapi import HTTPException, Depends
-from app.dependencies.caller_user_dep import CallerUserDep
+from app.dependencies.user_roles.caller_user_dep import CallerUserDep
 
 
 class AdminUser:
