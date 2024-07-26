@@ -19,13 +19,13 @@ from app.routers.events.media import events_media_router
 from app.routers.events.configuration.configuration import events_configuration_router
 from app.routers.events.administration import events_admin_router
 
-events_router = APIRouter(prefix="/events", tags=["Events"])
+events_router = APIRouter(prefix="/events")
 events_router.include_router(events_media_router)
 events_router.include_router(events_configuration_router)
 events_router.include_router(events_admin_router)
 
 
-@events_router.get("/my-events", response_model=List[EventModelWithRol])
+@events_router.get("/my-events", response_model=List[EventModelWithRol], tags=["Events: General"])
 async def read_my_events(
         db: SessionDep,
         caller_user: CallerUserDep,
@@ -35,7 +35,7 @@ async def read_my_events(
     return await events_crud.get_all_events_for_user(db, caller_user.id)
 
 
-@events_router.get("/", response_model=List[EventSchemaWithEventId])
+@events_router.get("/", response_model=List[EventSchemaWithEventId], tags=["Events: General"])
 async def read_all_events(
         db: SessionDep,
         status_query: GetEventsQuerysDep,
@@ -52,7 +52,7 @@ async def read_all_events(
     )
 
 
-@events_router.post("", status_code=201, response_model=str)
+@events_router.post("", status_code=201, response_model=str, tags=["Events: General"])
 async def create_event(
         event: EventSchema,
         caller_user: CallerUserDep,
@@ -71,7 +71,7 @@ async def create_event(
     return event_created.id
 
 
-@events_router.get("/{event_id}/public", response_model=EventModelWithRol)
+@events_router.get("/{event_id}/public", response_model=EventModelWithRol, tags=["Events: General"])
 async def read_event_general(event_id: str, db: SessionDep,
                              X_User_Id: str = Header(...)):
     event = await get_event(db, event_id)
