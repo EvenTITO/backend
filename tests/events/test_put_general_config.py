@@ -10,7 +10,7 @@ async def test_put_event(client, admin_data, event_data):
     id_event = update_event_data.pop('id')
 
     response = await client.put(
-        f"/events/{id_event}/general",
+        f"/events/{id_event}/configuration/general",
         json=jsonable_encoder(update_event_data),
         headers=create_headers(admin_data.id)
     )
@@ -29,7 +29,7 @@ async def test_put_event_with_invalid_end_date_fails(
     update_event_data["end_date"] = "2024-08-05T00:00:00"
     id_event = update_event_data.pop('id')
     response = await client.put(
-        f"/events/{id_event}/general",
+        f"/events/{id_event}/configuration/general",
         json=jsonable_encoder(update_event_data),
         headers=create_headers(admin_data.id)
     )
@@ -51,7 +51,7 @@ async def test_put_event_different_notif_mails(
     id_event = update_event_data.pop('id')
 
     _ = await client.put(
-        f"/events/{id_event}/general",
+        f"/events/{id_event}/configuration/general",
         json=jsonable_encoder(update_event_data),
         headers=create_headers(admin_data.id)
     )
@@ -77,7 +77,7 @@ async def test_put_event_change_tracks(
     id_event = update_event_data.pop('id')
 
     _ = await client.put(
-        f"/events/{id_event}/general",
+        f"/events/{id_event}/configuration/general",
         json=jsonable_encoder(update_event_data),
         headers=create_headers(admin_data.id)
     )
@@ -108,7 +108,7 @@ async def test_put_many_changes(
     id_event = update_event_data.pop('id')
 
     _ = await client.put(
-        f"/events/{id_event}/general",
+        f"/events/{id_event}/configuration/general",
         json=jsonable_encoder(update_event_data),
         headers=create_headers(admin_data.id)
     )

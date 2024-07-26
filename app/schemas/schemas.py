@@ -11,6 +11,26 @@ from datetime import datetime
 from ..models.event import EventType, EventStatus
 from typing_extensions import Self
 from app.storage.events_storage import EventsStaticFiles, get_public_event_url
+from app.schemas.event_dates import DatesCompleteSchema
+from app.schemas.pricing import PricingSchema
+
+
+class MultipleChoiceQuestion(BaseModel):
+    type_question: Literal['multiple_choice']
+    question: str
+    options: list[str] = Field(examples=[
+        ['first answer', 'second answer', 'third answer']
+    ], min_length=2, max_length=20)
+    more_than_one_answer_allowed: bool = False
+
+
+class SimpleQuestion(BaseModel):
+    type_question: Literal['simple_question']
+    question: str
+
+
+class ReviewSkeletonSchema(BaseModel):
+    questions: list[Union[MultipleChoiceQuestion, SimpleQuestion]]
 
 
 class EventRol(str, Enum):
@@ -46,6 +66,8 @@ class DynamicEventSchema(BaseModel):
         examples=["Pepe Argento"],
         default=None
     )
+    dates: DatesCompleteSchema | None = None  # TODO: AGREGAR DEFAULT EN VEZ DE NONE.
+    pricing: PricingSchema | None = None
 
     @model_validator(mode='after')
     def check_dates(self) -> Self:
@@ -69,19 +91,13 @@ class EventStatusSchema(BaseModel):
     status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
 
 
-class EventSchemaWithEventId(EventSchema, EventStatusSchema):
-    id: str = Field(examples=["..."])
-
-
 class ImgSchema(BaseModel):
     name: str = Field(max_length=100, examples=["main_image_url"])
     url: str = Field(max_length=1000, examples=["https://go.com/img.png"])
 
 
-class EventModelWithRol(EventSchemaWithEventId):
-    model_config = ConfigDict(from_attributes=True)
-    roles: list[str] = Field(examples=[["ORGANIZER", "SUBSCRIBER"]],
-                             default=[])
+class EventSchemaWithEventId(EventSchema, EventStatusSchema):
+    id: str = Field(examples=["..."])
 
     @computed_field
     def media(self) -> list[ImgSchema]:
@@ -102,63 +118,15 @@ class EventModelWithRol(EventSchemaWithEventId):
         ]
 
 
+class EventModelWithRol(EventSchemaWithEventId):
+    model_config = ConfigDict(from_attributes=True)
+    roles: list[str] = Field(examples=[["ORGANIZER"]],
+                             default=[])
+
+
 class GeneralEventSchema(DynamicEventSchema):
     notification_mails: list[str] = Field(default_factory=list)
 
 
-class CustomDateSchema(BaseModel):
-    name: str = Field(min_length=2, max_length=100,
-                      examples=["Presentacion trabajos"], default=None)
-    description: str = Field(min_length=2, max_length=100,
-                             examples=["Inicio fecha"],
-                             default=None)
-    value: datetime = Field(examples=["2023-07-20T15:30:00"], default=None)
-
-
-class DatesCompleteSchema(BaseModel):
-    start_date: datetime | None = Field(examples=["2023-07-20T15:30:00"],
-                                        default=None)
-    end_date: datetime | None = Field(examples=["2023-07-20T15:30:00"],
-                                      default=None)
-    deadline_submission_date: datetime | None = Field(
-        examples=["2023-07-20T15:30:00"], default=None)
-    custom_dates: list[CustomDateSchema]
-
-
-class FeeSchema(BaseModel):
-    name: str = Field(examples=['Students Only Fee']),
-    description: str = Field(examples=['Only Students with certificate']),
-    value: int = Field(examples=[50]),
-    currency: str = Field(examples=['ARS'], default='ARS')
-    need_verification: bool = Field(
-        description='If it is set to True,'
-        ' a validation file must be added in the inscription form'
-    )
-
-
-class PricingRateSchema(BaseModel):
-    rates: list[FeeSchema]
-
-
-class MultipleChoiceQuestion(BaseModel):
-    type_question: Literal['multiple_choice']
-    question: str
-    options: list[str] = Field(examples=[
-        ['first answer', 'second answer', 'third answer']
-    ], min_length=2, max_length=20)
-    more_than_one_answer_allowed: bool = False
-
-
-class SimpleQuestion(BaseModel):
-    type_question: Literal['simple_question']
-    question: str
-
-
-class ReviewSkeletonSchema(BaseModel):
-    questions: list[Union[MultipleChoiceQuestion, SimpleQuestion]]
-
-
 class FullEventSchema(GeneralEventSchema, StaticEventSchema):
-    dates: DatesCompleteSchema | None  # TODO: AGREGAR DEFAULT EN VEZ DE NONE.
-    pricing: PricingRateSchema | None
     review_skeleton: ReviewSkeletonSchema | None

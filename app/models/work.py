@@ -29,6 +29,16 @@ class WorkModel(Base):
         UniqueConstraint('id_event', 'title', name='event_id_title_uc'),
     )
 
-    author = relationship("UserModel", back_populates="works")
+    author = relationship(
+        "UserModel",
+        foreign_keys=[id_author],
+        back_populates="works_as_author"
+    )
+    reviewer = relationship(
+        "UserModel",
+        foreign_keys=[id_reviewer],
+        back_populates="works_as_reviewer"
+    )
     event = relationship("EventModel", back_populates="works")
-    reviewer = relationship("UserModel", back_populates="works")
+
+    submissions = relationship("SubmissionModel", back_populates="work")

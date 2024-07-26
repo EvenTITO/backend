@@ -1,8 +1,8 @@
-from app.events.schemas import (
-    FeeSchema,
-    PricingRateSchema
-)
 from fastapi.encoders import jsonable_encoder
+from app.schemas.pricing import (
+    FeeSchema,
+    PricingSchema
+)
 from ..common import create_headers
 
 
@@ -14,24 +14,24 @@ async def test_put_pricing_config(client, admin_data, event_data):
         currency="ARS",
         need_verification=True
     )
-    pricing_config = PricingRateSchema(
+    pricing_config = PricingSchema(
         rates=[
             students_fee
         ]
     )
 
     response = await client.put(
-        f"/events/{event_data['id']}/pricing",
+        f"/events/{event_data['id']}/configuration/pricing",
         json=jsonable_encoder(pricing_config),
         headers=create_headers(admin_data.id)
     )
     assert response.status_code == 204
 
     response = await client.get(
-        f"/events/{event_data['id']}/pricing",
+        f"/events/{event_data['id']}/public",
         headers=create_headers(admin_data.id)
     )
 
     assert response.status_code == 200
     print(response.json())
-    assert response.json()["rates"][0]["name"] == students_fee.name
+    assert response.json()["pricing"]["rates"][0]["name"] == students_fee.name

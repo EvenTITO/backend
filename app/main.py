@@ -2,8 +2,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.models.user import UserRole
-from app.users.router import users_router
-from app.events.router import events_router
+from app.routers.users.users import users_router
+from app.routers.events.events import events_router
 from app.inscriptions.router import (
     inscriptions_events_router,
     inscriptions_users_router
@@ -22,7 +22,7 @@ from app.reviewers.routers.reviewer import reviewers_router
 
 from app.database.database import Base, engine
 from app.database.dependencies import get_db
-from app.users.crud import create_user, update_role
+from app.repository.users_crud import create_user, update_role
 from app.users.schemas import UserSchema
 import os
 from dotenv import load_dotenv

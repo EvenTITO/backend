@@ -2,6 +2,11 @@ from fastapi import APIRouter
 from app.submissions.schemas.work import Work, WorkWithState, BasicWorkInfo
 from app.submissions.schemas.work_stages import BeforeDeadline, NoReviewStages
 from datetime import datetime
+from app.models.work import WorkModel  # noqa
+from app.models.submission import SubmissionModel  # noqa
+from app.models.review import ReviewModel  # noqa
+
+
 works_router = APIRouter(prefix="/events/{event_id}/works", tags=["Works"])
 
 

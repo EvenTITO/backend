@@ -1,5 +1,5 @@
 from app.models.event import EventModel
-from app.events.schemas import EventSchema
+from app.schemas.schemas import EventSchema
 from app.inscriptions.schemas import (
     InscriptionsForUserSchema,
     InscriptionsInEventResponseSchema

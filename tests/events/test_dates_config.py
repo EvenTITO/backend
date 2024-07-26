@@ -1,9 +1,9 @@
+from fastapi.encoders import jsonable_encoder
 from datetime import datetime
-from app.events.schemas import (
+from app.schemas.event_dates import (
     DatesCompleteSchema,
     CustomDateSchema
 )
-from fastapi.encoders import jsonable_encoder
 from ..common import create_headers
 
 
@@ -21,20 +21,20 @@ async def test_put_dates_config(client, admin_data, event_data):
         ]
     )
     response = await client.put(
-        f"/events/{event_data['id']}/dates",
+        f"/events/{event_data['id']}/configuration/dates",
         json=jsonable_encoder(dates),
         headers=create_headers(admin_data.id)
     )
     assert response.status_code == 204
 
     response = await client.get(
-        f"/events/{event_data['id']}/dates",
+        f"/events/{event_data['id']}/public",
         headers=create_headers(admin_data.id)
     )
 
     assert response.status_code == 200
     dates_json_encoded = dates.model_dump(mode='json')
-    assert response.json()["start_date"] == dates_json_encoded['start_date']
-    assert response.json()["end_date"] == dates_json_encoded['end_date']
-    assert response.json()["custom_dates"][0]['name'] == \
-        dates.custom_dates[0].name
+    dates_response = response.json()["dates"]
+    assert dates_response["start_date"] == dates_json_encoded['start_date']
+    assert dates_response["end_date"] == dates_json_encoded['end_date']
+    assert dates_response["custom_dates"][0]['name'] == dates.custom_dates[0].name

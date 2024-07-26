@@ -1,5 +1,5 @@
 from typing import Annotated
-from app.users.crud import get_user_by_id
+from app.repository.users_crud import get_user_by_id
 from app.users.exceptions import UserNotFound
 from app.models.user import UserModel, UserRole
 from fastapi import HTTPException, Depends

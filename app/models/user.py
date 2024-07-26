@@ -28,6 +28,14 @@ class UserModel(ModelTemplate, Base):
         "OrganizerModel",
         back_populates="organizer"
     )
-
-    def __repr__(self):
-        return f"User({self.id})"
+    works_as_author = relationship(
+        "WorkModel",
+        foreign_keys="[WorkModel.id_author]",
+        back_populates="author"
+    )
+    works_as_reviewer = relationship(
+        "WorkModel",
+        foreign_keys="[WorkModel.id_reviewer]",
+        back_populates="reviewer"
+    )
+    reviews = relationship("ReviewModel", back_populates="reviewer")

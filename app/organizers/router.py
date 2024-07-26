@@ -1,7 +1,7 @@
 from typing import List
 from app.users.dependencies import SameUserOrAdminDep
 from app.database.dependencies import SessionDep
-from app.organizers import crud
+from app.repository import organizers_crud
 from app.utils.dependencies import CallerIdDep
 from .schemas import (
     ModifyInvitationStatusSchema,
@@ -10,8 +10,8 @@ from .schemas import (
     OrganizerRequestSchema
 )
 from fastapi import APIRouter
-from app.users.router import users_router
-from app.events.router import events_router
+from app.routers.users.users import users_router
+from app.routers.events.events import events_router
 from app.organizers.dependencies import EventOrganizerDep
 from app.users.service import get_user_by_email
 
@@ -34,7 +34,7 @@ async def create_organizer(
     db: SessionDep
 ) -> str:
     organizer_user = await get_user_by_email(db, organizer.email_organizer)
-    organizer = await crud.add_organizer_to_event(
+    organizer = await organizers_crud.add_organizer_to_event(
         db,
         organizer_user.id,
         event_id
@@ -50,7 +50,7 @@ async def read_event_organizers(
     _: EventOrganizerDep,
     db: SessionDep
 ):
-    return await crud.get_organizers_in_event(db, event_id)
+    return await organizers_crud.get_organizers_in_event(db, event_id)
 
 
 @organizers_events_router.patch("", status_code=200)
@@ -61,10 +61,12 @@ async def update_status_organizer(
     status_modification: ModifyInvitationStatusSchema,
     db: SessionDep
 ):
-    await crud.update_invitation_status(db,
-                                        caller_id,
-                                        event_id,
-                                        status_modification.invitation_status)
+    await organizers_crud.update_invitation_status(
+        db,
+        caller_id,
+        event_id,
+        status_modification.invitation_status
+    )
     return
 
 
@@ -76,7 +78,7 @@ async def read_user_event_organizes(
     _: SameUserOrAdminDep,
     db: SessionDep
 ):
-    return await crud.get_user_event_organizes(db, user_id)
+    return await organizers_crud.get_user_event_organizes(db, user_id)
 
 
 # @organizers_events_router.delete(
