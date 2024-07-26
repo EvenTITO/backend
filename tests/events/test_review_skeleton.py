@@ -31,7 +31,7 @@ async def test_put_review_skeleton(client, admin_data, event_data):
     assert response.status_code == 204
 
     response = await client.get(
-        f"/events/{event_data['id']}/review-skeleton",
+        f"/events/{event_data['id']}/configuration/review-skeleton",
         headers=create_headers(admin_data.id)
     )
 

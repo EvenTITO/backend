@@ -6,18 +6,14 @@ from app.events.dependencies import GetEventsQuerysDep
 from app.models.event import EventStatus
 from app.repository.organizers_crud import is_organizer
 from app.users.dependencies import CallerUserDep
-from app.organizers.dependencies import EventOrganizerDep
 from app.events import validations
 import app.notifications.events as notifications
 from app.events.utils import get_event
 from app.events.schemas import (
-    DatesCompleteSchema,
     EventSchema,
     EventSchemaWithEventId,
-    PricingRateSchema,
     EventModelWithRol,
     EventRol,
-    ReviewSkeletonSchema,
 )
 from app.routers.events.media import events_media_router
 from app.routers.events.configuration.configuration import events_configuration_router
@@ -86,40 +82,3 @@ async def read_event_general(event_id: str, db: SessionDep,
     if await is_organizer(db, event_id, X_User_Id):
         event.roles.append(EventRol.ORGANIZER)
     return event
-
-
-@events_router.get(
-    "/{event_id}/review-skeleton",
-    status_code=200
-)
-async def get_review_skeleton(
-        _: EventOrganizerDep,
-        caller: CallerUserDep,
-        event_id: str,
-        db: SessionDep
-) -> ReviewSkeletonSchema:
-    return await events_crud.get_review_sckeletor(db, event_id, caller.id)
-
-
-@events_router.get(
-    "/{event_id}/pricing",
-    status_code=200
-)
-async def get_pricing(
-        caller: CallerUserDep,
-        event_id: str,
-        db: SessionDep
-) -> PricingRateSchema:
-    return await events_crud.get_pricing(db, event_id, caller.id)
-
-
-@events_router.get(
-    "/{event_id}/dates",
-    status_code=200
-)
-async def get_dates(
-        caller: CallerUserDep,
-        event_id: str,
-        db: SessionDep
-) -> DatesCompleteSchema:
-    return await events_crud.get_dates(db, event_id, caller.id)

@@ -28,10 +28,10 @@ async def test_put_pricing_config(client, admin_data, event_data):
     assert response.status_code == 204
 
     response = await client.get(
-        f"/events/{event_data['id']}/pricing",
+        f"/events/{event_data['id']}/public",
         headers=create_headers(admin_data.id)
     )
 
     assert response.status_code == 200
     print(response.json())
-    assert response.json()["rates"][0]["name"] == students_fee.name
+    assert response.json()["pricing"]["rates"][0]["name"] == students_fee.name

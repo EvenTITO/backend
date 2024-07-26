@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from app.users.dependencies import CallerUserDep
 from app.repository import events_crud
 from app.database.dependencies import SessionDep
 from app.organizers.dependencies import EventOrganizerDep
@@ -17,3 +18,13 @@ async def change_review_skeleton(
 ):
     event = await get_event(db, event_id)
     await events_crud.update_review_skeleton(db, event, review_skeleton)
+
+
+@review_skeleton_configuration_router.get("", status_code=200)
+async def get_review_skeleton(
+        _: EventOrganizerDep,
+        caller: CallerUserDep,
+        event_id: str,
+        db: SessionDep
+) -> ReviewSkeletonSchema:
+    return await events_crud.get_review_sckeletor(db, event_id, caller.id)

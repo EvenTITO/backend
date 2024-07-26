@@ -11,7 +11,7 @@ from .schemas import (
 )
 from fastapi import APIRouter
 from app.routers.users.users import users_router
-from app.routers.events.router import events_router
+from app.routers.events.events import events_router
 from app.organizers.dependencies import EventOrganizerDep
 from app.users.service import get_user_by_email
 

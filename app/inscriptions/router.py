@@ -7,7 +7,7 @@ from .schemas import (
 from app.database.dependencies import SessionDep
 from app.repository import inscriptions_crud
 from app.routers.users.users import users_router
-from app.routers.events.router import events_router
+from app.routers.events.events import events_router
 from app.inscriptions import validations
 
 inscriptions_PREFIX = '/inscriptions'
