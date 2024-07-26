@@ -2,8 +2,6 @@ from sqlalchemy import (
     Column,
     String,
     Integer,
-    ARRAY,
-    JSON,
     ForeignKeyConstraint
 )
 from sqlalchemy.orm import relationship
@@ -17,10 +15,6 @@ class SubmissionModel(Base):
     id_event = Column(String, primary_key=True)
     id_work = Column(Integer, primary_key=True)
     id = Column(Integer, primary_key=True)
-
-    abstract = Column(String)
-    keywords = Column(ARRAY(String), default='{}')
-    authors = Column(JSON)
 
     review_decision = Column(String, nullable=True)
     review_comments = Column(String, nullable=True)

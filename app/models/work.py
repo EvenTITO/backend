@@ -4,7 +4,9 @@ from sqlalchemy import (
     ForeignKey,
     UniqueConstraint,
     Integer,
-    Date
+    Date,
+    ARRAY,
+    JSON
 )
 from sqlalchemy.orm import relationship
 from app.database.database import Base
@@ -18,7 +20,9 @@ class WorkModel(Base):
 
     title = Column(String, nullable=False)
     track = Column(String, nullable=False)
-    stage = Column(String, nullable=False)
+    abstract = Column(String)
+    keywords = Column(ARRAY(String), default='{}')
+    authors = Column(JSON)
 
     deadline_date = Column(Date)
 
