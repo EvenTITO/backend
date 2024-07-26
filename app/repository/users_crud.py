@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..models.user import UserModel, UserRole
-from ..users.schemas import UserSchema
+from app.schemas.users.user import UserSchema
 from sqlalchemy.future import select
 from sqlalchemy import func
 

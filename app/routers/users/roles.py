@@ -5,7 +5,7 @@ from app.database.dependencies import SessionDep
 from app.users.dependencies import AdminDep
 from app.users import validations
 from app.users.service import get_user
-from ...users.schemas import RoleSchema
+from app.schemas.users.user_role import UserRoleSchema
 
 
 user_roles_router = APIRouter(
@@ -16,7 +16,7 @@ user_roles_router = APIRouter(
 
 @user_roles_router.patch("", status_code=204, response_model=None)
 async def update_user_role(
-    user_id: str, role: RoleSchema, caller_user: AdminDep, db: SessionDep
+    user_id: str, role: UserRoleSchema, caller_user: AdminDep, db: SessionDep
 ):
     await validations.validate_always_at_least_one_admin(
         db,

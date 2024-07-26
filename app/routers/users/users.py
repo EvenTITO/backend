@@ -1,3 +1,4 @@
+from app.schemas.users.user import UserSchema
 from fastapi import APIRouter
 from app.routers.users.roles import user_roles_router
 from app.routers.users.echo import echo_router
@@ -10,7 +11,7 @@ from app.users.dependencies import (
 )
 from app.users import validations
 from app.users.service import get_user
-from app.users.schemas import UserSchema, UserReply
+from app.schemas.users.user import UserReply
 from app.users.dependencies import AdminDep
 
 

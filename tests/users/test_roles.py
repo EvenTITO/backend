@@ -1,5 +1,6 @@
 from app.models.user import UserRole
-from app.users.schemas import UserSchema, RoleSchema
+from app.schemas.users.user import UserSchema
+from app.schemas.users.user_role import UserRoleSchema
 from fastapi.encoders import jsonable_encoder
 from ..common import create_headers, get_user_method
 
@@ -16,7 +17,7 @@ async def test_admin_can_change_default_role_to_admin(
         user_data,
         admin_data
 ):
-    new_role = RoleSchema(
+    new_role = UserRoleSchema(
         role=UserRole.ADMIN.value
     )
     response = await client.patch(
@@ -37,7 +38,7 @@ async def test_change_role_to_event_creator(
     user_data,
     admin_data
 ):
-    new_role = RoleSchema(
+    new_role = UserRoleSchema(
         role=UserRole.EVENT_CREATOR.value
     )
     response = await client.patch(
@@ -57,7 +58,7 @@ async def test_admin_deletes_other_admin_role(
     admin_data
 ):
     # changes user_data to ADMIN
-    new_role = RoleSchema(
+    new_role = UserRoleSchema(
         role=UserRole.ADMIN.value
     )
     _ = await client.patch(
@@ -67,7 +68,7 @@ async def test_admin_deletes_other_admin_role(
     )
 
     # changes user_data to DEFAULT
-    new_role = RoleSchema(
+    new_role = UserRoleSchema(
         role=UserRole.DEFAULT.value
     )
     response = await client.patch(
@@ -88,7 +89,7 @@ async def test_admin_deletes_other_event_creator_role(
     admin_data
 ):
     # changes user_data to EVENT_CREATOR
-    new_role = RoleSchema(
+    new_role = UserRoleSchema(
         role=UserRole.EVENT_CREATOR.value
     )
     _ = await client.patch(
@@ -98,7 +99,7 @@ async def test_admin_deletes_other_event_creator_role(
     )
 
     # changes user_data to DEFAULT
-    new_role = RoleSchema(
+    new_role = UserRoleSchema(
         role=UserRole.DEFAULT.value
     )
     response = await client.patch(
@@ -122,7 +123,7 @@ async def test_not_admin_user_cant_add_admin(client, user_data):
     response = await client.post("/users",
                                  json=jsonable_encoder(non_admin_user),
                                  headers=create_headers(non_admin_id))
-    new_role = RoleSchema(
+    new_role = UserRoleSchema(
         role=UserRole.ADMIN.value
     )
     response = await client.patch(
@@ -143,7 +144,7 @@ async def test_not_admin_user_cant_add_creator(client, user_data):
     response = await client.post("/users",
                                  json=jsonable_encoder(non_admin_user),
                                  headers=create_headers(non_admin_id))
-    new_role = RoleSchema(
+    new_role = UserRoleSchema(
         role=UserRole.EVENT_CREATOR.value
     )
     response = await client.patch(
@@ -159,7 +160,7 @@ async def test_creator_user_cant_add_other_creator(
     user_data,
     admin_data
 ):
-    creator_role = RoleSchema(
+    creator_role = UserRoleSchema(
         role=UserRole.EVENT_CREATOR.value
     )
     await client.patch(
@@ -194,7 +195,7 @@ async def test_user_without_roles_cant_delete_other_admin(
     admin_data
 ):
     # user is trying to change admin_data to DEFAULT
-    new_role = RoleSchema(
+    new_role = UserRoleSchema(
         role=UserRole.DEFAULT.value
     )
     response = await client.patch(
@@ -212,7 +213,7 @@ async def test_event_creator_cant_delete_other_admin(
     admin_data
 ):
     # changes user_data to EVENT_CREATOR
-    new_role = RoleSchema(
+    new_role = UserRoleSchema(
         role=UserRole.EVENT_CREATOR.value
     )
     _ = await client.patch(
@@ -222,7 +223,7 @@ async def test_event_creator_cant_delete_other_admin(
     )
 
     # user is trying to change admin_data to DEFAULT
-    new_role = RoleSchema(
+    new_role = UserRoleSchema(
         role=UserRole.DEFAULT.value
     )
     response = await client.patch(
@@ -236,7 +237,7 @@ async def test_event_creator_cant_delete_other_admin(
 
 async def test_admin_can_change_self(client, user_data, admin_data):
     # add another admin
-    new_role = RoleSchema(
+    new_role = UserRoleSchema(
         role=UserRole.ADMIN.value
     )
     _ = await client.patch(
@@ -245,7 +246,7 @@ async def test_admin_can_change_self(client, user_data, admin_data):
         headers=create_headers(admin_data.id)
     )
 
-    new_role = RoleSchema(
+    new_role = UserRoleSchema(
         role=UserRole.DEFAULT.value
     )
     response = await client.patch(

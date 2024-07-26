@@ -2,7 +2,7 @@ from datetime import datetime
 from app.models.organizer import InvitationStatus
 from pydantic import BaseModel, Field
 from app.schemas.schemas import EventSchema
-from app.users.schemas import UserSchema
+from app.schemas.users.user import UserSchema
 
 
 class OrganizerRequestSchema(BaseModel):

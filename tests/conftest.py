@@ -1,4 +1,5 @@
 from app.storage.schemas import DownloadURLSchema, UploadURLSchema
+from app.schemas.users.user import UserSchema
 import pytest
 from app.models.event import EventStatus, EventType
 from app.schemas.schemas import EventSchema, EventStatusSchema
@@ -6,7 +7,7 @@ from fastapi.encoders import jsonable_encoder
 from app.organizers.schemas import OrganizerRequestSchema
 from app.database.dependencies import get_db
 from app.models.user import UserRole
-from app.users.schemas import UserSchema, RoleSchema
+from app.schemas.users.user_role import UserRoleSchema
 from app.repository.users_crud import update_role
 from app.users.service import get_user
 from app.main import app
@@ -146,7 +147,7 @@ async def event_creator_data(client, admin_data):
         headers=create_headers("lakjsdeuimx213klasmd3")
     )
     user_id = user_id.json()
-    new_role = RoleSchema(
+    new_role = UserRoleSchema(
         role=UserRole.EVENT_CREATOR.value
     )
     _ = await client.patch(

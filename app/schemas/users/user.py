@@ -1,5 +1,5 @@
-from pydantic import BaseModel, EmailStr, Field
-from ..models.user import UserRole
+from pydantic import BaseModel, Field, EmailStr
+from app.schemas.users.user_role import UserRoleSchema
 
 
 class UserSchema(BaseModel):
@@ -8,9 +8,5 @@ class UserSchema(BaseModel):
     email: EmailStr = Field(examples=["pepe.argento@email.com"])
 
 
-class RoleSchema(BaseModel):
-    role: UserRole
-
-
-class UserReply(UserSchema, RoleSchema):
+class UserReply(UserSchema, UserRoleSchema):
     id: str

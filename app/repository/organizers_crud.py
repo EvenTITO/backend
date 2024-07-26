@@ -4,7 +4,7 @@ from app.organizers.exceptions import ExpirationDateException
 from app.organizers.schemas import OrganizationsForUserSchema
 from app.organizers.schemas import OrganizerInEventResponseSchema
 from app.models.user import UserModel
-from app.users.schemas import UserSchema
+from app.schemas.users.user import UserSchema
 from ..models.organizer import InvitationStatus, OrganizerModel
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
