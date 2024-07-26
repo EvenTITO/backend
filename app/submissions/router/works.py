@@ -1,26 +1,28 @@
 from fastapi import APIRouter
-from app.submissions.schemas.work import Work, WorkWithState, BasicWorkInfo
-from app.submissions.schemas.work_stages import BeforeDeadline, NoReviewStages
 from datetime import datetime
+from app.database.dependencies import SessionDep
+from app.submissions.schemas.work import WorkSchema, WorkWithState, BasicWorkInfo
+from app.services.works import works_service
+from app.submissions.schemas.work_stages import BeforeDeadline, NoReviewStages
 from app.models.work import WorkModel  # noqa
 from app.models.submission import SubmissionModel  # noqa
 from app.models.review import ReviewModel  # noqa
-
+from app.dependencies.user_roles.user_id_dep import UserIdDep
 
 works_router = APIRouter(prefix="/events/{event_id}/works", tags=["Works"])
 
 
 @works_router.post("", status_code=201)
-async def create_work(work: Work) -> str:
+async def create_work(work: WorkSchema, event_id: str, user_id: UserIdDep, db: SessionDep) -> int:
     """
     Creates the Work. This call is made by the work author.
     """
-    # TODO
-    return 'this-is-a-mocked-answer'
+    work_id = await works_service.create_work(db, work, event_id, user_id)
+    return work_id
 
 
 @works_router.put("/{work_id}", status_code=204)
-async def update_work(work_update: Work):
+async def update_work(work_update: WorkSchema):
     """
     Author updates the work with work_id. This method is used only
     in the first stage before the first submission deadline date.

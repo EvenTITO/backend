@@ -9,7 +9,7 @@ from .exceptions import (
     EventNotFound, ReviewerFound
 )
 from app.organizers.dependencies import event_organizer_checker
-from ..users.validations import validate_user_exists_with_id
+from ..services.users.validations import validate_user_exists_with_id
 
 
 async def validate_event_exists_with_id(db, event_id):

@@ -1,7 +1,7 @@
 from fastapi.encoders import jsonable_encoder
-from app.users.schemas import UserSchema
+from app.schemas.users.user import UserSchema
 from ..common import create_headers
-from app.users.exceptions import UserNotFound
+from app.services.users.exceptions import UserNotFound
 
 
 async def test_get_user(client, user_data):

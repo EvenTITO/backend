@@ -1,5 +1,5 @@
 from fastapi.encoders import jsonable_encoder
-from app.users.schemas import UserSchema
+from app.schemas.users.user import UserSchema
 from ..common import create_headers
 
 

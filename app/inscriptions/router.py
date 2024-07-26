@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Query
 from typing import List
-from app.users.dependencies import CallerUserDep, SameUserOrAdminDep
+from app.dependencies.user_roles.caller_user_dep import CallerUserDep
+from app.dependencies.user_roles.same_user_or_admin_dep import SameUserOrAdminDep
 from .schemas import (
     InscriptionReplySchema
 )

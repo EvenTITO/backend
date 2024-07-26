@@ -15,11 +15,11 @@ class StaticWorkInfo(BaseModel):
     track: str
 
 
-class Work(StaticWorkInfo, Submission):
+class WorkSchema(StaticWorkInfo, Submission):
     pass
 
 
-class WorkWithState(Work):
+class WorkWithState(WorkSchema):
     state: Union[
         BeforeDeadline,
         WaitingDecision,

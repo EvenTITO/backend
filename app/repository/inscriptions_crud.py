@@ -5,7 +5,7 @@ from app.inscriptions.schemas import (
     InscriptionsInEventResponseSchema
 )
 from app.models.user import UserModel
-from app.users.schemas import UserSchema
+from app.schemas.users.user import UserSchema
 from ..models.inscription import InscriptionModel
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
