@@ -1,4 +1,4 @@
-from app.events.schemas import EventSchema
+from app.schemas.schemas import EventSchema
 from fastapi.encoders import jsonable_encoder
 from app.models.event import EventType
 from datetime import datetime

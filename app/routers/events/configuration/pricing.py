@@ -3,7 +3,7 @@ from app.repository import events_crud
 from app.database.dependencies import SessionDep
 from app.organizers.dependencies import EventOrganizerDep
 from app.events.utils import get_event
-from app.events.schemas import PricingRateSchema
+from app.schemas.schemas import PricingSchema
 
 pricing_configuration_router = APIRouter(prefix="/pricing")
 
@@ -12,7 +12,7 @@ pricing_configuration_router = APIRouter(prefix="/pricing")
 async def update_pricing_event(
     _: EventOrganizerDep,
     event_id: str,
-    pricing_modification: PricingRateSchema,
+    pricing_modification: PricingSchema,
     db: SessionDep
 ):
     current_event = await get_event(db, event_id)

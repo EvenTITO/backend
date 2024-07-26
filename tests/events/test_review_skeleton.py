@@ -1,4 +1,4 @@
-from app.events.schemas import (
+from app.schemas.schemas import (
     ReviewSkeletonSchema,
     MultipleChoiceQuestion,
     SimpleQuestion

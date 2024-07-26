@@ -1,13 +1,13 @@
 from app.models.inscription import InscriptionModel
 from app.models.user import UserModel, UserRole
 from ..models.event import EventModel, EventStatus
-from ..events.schemas import (
+from ..schemas.schemas import (
     DatesCompleteSchema,
     EventRol,
     GeneralEventSchema,
-    PricingRateSchema,
+    PricingSchema,
 )
-from ..events.schemas import (
+from ..schemas.schemas import (
     EventModelWithRol,
     EventSchema,
     ReviewSkeletonSchema
@@ -182,7 +182,7 @@ async def update_status(
 async def update_pricing(
     db: AsyncSession,
     event: EventModel,
-    pricing: PricingRateSchema
+    pricing: PricingSchema
 ):
     event.pricing = pricing.model_dump()
     await db.commit()

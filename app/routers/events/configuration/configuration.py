@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from app.database.dependencies import SessionDep
 from app.organizers.dependencies import EventOrganizerDep
 from app.events.utils import get_event
-from app.events.schemas import FullEventSchema
+from app.schemas.schemas import FullEventSchema
 from app.routers.events.configuration.dates import dates_configuration_router
 from app.routers.events.configuration.general import general_configuration_router
 from app.routers.events.configuration.pricing import pricing_configuration_router

@@ -1,7 +1,7 @@
 from fastapi.encoders import jsonable_encoder
-from app.events.schemas import (
+from app.schemas.pricing import (
     FeeSchema,
-    PricingRateSchema
+    PricingSchema
 )
 from ..common import create_headers
 
@@ -14,7 +14,7 @@ async def test_put_pricing_config(client, admin_data, event_data):
         currency="ARS",
         need_verification=True
     )
-    pricing_config = PricingRateSchema(
+    pricing_config = PricingSchema(
         rates=[
             students_fee
         ]

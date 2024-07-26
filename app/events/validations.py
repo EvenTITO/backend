@@ -3,7 +3,7 @@ from app.repository import events_crud
 from app.repository import reviewers_crud as reviewers_crud
 from app.models.event import EventStatus
 from app.models.user import UserRole
-from .schemas import EventSchema
+from ..schemas.schemas import EventSchema
 from .exceptions import (
     InvalidEventSameTitle,
     EventNotFound, ReviewerFound
