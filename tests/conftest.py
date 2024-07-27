@@ -9,7 +9,7 @@ from app.database.dependencies import get_db
 from app.models.user import UserRole
 from app.schemas.users.user_role import UserRoleSchema
 from app.repository.users_crud import update_role
-from app.services.users.users_service import get_user_by_id
+from app.services.users.users_service import create_user, get_user_by_id
 from app.main import app
 from app.database.database import SessionLocal, engine, Base
 from .common import create_headers, EVENTS, get_user_method, USERS
@@ -31,24 +31,40 @@ async def setup_database(anyio_backend):
     yield
 
 
-@pytest.fixture(scope="function", autouse=True)
-async def current_session():
+@pytest.fixture(scope="session")
+async def connection(anyio_backend):
     async with engine.connect() as connection:
-        async with connection.begin() as transaction:
-            session = SessionLocal(bind=connection)
-            yield session
-            await transaction.rollback()
+        yield connection
 
 
-# Must be async, because the get_db function is async.
-@pytest.fixture(scope="function", autouse=True)
-async def session_override(current_session):
+@pytest.fixture()
+async def transaction(connection):
+    async with connection.begin() as transaction:
+        yield transaction
+
+
+@pytest.fixture(scope="function")
+async def session_override(connection, transaction):
     async def get_db_session_override():
-        yield current_session
+        async_session = SessionLocal(
+            bind=connection,
+            join_transaction_mode="create_savepoint",
+        )
+        async with async_session:
+            yield async_session
 
     app.dependency_overrides[get_db] = get_db_session_override
     yield
-    app.dependency_overrides[get_db] = get_db
+    del app.dependency_overrides[get_db]
+
+    await transaction.rollback()
+
+
+@pytest.fixture(scope="function")
+async def client(session_override):
+    async with AsyncClient(transport=ASGITransport(app=app),
+                           base_url="http://test") as ac:
+        yield ac
 
 
 @pytest.fixture(scope="function")
@@ -73,11 +89,28 @@ async def mock_storage(mocker):
     yield
 
 
-@pytest.fixture(scope="function")
-async def client():
-    async with AsyncClient(transport=ASGITransport(app=app),
-                           base_url="http://test") as ac:
-        yield ac
+# ------------------------- DATA FIXTURES --------------------------
+
+@pytest.fixture(scope="session")
+async def admin_data():
+    session = SessionLocal(
+        bind=engine,
+    )
+    new_user = UserSchema(
+        name="Jorge",
+        lastname="Benitez",
+        email="jbenitez@email.com",
+    )
+    id_user = "iuaealdasldanfas98298329"
+
+    await create_user(session, id_user, new_user)
+    user = await get_user_by_id(session, id_user)
+
+    user_updated = await update_role(
+        session, user, UserRole.ADMIN.value
+    )
+    await session.close()
+    return user_updated
 
 
 @pytest.fixture(scope="function")
@@ -109,29 +142,6 @@ async def post_users(client):
         )
         ids.append(id)
     return ids
-
-
-@pytest.fixture(scope="function")
-async def admin_data(current_session, client):
-    new_user = UserSchema(
-        name="Jorge",
-        lastname="Benitez",
-        email="jbenitez@email.com",
-    )
-    id_user = "iuaealdasldanfas98298329"
-    _ = await client.post(
-        "/users",
-        json=jsonable_encoder(new_user),
-        headers=create_headers(id_user)
-    )
-
-    # id_admin = response.json()
-    user = await get_user_by_id(current_session, id_user)
-
-    user_updated = await update_role(
-        current_session, user, UserRole.ADMIN.value
-    )
-    return user_updated
 
 
 @pytest.fixture(scope="function")

@@ -1,6 +1,6 @@
-from app.submissions.schemas.work_stages import NoReviewStages
+from app.schemas.works.work_stages import NoReviewStages
 from fastapi import APIRouter
-from app.submissions.schemas.work import BasicWorkInfoForAuthor
+from app.schemas.works.work import BasicWorkInfoForAuthor
 
 my_works_router = APIRouter(
     prefix="/events/{event_id}/my-works",

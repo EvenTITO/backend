@@ -121,7 +121,10 @@ async def test_put_many_changes(
     print(response.json())
     assert response.json()['tracks'][0] == new_tracks[0]
     assert response.json()['tracks'][1] == new_tracks[1]
+
+    # the title and description do not change.
     assert response.json()['title'] == event_data["title"]
     assert response.json()['description'] == event_data["description"]
+
     assert response.json()['location'] == update_event_data["location"]
     assert response.json()['contact'] == update_event_data["contact"]

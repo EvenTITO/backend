@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import Literal, Union
-from app.submissions.schemas.work_review import PublicReview, ReviewDecision
+from app.schemas.works.work_review import PublicReview, ReviewDecision
 from pydantic import BaseModel
 from datetime import datetime
 
