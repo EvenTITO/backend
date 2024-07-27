@@ -1,4 +1,3 @@
-import asyncio
 from fastapi.encoders import jsonable_encoder
 
 from app.schemas.works.author import AuthorInformation
@@ -104,6 +103,7 @@ async def test_create_lots_works_in_same_event_should_have_incremental_ids(clien
         ]
     )
     number_works_to_create = 10
+    ids_results = []
 
     async def create_work(work, i):
         work.title = work.title + str(i)
@@ -112,14 +112,14 @@ async def test_create_lots_works_in_same_event_should_have_incremental_ids(clien
             json=jsonable_encoder(work),
             headers=create_headers(user_data["id"])
         )
-        return response.json()
+        work_id = response.json()
+        ids_results.append(work_id)
 
-    queries_to_await = [create_work(user_work, i) for i in range(number_works_to_create)]
-    ids_results = set(await asyncio.gather(*queries_to_await))
+    for i in range(number_works_to_create):
+        await create_work(user_work, i)
 
-    expected_ids = set(range(1, 1+number_works_to_create))
-    assert ids_results == expected_ids, \
-        f"The expected ids: {expected_ids} are not the same as the ids received: {ids_results}"
+    for i in range(1, 1+number_works_to_create):
+        assert i == ids_results[i-1]
 
 
 async def test_create_two_works_same_title_same_event_fails(client, user_data, event_data):

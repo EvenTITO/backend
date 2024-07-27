@@ -9,7 +9,7 @@ from app.database.dependencies import get_db
 from app.models.user import UserRole
 from app.schemas.users.user_role import UserRoleSchema
 from app.repository.users_crud import update_role
-from app.services.users.users_service import get_user_by_id
+from app.services.users.users_service import create_user, get_user_by_id
 from app.main import app
 from app.database.database import SessionLocal, engine, Base
 from .common import create_headers, EVENTS, get_user_method, USERS
@@ -41,17 +41,6 @@ async def connection(anyio_backend):
 async def transaction(connection):
     async with connection.begin() as transaction:
         yield transaction
-
-
-@pytest.fixture()
-async def session(connection, transaction):
-    async_session = SessionLocal(
-        bind=connection,
-        join_transaction_mode="create_savepoint",
-    )
-    yield async_session
-    await async_session.rollback()
-    await async_session.close()
 
 
 @pytest.fixture(scope="function")
@@ -102,6 +91,28 @@ async def mock_storage(mocker):
 
 # ------------------------- DATA FIXTURES --------------------------
 
+@pytest.fixture(scope="session")
+async def admin_data():
+    session = SessionLocal(
+        bind=engine,
+    )
+    new_user = UserSchema(
+        name="Jorge",
+        lastname="Benitez",
+        email="jbenitez@email.com",
+    )
+    id_user = "iuaealdasldanfas98298329"
+
+    await create_user(session, id_user, new_user)
+    user = await get_user_by_id(session, id_user)
+
+    user_updated = await update_role(
+        session, user, UserRole.ADMIN.value
+    )
+    await session.close()
+    return user_updated
+
+
 @pytest.fixture(scope="function")
 async def user_data(client):
     new_user = UserSchema(
@@ -131,29 +142,6 @@ async def post_users(client):
         )
         ids.append(id)
     return ids
-
-
-@pytest.fixture(scope="function")
-async def admin_data(session, client):
-    new_user = UserSchema(
-        name="Jorge",
-        lastname="Benitez",
-        email="jbenitez@email.com",
-    )
-    id_user = "iuaealdasldanfas98298329"
-    _ = await client.post(
-        "/users",
-        json=jsonable_encoder(new_user),
-        headers=create_headers(id_user)
-    )
-
-    # id_admin = response.json()
-    user = await get_user_by_id(session, id_user)
-
-    user_updated = await update_role(
-        session, user, UserRole.ADMIN.value
-    )
-    return user_updated
 
 
 @pytest.fixture(scope="function")
