@@ -2,7 +2,7 @@ from app.storage.schemas import DownloadURLSchema, UploadURLSchema
 from app.schemas.users.user import UserSchema
 import pytest
 from app.models.event import EventStatus, EventType
-from app.schemas.schemas import EventSchema, EventStatusSchema
+from app.schemas.events.schemas import EventSchema, EventStatusSchema
 from fastapi.encoders import jsonable_encoder
 from app.organizers.schemas import OrganizerRequestSchema
 from app.database.dependencies import get_db

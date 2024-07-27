@@ -1,5 +1,5 @@
 from app.models.event import EventModel
-from app.schemas.schemas import EventSchema
+from app.schemas.events.schemas import EventSchema
 from app.organizers.exceptions import ExpirationDateException
 from app.organizers.schemas import OrganizationsForUserSchema
 from app.organizers.schemas import OrganizerInEventResponseSchema

@@ -8,7 +8,7 @@ from pydantic import (
 )
 from datetime import datetime
 
-from ..models.event import EventType, EventStatus
+from ...models.event import EventType, EventStatus
 from typing_extensions import Self
 from app.storage.events_storage import EventsStaticFiles, get_public_event_url
 from app.schemas.events.dates import DatesCompleteSchema

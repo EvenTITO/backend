@@ -1,5 +1,5 @@
 from app.schemas.events.review_skeleton.review_skeleton import ReviewSkeletonSchema
-from app.schemas.schemas import DynamicEventSchema, GeneralEventSchema, StaticEventSchema
+from app.schemas.events.schemas import DynamicEventSchema, GeneralEventSchema, StaticEventSchema
 
 
 class EventConfigurationSchema(GeneralEventSchema, DynamicEventSchema, StaticEventSchema):

@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 
-from app.schemas.schemas import EventSchema
+from app.schemas.events.schemas import EventSchema
 from app.schemas.users.user import UserSchema
 
 

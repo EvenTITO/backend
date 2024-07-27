@@ -9,7 +9,7 @@ from app.dependencies.user_roles.caller_user_dep import CallerUserDep
 from app.events import validations
 import app.notifications.events as notifications
 from app.events.utils import get_event
-from app.schemas.schemas import (
+from app.schemas.events.schemas import (
     EventSchema,
     EventSchemaWithEventId,
     EventModelWithRol,

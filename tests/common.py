@@ -1,5 +1,5 @@
 from app.schemas.users.user import UserSchema
-from app.schemas.schemas import EventSchema
+from app.schemas.events.schemas import EventSchema
 from app.models.event import EventType
 from app.schemas.works.author import AuthorInformation
 from app.schemas.works.work import WorkSchema

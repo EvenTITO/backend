@@ -4,7 +4,7 @@ from app.database.dependencies import SessionDep
 from app.dependencies.user_roles.caller_user_dep import CallerUserDep
 from app.events import validations
 from ...events.utils import get_event
-from ...schemas.schemas import EventStatusSchema
+from ...schemas.events.schemas import EventStatusSchema
 
 
 events_admin_router = APIRouter(prefix="/{event_id}", tags=["Events: Administration"])
