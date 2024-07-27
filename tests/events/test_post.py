@@ -8,8 +8,6 @@ from ..common import create_headers
 async def test_post_event(client, admin_data):
     new_event = CreateEventSchema(
         title="Event Title",
-        start_date=datetime(2024, 9, 2),
-        end_date=datetime(2024, 9, 3),
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
         location='Paseo Colon 850',
@@ -29,8 +27,6 @@ async def test_post_event(client, admin_data):
 async def test_post_event_with_event_creator(client, event_creator_data):
     new_event = CreateEventSchema(
         title="Event Title",
-        start_date=datetime(2024, 9, 2),
-        end_date=datetime(2024, 9, 3),
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
         location='Paseo Colon 850',
@@ -47,8 +43,6 @@ async def test_post_event_with_event_creator(client, event_creator_data):
 async def test_post_event_invalid_user(client):
     event = CreateEventSchema(
         title="Another Event Title",
-        start_date=datetime(2024, 9, 2),
-        end_date=datetime(2024, 9, 3),
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
         location='Paseo Colon 850',
@@ -67,7 +61,9 @@ async def test_post_event_past_dates_fails(client, admin_data):
     json = jsonable_encoder({
         'title': "Event Title",
         'start_date': "2023-09-02",
-        'end_date': "2023-09-04",
+        'dates': {
+
+        }"2023-09-04",
         'description': "This is a nice event",
         'event_type': EventType.CONFERENCE,
         'location': 'Paseo Colon 850',
