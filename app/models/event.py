@@ -35,7 +35,7 @@ class EventModel(ModelTemplate, Base):
     location = Column(String)
     tracks = Column(ARRAY(String))
 
-    notification_mails = Column(ARRAY(String), default='{}')
+    notification_mails = Column(ARRAY(String))
 
     review_skeleton = Column(JSON, default=None)
     pricing = Column(JSON, default=None)

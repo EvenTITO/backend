@@ -20,11 +20,11 @@ class WorkModel(Base):
 
     title = Column(String, nullable=False)
     track = Column(String, nullable=False)
-    abstract = Column(String)
-    keywords = Column(ARRAY(String), default='{}')
-    authors = Column(JSON)
+    abstract = Column(String, nullable=False)
+    keywords = Column(ARRAY(String), nullable=False)
+    authors = Column(JSON, nullable=False)
 
-    deadline_date = Column(Date)
+    deadline_date = Column(Date, nullable=False)
 
     id_author = Column(String, ForeignKey("users.id"), nullable=False)
     id_reviewer = Column(String, ForeignKey("users.id"), nullable=True)

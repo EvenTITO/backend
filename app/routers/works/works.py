@@ -1,3 +1,4 @@
+# flake8: noqa
 from fastapi import APIRouter
 from datetime import datetime
 from app.database.dependencies import SessionDep
