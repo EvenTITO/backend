@@ -1,5 +1,5 @@
 from app.models.event import EventModel
-from app.schemas.events.schemas import EventSchema
+from app.schemas.events.create_event import CreateEventSchema
 from app.organizers.exceptions import ExpirationDateException
 from app.organizers.schemas import OrganizationsForUserSchema
 from app.organizers.schemas import OrganizerInEventResponseSchema
@@ -84,7 +84,7 @@ async def get_user_event_organizes(db: AsyncSession, user_id: str):
             id_event=organizer.id_event,
             id_organizer=organizer.id_organizer,
             invitation_date=organizer.creation_date,
-            event=EventSchema(
+            event=CreateEventSchema(
                 title=event.title,
                 start_date=event.start_date,
                 end_date=event.end_date,

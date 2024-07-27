@@ -1,4 +1,4 @@
-from app.schemas.events.schemas import EventSchema
+from app.schemas.events.create_event import CreateEventSchema
 from fastapi.encoders import jsonable_encoder
 from app.models.event import EventType
 from datetime import datetime
@@ -6,7 +6,7 @@ from ..common import create_headers
 
 
 async def test_post_event(client, admin_data):
-    new_event = EventSchema(
+    new_event = CreateEventSchema(
         title="Event Title",
         start_date=datetime(2024, 9, 2),
         end_date=datetime(2024, 9, 3),
@@ -27,7 +27,7 @@ async def test_post_event(client, admin_data):
 
 
 async def test_post_event_with_event_creator(client, event_creator_data):
-    new_event = EventSchema(
+    new_event = CreateEventSchema(
         title="Event Title",
         start_date=datetime(2024, 9, 2),
         end_date=datetime(2024, 9, 3),
@@ -45,7 +45,7 @@ async def test_post_event_with_event_creator(client, event_creator_data):
 
 
 async def test_post_event_invalid_user(client):
-    event = EventSchema(
+    event = CreateEventSchema(
         title="Another Event Title",
         start_date=datetime(2024, 9, 2),
         end_date=datetime(2024, 9, 3),

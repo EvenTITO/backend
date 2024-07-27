@@ -1,16 +1,14 @@
 from enum import Enum
 from pydantic import (
     BaseModel,
-    ConfigDict,
     Field,
-    model_validator,
-    computed_field
+    model_validator
 )
 from datetime import datetime
 
-from ...models.event import EventType, EventStatus
+
+from ...models.event import EventType
 from typing_extensions import Self
-from app.storage.events_storage import EventsStaticFiles, get_public_event_url
 from app.schemas.events.dates import DatesCompleteSchema
 from app.schemas.events.pricing import PricingSchema
 
@@ -74,48 +72,3 @@ class DynamicGeneralEventSchema(BaseModel):
 class DynamicEventSchema(DynamicGeneralEventSchema):
     dates: DatesCompleteSchema | None = None  # TODO: AGREGAR DEFAULT EN VEZ DE NONE.
     pricing: PricingSchema | None = None
-
-
-class EventSchema(StaticEventSchema, DynamicEventSchema):
-    pass
-
-
-class EventStatusSchema(BaseModel):
-    status: EventStatus = Field(examples=[EventStatus.WAITING_APPROVAL])
-
-
-class ImgSchema(BaseModel):
-    name: str = Field(max_length=100, examples=["main_image_url"])
-    url: str = Field(max_length=1000, examples=["https://go.com/img.png"])
-
-
-class EventSchemaWithEventId(EventSchema, EventStatusSchema):
-    id: str = Field(examples=["..."])
-
-    @computed_field
-    def media(self) -> list[ImgSchema]:
-        return [
-            ImgSchema(
-                name='main_image_url',
-                url=get_public_event_url(self.id, EventsStaticFiles.MAIN_IMAGE)
-            ),
-            ImgSchema(
-                name='brochure_url',
-                url=get_public_event_url(self.id, EventsStaticFiles.BROCHURE)
-            ),
-            ImgSchema(
-                name='banner_image_url',
-                url=get_public_event_url(
-                    self.id, EventsStaticFiles.BANNER_IMAGE),
-            )
-        ]
-
-
-class EventModelWithRol(EventSchemaWithEventId):
-    model_config = ConfigDict(from_attributes=True)
-    roles: list[str] = Field(examples=[["ORGANIZER"]],
-                             default=[])
-
-
-class GeneralEventSchema(DynamicGeneralEventSchema):
-    notification_mails: list[str] = Field(default_factory=list)

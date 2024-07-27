@@ -2,7 +2,7 @@ from datetime import datetime
 from fastapi.encoders import jsonable_encoder
 from app.models.event import EventType
 from app.schemas.events.schemas import EventRol
-from app.schemas.events.schemas import EventSchema
+from app.schemas.events.create_event import CreateEventSchema
 from ..common import create_headers
 
 
@@ -14,7 +14,7 @@ async def test_get_my_events_no_events_empty_list(client, user_data):
 
 
 async def test_get_my_events(client, event_data, user_data):
-    new_event = EventSchema(
+    new_event = CreateEventSchema(
         title="Some Event Title",
         start_date=datetime(2024, 9, 2),
         end_date=datetime(2024, 9, 3),

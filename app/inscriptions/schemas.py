@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 
-from app.schemas.events.schemas import EventSchema
+from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.users.user import UserSchema
 
 
@@ -17,4 +17,4 @@ class InscriptionsInEventResponseSchema(InscriptionReplySchema):
 
 
 class InscriptionsForUserSchema(InscriptionReplySchema):
-    event: EventSchema
+    event: CreateEventSchema

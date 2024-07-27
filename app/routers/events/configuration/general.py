@@ -3,7 +3,7 @@ from app.repository import events_crud
 from app.database.dependencies import SessionDep
 from app.organizers.dependencies import EventOrganizerDep
 from app.events.utils import get_event
-from app.schemas.events.schemas import GeneralEventSchema
+from app.schemas.events.configuration_general import ConfigurationGeneralEventSchema
 
 
 general_configuration_router = APIRouter(prefix="/general")
@@ -13,7 +13,7 @@ general_configuration_router = APIRouter(prefix="/general")
 async def update_general_event(
     _: EventOrganizerDep,
     event_id: str,
-    event_modification: GeneralEventSchema,
+    event_modification: ConfigurationGeneralEventSchema,
     db: SessionDep
 ):
     current_event = await get_event(db, event_id)

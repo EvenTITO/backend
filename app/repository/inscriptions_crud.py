@@ -1,5 +1,5 @@
 from app.models.event import EventModel
-from app.schemas.events.schemas import EventSchema
+from app.schemas.events.create_event import CreateEventSchema
 from app.inscriptions.schemas import (
     InscriptionsForUserSchema,
     InscriptionsInEventResponseSchema
@@ -77,7 +77,7 @@ async def read_user_inscriptions(
             id_inscriptor=inscription.id_inscriptor,
             status=inscription.status,
             creation_date=inscription.creation_date,
-            event=EventSchema(
+            event=CreateEventSchema(
                 title=event.title,
                 start_date=event.start_date,
                 end_date=event.end_date,

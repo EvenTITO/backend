@@ -1,16 +1,16 @@
 from app.models.inscription import InscriptionModel
 from app.models.user import UserModel, UserRole
+from ..schemas.events.configuration_general import ConfigurationGeneralEventSchema
+from ..schemas.events.public_event_with_roles import PublicEventWithRolesSchema
 from ..schemas.events.review_skeleton.review_skeleton import ReviewSkeletonSchema
 from ..models.event import EventModel, EventStatus
 from ..schemas.events.schemas import (
     DatesCompleteSchema,
     EventRol,
-    GeneralEventSchema,
     PricingSchema,
 )
-from ..schemas.events.schemas import (
-    EventModelWithRol,
-    EventSchema
+from ..schemas.events.create_event import (
+    CreateEventSchema
 )
 from sqlalchemy.future import select
 from app.models.organizer import InvitationStatus, OrganizerModel
@@ -71,7 +71,7 @@ async def get_all_events_for_user(db: AsyncSession, user_id: str):
             if event.id in response:
                 response[event.id].roles.append(role)
             else:
-                response[event.id] = EventModelWithRol(
+                response[event.id] = PublicEventWithRolesSchema(
                     id=event.id,
                     title=event.title,
                     start_date=event.start_date,
@@ -116,7 +116,7 @@ async def get_all_events(
     return result.scalars().all()
 
 
-async def create_event(db: AsyncSession, event: EventSchema,
+async def create_event(db: AsyncSession, event: CreateEventSchema,
                        user: UserModel):
     if user.role == UserRole.EVENT_CREATOR:
         status = EventStatus.CREATED
@@ -162,7 +162,7 @@ async def update_general_event(
 async def update_event(
     db: AsyncSession,
     current_event: EventModel,
-    event_modification: GeneralEventSchema
+    event_modification: ConfigurationGeneralEventSchema
 ):
     for attr, value in event_modification.model_dump().items():
         setattr(current_event, attr, value)

@@ -1,5 +1,5 @@
 from app.schemas.users.user import UserSchema
-from app.schemas.events.schemas import EventSchema
+from app.schemas.events.create_event import CreateEventSchema
 from app.models.event import EventType
 from app.schemas.works.author import AuthorInformation
 from app.schemas.works.work import WorkSchema
@@ -47,7 +47,7 @@ USERS = [
 
 
 EVENTS = [
-    EventSchema(
+    CreateEventSchema(
         title="Conferencia de química",
         start_date="2024-09-02",
         end_date="2024-09-04",
@@ -58,7 +58,7 @@ EVENTS = [
         location='Paseo Colon 850',
         tracks=['math', 'chemistry', 'phisics'],
     ),
-    EventSchema(
+    CreateEventSchema(
         title="Maratón de proba",
         start_date="2024-08-01",
         end_date="2024-08-02",
@@ -68,7 +68,7 @@ EVENTS = [
         location='Paseo Colon 850',
         tracks=['math', 'chemistry', 'phisics'],
     ),
-    EventSchema(
+    CreateEventSchema(
         title="Conferencia JIAFES",
         start_date="2024-08-01",
         end_date="2024-08-05",
