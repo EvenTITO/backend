@@ -1,8 +1,9 @@
+from app.schemas.events.create_event import CreateEventSchema
 from app.storage.schemas import DownloadURLSchema, UploadURLSchema
 from app.schemas.users.user import UserSchema
 import pytest
 from app.models.event import EventStatus, EventType
-from app.schemas.schemas import EventSchema, EventStatusSchema
+from app.schemas.events.event_status import EventStatusSchema
 from fastapi.encoders import jsonable_encoder
 from app.organizers.schemas import OrganizerRequestSchema
 from app.database.dependencies import get_db
@@ -172,7 +173,7 @@ async def event_creator_data(client, admin_data):
 
 @pytest.fixture(scope="function")
 async def event_from_event_creator(client, event_creator_data):
-    new_event = EventSchema(
+    new_event = CreateEventSchema(
         title="Event Creator Event",
         start_date="2024-09-02",
         end_date="2024-09-04",
@@ -191,7 +192,7 @@ async def event_from_event_creator(client, event_creator_data):
 
 @pytest.fixture(scope="function")
 async def event_data(client, admin_data):
-    new_event = EventSchema(
+    new_event = CreateEventSchema(
         title="Event Title",
         start_date="2024-09-02",
         end_date="2024-09-04",

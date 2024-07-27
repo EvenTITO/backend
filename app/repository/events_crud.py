@@ -1,16 +1,16 @@
 from app.models.inscription import InscriptionModel
 from app.models.user import UserModel, UserRole
+from ..schemas.events.configuration_general import ConfigurationGeneralEventSchema
+from ..schemas.events.public_event_with_roles import PublicEventWithRolesSchema
+from ..schemas.events.review_skeleton.review_skeleton import ReviewSkeletonSchema
 from ..models.event import EventModel, EventStatus
-from ..schemas.schemas import (
+from ..schemas.events.schemas import (
     DatesCompleteSchema,
     EventRol,
-    GeneralEventSchema,
     PricingSchema,
 )
-from ..schemas.schemas import (
-    EventModelWithRol,
-    EventSchema,
-    ReviewSkeletonSchema
+from ..schemas.events.create_event import (
+    CreateEventSchema
 )
 from sqlalchemy.future import select
 from app.models.organizer import InvitationStatus, OrganizerModel
@@ -71,11 +71,10 @@ async def get_all_events_for_user(db: AsyncSession, user_id: str):
             if event.id in response:
                 response[event.id].roles.append(role)
             else:
-                response[event.id] = EventModelWithRol(
+                response[event.id] = PublicEventWithRolesSchema(
                     id=event.id,
                     title=event.title,
-                    start_date=event.start_date,
-                    end_date=event.end_date,
+                    dates=event.dates,
                     description=event.description,
                     event_type=event.event_type,
                     location=event.location,
@@ -91,7 +90,8 @@ async def get_all_events_for_user(db: AsyncSession, user_id: str):
 
 
 async def get_event_by_id(db: AsyncSession, event_id: str):
-    return await db.get(EventModel, event_id)
+    event = await db.get(EventModel, event_id)
+    return event
 
 
 async def get_event_by_title(db: AsyncSession, event_title: str):
@@ -116,21 +116,22 @@ async def get_all_events(
     return result.scalars().all()
 
 
-async def create_event(db: AsyncSession, event: EventSchema,
+async def create_event(db: AsyncSession, event: CreateEventSchema,
                        user: UserModel):
     if user.role == UserRole.EVENT_CREATOR:
         status = EventStatus.CREATED
     else:
         status = EventStatus.WAITING_APPROVAL
-
     db_event = EventModel(
-        **event.model_dump(),
+        **event.model_dump(mode='json'),
         id_creator=user.id,
         status=status,
         notification_mails=[]
     )
+    print('llegaaste')
     db.add(db_event)
     await db.flush()
+    print('llegaas')
 
     db_organizer = OrganizerModel(
         id_organizer=user.id,
@@ -162,7 +163,7 @@ async def update_general_event(
 async def update_event(
     db: AsyncSession,
     current_event: EventModel,
-    event_modification: GeneralEventSchema
+    event_modification: ConfigurationGeneralEventSchema
 ):
     for attr, value in event_modification.model_dump().items():
         setattr(current_event, attr, value)
@@ -199,9 +200,8 @@ async def update_dates(
     event: EventModel,
     dates: DatesCompleteSchema
 ):
-    event.start_date = dates.start_date
-    event.end_date = dates.end_date
-    event.dates = dates.model_dump(mode='json')
+    dates = dates.model_dump(mode='json')
+    event.dates = dates["dates"]
     await db.commit()
     await db.refresh(event)
     return event

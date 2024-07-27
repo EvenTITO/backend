@@ -1,10 +1,8 @@
-from datetime import datetime
-from app.utils.exceptions import DatesException
-from sqlalchemy import Column, String, Date, ForeignKey, JSON, ARRAY
+from sqlalchemy import Column, String, ForeignKey, JSON, ARRAY
 from app.database.database import Base
 from app.utils.models_utils import ModelTemplate
 from enum import Enum
-from sqlalchemy.orm import relationship, validates
+from sqlalchemy.orm import relationship
 
 
 class EventStatus(str, Enum):
@@ -26,8 +24,6 @@ class EventModel(ModelTemplate, Base):
     __tablename__ = "events"
 
     title = Column(String, nullable=False, unique=True)
-    start_date = Column(Date)
-    end_date = Column(Date)
     description = Column(String)
     event_type = Column(String)
     status = Column(String, default=EventStatus.WAITING_APPROVAL)
@@ -39,7 +35,7 @@ class EventModel(ModelTemplate, Base):
 
     review_skeleton = Column(JSON, default=None)
     pricing = Column(JSON, default=None)
-    dates = Column(JSON, default=None)
+    dates = Column(JSON)
 
     contact = Column(String, nullable=True)
     organized_by = Column(String, nullable=True)
@@ -49,23 +45,3 @@ class EventModel(ModelTemplate, Base):
     inscriptions = relationship("InscriptionModel", back_populates="event")
     organizers = relationship("OrganizerModel", back_populates="event")
     works = relationship("WorkModel", back_populates="event")
-
-    @validates("start_date")
-    def validate_start_date(self, key, start_date):
-        if start_date is None:
-            return start_date
-        if datetime.now() > start_date:
-            raise DatesException()
-        else:
-            return start_date
-
-    @validates("end_date")
-    def validate_end_date(self, key, end_date):
-        if end_date is None:
-            return end_date
-        if datetime.now() > end_date:
-            raise DatesException()
-        elif self.start_date and end_date <= self.start_date:
-            raise DatesException()
-        else:
-            return end_date

@@ -2,7 +2,6 @@
 from datetime import datetime, timedelta
 from fastapi.encoders import jsonable_encoder
 
-from app.schemas.event_dates import CustomDateSchema, DatesCompleteSchema
 from app.schemas.works.author import AuthorInformation
 from app.schemas.works.work import WorkSchema
 from app.schemas.works.work_stages import NoReviewStages

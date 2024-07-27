@@ -9,10 +9,10 @@ from app.dependencies.user_roles.caller_user_dep import CallerUserDep
 from app.events import validations
 import app.notifications.events as notifications
 from app.events.utils import get_event
-from app.schemas.schemas import (
-    EventSchema,
-    EventSchemaWithEventId,
-    EventModelWithRol,
+from app.schemas.events.public_event import PublicEventSchema
+from app.schemas.events.create_event import CreateEventSchema
+from app.schemas.events.public_event_with_roles import PublicEventWithRolesSchema
+from app.schemas.events.schemas import (
     EventRol,
 )
 from app.routers.events.media import events_media_router
@@ -25,7 +25,7 @@ events_router.include_router(events_configuration_router)
 events_router.include_router(events_admin_router)
 
 
-@events_router.get("/my-events", response_model=List[EventModelWithRol], tags=["Events: General"])
+@events_router.get("/my-events", response_model=List[PublicEventWithRolesSchema], tags=["Events: General"])
 async def read_my_events(
         db: SessionDep,
         caller_user: CallerUserDep,
@@ -35,7 +35,7 @@ async def read_my_events(
     return await events_crud.get_all_events_for_user(db, caller_user.id)
 
 
-@events_router.get("/", response_model=List[EventSchemaWithEventId], tags=["Events: General"])
+@events_router.get("/", response_model=List[PublicEventSchema], tags=["Events: General"])
 async def read_all_events(
         db: SessionDep,
         status_query: GetEventsQuerysDep,
@@ -54,7 +54,7 @@ async def read_all_events(
 
 @events_router.post("", status_code=201, response_model=str, tags=["Events: General"])
 async def create_event(
-        event: EventSchema,
+        event: CreateEventSchema,
         caller_user: CallerUserDep,
         db: SessionDep
 ):
@@ -71,12 +71,12 @@ async def create_event(
     return event_created.id
 
 
-@events_router.get("/{event_id}/public", response_model=EventModelWithRol, tags=["Events: General"])
+@events_router.get("/{event_id}/public", response_model=PublicEventWithRolesSchema, tags=["Events: General"])
 async def read_event_general(event_id: str, db: SessionDep,
                              X_User_Id: str = Header(...)):
     event = await get_event(db, event_id)
     event.roles = []
-    event = EventModelWithRol.model_validate(event)
+    event = PublicEventWithRolesSchema.model_validate(event)
     if not X_User_Id:
         return event
     if await is_organizer(db, event_id, X_User_Id):

@@ -1,4 +1,4 @@
-from app.schemas.schemas import EventSchema
+from app.schemas.events.create_event import CreateEventSchema
 from fastapi.encoders import jsonable_encoder
 from app.models.event import EventType
 from datetime import datetime
@@ -6,7 +6,7 @@ from ..common import create_headers
 
 
 async def test_post_event(client, admin_data):
-    new_event = EventSchema(
+    new_event = CreateEventSchema(
         title="Event Title",
         start_date=datetime(2024, 9, 2),
         end_date=datetime(2024, 9, 3),
@@ -27,7 +27,7 @@ async def test_post_event(client, admin_data):
 
 
 async def test_post_event_with_event_creator(client, event_creator_data):
-    new_event = EventSchema(
+    new_event = CreateEventSchema(
         title="Event Title",
         start_date=datetime(2024, 9, 2),
         end_date=datetime(2024, 9, 3),
@@ -45,7 +45,7 @@ async def test_post_event_with_event_creator(client, event_creator_data):
 
 
 async def test_post_event_invalid_user(client):
-    event = EventSchema(
+    event = CreateEventSchema(
         title="Another Event Title",
         start_date=datetime(2024, 9, 2),
         end_date=datetime(2024, 9, 3),
@@ -71,7 +71,7 @@ async def test_post_event_past_dates_fails(client, admin_data):
         'description': "This is a nice event",
         'event_type': EventType.CONFERENCE,
         'location': 'Paseo Colon 850',
-        'tracks': 'math, chemistry, phisics'
+        'tracks': ['math, chemistry, phisics']
     })
     response = await client.post("/events",
                                  json=json,
@@ -87,7 +87,7 @@ async def test_post_event_same_dates_fails(client, admin_data):
         'description': "This is a nice event",
         'event_type': EventType.CONFERENCE,
         'location': 'Paseo Colon 850',
-        'tracks': 'math, chemistry, phisics'
+        'tracks': ['math, chemistry, phisics']
     })
     response = await client.post("/events",
                                  json=json,
@@ -115,7 +115,7 @@ async def test_post_event_start_date_gt_end_date_fails(client, admin_data):
         'description': "This is a nice event",
         'event_type': EventType.CONFERENCE,
         'location': 'Paseo Colon 850',
-        'tracks': 'math, chemistry, phisics'
+        'tracks': ['math, chemistry, phisics']
     })
     response = await client.post("/events",
                                  json=json,

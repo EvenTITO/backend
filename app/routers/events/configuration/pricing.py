@@ -3,7 +3,7 @@ from app.repository import events_crud
 from app.database.dependencies import SessionDep
 from app.organizers.dependencies import EventOrganizerDep
 from app.events.utils import get_event
-from app.schemas.schemas import PricingSchema
+from app.schemas.events.schemas import PricingSchema
 
 pricing_configuration_router = APIRouter(prefix="/pricing")
 

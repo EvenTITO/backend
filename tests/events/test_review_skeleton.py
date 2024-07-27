@@ -1,7 +1,7 @@
-from app.schemas.schemas import (
-    ReviewSkeletonSchema,
-    MultipleChoiceQuestion,
-    SimpleQuestion
+from app.schemas.events.review_skeleton.review_skeleton import ReviewSkeletonSchema
+from app.schemas.events.review_skeleton.simple_question import SimpleQuestion
+from app.schemas.events.review_skeleton.multiples_choice_question import (
+    MultipleChoiceQuestion
 )
 from fastapi.encoders import jsonable_encoder
 from ..common import create_headers
