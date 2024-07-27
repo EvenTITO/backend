@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Literal, Union
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -8,29 +7,13 @@ from pydantic import (
     computed_field
 )
 from datetime import datetime
+
+from app.schemas.events.review_skeleton.review_skeleton import ReviewSkeletonSchema
 from ..models.event import EventType, EventStatus
 from typing_extensions import Self
 from app.storage.events_storage import EventsStaticFiles, get_public_event_url
-from app.schemas.event_dates import DatesCompleteSchema
-from app.schemas.pricing import PricingSchema
-
-
-class MultipleChoiceQuestion(BaseModel):
-    type_question: Literal['multiple_choice']
-    question: str
-    options: list[str] = Field(examples=[
-        ['first answer', 'second answer', 'third answer']
-    ], min_length=2, max_length=20)
-    more_than_one_answer_allowed: bool = False
-
-
-class SimpleQuestion(BaseModel):
-    type_question: Literal['simple_question']
-    question: str
-
-
-class ReviewSkeletonSchema(BaseModel):
-    questions: list[Union[MultipleChoiceQuestion, SimpleQuestion]]
+from app.schemas.events.dates import DatesCompleteSchema
+from app.schemas.events.pricing import PricingSchema
 
 
 class EventRol(str, Enum):

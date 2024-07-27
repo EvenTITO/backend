@@ -1,6 +1,6 @@
 from fastapi.encoders import jsonable_encoder
 from datetime import datetime
-from app.schemas.event_dates import (
+from app.schemas.events.dates import (
     DatesCompleteSchema,
     CustomDateSchema
 )

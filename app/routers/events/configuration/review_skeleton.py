@@ -4,7 +4,7 @@ from app.repository import events_crud
 from app.database.dependencies import SessionDep
 from app.organizers.dependencies import EventOrganizerDep
 from app.events.utils import get_event
-from app.schemas.schemas import ReviewSkeletonSchema
+from app.schemas.events.review_skeleton.review_skeleton import ReviewSkeletonSchema
 
 review_skeleton_configuration_router = APIRouter(prefix="/review-skeleton")
 

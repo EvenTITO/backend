@@ -1,5 +1,5 @@
 from fastapi.encoders import jsonable_encoder
-from app.schemas.pricing import (
+from app.schemas.events.pricing import (
     FeeSchema,
     PricingSchema
 )

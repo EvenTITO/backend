@@ -1,5 +1,6 @@
 from app.models.inscription import InscriptionModel
 from app.models.user import UserModel, UserRole
+from ..schemas.events.review_skeleton.review_skeleton import ReviewSkeletonSchema
 from ..models.event import EventModel, EventStatus
 from ..schemas.schemas import (
     DatesCompleteSchema,
@@ -9,8 +10,7 @@ from ..schemas.schemas import (
 )
 from ..schemas.schemas import (
     EventModelWithRol,
-    EventSchema,
-    ReviewSkeletonSchema
+    EventSchema
 )
 from sqlalchemy.future import select
 from app.models.organizer import InvitationStatus, OrganizerModel
