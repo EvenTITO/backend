@@ -31,13 +31,14 @@ async def update_work(work_update: WorkSchema):
     pass
 
 
-@works_router.get("/{work_id}/")
-async def get_work_author_information() -> WorkWithState:
+@works_router.get("/{work_id}")
+async def get_work_author_information(db: SessionDep, work_id: int, event_id: str) -> WorkWithState:
     """
     Obtain all the work information that the author is allowed
     to see.
     This method is used by the work author.
     """
+    work = await works_service.get_work_author_info(db, work, event_id, user_id)
     return WorkWithState(
         state=BeforeDeadline(
             deadline_date=datetime(2024, 12, 1)

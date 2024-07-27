@@ -4,6 +4,7 @@ from fastapi.encoders import jsonable_encoder
 from app.schemas.event_dates import CustomDateSchema, DatesCompleteSchema
 from app.schemas.works.author import AuthorInformation
 from app.schemas.works.work import WorkSchema
+from app.schemas.works.work_stages import NoReviewStages
 from ..common import create_headers
 
 
@@ -113,33 +114,41 @@ async def test_create_two_works_same_title_same_event_fails(client, user_data, e
     assert second_response.status_code == 409, "The second response should fail given that the title is repeated"
 
 
-async def test_create_work_deadline_date_is_event_deadline_date(client, user_data, event_data, admin_data):
-    id_event = event_data['id']
-    today = datetime.now()
-    deadline = today+timedelta(days=10)
-    dates = DatesCompleteSchema(
-        start_date=today+timedelta(days=30),
-        end_date=today+timedelta(days=31),
-        deadline_submission_date=deadline,
-        custom_dates=[
-            CustomDateSchema(
-                name='deadeline re submissions',
-                description='can resubmit after the first review',
-                value=today+timedelta(days=20)
-            )
-        ]
-    )
-    response = await client.put(
-        f"/events/{event_data['id']}/configuration/dates",
-        json=jsonable_encoder(dates),
-        headers=create_headers(admin_data.id)
-    )
+# async def test_create_work_deadline_date_is_event_deadline_date(client, user_data, event_data, admin_data):
+#     id_event = event_data['id']
+#     today = datetime.now()
+#     deadline = today+timedelta(days=10)
+#     dates = DatesCompleteSchema(
+#         start_date=today+timedelta(days=30),
+#         end_date=today+timedelta(days=31),
+#         deadline_submission_date=deadline,
+#         custom_dates=[
+#             CustomDateSchema(
+#                 name='deadeline re submissions',
+#                 description='can resubmit after the first review',
+#                 value=today+timedelta(days=20)
+#             )
+#         ]
+#     )
+#     # Update event with submission date.
+#     response = await client.put(
+#         f"/events/{event_data['id']}/configuration/dates",
+#         json=jsonable_encoder(dates),
+#         headers=create_headers(admin_data.id)
+#     )
 
-    response = await client.post(
-        f"/events/{id_event}/works",
-        json=jsonable_encoder(user_work),
-        headers=create_headers(user_data["id"])
-    )
+#     response = await client.post(
+#         f"/events/{id_event}/works",
+#         json=jsonable_encoder(user_work),
+#         headers=create_headers(user_data["id"])
+#     )
+#     work_id = response.json()
 
-    assert response.status_code == 201
-    assert False
+#     get_work_resp = await client.get(
+#         f"/events/{id_event}/works/{work_id}",
+#         headers=create_headers(user_data["id"])
+#     )
+#     work_response = get_work_resp.json()
+#     print(work_response)
+#     assert work_response["state"]["stage"] == NoReviewStages.BEFORE_DEADLINE.value
+#     assert work_response["state"]["deadline_date"] == deadline

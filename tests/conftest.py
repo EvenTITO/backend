@@ -12,7 +12,7 @@ from app.repository.users_crud import update_role
 from app.services.users.users_service import create_user, get_user_by_id
 from app.main import app
 from app.database.database import SessionLocal, engine, Base
-from .common import create_headers, EVENTS, get_user_method, USERS
+from .common import WORKS, create_headers, EVENTS, get_user_method, USERS
 from uuid import uuid4
 from httpx import AsyncClient, ASGITransport
 
@@ -264,9 +264,7 @@ async def organizer_id_from_event(client, event_creator_data,
 
 
 @pytest.fixture(scope="function")
-async def event_started(
-        client, event_data, admin_data
-):
+async def event_started(client, event_data, admin_data):
     status_update = EventStatusSchema(
         status=EventStatus.STARTED
     )
@@ -276,3 +274,17 @@ async def event_started(
         headers=create_headers(admin_data.id)
     )
     return event_data['id']
+
+
+@pytest.fixture(scope="function")
+async def event_works(client, user_data, event_data):
+    id_event = event_data['id']
+    for work in WORKS:
+        response = await client.post(
+            f"/events/{id_event}/works",
+            json=jsonable_encoder(work),
+            headers=create_headers(user_data["id"])
+        )
+        work_id = response.json()
+        work['id'] = work_id
+    return WORKS
