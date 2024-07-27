@@ -1,8 +1,10 @@
+from app.schemas.events.dates import DateSchema, MandatoryDates
 from app.schemas.users.user import UserSchema
 from app.schemas.events.create_event import CreateEventSchema
 from app.models.event import EventType
 from app.schemas.works.author import AuthorInformation
 from app.schemas.works.work import WorkSchema
+import datetime
 
 
 async def get_user_method(client, user_id):
@@ -49,8 +51,28 @@ USERS = [
 EVENTS = [
     CreateEventSchema(
         title="Conferencia de química",
-        start_date="2024-09-02",
-        end_date="2024-09-04",
+        dates=[
+            DateSchema(
+                name=MandatoryDates.START_DATE,
+                label='Fecha de Comienzo',
+                description='Fecha de comienzo del evento.',
+                date=datetime.date.today()+datetime.timedelta(days=30),
+                is_mandatory=True
+            ),
+            DateSchema(
+                name=MandatoryDates.END_DATE,
+                label='Fecha de Finalización',
+                description='Fecha de comienzo del evento.',
+                is_mandatory=True,
+                date=datetime.date.today()+datetime.timedelta(days=32)
+            ),
+            DateSchema(
+                name=MandatoryDates.SUBMISSION_DEADLINE_DATE,
+                label='Fecha de envío de trabajos',
+                description='Fecha límite de envío de trabajos.',
+                is_mandatory=True
+            )
+        ],
         description="""
         Conferencia donde se tratará el tema de hidrocarburos
         """,
@@ -60,8 +82,6 @@ EVENTS = [
     ),
     CreateEventSchema(
         title="Maratón de proba",
-        start_date="2024-08-01",
-        end_date="2024-08-02",
         description="Abierta para todos los estudiantes" +
         "de la materia Probabilidad y Estadística",
         event_type=EventType.TALK,
@@ -70,8 +90,6 @@ EVENTS = [
     ),
     CreateEventSchema(
         title="Conferencia JIAFES",
-        start_date="2024-08-01",
-        end_date="2024-08-05",
         description="Nueva edición de la conferencia",
         event_type=EventType.CONFERENCE,
         location='Paseo Colon 850',

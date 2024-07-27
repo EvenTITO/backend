@@ -79,8 +79,6 @@ async def read_user_inscriptions(
             creation_date=inscription.creation_date,
             event=CreateEventSchema(
                 title=event.title,
-                start_date=event.start_date,
-                end_date=event.end_date,
                 event_type=event.event_type,
                 description=event.description,
                 location=event.location,

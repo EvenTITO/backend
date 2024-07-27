@@ -1,22 +1,41 @@
 from fastapi.encoders import jsonable_encoder
-from datetime import datetime
+import datetime
 from app.schemas.events.dates import (
+    DateSchema,
     DatesCompleteSchema,
-    CustomDateSchema
+    MandatoryDates
 )
 from ..common import create_headers
 
 
 async def test_put_dates_config(client, admin_data, event_data):
     dates = DatesCompleteSchema(
-        start_date=datetime(2024, 9, 2),
-        end_date=datetime(2024, 9, 3),
-        deadline_submission_date=datetime(2024, 8, 1),
-        custom_dates=[
-            CustomDateSchema(
-                name='deadeline re submissions',
-                description='can resubmit after the first review',
-                value=datetime(2024, 8, 15)
+        dates=[
+            DateSchema(
+                name=MandatoryDates.START_DATE,
+                label='Fecha de Comienzo',
+                description='Fecha de comienzo del evento.',
+                is_mandatory=True
+            ),
+            DateSchema(
+                name=MandatoryDates.END_DATE,
+                label='Fecha de Finalización',
+                description='Fecha de comienzo del evento.',
+                is_mandatory=True
+            ),
+            DateSchema(
+                name=MandatoryDates.SUBMISSION_DEADLINE_DATE,
+                label='Fecha de envío de trabajos',
+                description='Fecha límite de envío de trabajos.',
+                is_mandatory=True
+            ),
+            DateSchema(
+                name=None,
+                label='deadeline re submissions',
+                description='can resubmit after the first review.',
+                is_mandatory=False,
+                date=datetime.date.today()+datetime.timedelta(days=30),
+                time=datetime.time(15, 30)
             )
         ]
     )
@@ -33,8 +52,8 @@ async def test_put_dates_config(client, admin_data, event_data):
     )
 
     assert response.status_code == 200
-    dates_json_encoded = dates.model_dump(mode='json')
     dates_response = response.json()["dates"]
-    assert dates_response["start_date"] == dates_json_encoded['start_date']
-    assert dates_response["end_date"] == dates_json_encoded['end_date']
-    assert dates_response["custom_dates"][0]['name'] == dates.custom_dates[0].name
+
+    assert dates_response[0]["name"] == MandatoryDates.START_DATE
+    assert dates_response[1]["name"] == MandatoryDates.END_DATE
+    assert dates_response[2]["name"] == MandatoryDates.SUBMISSION_DEADLINE_DATE

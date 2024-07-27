@@ -86,8 +86,6 @@ async def get_user_event_organizes(db: AsyncSession, user_id: str):
             invitation_date=organizer.creation_date,
             event=CreateEventSchema(
                 title=event.title,
-                start_date=event.start_date,
-                end_date=event.end_date,
                 event_type=event.event_type,
                 description=event.description,
                 location=event.location,
