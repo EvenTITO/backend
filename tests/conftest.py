@@ -31,24 +31,51 @@ async def setup_database(anyio_backend):
     yield
 
 
-@pytest.fixture(scope="function", autouse=True)
-async def current_session():
+@pytest.fixture(scope="session")
+async def connection(anyio_backend):
     async with engine.connect() as connection:
-        async with connection.begin() as transaction:
-            session = SessionLocal(bind=connection)
-            yield session
-            await transaction.rollback()
+        yield connection
 
 
-# Must be async, because the get_db function is async.
-@pytest.fixture(scope="function", autouse=True)
-async def session_override(current_session):
+@pytest.fixture()
+async def transaction(connection):
+    async with connection.begin() as transaction:
+        yield transaction
+
+
+@pytest.fixture()
+async def session(connection, transaction):
+    async_session = SessionLocal(
+        bind=connection,
+        join_transaction_mode="create_savepoint",
+    )
+    yield async_session
+    await async_session.rollback()
+    await async_session.close()
+
+
+@pytest.fixture(scope="function")
+async def session_override(connection, transaction):
     async def get_db_session_override():
-        yield current_session
+        async_session = SessionLocal(
+            bind=connection,
+            join_transaction_mode="create_savepoint",
+        )
+        async with async_session:
+            yield async_session
 
     app.dependency_overrides[get_db] = get_db_session_override
     yield
-    app.dependency_overrides[get_db] = get_db
+    del app.dependency_overrides[get_db]
+
+    await transaction.rollback()
+
+
+@pytest.fixture(scope="function")
+async def client(session_override):
+    async with AsyncClient(transport=ASGITransport(app=app),
+                           base_url="http://test") as ac:
+        yield ac
 
 
 @pytest.fixture(scope="function")
@@ -73,12 +100,7 @@ async def mock_storage(mocker):
     yield
 
 
-@pytest.fixture(scope="function")
-async def client():
-    async with AsyncClient(transport=ASGITransport(app=app),
-                           base_url="http://test") as ac:
-        yield ac
-
+# ------------------------- DATA FIXTURES --------------------------
 
 @pytest.fixture(scope="function")
 async def user_data(client):
@@ -112,7 +134,7 @@ async def post_users(client):
 
 
 @pytest.fixture(scope="function")
-async def admin_data(current_session, client):
+async def admin_data(session, client):
     new_user = UserSchema(
         name="Jorge",
         lastname="Benitez",
@@ -126,10 +148,10 @@ async def admin_data(current_session, client):
     )
 
     # id_admin = response.json()
-    user = await get_user_by_id(current_session, id_user)
+    user = await get_user_by_id(session, id_user)
 
     user_updated = await update_role(
-        current_session, user, UserRole.ADMIN.value
+        session, user, UserRole.ADMIN.value
     )
     return user_updated
 
