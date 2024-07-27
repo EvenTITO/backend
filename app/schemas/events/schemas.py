@@ -28,25 +28,33 @@ class StaticEventSchema(BaseModel):
 
 
 class DynamicGeneralEventSchema(BaseModel):
-    start_date: datetime | None = Field(examples=[datetime(2024, 8, 1)],
-                                        default=None)
-    end_date: datetime | None = Field(examples=[datetime(2024, 8, 2)],
-                                      default=None)
-    location: str | None = Field(max_length=200,
-                                 examples=["FIUBA, Av. Paseo Colon 850"],
-                                 default=None)
-    tracks: list[str] | None = Field(max_length=1000,
-                                     examples=[["track1", "track2", "track3"]],
-                                     default=None)
-    contact: str | None = Field(
-        max_length=100,
-        examples=["Pepe"],
+    start_date: datetime | None = Field(
+        examples=[datetime(2024, 8, 1)],
         default=None
     )
-    organized_by: str | None = Field(
+    end_date: datetime | None = Field(
+        examples=[datetime(2024, 8, 2)],
+        default=None
+    )
+    location: str = Field(
+        max_length=200,
+        examples=["FIUBA, Av. Paseo Colon 850"],
+        default=""
+    )
+    tracks: list[str] = Field(
+        max_length=1000,
+        examples=[["track1", "track2", "track3"]],
+        default_factory=list
+    )
+    contact: str = Field(
+        max_length=100,
+        examples=["Pepe"],
+        default=''
+    )
+    organized_by: str = Field(
         max_length=100,
         examples=["Pepe Argento"],
-        default=None
+        default=''
     )
 
     @model_validator(mode='after')
