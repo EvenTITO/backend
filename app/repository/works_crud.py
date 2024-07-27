@@ -1,4 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.sql import exists
 
 from app.models.work import WorkModel
 from app.schemas.works.work import WorkSchema
@@ -20,6 +22,15 @@ async def create_work(db: AsyncSession, work: WorkSchema, event_id: str, deadlin
     return work_model
 
 
+async def work_with_title_exists(db, id_event, title):
+    stmt = select(exists().where(WorkModel.id_event == id_event, WorkModel.title == title))
+    result = await db.execute(stmt)
+    return result.scalar()
+
+
 async def __find_next_id(db, event_id):
     # TODO
     return 1
+
+# max_id = session.query(WorkModel.id).filter_by(id_event=id_event).order_by(WorkModel.id.desc()).first()
+# new_id = (max_id[0] + 1) if max_id else 1
