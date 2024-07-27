@@ -8,7 +8,6 @@ from pydantic import (
 )
 from datetime import datetime
 
-from app.schemas.events.review_skeleton.review_skeleton import ReviewSkeletonSchema
 from ..models.event import EventType, EventStatus
 from typing_extensions import Self
 from app.storage.events_storage import EventsStaticFiles, get_public_event_url
@@ -112,7 +111,3 @@ class EventModelWithRol(EventSchemaWithEventId):
 
 class GeneralEventSchema(DynamicGeneralEventSchema):
     notification_mails: list[str] = Field(default_factory=list)
-
-
-class FullEventSchema(GeneralEventSchema, DynamicEventSchema, StaticEventSchema):
-    review_skeleton: ReviewSkeletonSchema | None
