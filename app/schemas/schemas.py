@@ -131,5 +131,5 @@ class GeneralEventSchema(DynamicGeneralEventSchema):
     notification_mails: list[str] = Field(default_factory=list)
 
 
-class FullEventSchema(GeneralEventSchema, StaticEventSchema):
+class FullEventSchema(GeneralEventSchema, DynamicEventSchema, StaticEventSchema):
     review_skeleton: ReviewSkeletonSchema | None

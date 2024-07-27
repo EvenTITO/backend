@@ -123,8 +123,12 @@ async def create_event(db: AsyncSession, event: EventSchema,
     else:
         status = EventStatus.WAITING_APPROVAL
 
-    db_event = EventModel(**event.model_dump(), id_creator=user.id,
-                          status=status)
+    db_event = EventModel(
+        **event.model_dump(),
+        id_creator=user.id,
+        status=status,
+        notification_mails=[]
+    )
     db.add(db_event)
     await db.flush()
 
