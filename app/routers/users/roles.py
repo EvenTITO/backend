@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.database.dependencies import SessionDep
+from app.dependencies.database.session_dep import SessionDep
 from app.dependencies.user_roles.admin_user_dep import AdminDep
 from app.services.users import users_service
 from app.schemas.users.user_role import UserRoleSchema

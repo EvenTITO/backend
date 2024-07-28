@@ -1,7 +1,7 @@
 from fastapi import Depends
 from typing import Annotated
 
-from app.database.dependencies import SessionDep
+from app.dependencies.database.session_dep import SessionDep
 from app.repository.users_crud import get_user_by_id
 from app.services.users.exceptions import UserNotFound
 from app.utils.dependencies import CallerIdDep

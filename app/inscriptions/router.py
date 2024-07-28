@@ -5,7 +5,7 @@ from app.dependencies.user_roles.same_user_or_admin_dep import SameUserOrAdminDe
 from .schemas import (
     InscriptionReplySchema
 )
-from app.database.dependencies import SessionDep
+from app.dependencies.database.session_dep import SessionDep
 from app.repository import inscriptions_crud
 from app.routers.users.users import users_router
 from app.routers.events.events import events_router

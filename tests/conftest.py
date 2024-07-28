@@ -6,7 +6,7 @@ from app.models.event import EventStatus, EventType
 from app.schemas.events.event_status import EventStatusSchema
 from fastapi.encoders import jsonable_encoder
 from app.organizers.schemas import OrganizerRequestSchema
-from app.database.dependencies import get_db
+from app.dependencies.database.session_dep import get_db
 from app.models.user import UserRole
 from app.schemas.users.user_role import UserRoleSchema
 from app.repository.users_crud import update_role

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from app.repository import events_crud
-from app.database.dependencies import SessionDep
+from app.dependencies.database.session_dep import SessionDep
 from app.dependencies.user_roles.caller_user_dep import CallerUserDep
 from app.events import validations
 from ...events.utils import get_event

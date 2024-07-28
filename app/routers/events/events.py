@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Header, Query
 from typing import List
 from app.repository import events_crud
-from app.database.dependencies import SessionDep
+from app.dependencies.database.session_dep import SessionDep
 from app.events.dependencies import GetEventsQuerysDep
 from app.models.event import EventStatus
 from app.repository.organizers_crud import is_organizer

@@ -1,7 +1,7 @@
 # flake8: noqa
 from fastapi import APIRouter
 from datetime import datetime
-from app.database.dependencies import SessionDep
+from app.dependencies.database.session_dep import SessionDep
 from app.schemas.works.work import WorkSchema, WorkWithState, BasicWorkInfo
 from app.services.works import works_service
 from app.schemas.works.work_stages import BeforeDeadline, NoReviewStages
