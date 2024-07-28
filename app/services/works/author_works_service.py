@@ -1,5 +1,5 @@
 from app.repository.works import WorksRepository
-from app.schemas.works.work import BasicWorkInfoForAuthor, WorkSchema, WorkWithState
+from app.schemas.works.work import WorkSchema, WorkWithState
 from app.schemas.works.work_stages import BeforeDeadline
 from app.utils.services import BaseService
 from datetime import datetime
@@ -14,11 +14,22 @@ class AuthorWorksService(BaseService):
 
     async def get_work(self) -> WorkWithState:
         my_work = await self.works_repository.get_work(event_id=self.event_id, work_id=self.work_id)
-        # print(WorkSchema.model_validate(my_work).model_dump())
         if my_work is None:
             raise Exception('None work')
         if my_work.id_author != self.user_id:
             raise Exception('Not my work')
+        today = datetime.today()
+
+        deadline_date = my_work.deadline_date
+        stage = None
+        if today < deadline_date:
+            # Estoy BEFORE DEADLINE
+            stage = BeforeDeadline(
+                deadline_date=deadline_date
+            )
+        # agregar ultima reivision publica
+        else:
+
         work = WorkSchema.model_validate(obj=my_work)
         stage = BeforeDeadline(
             deadline_date=datetime.today()
@@ -28,14 +39,3 @@ class AuthorWorksService(BaseService):
             **work.model_dump(),
             state=stage
         )
-
-        return my_work
-        stage = "no deadline"
-        last_submission = works_repository.get_last_submission(event_id=self.event_id, work_id=self.work_id)
-        if last_submission == None:
-            if my_work.submission_date < today:
-                stage = "waiting deadline"
-            else:
-                stage = "waiting decision"
-
-        return BasicWorkInfoForAuthor

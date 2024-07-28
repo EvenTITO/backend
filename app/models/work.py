@@ -10,6 +10,15 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from app.database.database import Base
+from enum import Enum
+
+
+class WorkStates(str, Enum):
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+    RE_SUBMIT = "RE_SUBMIT"
+    IN_REVISION = "IN_REVISION"
+    SUBMITTED = "SUBMITTED"
 
 
 class WorkModel(Base):
@@ -24,10 +33,10 @@ class WorkModel(Base):
     keywords = Column(ARRAY(String), nullable=False)
     authors = Column(JSON, nullable=False)
 
+    state = Column(Enum(WorkStates), nullable=False)
     deadline_date = Column(Date, nullable=False)
 
     id_author = Column(String, ForeignKey("users.id"), nullable=False)
-    id_reviewer = Column(String, ForeignKey("users.id"), nullable=True)
 
     __table_args__ = (
         UniqueConstraint('id_event', 'title', name='event_id_title_uc'),
@@ -38,11 +47,5 @@ class WorkModel(Base):
         foreign_keys=[id_author],
         back_populates="works_as_author"
     )
-    reviewer = relationship(
-        "UserModel",
-        foreign_keys=[id_reviewer],
-        back_populates="works_as_reviewer"
-    )
     event = relationship("EventModel", back_populates="works")
-
     submissions = relationship("SubmissionModel", back_populates="work")
