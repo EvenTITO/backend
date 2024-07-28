@@ -1,29 +1,12 @@
 from enum import Enum
 import datetime
+from typing import Self
 from pydantic import (
     BaseModel,
     Field,
+    model_validator,
 )
-# from datetime import datetime
 
-
-# class CustomDateSchema(BaseModel):
-#     name: str = Field(min_length=2, max_length=100,
-#                       examples=["Presentacion trabajos"], default=None)
-#     description: str = Field(min_length=2, max_length=100,
-#                              examples=["Inicio fecha"],
-#                              default=None)
-#     value: datetime = Field(examples=["2023-07-20T15:30:00"], default=None)
-
-
-# class DatesCompleteSchema(BaseModel):
-#     start_date: datetime | None = Field(examples=["2023-07-20T15:30:00"],
-#                                         default=None)
-#     end_date: datetime | None = Field(examples=["2023-07-20T15:30:00"],
-#                                       default=None)
-#     deadline_submission_date: datetime | None = Field(
-#         examples=["2023-07-20T15:30:00"], default=None)
-#     custom_dates: list[CustomDateSchema]
 
 class MandatoryDates(str, Enum):
     START_DATE = 'START_DATE'
@@ -76,20 +59,28 @@ class DatesCompleteSchema(BaseModel):
             )
         ]
     )
-    # TODO: add validator: all mandatory dates should be present with is_mandatory true.
-    # TODO: validate start date before end date.
-    # TODO: validate submission date before start date.
-    # TODO: solo debe haber 3 mandatory que son esas 3 separadas.
 
-    # @model_validator(mode='after')
-    # def check_dates(self) -> Self:
-    #     start_date = self.start_date
-    #     end_date = self.end_date
-    #     if start_date is None and end_date is None:
-    #         return self
-    #     if start_date is None or end_date is None:
-    #         raise ValueError('Both start_date and"\
-    #                          " end_date must be specified.')
-    #     if start_date < datetime.now() or end_date < start_date:
-    #         raise ValueError('Invalid Dates.')
-    #     return self
+    @model_validator(mode='after')
+    def check_mandatory_dates(self) -> Self:
+        mandatory_dates = [date for date in self.dates if date.is_mandatory]
+        if len(mandatory_dates) != len(MandatoryDates):
+            raise ValueError("There should be 3 mandatory dates")
+
+        for date_type in list(MandatoryDates):
+            if date_type not in [date.name for date in mandatory_dates]:
+                raise ValueError("All 3 mandatory dates should be present")
+
+        mandatory_dates_dict = {}
+        for date in mandatory_dates:
+            mandatory_dates_dict[date.name] = date
+        start_date = mandatory_dates_dict[MandatoryDates.START_DATE].date
+        start_time = mandatory_dates_dict[MandatoryDates.START_DATE].time
+        end_date = mandatory_dates_dict[MandatoryDates.END_DATE].date
+        end_time = mandatory_dates_dict[MandatoryDates.END_DATE].time
+        print('dale')
+        if start_date is not None and end_date is not None:
+            print('daleww', start_date, end_date)
+            if (start_date > end_date) or (start_date == end_date and start_time > end_time):
+                print('daleww')
+                raise ValueError('End Date should be after Start Date.')
+        return self
