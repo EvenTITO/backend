@@ -1,5 +1,5 @@
 from typing import Union
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from app.schemas.works.author import AuthorInformation
 from app.schemas.works.work_stages import (
     BeforeDeadline,
@@ -11,6 +11,7 @@ from app.schemas.works.work_stages import (
 
 
 class WorkSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     title: str
     track: str
     abstract: str
@@ -28,7 +29,7 @@ class WorkWithState(WorkSchema):
 
 
 class BasicWorkInfoForAuthor(WorkSchema, WorkStage):
-    id: str
+    id: int
 
 
 class BasicWorkInfo(BasicWorkInfoForAuthor):
