@@ -1,9 +1,10 @@
 import inspect
 from typing import Type, List
 from fastapi import Depends
-from cart.utils.repositories import BaseRepository
-from cart.utils.services import BaseService
-from cart.dependencies.repository import get_repositories
+from app.dependencies.repository import get_repositories
+
+from app.utils.repositories import BaseRepository
+from app.utils.services import BaseService
 
 
 def get_service(service_type: Type[BaseService]):

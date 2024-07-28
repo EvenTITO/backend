@@ -1,7 +1,9 @@
 # flake8: noqa
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from datetime import datetime
 from app.dependencies.database.session_dep import SessionDep
+from app.dependencies.service import get_service
+from app.dependencies.services.works_dep import WorksServiceDep
 from app.schemas.works.work import WorkSchema, WorkWithState, BasicWorkInfo
 from app.services.works import works_service
 from app.schemas.works.work_stages import BeforeDeadline, NoReviewStages
@@ -14,11 +16,11 @@ works_router = APIRouter(prefix="/events/{event_id}/works", tags=["Works"])
 
 
 @works_router.post("", status_code=201)
-async def create_work(work: WorkSchema, event_id: str, user_id: UserIdDep, db: SessionDep) -> int:
+async def create_work(work: WorkSchema, works_service: WorksServiceDep) -> int:
     """
     Creates the Work. This call is made by the work author.
     """
-    work_id = await works_service.create_work(db, work, event_id, user_id)
+    work_id = await works_service.create_work(work)
     return work_id
 
 
