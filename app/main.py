@@ -15,7 +15,7 @@ from app.organizers.router import (
 from app.routers.works.my_reviews import my_reviews_router
 from app.routers.works.my_works import my_works_router
 from app.routers.works.works import works_router
-from app.routers.works.submissions import submissions_router
+# from app.routers.works.submissions import submissions_router
 from app.routers.works.reviews import reviews_router
 from app.routers.works.reviews_management import review_management_router
 from app.reviewers.routers.reviewer import reviewers_router
@@ -102,6 +102,6 @@ app.include_router(reviewers_router)
 app.include_router(my_reviews_router)
 app.include_router(my_works_router)
 app.include_router(works_router)
-app.include_router(submissions_router)
+# app.include_router(submissions_router)
 app.include_router(reviews_router)
 app.include_router(review_management_router)

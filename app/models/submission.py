@@ -2,7 +2,8 @@ from sqlalchemy import (
     Column,
     String,
     Integer,
-    ForeignKeyConstraint
+    ForeignKeyConstraint,
+    Boolean
 )
 from sqlalchemy.orm import relationship
 from app.database.database import Base
@@ -18,6 +19,7 @@ class SubmissionModel(Base):
 
     review_decision = Column(String, nullable=True)
     review_comments = Column(String, nullable=True)
+    public_review = Column(Boolean, nullable=False)
 
     __table_args__ = (
         ForeignKeyConstraint(

@@ -3,9 +3,10 @@ from fastapi import APIRouter, Depends
 from datetime import datetime
 from app.dependencies.database.session_dep import SessionDep
 from app.dependencies.service import get_service
+from app.dependencies.services.author_works_dep import AuthorWorksServiceDep
 from app.dependencies.services.works_dep import WorksServiceDep
 from app.schemas.works.work import WorkSchema, WorkWithState, BasicWorkInfo
-from app.services.works import works_service
+# from app.services.works import works_service
 from app.schemas.works.work_stages import BeforeDeadline, NoReviewStages
 from app.models.work import WorkModel  # noqa
 from app.models.submission import SubmissionModel  # noqa
@@ -35,18 +36,14 @@ async def update_work(work_update: WorkSchema):
 
 
 @works_router.get("/{work_id}")
-async def get_work_author_information(db: SessionDep, work_id: int, event_id: str) -> WorkWithState:
+async def get_work_author_information(works_service: AuthorWorksServiceDep) -> WorkWithState:
     """
     Obtain all the work information that the author is allowed
     to see.
     This method is used by the work author.
     """
-    work = await works_service.get_work_author_info(db, work, event_id, user_id)
-    return WorkWithState(
-        state=BeforeDeadline(
-            deadline_date=datetime(2024, 12, 1)
-        )
-    )
+    work = await works_service.get_work()
+    return work
 
 
 @works_router.get("/")

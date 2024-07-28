@@ -15,8 +15,8 @@ from app.database.database import Base
 class WorkModel(Base):
     __tablename__ = "works"
 
-    id_event = Column(String, ForeignKey("events.id"), primary_key=True)
     id = Column(Integer, primary_key=True)
+    id_event = Column(String, ForeignKey("events.id"), primary_key=True)
 
     title = Column(String, nullable=False)
     track = Column(String, nullable=False)

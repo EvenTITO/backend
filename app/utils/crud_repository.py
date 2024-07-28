@@ -1,16 +1,45 @@
-from fastapi.encoders import jsonable_encoder
-from sqlalchemy import exists
+from pydantic import BaseModel
+from sqlalchemy import and_, exists
 from app.utils.repositories import BaseRepository
 from sqlalchemy.future import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class CRUDBRepository(BaseRepository):
-    model = None
+    def __init__(self, session: AsyncSession, model):
+        super().__init__(session)
+        self.model = model
 
     async def exists(self, id) -> bool:
-        query = select(exists().where(self.model.id == id))
+        conditions = [self.model.id == id]
+        return self._exists_with_conditions(conditions)
+
+    async def _exists_with_conditions(self, conditions):
+        query = select(exists().where(and_(*conditions)))
         result = await self.session.execute(query)
         return result.scalar()
+
+    async def get(self, id):
+        conditions = [self.model.id == id]
+        return self._get_with_conditions(conditions)
+
+    async def _get_with_conditions(self, conditions):
+        query = select(self.model).where(and_(*conditions))
+        result = await self.session.execute(query)
+        return result.scalars().first()
+
+    async def _update_if_exists(self, conditions, object_update):
+        db_object = self._get_with_conditions(conditions)
+        if db_object is None:
+            return None
+        return self._update(db_object, object_update)
+
+    async def _update(self, db_object, object_update: BaseModel):
+        for attr, value in object_update.model_dump(mode='json').items():
+            setattr(db_object, attr, value)
+        await self.session.commit()
+        await self.session.refresh(db_object)
+        return db_object
 
     # def get(self, id):
     #     return self.session.query(self.model).filter(self.model.id == id).first()

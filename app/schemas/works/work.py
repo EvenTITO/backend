@@ -1,5 +1,6 @@
 from typing import Union
 from pydantic import BaseModel
+from app.schemas.works.author import AuthorInformation
 from app.schemas.works.work_stages import (
     BeforeDeadline,
     WaitingDecision,
@@ -7,16 +8,14 @@ from app.schemas.works.work_stages import (
     ReSubmitDecision,
     WorkStage
 )
-from .submission import Submission
 
 
-class StaticWorkInfo(BaseModel):
+class WorkSchema(BaseModel):
     title: str
     track: str
-
-
-class WorkSchema(StaticWorkInfo, Submission):
-    pass
+    abstract: str
+    keywords: list[str]
+    authors: list[AuthorInformation]
 
 
 class WorkWithState(WorkSchema):
@@ -28,7 +27,7 @@ class WorkWithState(WorkSchema):
     ]
 
 
-class BasicWorkInfoForAuthor(StaticWorkInfo, WorkStage):
+class BasicWorkInfoForAuthor(WorkSchema, WorkStage):
     id: str
 
 

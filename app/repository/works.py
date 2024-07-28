@@ -1,13 +1,17 @@
 from datetime import datetime
 from sqlalchemy.future import select
 
-from sqlalchemy import exists, func
+from sqlalchemy import func
 from app.models.work import WorkModel
 from app.schemas.works.work import WorkSchema
-from app.utils.repositories import BaseRepository
+from app.utils.crud_repository import CRUDBRepository
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
-class WorksRepository(BaseRepository):
+class WorksRepository(CRUDBRepository):
+    def __init__(self, session: AsyncSession):
+        super().__init__(session, WorkModel)
+
     async def create(self, work: WorkSchema, event_id: str, deadline_date: datetime, author_id: str):
         next_work_id = await self.__find_next_id(event_id)
         work_model = WorkModel(
@@ -22,10 +26,13 @@ class WorksRepository(BaseRepository):
         await self.session.refresh(work_model)
         return work_model
 
+    async def get_work(self, event_id: str, work_id: int) -> WorkSchema:
+        conditions = [WorkModel.id_event == event_id, WorkModel.id == work_id]
+        return await self._get_with_conditions(conditions)
+
     async def work_with_title_exists(self, id_event, title):
-        stmt = select(exists().where(WorkModel.id_event == id_event, WorkModel.title == title))
-        result = await self.session.execute(stmt)
-        return result.scalar()
+        conditions = [WorkModel.id_event == id_event, WorkModel.title == title]
+        return await self._exists_with_conditions(conditions)
 
     async def __find_next_id(self, event_id):
         query = select(func.max(WorkModel.id)).filter_by(id_event=event_id)
