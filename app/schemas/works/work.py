@@ -1,5 +1,7 @@
+from datetime import datetime
 from typing import Union
 from pydantic import BaseModel, ConfigDict
+from app.models.work import WorkStates
 from app.schemas.works.author import AuthorInformation
 from app.schemas.works.work_stages import (
     BeforeDeadline,
@@ -17,6 +19,8 @@ class WorkSchema(BaseModel):
     abstract: str
     keywords: list[str]
     authors: list[AuthorInformation]
+    state: WorkStates
+    deadline_date: datetime
 
 
 class WorkWithState(WorkSchema):

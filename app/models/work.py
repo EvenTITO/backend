@@ -33,7 +33,7 @@ class WorkModel(Base):
     keywords = Column(ARRAY(String), nullable=False)
     authors = Column(JSON, nullable=False)
 
-    state = Column(Enum(WorkStates), nullable=False)
+    state = Column(Enum(WorkStates), nullable=False, default=WorkStates.SUBMITTED)
     deadline_date = Column(Date, nullable=False)
 
     id_author = Column(String, ForeignKey("users.id"), nullable=False)

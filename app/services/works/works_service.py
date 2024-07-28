@@ -14,6 +14,7 @@ class WorksService(BaseService):
     async def create_work(self, work):
         deadline_date = datetime(2024, 11, 5)
         # TODO: use event deadline date.
+        # TODO: validate tracks.
         repeated_title = await self.works_repository.work_with_title_exists(self.event_id, work.title)
         if repeated_title:
             raise TitleAlreadyExists(work.title, self.event_id)
