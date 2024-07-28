@@ -58,7 +58,6 @@ async def create_event(
         caller_user: CallerUserDep,
         db: SessionDep
 ):
-    print(f'el evento es {event}')
     await validations.validate_event_not_exists(db, event)
     event_created = await events_crud.create_event(
         db=db,
