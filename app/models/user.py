@@ -3,6 +3,8 @@ from sqlalchemy import Column, String
 from app.database.database import Base
 from sqlalchemy.orm import relationship
 from app.utils.models_utils import ModelTemplate
+from app.models.work import WorkModel
+from app.models.review import ReviewModel
 
 
 class UserRole(str, Enum):
@@ -29,13 +31,12 @@ class UserModel(ModelTemplate, Base):
         back_populates="organizer"
     )
     works_as_author = relationship(
-        "WorkModel",
-        foreign_keys="[WorkModel.id_author]",
+        WorkModel,
+        foreign_keys=WorkModel.id_author,
         back_populates="author"
     )
-    works_as_reviewer = relationship(
-        "WorkModel",
-        foreign_keys="[WorkModel.id_reviewer]",
+    reviews = relationship(
+        ReviewModel,
+        foreign_keys=ReviewModel.id_reviewer,
         back_populates="reviewer"
     )
-    reviews = relationship("ReviewModel", back_populates="reviewer")

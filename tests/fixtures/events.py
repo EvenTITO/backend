@@ -1,3 +1,4 @@
+# flake8: noqa
 import pytest
 from app.events.model import EventType
 from app.events.schemas import EventSchema

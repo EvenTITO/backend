@@ -1,6 +1,6 @@
 from typing import List
 from app.dependencies.user_roles.same_user_or_admin_dep import SameUserOrAdminDep
-from app.database.dependencies import SessionDep
+from app.dependencies.database.session_dep import SessionDep
 from app.repository import organizers_crud
 from app.utils.dependencies import CallerIdDep
 from .schemas import (

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Header, Query
 from typing import List
 from app.repository import events_crud
-from app.database.dependencies import SessionDep
+from app.dependencies.database.session_dep import SessionDep
 from app.events.dependencies import GetEventsQuerysDep
 from app.models.event import EventStatus
 from app.repository.organizers_crud import is_organizer
@@ -58,7 +58,6 @@ async def create_event(
         caller_user: CallerUserDep,
         db: SessionDep
 ):
-    print(f'el evento es {event}')
     await validations.validate_event_not_exists(db, event)
     event_created = await events_crud.create_event(
         db=db,

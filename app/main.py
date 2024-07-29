@@ -12,16 +12,16 @@ from app.organizers.router import (
     organizers_events_router,
     organizers_users_router
 )
-from app.routers.works.my_reviews import my_reviews_router
-from app.routers.works.my_works import my_works_router
+# from app.routers.works.my_reviews import my_reviews_router
+# from app.routers.works.my_works import my_works_router
 from app.routers.works.works import works_router
-from app.routers.works.submissions import submissions_router
-from app.routers.works.reviews import reviews_router
-from app.routers.works.reviews_management import review_management_router
+# from app.routers.works.submissions import submissions_router
+# from app.routers.works.reviews import reviews_router
+# from app.routers.works.reviews_management import review_management_router
 from app.reviewers.routers.reviewer import reviewers_router
 
 from app.database.database import Base, engine
-from app.database.dependencies import get_db
+from app.dependencies.database.session_dep import get_db
 from app.repository.users_crud import create_user, update_role
 from app.schemas.users.user import UserSchema
 import os
@@ -99,9 +99,9 @@ app.include_router(reviewers_router)
 
 
 # Submissions Routers
-app.include_router(my_reviews_router)
-app.include_router(my_works_router)
+# app.include_router(my_reviews_router)
+# app.include_router(my_works_router)
 app.include_router(works_router)
-app.include_router(submissions_router)
-app.include_router(reviews_router)
-app.include_router(review_management_router)
+# app.include_router(submissions_router)
+# app.include_router(reviews_router)
+# app.include_router(review_management_router)

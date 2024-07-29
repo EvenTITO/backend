@@ -41,7 +41,7 @@ class EventModel(ModelTemplate, Base):
     organized_by = Column(String, nullable=True)
     media = Column(ARRAY(JSON), default=None)
 
-    creator = relationship("UserModel", back_populates="events")
+    creator = relationship("UserModel", foreign_keys=[id_creator], back_populates="events")
     inscriptions = relationship("InscriptionModel", back_populates="event")
     organizers = relationship("OrganizerModel", back_populates="event")
     works = relationship("WorkModel", back_populates="event")

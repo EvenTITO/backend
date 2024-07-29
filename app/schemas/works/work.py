@@ -1,37 +1,24 @@
-from typing import Union
-from pydantic import BaseModel
-from app.schemas.works.work_stages import (
-    BeforeDeadline,
-    WaitingDecision,
-    DeterminedDecision,
-    ReSubmitDecision,
-    WorkStage
-)
-from .submission import Submission
+from datetime import datetime
+from pydantic import BaseModel, ConfigDict
+from app.models.work import WorkStates
+from app.schemas.works.author import AuthorInformation
 
 
-class StaticWorkInfo(BaseModel):
+class WorkSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     title: str
     track: str
-
-
-class WorkSchema(StaticWorkInfo, Submission):
-    pass
+    abstract: str
+    keywords: list[str]
+    authors: list[AuthorInformation]
 
 
 class WorkWithState(WorkSchema):
-    state: Union[
-        BeforeDeadline,
-        WaitingDecision,
-        DeterminedDecision,
-        ReSubmitDecision
-    ]
+    id: int
+    state: WorkStates
+    deadline_date: datetime
 
 
-class BasicWorkInfoForAuthor(StaticWorkInfo, WorkStage):
-    id: str
-
-
-class BasicWorkInfo(BasicWorkInfoForAuthor):
-    main_author_name: str
-    reviewer_name: str | None = None
+# class BasicWorkInfo(BasicWorkInfoForAuthor):
+#     main_author_name: str
+#     reviewer_name: str | None = None

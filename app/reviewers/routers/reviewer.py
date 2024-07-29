@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import APIRouter
-from app.database.dependencies import SessionDep
+from app.dependencies.database.session_dep import SessionDep
 from app.organizers.dependencies import EventOrganizerDep
 from app.repository import reviewers_crud as crud
 from app.events import validations

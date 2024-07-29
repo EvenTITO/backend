@@ -3,7 +3,7 @@ from fastapi import HTTPException, Depends
 from app.dependencies.user_roles.caller_user_dep import CallerUserDep
 from app.repository import organizers_crud
 from app.models.event import EventModel
-from app.database.dependencies import SessionDep
+from app.dependencies.database.session_dep import SessionDep
 
 
 class EventOrganizerChecker:

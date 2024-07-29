@@ -4,7 +4,7 @@ from app.routers.users.roles import user_roles_router
 from app.routers.users.echo import echo_router
 from app.repository import users_crud
 from app.utils.dependencies import CallerIdDep
-from app.database.dependencies import SessionDep
+from app.dependencies.database.session_dep import SessionDep
 from app.services.users import users_service
 from app.schemas.users.user import UserReply
 from app.dependencies.user_roles.admin_user_dep import AdminDep
