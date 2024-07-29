@@ -22,10 +22,13 @@ from app.reviewers.routers.reviewer import reviewers_router
 
 from app.database.database import Base, engine
 from app.dependencies.database.session_dep import get_db
-from app.repository.users_crud import create_user, update_role
+from app.repository.users_crud import create_user
+from app.repository.users import UsersRepository
 from app.schemas.users.user import UserSchema
 import os
 from dotenv import load_dotenv
+
+from app.schemas.users.user_role import UserRoleSchema
 
 load_dotenv()
 
@@ -40,8 +43,9 @@ async def add_first_admin():
     )
     admin_id = os.getenv("ADMIN_ID")
     try:
-        db_admin = await create_user(db, admin_id, admin_user)
-        await update_role(db, db_admin, UserRole.ADMIN)
+        await create_user(db, admin_id, admin_user)
+        repository = UsersRepository(db)
+        await repository.update(admin_id, UserRoleSchema(role=UserRole.ADMIN))
     except Exception:
         print('Admin already exists.')
 

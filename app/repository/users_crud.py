@@ -2,7 +2,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..models.user import UserModel, UserRole
 from app.schemas.users.user import UserSchema
 from sqlalchemy.future import select
-from sqlalchemy import func
 
 
 async def get_user_by_id(db: AsyncSession, user_id: str):
@@ -42,25 +41,6 @@ async def update_user(
 ):
     for attr, value in user_to_update.model_dump().items():
         setattr(current_user, attr, value)
-    await db.commit()
-    await db.refresh(current_user)
-    return current_user
-
-
-async def get_amount_admins(db):
-    admin_role = UserRole.ADMIN.value
-    query = select(func.count()).where(UserModel.role == admin_role)
-    result = await db.execute(query)
-    return result.scalar_one()
-
-
-async def update_role(
-    db: AsyncSession,
-    current_user: UserModel,
-    new_role: UserRole
-):
-    current_user.role = new_role
-    # setattr(current_user, "role", new_role)
     await db.commit()
     await db.refresh(current_user)
     return current_user
