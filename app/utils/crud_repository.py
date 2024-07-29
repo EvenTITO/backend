@@ -16,7 +16,7 @@ class CRUDBRepository(BaseRepository):
 
     async def exists(self, id) -> bool:
         conditions = await self._primary_key_conditions(id)
-        return self._exists_with_conditions(conditions)
+        return await self._exists_with_conditions(conditions)
 
     async def _exists_with_conditions(self, conditions):
         query = select(exists().where(and_(*conditions)))
@@ -25,7 +25,7 @@ class CRUDBRepository(BaseRepository):
 
     async def get(self, id):
         conditions = await self._primary_key_conditions(id)
-        return self._get_with_conditions(conditions)
+        return await self._get_with_conditions(conditions)
 
     async def _get_with_conditions(self, conditions):
         return await self._get_with_values(conditions, self.model)
@@ -56,6 +56,13 @@ class CRUDBRepository(BaseRepository):
         query = select(func.count()).where(and_(*conditions))
         result = await self.session.execute(query)
         return result.scalar_one()
+
+    async def create(self, object_create: BaseModel):
+        db_in = self.model(**object_create.model_dump(mode='json'))
+        self.session.add(db_in)
+        await self.session.commit()
+        await self.session.refresh(db_in)
+        return db_in
 
     # def create(self, obj_in):
     #     obj_in_data = jsonable_encoder(obj_in)

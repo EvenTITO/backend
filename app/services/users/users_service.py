@@ -1,12 +1,14 @@
 from app.models.user import UserRole
 from app.repository import users_crud
+from app.repository.users import UsersRepository
+from app.schemas.users.user import UserReply, UserSchema
 from app.services.users.exceptions import (
-    CantRemoveLastAdmin,
     EmailAlreadyExists,
     EmailCantChange,
     IdAlreadyExists,
     UserNotFound
 )
+from app.utils.services import BaseService
 
 
 async def get_user_by_id(db, user_id):
@@ -45,26 +47,29 @@ async def update_user(db, current_user, user_with_update):
     await users_crud.update_user(db, current_user, user_with_update)
 
 
-async def update_role(db, admin_user_id, user_id, user_role_update):
-    await __validate_always_at_least_one_admin(db, user_id, admin_user_id, user_role_update)
-
-    current_user = await get_user_by_id(db, user_id)
-    await users_crud.update_role(db, current_user, user_role_update)
-
-
 async def delete_user(db, user_id):
     user = await get_user_by_id(db, user_id)
     await users_crud.delete_user(db, user)
 
 
-async def __validate_always_at_least_one_admin(db, user_id, admin_user_id, role):
-    """
-    One can remove himself from Admin role, but there must be
-    always at least one admin.
-    """
-    if (
-            (admin_user_id == user_id)
-            and (role != UserRole.ADMIN)
-            and (await users_crud.get_amount_admins(db) == 1)
-    ):
-        raise CantRemoveLastAdmin()
+class UsersService(BaseService):
+    def __init__(self, users_repository: UsersRepository, user_id: str):
+        self.users_repository = users_repository
+        self.user_id = user_id
+
+    async def create(self, user: UserSchema) -> str:
+        user_in_db = await self.users_repository.get(self.user_id)
+        if user_in_db:
+            raise IdAlreadyExists(self.user_id)
+        user_in_db = await self.users_repository.get_user_by_email(user.email)
+        if user_in_db:
+            raise EmailAlreadyExists(user.email)
+
+        user_to_create = UserReply(
+            **user.model_dump(),
+            id=self.user_id,
+            role=UserRole.DEFAULT
+        )
+
+        user_created = await self.users_repository.create(user_to_create)
+        return user_created.id

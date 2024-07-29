@@ -1,3 +1,4 @@
+from app.dependencies.services.users.users_service_dep import UsersServiceDep
 from app.schemas.users.user import UserSchema
 from fastapi import APIRouter
 from app.routers.users.roles import user_roles_router
@@ -26,8 +27,8 @@ async def read_user(user_id: str, db: SessionDep, _: SameUserOrAdminDep):
 
 
 @users_router.post("", status_code=201, response_model=str, tags=["Users: General"])
-async def create_user(user: UserSchema, db: SessionDep, caller_id: CallerIdDep):
-    user_created_id = await users_service.create_user(db, caller_id, user)
+async def create_user(user: UserSchema, users_service: UsersServiceDep):
+    user_created_id = await users_service.create(user)
     return user_created_id
 
 
