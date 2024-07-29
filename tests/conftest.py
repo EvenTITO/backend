@@ -2,7 +2,7 @@ from app.repository.users import UsersRepository
 from app.repository.users_crud import get_user_by_id
 from app.schemas.events.create_event import CreateEventSchema
 from app.storage.schemas import DownloadURLSchema, UploadURLSchema
-from app.schemas.users.user import UserSchema
+from app.schemas.users.user import UserReply, UserSchema
 import pytest
 from app.models.event import EventStatus, EventType
 from app.schemas.events.event_status import EventStatusSchema
@@ -11,7 +11,6 @@ from app.organizers.schemas import OrganizerRequestSchema
 from app.dependencies.database.session_dep import get_db
 from app.models.user import UserRole
 from app.schemas.users.user_role import UserRoleSchema
-from app.services.users.users_service import create_user
 from app.main import app
 from app.database.database import SessionLocal, engine, Base
 from .common import WORKS, create_headers, EVENTS, get_user_method, USERS
@@ -98,16 +97,17 @@ async def admin_data():
     session = SessionLocal(
         bind=engine,
     )
-    new_user = UserSchema(
+
+    id_user = "iuaealdasldanfas98298329"
+    user_to_create = UserReply(
         name="Jorge",
         lastname="Benitez",
         email="jbenitez@email.com",
+        id=id_user,
+        role=UserRole.ADMIN
     )
-    id_user = "iuaealdasldanfas98298329"
-
-    await create_user(session, id_user, new_user)
     users_repo = UsersRepository(session)
-    await users_repo.update(id_user, UserRoleSchema(role=UserRole.ADMIN))
+    await users_repo.create(user_to_create)
     user = await get_user_by_id(session, id_user)
     await session.close()
     return user

@@ -29,18 +29,6 @@ async def get_users(db, skip, limit):
     return await users_crud.get_users(db, skip, limit)
 
 
-async def create_user(db, user_id, user):
-    user_in_db = await users_crud.get_user_by_id(db, user_id)
-    if user_in_db:
-        raise IdAlreadyExists(user_id)
-    user_in_db = await users_crud.get_user_by_email(db, user.email)
-    if user_in_db:
-        raise EmailAlreadyExists(user.email)
-
-    user_created = await users_crud.create_user(db=db, id=user_id, user=user)
-    return user_created.id
-
-
 async def update_user(db, current_user, user_with_update):
     if current_user.email != user_with_update.email:
         raise EmailCantChange(current_user.email, user_with_update.email)
