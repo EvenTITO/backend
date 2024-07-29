@@ -6,14 +6,15 @@ from sqlalchemy import (
     Integer,
     Date,
     ARRAY,
-    JSON
+    JSON,
+    Enum
 )
 from sqlalchemy.orm import relationship
 from app.database.database import Base
-from enum import Enum
+import enum
 
 
-class WorkStates(str, Enum):
+class WorkStates(str, enum.Enum):
     ACCEPTED = "ACCEPTED"
     REJECTED = "REJECTED"
     RE_SUBMIT = "RE_SUBMIT"
@@ -47,5 +48,5 @@ class WorkModel(Base):
         foreign_keys=[id_author],
         back_populates="works_as_author"
     )
-    event = relationship("EventModel", back_populates="works")
+    event = relationship("EventModel", foreign_keys=[id_event], back_populates="works")
     submissions = relationship("SubmissionModel", back_populates="work")

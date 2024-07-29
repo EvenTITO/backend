@@ -1,15 +1,7 @@
 from datetime import datetime
-from typing import Union
 from pydantic import BaseModel, ConfigDict
 from app.models.work import WorkStates
 from app.schemas.works.author import AuthorInformation
-from app.schemas.works.work_stages import (
-    BeforeDeadline,
-    WaitingDecision,
-    DeterminedDecision,
-    ReSubmitDecision,
-    WorkStage
-)
 
 
 class WorkSchema(BaseModel):
@@ -19,23 +11,14 @@ class WorkSchema(BaseModel):
     abstract: str
     keywords: list[str]
     authors: list[AuthorInformation]
+
+
+class WorkWithState(WorkSchema):
+    id: int
     state: WorkStates
     deadline_date: datetime
 
 
-class WorkWithState(WorkSchema):
-    state: Union[
-        BeforeDeadline,
-        WaitingDecision,
-        DeterminedDecision,
-        ReSubmitDecision
-    ]
-
-
-class BasicWorkInfoForAuthor(WorkSchema, WorkStage):
-    id: int
-
-
-class BasicWorkInfo(BasicWorkInfoForAuthor):
-    main_author_name: str
-    reviewer_name: str | None = None
+# class BasicWorkInfo(BasicWorkInfoForAuthor):
+#     main_author_name: str
+#     reviewer_name: str | None = None

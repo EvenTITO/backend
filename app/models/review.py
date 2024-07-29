@@ -5,14 +5,15 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     JSON,
-    ForeignKeyConstraint
+    ForeignKeyConstraint,
+    Enum
 )
-from enum import Enum
+import enum
 from app.database.database import Base
 from app.models.submission import SubmissionModel
 
 
-class ReviewStatus(str, Enum):
+class ReviewStatus(str, enum.Enum):
     ACCEPTED = "ACCEPTED"
     REJECTED = "REJECTED"
     RE_SUBMIT = "RE_SUBMIT"

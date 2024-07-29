@@ -1,17 +1,10 @@
 # flake8: noqa
-from fastapi import APIRouter, Depends
-from datetime import datetime
-from app.dependencies.database.session_dep import SessionDep
-from app.dependencies.service import get_service
+from fastapi import APIRouter
 from app.dependencies.services.author_works_dep import AuthorWorksServiceDep
 from app.dependencies.services.works_dep import WorksServiceDep
-from app.schemas.works.work import WorkSchema, WorkWithState, BasicWorkInfo
+from app.schemas.works.work import WorkSchema, WorkWithState
 # from app.services.works import works_service
-from app.schemas.works.work_stages import BeforeDeadline, NoReviewStages
-from app.models.work import WorkModel  # noqa
-from app.models.submission import SubmissionModel  # noqa
-from app.models.review import ReviewModel  # noqa
-from app.dependencies.user_roles.user_id_dep import UserIdDep
+# from app.schemas.works.work_stages import BeforeDeadline, NoReviewStages
 
 works_router = APIRouter(prefix="/events/{event_id}/works", tags=["Works"])
 
@@ -26,7 +19,8 @@ async def create_work(work: WorkSchema, works_service: WorksServiceDep) -> int:
 
 
 @works_router.put("/{work_id}", status_code=204)
-async def update_work(work_update: WorkSchema):
+async def update_work(work_update: WorkSchema, works_service: AuthorWorksServiceDep):
+    await works_service.update(work_update)
     """
     Author updates the work with work_id. This method is used only
     in the first stage before the first submission deadline date.
@@ -46,34 +40,34 @@ async def get_work_author_information(works_service: AuthorWorksServiceDep) -> W
     return work
 
 
-@works_router.get("/")
-async def get_all_works_basic_information() -> list[BasicWorkInfo]:
-    """
-    Obtain a resumee of all the works in the event.
-    This method is used by the event organizer.
-    """
-    return [
-        BasicWorkInfo(
-            main_author_name='Martin Sanchez',
-            reviewer_name='Juana Gomez',
-            title=(
-                'Comparación del Rendimiento de Curve25519, '
-                'P-256 y Curvas de Edwards en Algoritmos '
-                'de Criptografía Cuántica'
-            ),
-            track='cibersecurity',
-            id=3,
-            stage=NoReviewStages.BEFORE_DEADLINE,
-        ),
-        BasicWorkInfo(
-            main_author_name='Martina Federer',
-            reviewer_name=None,
-            title=(
-                'Aplicaciones de los Toros de Clifford en '
-                'la Teoría de Códigos Correctores de Errores'
-            ),
-            track='math',
-            id=2,
-            stage=NoReviewStages.BEFORE_DEADLINE,
-        ),
-    ]
+# @works_router.get("/")
+# async def get_all_works_basic_information() -> list[BasicWorkInfo]:
+#     """
+#     Obtain a resumee of all the works in the event.
+#     This method is used by the event organizer.
+#     """
+#     return [
+#         BasicWorkInfo(
+#             main_author_name='Martin Sanchez',
+#             reviewer_name='Juana Gomez',
+#             title=(
+#                 'Comparación del Rendimiento de Curve25519, '
+#                 'P-256 y Curvas de Edwards en Algoritmos '
+#                 'de Criptografía Cuántica'
+#             ),
+#             track='cibersecurity',
+#             id=3,
+#             stage=NoReviewStages.BEFORE_DEADLINE,
+#         ),
+#         BasicWorkInfo(
+#             main_author_name='Martina Federer',
+#             reviewer_name=None,
+#             title=(
+#                 'Aplicaciones de los Toros de Clifford en '
+#                 'la Teoría de Códigos Correctores de Errores'
+#             ),
+#             track='math',
+#             id=2,
+#             stage=NoReviewStages.BEFORE_DEADLINE,
+#         ),
+#     ]
