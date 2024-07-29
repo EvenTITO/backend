@@ -30,6 +30,10 @@ class WorksRepository(CRUDBRepository):
         conditions = await self.__primary_key_conditions(event_id, work_id)
         return await self._get_with_conditions(conditions)
 
+    async def get_works_in_tracks(self, event_id: str, tracks: list[str], limit: int, offset: int):
+        conditions = [WorkModel.id_event == event_id, WorkModel.track.in_(tracks)]
+        await self._get_many_with_conditions(conditions, limit, offset)
+
     async def update(self, work_update: WorkSchema, event_id: str, work_id: int):
         conditions = await self.__primary_key_conditions(event_id, work_id)
         return await self._update_with_conditions(conditions, work_update)

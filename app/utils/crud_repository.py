@@ -25,7 +25,7 @@ class CRUDBRepository(BaseRepository):
         return self._get_with_conditions(conditions)
 
     async def _get_with_conditions(self, conditions):
-        query = select(self.model).where(and_(*conditions))
+        query = select(self.model).where(and_(*conditions)).limit(1)
         result = await self.session.execute(query)
         return result.scalars().first()
 
@@ -37,11 +37,10 @@ class CRUDBRepository(BaseRepository):
             return False
         return True
 
-    # def get(self, id):
-    #     return self.session.query(self.model).filter(self.model.id == id).first()
-
-    # def get_multi(self, skip=0, limit=100):
-    #     return self.session.query(self.model).offset(skip).limit(limit).all()
+    async def _get_many_with_conditions(self, conditions, limit: int, offset: int):
+        query = select(self.model).where(and_(*conditions)).offset(offset).limit(limit)
+        result = await self.session.execute(query)
+        return result.scalars().all()
 
     # def create(self, obj_in):
     #     obj_in_data = jsonable_encoder(obj_in)

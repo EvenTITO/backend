@@ -1,6 +1,7 @@
 from app.models.work import WorkStates
 from app.repository.works import WorksRepository
 from app.schemas.works.work import WorkSchema, WorkWithState
+from app.services.works.exceptions.title_already_exists import TitleAlreadyExists
 from app.utils.services import BaseService
 from datetime import datetime
 
@@ -27,8 +28,9 @@ class AuthorWorksService(BaseService):
     async def update(self, work_update: WorkSchema):
         if not await self.__is_before_first_deadline():
             raise Exception('TODO: better exception. Cant update after first submission.')
-        if await self.works_repository.work_with_title_exists(self.event_id, work_update.title):
-            raise Exception('TODO: better exception. Title already in use.')
+        repeated_title = await self.works_repository.work_with_title_exists(self.event_id, work_update.title)
+        if repeated_title:
+            raise TitleAlreadyExists(work_update.title, self.event_id)
         await self.works_repository.update(work_update, self.event_id, self.work_id)
 
     async def __is_before_first_deadline(self):
