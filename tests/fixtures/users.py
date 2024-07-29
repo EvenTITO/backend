@@ -1,3 +1,4 @@
+# flake8: noqa
 import pytest
 from fastapi.encoders import jsonable_encoder
 from app.users.crud import update_permission

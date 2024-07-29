@@ -19,14 +19,12 @@ async def create_work(work: WorkSchema, works_service: WorksServiceDep) -> int:
 
 
 @works_router.put("/{work_id}", status_code=204)
-async def update_work(work_update: WorkSchema, works_service: AuthorWorksServiceDep):
-    await works_service.update(work_update)
+async def update_work(work_update: WorkSchema, works_service: AuthorWorksServiceDep) -> None:
     """
     Author updates the work with work_id. This method is used only
     in the first stage before the first submission deadline date.
     """
-    # TODO
-    pass
+    await works_service.update(work_update)
 
 
 @works_router.get("/{work_id}")
