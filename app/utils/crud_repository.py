@@ -11,8 +11,11 @@ class CRUDBRepository(BaseRepository):
         super().__init__(session)
         self.model = model
 
+    async def _primary_key_conditions(self, id):
+        return [self.model.id == id]
+
     async def exists(self, id) -> bool:
-        conditions = [self.model.id == id]
+        conditions = await self._primary_key_conditions(id)
         return self._exists_with_conditions(conditions)
 
     async def _exists_with_conditions(self, conditions):
@@ -21,13 +24,20 @@ class CRUDBRepository(BaseRepository):
         return result.scalar()
 
     async def get(self, id):
-        conditions = [self.model.id == id]
+        conditions = await self._primary_key_conditions(id)
         return self._get_with_conditions(conditions)
 
     async def _get_with_conditions(self, conditions):
-        query = select(self.model).where(and_(*conditions)).limit(1)
+        return await self._get_with_values(conditions, self.model)
+
+    async def _get_with_values(self, conditions, values):
+        query = select(values).where(and_(*conditions)).limit(1)
         result = await self.session.execute(query)
         return result.scalars().first()
+
+    async def update(self, id, object_update: BaseModel) -> bool:
+        conditions = await self._primary_key_conditions(id)
+        return await self._update_with_conditions(conditions, object_update)
 
     async def _update_with_conditions(self, conditions, object_update: BaseModel) -> bool:
         query = update(self.model).where(and_(*conditions)).values(object_update.model_dump(mode='json'))
