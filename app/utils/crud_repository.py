@@ -52,6 +52,11 @@ class CRUDBRepository(BaseRepository):
         result = await self.session.execute(query)
         return result.scalars().all()
 
+    async def get_many(self, limit: int, offset: int):
+        query = select(self.model).offset(offset).limit(limit)
+        result = await self.session.execute(query)
+        return result.scalars().all()
+
     async def _count_with_conditions(self, conditions):
         query = select(func.count()).where(and_(*conditions))
         result = await self.session.execute(query)

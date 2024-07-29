@@ -1,5 +1,6 @@
 from app.models.user import UserRole
 from app.repository.users import UsersRepository
+from app.schemas.users.user import UserReply
 from app.schemas.users.user_role import UserRoleSchema
 from app.services.users.exceptions import CantRemoveLastAdmin, UserNotFound
 from app.utils.services import BaseService
@@ -26,3 +27,6 @@ class UsersAdminService(BaseService):
                 and (await self.users_repository.get_amount_admins() == 1)
         ):
             raise CantRemoveLastAdmin()
+
+    async def get_many(self, limit: int, offset: int) -> list[UserReply]:
+        return await self.users_repository.get_many(limit, offset)

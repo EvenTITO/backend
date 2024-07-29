@@ -4,7 +4,6 @@ from app.repository.users import UsersRepository
 from app.schemas.users.user import UserModifySchema, UserReply, UserSchema
 from app.services.users.exceptions import (
     EmailAlreadyExists,
-    EmailCantChange,
     IdAlreadyExists,
     UserNotFound
 )
@@ -27,17 +26,6 @@ async def get_user_by_email(db, email):
 
 async def get_users(db, skip, limit):
     return await users_crud.get_users(db, skip, limit)
-
-
-async def update_user(db, current_user, user_with_update):
-    if current_user.email != user_with_update.email:
-        raise EmailCantChange(current_user.email, user_with_update.email)
-    await users_crud.update_user(db, current_user, user_with_update)
-
-
-async def delete_user(db, user_id):
-    user = await get_user_by_id(db, user_id)
-    await users_crud.delete_user(db, user)
 
 
 class UsersService(BaseService):
