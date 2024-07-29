@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from sqlalchemy import and_, exists
+from sqlalchemy import and_, exists, func
 from app.utils.repositories import BaseRepository
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -51,6 +51,11 @@ class CRUDBRepository(BaseRepository):
         query = select(self.model).where(and_(*conditions)).offset(offset).limit(limit)
         result = await self.session.execute(query)
         return result.scalars().all()
+
+    async def _count_with_conditions(self, conditions):
+        query = select(func.count()).where(and_(*conditions))
+        result = await self.session.execute(query)
+        return result.scalar_one()
 
     # def create(self, obj_in):
     #     obj_in_data = jsonable_encoder(obj_in)
