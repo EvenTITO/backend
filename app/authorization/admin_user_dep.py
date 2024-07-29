@@ -5,12 +5,11 @@ from fastapi import HTTPException, Depends
 
 
 class AdminUser:
-    async def __call__(self, service: UsersServiceDep) -> bool:
+    async def __call__(self, service: UsersServiceDep) -> None:
         role = await service.get_role()
         if role != UserRole.ADMIN:
             raise HTTPException(status_code=403)
-        return True
 
 
 admin_user_checker = AdminUser()
-AdminDep = Annotated[bool, Depends(admin_user_checker)]
+AdminDep = Annotated[None, Depends(admin_user_checker)]

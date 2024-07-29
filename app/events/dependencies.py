@@ -4,8 +4,6 @@ from app.database.session_dep import SessionDep
 from app.database.models.event import EventModel
 from app.database.models.event import EventStatus
 from app.authorization.admin_user_dep import admin_user_checker
-from app.authorization.caller_user_dep import verify_user_exists
-from app.authorization.caller_id_dep import get_user_id
 from app.services.users.users_service_dep import UsersServiceDep
 
 

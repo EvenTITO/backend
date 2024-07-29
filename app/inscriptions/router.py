@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 from typing import List
-from app.authorization.caller_user_dep import CallerUserDep
+from app.authorization.caller_id_dep import CallerIdDep
+from app.authorization.caller_user_dep import verify_user_exists
 from app.authorization.same_user_or_admin_dep import SameUserOrAdminDep
 from .schemas import (
     InscriptionReplySchema
@@ -10,6 +11,7 @@ from app.repository import inscriptions_crud
 from app.routers.users.users import users_router
 from app.routers.events.events import events_router
 from app.inscriptions import validations
+
 
 inscriptions_PREFIX = '/inscriptions'
 
@@ -26,18 +28,19 @@ inscriptions_users_router = APIRouter(
 
 @inscriptions_events_router.post(
     "",
-    status_code=201
+    status_code=201,
+    dependencies=[Depends(verify_user_exists)]
 )
 async def create_inscription(
     event_id: str,
-    caller_user: CallerUserDep,
+    caller_id: CallerIdDep,
     db: SessionDep
 ) -> str:
     await validations.validate_inscription_not_exists(
-        db, caller_user.id, event_id
+        db, caller_id, event_id
     )
     new_entry = await inscriptions_crud.inscribe_user_to_event(
-        db, event_id, caller_user.id
+        db, event_id, caller_id
     )
     return new_entry.id_inscriptor
 
