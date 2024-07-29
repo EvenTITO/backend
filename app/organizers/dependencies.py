@@ -1,9 +1,9 @@
 from typing import Annotated
 from fastapi import HTTPException, Depends
-from app.dependencies.user_roles.caller_user_dep import CallerUserDep
+from app.authorization.caller_user_dep import CallerUserDep
 from app.repository import organizers_crud
 from app.database.models.event import EventModel
-from app.dependencies.database.session_dep import SessionDep
+from app.database.session_dep import SessionDep
 
 
 class EventOrganizerChecker:

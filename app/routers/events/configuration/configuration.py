@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.dependencies.database.session_dep import SessionDep
+from app.database.session_dep import SessionDep
 from app.organizers.dependencies import EventOrganizerDep
 from app.events.utils import get_event
 from app.schemas.events.configuration import EventConfigurationSchema

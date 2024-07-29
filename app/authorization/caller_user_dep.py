@@ -1,24 +1,24 @@
 from fastapi import Depends
 from typing import Annotated
 
-from app.dependencies.database.session_dep import SessionDep
+from app.database.session_dep import SessionDep
+from app.database.models.user import UserModel
 from app.repository.users_crud import get_user_by_id
 from app.services.users.exceptions import UserNotFound
 from app.utils.dependencies import CallerIdDep
 
 
-class UserId:
+class CallerUser:
     async def __call__(
         self,
         caller_id: CallerIdDep,
         db: SessionDep
-    ) -> str:
+    ) -> UserModel:
         user = await get_user_by_id(db, caller_id)
         if not user:
             raise UserNotFound(caller_id)
-        return user.id
-# TODO: esta devolviendo el id, deberia cambiar a que el crud soporte la llamada de si existe.
+        return user
 
 
-user_id_exists_checker = UserId()
-UserIdDep = Annotated[str, Depends(user_id_exists_checker)]
+caller_user_checker = CallerUser()
+CallerUserDep = Annotated[UserModel, Depends(caller_user_checker)]

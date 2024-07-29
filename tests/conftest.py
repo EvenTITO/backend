@@ -8,7 +8,7 @@ from app.database.models.event import EventStatus, EventType
 from app.schemas.events.event_status import EventStatusSchema
 from fastapi.encoders import jsonable_encoder
 from app.organizers.schemas import OrganizerRequestSchema
-from app.dependencies.database.session_dep import get_db
+from app.database.session_dep import get_db
 from app.database.models.user import UserRole
 from app.schemas.users.user_role import UserRoleSchema
 from app.main import app

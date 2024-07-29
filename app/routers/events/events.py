@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Header, Query
 from typing import List
 from app.repository import events_crud
-from app.dependencies.database.session_dep import SessionDep
+from app.database.session_dep import SessionDep
 from app.events.dependencies import GetEventsQuerysDep
 from app.database.models.event import EventStatus
 from app.repository.organizers_crud import is_organizer
-from app.dependencies.user_roles.caller_user_dep import CallerUserDep
+from app.authorization.caller_user_dep import CallerUserDep
 from app.events import validations
 import app.notifications.events as notifications
 from app.events.utils import get_event

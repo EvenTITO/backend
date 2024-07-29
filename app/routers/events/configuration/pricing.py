@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from app.repository import events_crud
-from app.dependencies.database.session_dep import SessionDep
+from app.database.session_dep import SessionDep
 from app.organizers.dependencies import EventOrganizerDep
 from app.events.utils import get_event
 from app.schemas.events.schemas import PricingSchema

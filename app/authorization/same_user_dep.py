@@ -1,7 +1,7 @@
 from typing import Annotated
 from app.database.models.user import UserModel
 from fastapi import HTTPException, Depends
-from app.dependencies.user_roles.caller_user_dep import CallerUserDep
+from app.authorization.caller_user_dep import CallerUserDep
 
 
 class SameUser:

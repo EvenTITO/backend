@@ -5,10 +5,10 @@ from app.dependencies.services.users.users_service_dep import UsersServiceDep
 from app.schemas.users.user import UserModifySchema, UserSchema
 from app.routers.users.roles import user_roles_router
 from app.routers.users.echo import echo_router
-from app.dependencies.database.session_dep import SessionDep
+from app.database.session_dep import SessionDep
 from app.services.users import users_service
 from app.schemas.users.user import UserReply
-from app.dependencies.user_roles.same_user_or_admin_dep import SameUserOrAdminDep
+from app.authorization.same_user_or_admin_dep import SameUserOrAdminDep
 
 
 users_router = APIRouter(

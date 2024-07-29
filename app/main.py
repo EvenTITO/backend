@@ -21,7 +21,7 @@ from app.routers.works.works import works_router
 from app.reviewers.routers.reviewer import reviewers_router
 
 from app.database.database import Base, engine
-from app.dependencies.database.session_dep import get_db
+from app.database.session_dep import get_db
 from app.repository.users_crud import create_user
 from app.repository.users_repository import UsersRepository
 from app.schemas.users.user import UserSchema

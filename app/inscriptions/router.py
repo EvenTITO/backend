@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Query
 from typing import List
-from app.dependencies.user_roles.caller_user_dep import CallerUserDep
-from app.dependencies.user_roles.same_user_or_admin_dep import SameUserOrAdminDep
+from app.authorization.caller_user_dep import CallerUserDep
+from app.authorization.same_user_or_admin_dep import SameUserOrAdminDep
 from .schemas import (
     InscriptionReplySchema
 )
-from app.dependencies.database.session_dep import SessionDep
+from app.database.session_dep import SessionDep
 from app.repository import inscriptions_crud
 from app.routers.users.users import users_router
 from app.routers.events.events import events_router

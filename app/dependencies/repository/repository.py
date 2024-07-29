@@ -1,4 +1,4 @@
-from app.dependencies.database.session_dep import SessionDep
+from app.database.session_dep import SessionDep
 from typing import Type
 
 from app.utils.crud_repository import CRUDBRepository

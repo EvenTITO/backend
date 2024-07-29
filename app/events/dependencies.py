@@ -1,10 +1,10 @@
 from typing import Annotated
 from fastapi import Depends, Header
-from app.dependencies.database.session_dep import SessionDep
+from app.database.session_dep import SessionDep
 from app.database.models.event import EventModel
 from app.database.models.event import EventStatus
-from app.dependencies.user_roles.admin_user_dep import admin_user_checker
-from app.dependencies.user_roles.caller_user_dep import caller_user_checker
+from app.authorization.admin_user_dep import admin_user_checker
+from app.authorization.caller_user_dep import caller_user_checker
 from app.utils.dependencies import get_user_id
 
 
