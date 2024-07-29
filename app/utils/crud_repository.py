@@ -3,6 +3,7 @@ from sqlalchemy import and_, exists
 from app.utils.repositories import BaseRepository
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import update
 
 
 class CRUDBRepository(BaseRepository):
@@ -28,18 +29,13 @@ class CRUDBRepository(BaseRepository):
         result = await self.session.execute(query)
         return result.scalars().first()
 
-    async def _update_if_exists(self, conditions, object_update):
-        db_object = self._get_with_conditions(conditions)
-        if db_object is None:
-            return None
-        return self._update(db_object, object_update)
-
-    async def _update(self, db_object, object_update: BaseModel):
-        for attr, value in object_update.model_dump(mode='json').items():
-            setattr(db_object, attr, value)
+    async def _update_with_conditions(self, conditions, object_update: BaseModel) -> bool:
+        query = update(self.model).where(and_(*conditions)).values(object_update.model_dump(mode='json'))
+        result = await self.session.execute(query)
         await self.session.commit()
-        await self.session.refresh(db_object)
-        return db_object
+        if result.rowcount < 1:
+            return False
+        return True
 
     # def get(self, id):
     #     return self.session.query(self.model).filter(self.model.id == id).first()

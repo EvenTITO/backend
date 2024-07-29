@@ -27,12 +27,19 @@ class WorksRepository(CRUDBRepository):
         return work_model
 
     async def get_work(self, event_id: str, work_id: int) -> WorkSchema:
-        conditions = [WorkModel.id_event == event_id, WorkModel.id == work_id]
+        conditions = await self.__primary_key_conditions(event_id, work_id)
         return await self._get_with_conditions(conditions)
 
-    async def work_with_title_exists(self, id_event, title):
+    async def update(self, work_update: WorkSchema, event_id: str, work_id: int):
+        conditions = await self.__primary_key_conditions(event_id, work_id)
+        return await self._update_with_conditions(conditions, work_update)
+
+    async def work_with_title_exists(self, id_event: str, title: str):
         conditions = [WorkModel.id_event == id_event, WorkModel.title == title]
         return await self._exists_with_conditions(conditions)
+
+    async def __primary_key_conditions(self, event_id: str, work_id: int):
+        return [WorkModel.id_event == event_id, WorkModel.id == work_id]
 
     async def __find_next_id(self, event_id):
         query = select(func.max(WorkModel.id)).filter_by(id_event=event_id)

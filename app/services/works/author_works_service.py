@@ -1,6 +1,8 @@
+from app.models.work import WorkStates
 from app.repository.works import WorksRepository
 from app.schemas.works.work import WorkSchema, WorkWithState
 from app.utils.services import BaseService
+from datetime import datetime
 
 
 class AuthorWorksService(BaseService):
@@ -22,5 +24,17 @@ class AuthorWorksService(BaseService):
 
         return my_work
 
-    async def update(work_update: WorkSchema):
-        pass
+    async def update(self, work_update: WorkSchema):
+        if not await self.__is_before_first_deadline():
+            raise Exception('TODO: better exception. Cant update after first submission.')
+        if await self.works_repository.work_with_title_exists(self.event_id, work_update.title):
+            raise Exception('TODO: better exception. Title already in use.')
+        await self.works_repository.update(work_update, self.event_id, self.work_id)
+
+    async def __is_before_first_deadline(self):
+        work = await self.get_work()
+        print(work.state)
+        print(work.deadline_date)
+        if work.state == WorkStates.SUBMITTED and datetime.today() < work.deadline_date:
+            return True
+        return False

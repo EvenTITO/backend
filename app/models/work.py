@@ -4,7 +4,7 @@ from sqlalchemy import (
     ForeignKey,
     UniqueConstraint,
     Integer,
-    Date,
+    DateTime,
     ARRAY,
     JSON,
     Enum
@@ -35,7 +35,7 @@ class WorkModel(Base):
     authors = Column(JSON, nullable=False)
 
     state = Column(Enum(WorkStates), nullable=False, default=WorkStates.SUBMITTED)
-    deadline_date = Column(Date, nullable=False)
+    deadline_date = Column(DateTime, nullable=False)
 
     id_author = Column(String, ForeignKey("users.id"), nullable=False)
 
