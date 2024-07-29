@@ -1,5 +1,5 @@
 from app.repository.users_repository import UsersRepository
-from app.utils.services import BaseService
+from app.services.services import BaseService
 
 
 class AuthUsersService(BaseService):

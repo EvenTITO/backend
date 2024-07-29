@@ -1,10 +1,10 @@
 from app.database.session_dep import SessionDep
 from typing import Type
 
-from app.utils.crud_repository import CRUDBRepository
+from app.repository.crud_repository import Repository
 
 
-def get_repository(repository: Type[CRUDBRepository]):
+def get_repository(repository: Type[Repository]):
     async def _get_repository(session: SessionDep):
         return repository(session)
 

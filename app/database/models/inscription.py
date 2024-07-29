@@ -2,7 +2,7 @@ from enum import Enum
 from sqlalchemy import Column, String, ForeignKey
 from app.database.database import Base
 from sqlalchemy.orm import relationship
-from app.utils.models_utils import DateTemplate
+from app.database.models.utils import DateTemplate
 
 
 class InscriptionStatus(str, Enum):

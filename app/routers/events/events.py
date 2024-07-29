@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Header, Query
+from fastapi import APIRouter, Depends, Header, Query
 from typing import List
+from app.authorization.caller_id_dep import CallerIdDep
 from app.repository import events_crud
 from app.database.session_dep import SessionDep
 from app.events.dependencies import GetEventsQuerysDep
 from app.database.models.event import EventStatus
 from app.repository.organizers_crud import is_organizer
-from app.authorization.caller_user_dep import CallerUserDep
+from app.authorization.caller_user_dep import CallerUserDep, verify_user_exists
 from app.events import validations
 import app.notifications.events as notifications
 from app.events.utils import get_event
@@ -25,14 +26,14 @@ events_router.include_router(events_configuration_router)
 events_router.include_router(events_admin_router)
 
 
-@events_router.get("/my-events", response_model=List[PublicEventWithRolesSchema], tags=["Events: General"])
+@events_router.get("/my-events", response_model=List[PublicEventWithRolesSchema], tags=["Events: General"], dependencies=[Depends(verify_user_exists)])
 async def read_my_events(
         db: SessionDep,
-        caller_user: CallerUserDep,
+        caller_id: CallerIdDep,
         offset: int = 0,
         limit: int = Query(default=100, le=100)  # TODO: use offset & limit.
 ):
-    return await events_crud.get_all_events_for_user(db, caller_user.id)
+    return await events_crud.get_all_events_for_user(db, caller_id)
 
 
 @events_router.get("/", response_model=List[PublicEventSchema], tags=["Events: General"])

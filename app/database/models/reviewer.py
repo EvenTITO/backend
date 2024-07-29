@@ -1,4 +1,4 @@
-from app.utils.models_utils import DateTemplate
+from app.database.models.utils import DateTemplate
 from datetime import datetime
 from app.utils.exceptions import DatesException
 from sqlalchemy import Column, String, Date

@@ -4,11 +4,11 @@ from sqlalchemy.future import select
 from sqlalchemy import func
 from app.database.models.work import WorkModel
 from app.schemas.works.work import WorkSchema
-from app.utils.crud_repository import CRUDBRepository
+from app.repository.crud_repository import Repository
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-class WorksRepository(CRUDBRepository):
+class WorksRepository(Repository):
     def __init__(self, session: AsyncSession):
         super().__init__(session, WorkModel)
 

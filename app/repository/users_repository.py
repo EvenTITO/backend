@@ -1,10 +1,10 @@
 from app.database.models.user import UserModel, UserRole
 from app.schemas.users.user import UserSchema
-from app.utils.crud_repository import CRUDBRepository
+from app.repository.crud_repository import Repository
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-class UsersRepository(CRUDBRepository):
+class UsersRepository(Repository):
     def __init__(self, session: AsyncSession):
         super().__init__(session, UserModel)
 

@@ -3,7 +3,7 @@ from app.repository.users_repository import UsersRepository
 from app.schemas.users.user import UserReply
 from app.schemas.users.user_role import UserRoleSchema
 from app.services.users.exceptions import CantRemoveLastAdmin, UserNotFound
-from app.utils.services import BaseService
+from app.services.services import BaseService
 
 
 class UsersAdminService(BaseService):

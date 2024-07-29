@@ -1,14 +1,16 @@
 from pydantic import BaseModel
 from sqlalchemy import and_, exists, func
-from app.utils.repositories import BaseRepository
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import update
 
 
-class CRUDBRepository(BaseRepository):
+class Repository:
+    """
+    Base class for repositories
+    """
     def __init__(self, session: AsyncSession, model):
-        super().__init__(session)
+        self.session = session
         self.model = model
 
     async def _primary_key_conditions(self, id):

@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from app.database.models.event import EventStatus
 from app.repository.events_repository import EventsRepository
 from app.schemas.events.event_status import EventStatusSchema
-from app.utils.services import BaseService
+from app.services.services import BaseService
 
 
 class EventsOrganizerService(BaseService):

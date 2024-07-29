@@ -2,7 +2,7 @@ from app.database.models.work import WorkStates
 from app.repository.works_repository import WorksRepository
 from app.schemas.works.work import WorkSchema, WorkWithState
 from app.services.works.exceptions.title_already_exists import TitleAlreadyExists
-from app.utils.services import BaseService
+from app.services.services import BaseService
 from datetime import datetime
 
 

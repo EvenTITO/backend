@@ -2,7 +2,7 @@ from app.repository.works_repository import WorksRepository
 from app.services.works.exceptions.title_already_exists import TitleAlreadyExists
 from datetime import datetime
 
-from app.utils.services import BaseService
+from app.services.services import BaseService
 
 
 class WorksService(BaseService):

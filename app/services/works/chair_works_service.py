@@ -1,6 +1,6 @@
 from app.repository.works_repository import WorksRepository
 
-from app.utils.services import BaseService
+from app.services.services import BaseService
 
 
 class ChairWorksService(BaseService):

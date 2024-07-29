@@ -7,7 +7,7 @@ from app.services.users.exceptions import (
     IdAlreadyExists,
     UserNotFound
 )
-from app.utils.services import BaseService
+from app.services.services import BaseService
 
 
 async def get_user_by_id(db, user_id):
