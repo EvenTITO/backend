@@ -5,8 +5,7 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     JSON,
-    ForeignKeyConstraint,
-    Enum
+    ForeignKeyConstraint
 )
 import enum
 from app.database.database import Base
@@ -30,7 +29,7 @@ class ReviewModel(Base):
     id_reviewer = Column(String, ForeignKey("users.id"), primary_key=True)
 
     review = Column(JSON)
-    review_status = Column(Enum(ReviewStatus), nullable=False)
+    review_status = Column(String, nullable=False)
     __table_args__ = (
         ForeignKeyConstraint(
             [

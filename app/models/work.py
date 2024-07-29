@@ -7,7 +7,6 @@ from sqlalchemy import (
     DateTime,
     ARRAY,
     JSON,
-    Enum
 )
 from sqlalchemy.orm import relationship
 from app.database.database import Base
@@ -34,7 +33,7 @@ class WorkModel(Base):
     keywords = Column(ARRAY(String), nullable=False)
     authors = Column(JSON, nullable=False)
 
-    state = Column(Enum(WorkStates), nullable=False, default=WorkStates.SUBMITTED)
+    state = Column(String, nullable=False, default=WorkStates.SUBMITTED)
     deadline_date = Column(DateTime, nullable=False)
 
     id_author = Column(String, ForeignKey("users.id"), nullable=False)
