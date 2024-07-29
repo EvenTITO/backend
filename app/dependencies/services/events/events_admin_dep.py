@@ -3,7 +3,7 @@ from typing import Annotated
 
 from app.dependencies.repository.repository import get_repository
 from app.dependencies.user_roles.admin_user_dep import AdminDep
-from app.repository.events import EventsRepository
+from app.repository.events_repository import EventsRepository
 from app.services.events.events_admin_service import EventsAdminService
 
 

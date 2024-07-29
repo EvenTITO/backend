@@ -3,7 +3,7 @@ from typing import Annotated
 
 from app.dependencies.repository.repository import get_repository
 from app.utils.dependencies import CallerIdDep
-from app.repository.works import WorksRepository
+from app.repository.works_repository import WorksRepository
 from app.services.works.author_works_service import AuthorWorksService
 
 

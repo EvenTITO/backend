@@ -1,6 +1,6 @@
 from app.models.user import UserRole
 from app.repository import users_crud
-from app.repository.users import UsersRepository
+from app.repository.users_repository import UsersRepository
 from app.schemas.users.user import UserModifySchema, UserReply, UserSchema
 from app.services.users.exceptions import (
     EmailAlreadyExists,

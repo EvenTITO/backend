@@ -1,4 +1,4 @@
-from app.repository.works import WorksRepository
+from app.repository.works_repository import WorksRepository
 
 from app.utils.services import BaseService
 

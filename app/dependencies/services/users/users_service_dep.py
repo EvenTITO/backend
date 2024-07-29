@@ -3,7 +3,7 @@ from typing import Annotated
 
 from app.dependencies.repository.repository import get_repository
 from app.dependencies.user_roles.caller_user_dep import CallerUserDep
-from app.repository.users import UsersRepository
+from app.repository.users_repository import UsersRepository
 from app.services.users.users_service import UsersService
 
 

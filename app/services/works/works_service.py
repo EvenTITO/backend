@@ -1,4 +1,4 @@
-from app.repository.works import WorksRepository
+from app.repository.works_repository import WorksRepository
 from app.services.works.exceptions.title_already_exists import TitleAlreadyExists
 from datetime import datetime
 

@@ -1,4 +1,4 @@
-from app.repository.users import UsersRepository
+from app.repository.users_repository import UsersRepository
 from app.repository.users_crud import get_user_by_id
 from app.schemas.events.create_event import CreateEventSchema
 from app.storage.schemas import DownloadURLSchema, UploadURLSchema

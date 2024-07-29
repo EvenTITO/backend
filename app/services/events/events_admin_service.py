@@ -1,5 +1,5 @@
 from app.events.exceptions import EventNotFound
-from app.repository.events import EventsRepository
+from app.repository.events_repository import EventsRepository
 from app.schemas.events.event_status import EventStatusSchema
 from app.utils.services import BaseService
 
