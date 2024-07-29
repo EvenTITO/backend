@@ -2,7 +2,7 @@ from typing import List
 from app.authorization.same_user_or_admin_dep import SameUserOrAdminDep
 from app.database.session_dep import SessionDep
 from app.repository import organizers_crud
-from app.utils.dependencies import CallerIdDep
+from app.authorization.caller_id_dep import CallerIdDep
 from .schemas import (
     ModifyInvitationStatusSchema,
     OrganizationsForUserSchema,

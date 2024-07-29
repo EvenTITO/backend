@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from app.authorization.caller_user_dep import verify_user_exists
 from app.services.users.pubilc_users_service_dep import PublicUsersServiceDep
 from app.services.users.users_admin_service_dep import UsersAdminServiceDep
 from app.services.users.users_service_dep import UsersServiceDep
@@ -30,7 +31,13 @@ async def create_user(user: UserSchema, users_service: PublicUsersServiceDep):
     return user_created_id
 
 
-@users_router.put("/me", status_code=204, response_model=None, tags=["Users: General"])
+@users_router.put(
+    "/me",
+    status_code=204, 
+    response_model=None,
+    tags=["Users: General"],
+    dependencies=[Depends(verify_user_exists)]
+)
 async def update_user(user: UserModifySchema, users_service: UsersServiceDep):
     await users_service.update(user)
 

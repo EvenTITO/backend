@@ -5,7 +5,7 @@ from app.database.session_dep import SessionDep
 from app.database.models.user import UserModel
 from app.repository.users_crud import get_user_by_id
 from app.services.users.exceptions import UserNotFound
-from app.utils.dependencies import CallerIdDep
+from app.authorization.caller_id_dep import CallerIdDep
 
 
 class CallerUser:
@@ -20,5 +20,5 @@ class CallerUser:
         return user
 
 
-caller_user_checker = CallerUser()
-CallerUserDep = Annotated[UserModel, Depends(caller_user_checker)]
+verify_user_exists = CallerUser()
+CallerUserDep = Annotated[UserModel, Depends(verify_user_exists)]

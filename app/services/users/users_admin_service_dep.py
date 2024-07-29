@@ -5,7 +5,7 @@ from app.repository.repository import get_repository
 from app.authorization.admin_user_dep import AdminDep
 from app.repository.users_repository import UsersRepository
 from app.services.users.users_admin_service import UsersAdminService
-from app.utils.dependencies import CallerIdDep
+from app.authorization.caller_id_dep import CallerIdDep
 
 
 class UsersAdmin:

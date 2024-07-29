@@ -2,7 +2,7 @@ from fastapi import Depends
 from typing import Annotated
 
 from app.repository.repository import get_repository
-from app.utils.dependencies import CallerIdDep
+from app.authorization.caller_id_dep import CallerIdDep
 from app.repository.works_repository import WorksRepository
 from app.services.works.author_works_service import AuthorWorksService
 
