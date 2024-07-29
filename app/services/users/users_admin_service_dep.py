@@ -1,7 +1,7 @@
 from fastapi import Depends
 from typing import Annotated
 
-from app.dependencies.repository.repository import get_repository
+from app.repository.repository import get_repository
 from app.authorization.admin_user_dep import AdminDep
 from app.repository.users_repository import UsersRepository
 from app.services.users.users_admin_service import UsersAdminService

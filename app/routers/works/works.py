@@ -1,7 +1,7 @@
 # flake8: noqa
 from fastapi import APIRouter
-from app.dependencies.services.works.author_works_dep import AuthorWorksServiceDep
-from app.dependencies.services.works.works_dep import WorksServiceDep
+from app.services.works.author_works_dep import AuthorWorksServiceDep
+from app.services.works.works_dep import WorksServiceDep
 from app.schemas.works.work import WorkSchema, WorkWithState
 # from app.services.works import works_service
 # from app.schemas.works.work_stages import BeforeDeadline, NoReviewStages

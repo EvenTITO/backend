@@ -1,7 +1,7 @@
 from fastapi import APIRouter
-from app.dependencies.services.users.pubilc_users_service_dep import PublicUsersServiceDep
-from app.dependencies.services.users.users_admin_service_dep import UsersAdminServiceDep
-from app.dependencies.services.users.users_service_dep import UsersServiceDep
+from app.services.users.pubilc_users_service_dep import PublicUsersServiceDep
+from app.services.users.users_admin_service_dep import UsersAdminServiceDep
+from app.services.users.users_service_dep import UsersServiceDep
 from app.schemas.users.user import UserModifySchema, UserSchema
 from app.routers.users.roles import user_roles_router
 from app.routers.users.echo import echo_router

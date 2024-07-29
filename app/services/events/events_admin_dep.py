@@ -1,7 +1,7 @@
 from fastapi import Depends
 from typing import Annotated
 
-from app.dependencies.repository.repository import get_repository
+from app.repository.repository import get_repository
 from app.authorization.admin_user_dep import AdminDep
 from app.repository.events_repository import EventsRepository
 from app.services.events.events_admin_service import EventsAdminService

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.dependencies.services.events.events_admin_dep import EventsAdminServiceDep
+from app.services.events.events_admin_dep import EventsAdminServiceDep
 from ...schemas.events.event_status import EventStatusSchema
 
 
