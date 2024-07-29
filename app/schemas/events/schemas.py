@@ -4,7 +4,7 @@ from pydantic import (
     Field,
 )
 
-from ...models.event import EventType
+from ...database.models.event import EventType
 from app.schemas.events.dates import DatesCompleteSchema
 from app.schemas.events.pricing import PricingSchema
 

@@ -1,11 +1,11 @@
-from app.models.event import EventModel
+from app.database.models.event import EventModel
 from app.schemas.events.create_event import CreateEventSchema
 from app.organizers.exceptions import ExpirationDateException
 from app.organizers.schemas import OrganizationsForUserSchema
 from app.organizers.schemas import OrganizerInEventResponseSchema
-from app.models.user import UserModel
+from app.database.models.user import UserModel
 from app.schemas.users.user import UserSchema
-from ..models.organizer import InvitationStatus, OrganizerModel
+from ..database.models.organizer import InvitationStatus, OrganizerModel
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import update, func

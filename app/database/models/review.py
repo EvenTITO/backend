@@ -9,7 +9,7 @@ from sqlalchemy import (
 )
 import enum
 from app.database.database import Base
-from app.models.submission import SubmissionModel
+from app.database.models.submission import SubmissionModel
 
 
 class ReviewStatus(str, enum.Enum):

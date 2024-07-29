@@ -1,4 +1,4 @@
-from app.models.event import EventStatus
+from app.database.models.event import EventStatus
 
 
 from pydantic import BaseModel, Field

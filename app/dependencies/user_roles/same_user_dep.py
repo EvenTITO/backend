@@ -1,5 +1,5 @@
 from typing import Annotated
-from app.models.user import UserModel
+from app.database.models.user import UserModel
 from fastapi import HTTPException, Depends
 from app.dependencies.user_roles.caller_user_dep import CallerUserDep
 

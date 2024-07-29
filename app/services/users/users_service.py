@@ -1,4 +1,4 @@
-from app.models.user import UserRole
+from app.database.models.user import UserRole
 from app.repository import users_crud
 from app.repository.users_repository import UsersRepository
 from app.schemas.users.user import UserModifySchema, UserReply, UserSchema

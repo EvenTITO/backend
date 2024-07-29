@@ -1,8 +1,8 @@
 from typing import Annotated
 from fastapi import Depends, Header
 from app.dependencies.database.session_dep import SessionDep
-from app.models.event import EventModel
-from app.models.event import EventStatus
+from app.database.models.event import EventModel
+from app.database.models.event import EventStatus
 from app.dependencies.user_roles.admin_user_dep import admin_user_checker
 from app.dependencies.user_roles.caller_user_dep import caller_user_checker
 from app.utils.dependencies import get_user_id

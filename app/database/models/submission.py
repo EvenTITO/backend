@@ -7,7 +7,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from app.database.database import Base
-from app.models.work import WorkModel
+from app.database.models.work import WorkModel
 
 
 class SubmissionModel(Base):

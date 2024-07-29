@@ -2,7 +2,7 @@ from datetime import datetime
 from sqlalchemy.future import select
 
 from sqlalchemy import func
-from app.models.work import WorkModel
+from app.database.models.work import WorkModel
 from app.schemas.works.work import WorkSchema
 from app.utils.crud_repository import CRUDBRepository
 from sqlalchemy.ext.asyncio import AsyncSession

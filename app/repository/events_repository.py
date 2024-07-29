@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.event import EventModel
+from app.database.models.event import EventModel
 from app.utils.crud_repository import CRUDBRepository
 
 

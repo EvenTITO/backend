@@ -3,8 +3,8 @@ from sqlalchemy import Column, String
 from app.database.database import Base
 from sqlalchemy.orm import relationship
 from app.utils.models_utils import ModelTemplate
-from app.models.work import WorkModel
-from app.models.review import ReviewModel
+from app.database.models.work import WorkModel
+from app.database.models.review import ReviewModel
 
 
 class UserRole(str, Enum):

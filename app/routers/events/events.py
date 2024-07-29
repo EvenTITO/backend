@@ -3,7 +3,7 @@ from typing import List
 from app.repository import events_crud
 from app.dependencies.database.session_dep import SessionDep
 from app.events.dependencies import GetEventsQuerysDep
-from app.models.event import EventStatus
+from app.database.models.event import EventStatus
 from app.repository.organizers_crud import is_organizer
 from app.dependencies.user_roles.caller_user_dep import CallerUserDep
 from app.events import validations

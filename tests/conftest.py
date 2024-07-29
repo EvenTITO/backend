@@ -4,12 +4,12 @@ from app.schemas.events.create_event import CreateEventSchema
 from app.storage.schemas import DownloadURLSchema, UploadURLSchema
 from app.schemas.users.user import UserReply, UserSchema
 import pytest
-from app.models.event import EventStatus, EventType
+from app.database.models.event import EventStatus, EventType
 from app.schemas.events.event_status import EventStatusSchema
 from fastapi.encoders import jsonable_encoder
 from app.organizers.schemas import OrganizerRequestSchema
 from app.dependencies.database.session_dep import get_db
-from app.models.user import UserRole
+from app.database.models.user import UserRole
 from app.schemas.users.user_role import UserRoleSchema
 from app.main import app
 from app.database.database import SessionLocal, engine, Base

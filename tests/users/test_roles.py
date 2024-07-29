@@ -1,4 +1,4 @@
-from app.models.user import UserRole
+from app.database.models.user import UserRole
 from app.schemas.users.user import UserSchema
 from app.schemas.users.user_role import UserRoleSchema
 from fastapi.encoders import jsonable_encoder

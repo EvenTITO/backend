@@ -1,7 +1,7 @@
 from app.schemas.events.dates import DateSchema, MandatoryDates
 from app.schemas.users.user import UserSchema
 from app.schemas.events.create_event import CreateEventSchema
-from app.models.event import EventType
+from app.database.models.event import EventType
 from app.schemas.works.author import AuthorInformation
 from app.schemas.works.work import WorkSchema
 import datetime

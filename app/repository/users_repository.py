@@ -1,4 +1,4 @@
-from app.models.user import UserModel, UserRole
+from app.database.models.user import UserModel, UserRole
 from app.schemas.users.user import UserSchema
 from app.utils.crud_repository import CRUDBRepository
 from sqlalchemy.ext.asyncio import AsyncSession

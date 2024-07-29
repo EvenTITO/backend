@@ -1,8 +1,8 @@
 from fastapi import HTTPException
 from app.repository import events_crud
 from app.repository import reviewers_crud as reviewers_crud
-from app.models.event import EventStatus
-from app.models.user import UserRole
+from app.database.models.event import EventStatus
+from app.database.models.user import UserRole
 from ..schemas.events.create_event import CreateEventSchema
 from .exceptions import (
     InvalidEventSameTitle,

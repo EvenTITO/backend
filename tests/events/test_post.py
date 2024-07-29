@@ -1,6 +1,6 @@
 from app.schemas.events.create_event import CreateEventSchema
 from fastapi.encoders import jsonable_encoder
-from app.models.event import EventType
+from app.database.models.event import EventType
 import datetime
 
 from app.schemas.events.dates import DateSchema, MandatoryDates

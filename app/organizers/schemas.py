@@ -1,5 +1,5 @@
 from datetime import datetime
-from app.models.organizer import InvitationStatus
+from app.database.models.organizer import InvitationStatus
 from pydantic import BaseModel, Field
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.users.user import UserSchema
