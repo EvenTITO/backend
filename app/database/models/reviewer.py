@@ -1,6 +1,6 @@
 from app.database.models.utils import DateTemplate
 from datetime import datetime
-from app.utils.exceptions import DatesException
+from app.exceptions.dates_exception import DatesException
 from sqlalchemy import Column, String, Date
 from app.database.database import Base
 from sqlalchemy.orm import validates
