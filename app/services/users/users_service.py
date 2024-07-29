@@ -1,7 +1,7 @@
 from app.models.user import UserRole
 from app.repository import users_crud
 from app.repository.users import UsersRepository
-from app.schemas.users.user import UserReply, UserSchema
+from app.schemas.users.user import UserModifySchema, UserReply, UserSchema
 from app.services.users.exceptions import (
     EmailAlreadyExists,
     EmailCantChange,
@@ -61,3 +61,6 @@ class UsersService(BaseService):
 
         user_created = await self.users_repository.create(user_to_create)
         return user_created.id
+
+    async def update(self, user: UserModifySchema):
+        await self.users_repository.update(self.user_id, user)

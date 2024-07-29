@@ -19,4 +19,4 @@ class UsersRepository(CRUDBRepository):
 
     async def create_user(self, id, user: UserSchema):
         db_user = UserModel(**user.model_dump(), id=id)
-        return await self._create(db_user)
+        return await self.create(db_user)

@@ -1,5 +1,6 @@
+from app.dependencies.services.users.pubilc_users_service_dep import PublicUsersServiceDep
 from app.dependencies.services.users.users_service_dep import UsersServiceDep
-from app.schemas.users.user import UserSchema
+from app.schemas.users.user import UserModifySchema, UserSchema
 from fastapi import APIRouter
 from app.routers.users.roles import user_roles_router
 from app.routers.users.echo import echo_router
@@ -10,7 +11,6 @@ from app.services.users import users_service
 from app.schemas.users.user import UserReply
 from app.dependencies.user_roles.admin_user_dep import AdminDep
 from app.dependencies.user_roles.same_user_or_admin_dep import SameUserOrAdminDep
-from app.dependencies.user_roles.same_user_dep import SameUserDep
 
 
 users_router = APIRouter(
@@ -27,14 +27,14 @@ async def read_user(user_id: str, db: SessionDep, _: SameUserOrAdminDep):
 
 
 @users_router.post("", status_code=201, response_model=str, tags=["Users: General"])
-async def create_user(user: UserSchema, users_service: UsersServiceDep):
+async def create_user(user: UserSchema, users_service: PublicUsersServiceDep):
     user_created_id = await users_service.create(user)
     return user_created_id
 
 
-@users_router.put("/{user_id}", status_code=204, response_model=None, tags=["Users: General"])
-async def update_user(user: UserSchema, caller_user: SameUserDep, db: SessionDep):
-    await users_service.update_user(db, caller_user, user)
+@users_router.put("/me", status_code=204, response_model=None, tags=["Users: General"])
+async def update_user(user: UserModifySchema, users_service: UsersServiceDep):
+    await users_service.update(user)
 
 
 @users_router.delete("/{user_id}", status_code=204, response_model=None, tags=["Users: General"])
