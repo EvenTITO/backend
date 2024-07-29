@@ -6,6 +6,7 @@ from app.database.models.event import EventStatus
 from app.authorization.admin_user_dep import admin_user_checker
 from app.authorization.caller_user_dep import verify_user_exists
 from app.authorization.caller_id_dep import get_user_id
+from app.services.users.users_service_dep import UsersServiceDep
 
 
 # TODO: ver si se puede hacer mas bonito el chequeo de admin.
@@ -15,15 +16,13 @@ class GetEventQueryChecker:
     async def __call__(
         self,
         db: SessionDep,
+        users_service: UsersServiceDep,
         status: EventStatus | None = None,
-        X_User_Id: str | None = Header(default=None)
+        X_User_Id: str | None = Header(default=None),
     ):
         if (status != EventStatus.STARTED):
             await admin_user_checker(
-                await verify_user_exists(
-                    caller_id=await get_user_id(X_User_Id),
-                    db=db
-                )
+                users_service
             )
         return status
 

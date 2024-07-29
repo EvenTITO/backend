@@ -1,16 +1,16 @@
+from app.services.users.users_service_dep import UsersServiceDep
 from typing import Annotated
-from app.database.models.user import UserModel, UserRole
+from app.database.models.user import UserRole
 from fastapi import HTTPException, Depends
-from app.authorization.caller_user_dep import CallerUserDep
 
 
 class AdminUser:
-    async def __call__(self, caller_user: CallerUserDep) -> UserModel:
-        if caller_user.role == UserRole.ADMIN:
-            return caller_user
-        else:
+    async def __call__(self, service: UsersServiceDep) -> bool:
+        role = await service.get_role()
+        if role != UserRole.ADMIN:
             raise HTTPException(status_code=403)
+        return True
 
 
 admin_user_checker = AdminUser()
-AdminDep = Annotated[UserModel, Depends(admin_user_checker)]
+AdminDep = Annotated[bool, Depends(admin_user_checker)]

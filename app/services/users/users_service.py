@@ -52,3 +52,6 @@ class UsersService(BaseService):
 
     async def update(self, user: UserModifySchema):
         await self.users_repository.update(self.user_id, user)
+
+    async def get_role(self):
+        return await self.users_repository.get_role(self.user_id)

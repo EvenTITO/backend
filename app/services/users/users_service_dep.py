@@ -10,10 +10,11 @@ from app.services.users.users_service import UsersService
 class UsersDependencyChecker:
     async def __call__(
         self,
-        user_id: CallerIdDep,
+        caller_id: CallerIdDep,
         users_repository: UsersRepository = Depends(get_repository(UsersRepository)),
     ) -> UsersService:
-        return UsersService(users_repository, user_id)
+        print('pide users service')
+        return UsersService(users_repository, caller_id)
 
 
 users_service_factory = UsersDependencyChecker()

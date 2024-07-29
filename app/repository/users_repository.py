@@ -20,3 +20,7 @@ class UsersRepository(CRUDBRepository):
     async def create_user(self, id, user: UserSchema):
         db_user = UserModel(**user.model_dump(), id=id)
         return await self.create(db_user)
+
+    async def get_role(self, id):
+        conditions = await self._primary_key_conditions(id)
+        return await self._get_with_values(conditions, UserModel.role)
