@@ -1,10 +1,10 @@
 from typing import Annotated
-from fastapi import Depends, Header
+from fastapi import Depends, HTTPException, Header
+from app.authorization.user_id_dep import UserDep
+from app.database.models.user import UserRole
 from app.database.session_dep import SessionDep
 from app.database.models.event import EventModel
 from app.database.models.event import EventStatus
-from app.authorization.admin_user_dep import admin_user_checker
-from app.services.users.users_service_dep import UsersServiceDep
 
 
 # TODO: ver si se puede hacer mas bonito el chequeo de admin.
@@ -14,14 +14,12 @@ class GetEventQueryChecker:
     async def __call__(
         self,
         db: SessionDep,
-        users_service: UsersServiceDep,
+        role: UserDep,
         status: EventStatus | None = None,
         X_User_Id: str | None = Header(default=None),
     ):
-        if (status != EventStatus.STARTED):
-            await admin_user_checker(
-                users_service
-            )
+        if (status != EventStatus.STARTED and role != UserRole.ADMIN):
+            raise HTTPException(status_code=400)  # TODO: move to service.
         return status
 
 

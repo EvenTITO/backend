@@ -1,12 +1,12 @@
-from app.services.users.users_service_dep import UsersServiceDep
+from app.authorization.user_id_dep import UserDep
 from typing import Annotated
 from app.database.models.user import UserRole
 from fastapi import HTTPException, Depends
 
 
 class AdminUser:
-    async def __call__(self, service: UsersServiceDep) -> None:
-        role = await service.get_role()
+    async def __call__(self, role: UserDep) -> None:
+        print('el rol es ', role)
         if role != UserRole.ADMIN:
             raise HTTPException(status_code=403)
 
