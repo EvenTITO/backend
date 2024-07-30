@@ -11,3 +11,8 @@ class EventsRepository(Repository):
         conditions = await self._primary_key_conditions(event_id)
         event_status = await self._get_with_values(conditions, EventModel.status)
         return event_status
+
+    async def get_review_skeleton(self, event_id):
+        conditions = await self._primary_key_conditions(event_id)
+        review_skeleton = await self._get_with_values(conditions, EventModel.review_skeleton)
+        return review_skeleton

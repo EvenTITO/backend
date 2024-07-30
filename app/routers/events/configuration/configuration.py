@@ -21,4 +21,3 @@ async def get_event_configuration(
 ) -> EventConfigurationSchema:
     event = await events_configuration_service.get_configuration()
     return event
-

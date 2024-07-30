@@ -16,4 +16,4 @@ class FeeSchema(BaseModel):
 
 
 class PricingSchema(BaseModel):
-    rates: list[FeeSchema]
+    pricing: list[FeeSchema] = Field(default_factory=list)

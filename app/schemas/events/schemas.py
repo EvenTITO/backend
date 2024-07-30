@@ -44,5 +44,5 @@ class DynamicGeneralEventSchema(DatesCompleteSchema):
     )
 
 
-class DynamicEventSchema(DynamicGeneralEventSchema, DatesCompleteSchema):
-    pricing: PricingSchema | None = None  # TODO: AGREGAR DEFAULT EN VEZ DE NONE.
+class DynamicEventSchema(DynamicGeneralEventSchema, DatesCompleteSchema, PricingSchema):
+    pass

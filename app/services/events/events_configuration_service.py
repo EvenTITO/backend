@@ -26,3 +26,9 @@ class EventsConfigurationService(BaseService):
 
     async def update_general(self, general: ConfigurationGeneralEventSchema) -> None:
         await self.events_repository.update(self.event_id, general)
+
+    async def get_review_skeleton(self) -> ReviewSkeletonSchema:
+        review_skeleton = await self.events_repository.get_review_skeleton(self.event_id)
+        return ReviewSkeletonSchema(
+            review_skeleton=review_skeleton
+        )
