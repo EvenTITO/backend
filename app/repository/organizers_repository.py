@@ -17,6 +17,9 @@ class OrganizersRepository(Repository):
     async def is_organizer(self, id_event: str, id_organizer: str):
         return await self.exists((id_event, id_organizer))
 
+    # async def get(self, id_event, id_organizer):
+    #     return await self.
+
     async def _primary_key_conditions(self, primary_key):
         id_event, id_organizer = primary_key
         return [

@@ -19,7 +19,7 @@ class OrganizerOrAdminChecker:
     ) -> Union[EventRol, UserRole]:
         if role == UserRole.ADMIN:
             return UserRole.ADMIN
-        if not await organizers_crud.is_organizer(
+        if not await organizers_crud.is_organizer( # TODO
             db,
             event_id,
             caller_id

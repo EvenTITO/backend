@@ -6,7 +6,7 @@ from app.database.database import Base
 from sqlalchemy.orm import validates
 
 
-class ReviewerModel(DateTemplate, Base):
+class ReviewerModel(DateTemplate, Base):  # TODO: chair
     __tablename__ = "reviewer"
 
     id_user = Column(String, primary_key=True)

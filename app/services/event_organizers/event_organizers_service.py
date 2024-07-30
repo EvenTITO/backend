@@ -30,3 +30,7 @@ class EventOrganizersService(BaseService):
     async def get_organizers(self):
         organizers = await self.organizers_repository.get_event_organizers(self.event_id)
         return organizers
+
+    async def is_organizer(self, user_id):
+        print('el id es ', self.event_id)
+        return await self.organizers_repository.is_organizer(self.event_id, user_id)
