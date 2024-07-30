@@ -1,7 +1,8 @@
 from fastapi import HTTPException
 from app.database.models.organizer import InvitationStatus
+from app.exceptions.expiration_date_exception import ExpirationDateException
 from app.exceptions.users_exceptions import UserNotFound
-from app.organizers.schemas import ModifyInvitationStatusSchema, OrganizerRequestSchema
+from app.schemas.organizers.schemas import ModifyInvitationStatusSchema, OrganizerRequestSchema
 from app.repository.organizers_repository import OrganizersRepository
 from app.repository.users_repository import UsersRepository
 from app.services.services import BaseService
@@ -56,6 +57,6 @@ class EventOrganizersService(BaseService):
             organizer.invitation_expiration_date < datetime.now()
         ):
             await self.organizers_repository.delete(event_id, user_id)
-            raise HTTPException(status_code=409)  # TODO: mejor excepcion.
+            raise ExpirationDateException()
 
         await self.organizers_repository.update_invitation(event_id, user_id, status_modification)

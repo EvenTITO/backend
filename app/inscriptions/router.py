@@ -3,7 +3,7 @@ from typing import List
 from app.authorization.caller_id_dep import CallerIdDep
 from app.authorization.user_id_dep import verify_user_exists
 from app.authorization.same_user_or_admin_dep import SameUserOrAdminDep
-from .schemas import (
+from ..schemas.inscriptions.schemas import (
     InscriptionReplySchema
 )
 from app.database.session_dep import SessionDep

@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import select
 from app.database.models.organizer import OrganizerModel
 from app.database.models.user import UserModel
-from app.organizers.schemas import ModifyInvitationStatusSchema, OrganizerInEventResponseSchema
+from app.schemas.organizers.schemas import ModifyInvitationStatusSchema, OrganizerInEventResponseSchema
 from app.repository.crud_repository import Repository
 from sqlalchemy.ext.asyncio import AsyncSession
 

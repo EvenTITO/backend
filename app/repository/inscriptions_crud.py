@@ -1,6 +1,6 @@
 from app.database.models.event import EventModel
 from app.schemas.events.create_event import CreateEventSchema
-from app.inscriptions.schemas import (
+from app.schemas.inscriptions.schemas import (
     InscriptionsForUserSchema,
     InscriptionsInEventResponseSchema
 )

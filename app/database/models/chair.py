@@ -6,8 +6,8 @@ from app.database.database import Base
 from sqlalchemy.orm import validates
 
 
-class ReviewerModel(DateTemplate, Base):  # TODO: chair
-    __tablename__ = "reviewer"
+class ChairModel(DateTemplate, Base):  # TODO: chair
+    __tablename__ = "chairs"
 
     id_user = Column(String, primary_key=True)
     id_event = Column(String, primary_key=True)

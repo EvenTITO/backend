@@ -1,4 +1,4 @@
-from app.database.models.reviewer import ReviewerModel
+from app.database.models.chair import ChairModel
 from app.reviewers.schemas.reviewer import (
     ReviewerSchema
 )
@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 # TODO: revisar porque en caso de dup PK se obtiene un error
 async def create_reviewer(db: AsyncSession, reviewer: ReviewerSchema,
                           event_id: str, user_id: str):
-    new_reviewer = ReviewerModel(**reviewer.model_dump(),
+    new_reviewer = ChairModel(**reviewer.model_dump(),
                                  id_user=user_id, id_event=event_id)
     db.add(new_reviewer)
 
@@ -20,9 +20,9 @@ async def create_reviewer(db: AsyncSession, reviewer: ReviewerSchema,
 
 
 async def get_reviewer(db: AsyncSession, event_id: str, user_id: str):
-    query = select(ReviewerModel).where(
-        ReviewerModel.id_event == event_id,
-        ReviewerModel.id_user == user_id
+    query = select(ChairModel).where(
+        ChairModel.id_event == event_id,
+        ChairModel.id_user == user_id
     )
 
     result = await db.execute(query)
@@ -30,8 +30,8 @@ async def get_reviewer(db: AsyncSession, event_id: str, user_id: str):
 
 
 async def get_all_reviewer(db: AsyncSession, event_id: str):
-    query = select(ReviewerModel).where(
-        ReviewerModel.id_event == event_id
+    query = select(ChairModel).where(
+        ChairModel.id_event == event_id
     )
     result = await db.execute(query)
 

@@ -1,13 +1,13 @@
 from typing import List
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from app.database.session_dep import SessionDep
-from app.organizers.dependencies import EventOrganizerDep
 from app.repository import reviewers_crud as crud
 from app.events import validations
 from app.reviewers.schemas.reviewer import (
     ReviewerSchema,
     ReviewerSchemaComplete
 )
+from app.authorization.organizer_or_admin_dep import verify_is_organizer
 
 reviewers_router = APIRouter(
     prefix="/events/{event_id}/reviewers",
@@ -15,12 +15,11 @@ reviewers_router = APIRouter(
 )
 
 
-@reviewers_router.post("/{user_id}", status_code=201)
+@reviewers_router.post("/{user_id}", status_code=201, dependencies=[Depends(verify_is_organizer)])
 async def create_reviewer(
         event_id: str,
         user_id: str,
         reviewer: ReviewerSchema,
-        _: EventOrganizerDep,
         db: SessionDep
 ):
     await validations.validate_unique_reviewer(db, event_id, user_id)
@@ -36,10 +35,9 @@ async def create_reviewer(
 
 @reviewers_router.get(
     "",
-    response_model=List[ReviewerSchemaComplete])
+    response_model=List[ReviewerSchemaComplete], dependencies=[Depends(verify_is_organizer)])
 async def get_reviewer(
         event_id: str,
         db: SessionDep,
-        _: EventOrganizerDep
 ):
     return await crud.get_all_reviewer(db, event_id)

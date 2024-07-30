@@ -1,6 +1,6 @@
 import pytest
 from fastapi.encoders import jsonable_encoder
-from app.organizers.schemas import OrganizerRequestSchema
+from app.schemas.organizers.schemas import OrganizerRequestSchema
 from ..common import create_headers
 
 
