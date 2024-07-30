@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from app.authorization.caller_id_dep import CallerIdDep
-from app.authorization.caller_user_dep import verify_user_exists
+from app.authorization.user_id_dep import verify_user_exists
 from app.repository import events_crud
 from app.database.session_dep import SessionDep
 from app.organizers.dependencies import EventOrganizerDep

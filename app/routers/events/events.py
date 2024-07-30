@@ -7,7 +7,7 @@ from app.database.session_dep import SessionDep
 from app.events.dependencies import GetEventsQuerysDep
 from app.database.models.event import EventStatus
 from app.repository.organizers_crud import is_organizer
-from app.authorization.caller_user_dep import verify_user_exists
+from app.authorization.user_id_dep import verify_user_exists
 from app.events import validations
 import app.notifications.events as notifications
 from app.events.utils import get_event

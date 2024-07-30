@@ -19,5 +19,5 @@ class UserId:
         return user_role
 
 
-user_exists_checker = UserId()
-UserDep = Annotated[UserRole, Depends(user_exists_checker)]
+verify_user_exists = UserId()
+UserDep = Annotated[UserRole, Depends(verify_user_exists)]

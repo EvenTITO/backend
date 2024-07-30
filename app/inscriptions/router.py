@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from typing import List
 from app.authorization.caller_id_dep import CallerIdDep
-from app.authorization.caller_user_dep import verify_user_exists
+from app.authorization.user_id_dep import verify_user_exists
 from app.authorization.same_user_or_admin_dep import SameUserOrAdminDep
 from .schemas import (
     InscriptionReplySchema

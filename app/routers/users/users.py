@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from app.authorization.caller_user_dep import verify_user_exists
+from app.authorization.user_id_dep import verify_user_exists
 from app.services.users.pubilc_users_service_dep import PublicUsersServiceDep
 from app.services.users.users_admin_service_dep import UsersAdminServiceDep
 from app.services.users.users_service_dep import UsersServiceDep
