@@ -77,10 +77,7 @@ class DatesCompleteSchema(BaseModel):
         start_time = mandatory_dates_dict[MandatoryDates.START_DATE].time
         end_date = mandatory_dates_dict[MandatoryDates.END_DATE].date
         end_time = mandatory_dates_dict[MandatoryDates.END_DATE].time
-        print('dale')
         if start_date is not None and end_date is not None:
-            print('daleww', start_date, end_date)
             if (start_date > end_date) or (start_date == end_date and start_time > end_time):
-                print('daleww')
                 raise ValueError('End Date should be after Start Date.')
         return self

@@ -13,9 +13,12 @@ class UsersRepository(Repository):
         conditions = [UserModel.role == admin_role]
         return await self._count_with_conditions(conditions)
 
-    async def get_user_by_email(self, email):
+    async def get_user_id_by_email(self, email):
         conditions = [UserModel.email == email]
-        return await self._get_with_conditions(conditions)
+        user = await self._get_with_conditions(conditions)  # TODO: change to get only ID.
+        if user is None:
+            return user
+        return user.id
 
     async def create_user(self, id, user: UserSchema):
         db_user = UserModel(**user.model_dump(), id=id)

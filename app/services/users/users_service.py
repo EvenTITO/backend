@@ -33,11 +33,11 @@ class UsersService(BaseService):
         return await self.users_repository.exists(user_id)
 
     async def create(self, user: UserSchema) -> str:
-        user_in_db = await self.users_repository.get(self.user_id)
-        if user_in_db:
+        exists = await self.users_repository.exists(self.user_id)
+        if exists:
             raise IdAlreadyExists(self.user_id)
-        user_in_db = await self.users_repository.get_user_by_email(user.email)
-        if user_in_db:
+        user_id_in_db = await self.users_repository.get_user_id_by_email(user.email)
+        if user_id_in_db:
             raise EmailAlreadyExists(user.email)
 
         user_to_create = UserReply(

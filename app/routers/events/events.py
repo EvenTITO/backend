@@ -12,11 +12,14 @@ from app.routers.events.media import events_media_router
 from app.routers.events.configuration.configuration import events_configuration_router
 from app.routers.events.administration import events_admin_router
 from app.services.events.events_service_dep import EventsServiceDep
+from app.routers.events.members.organizers import event_organizers_router
+
 
 events_router = APIRouter(prefix="/events")
 events_router.include_router(events_media_router)
 events_router.include_router(events_configuration_router)
 events_router.include_router(events_admin_router)
+events_router.include_router(event_organizers_router)
 
 
 @events_router.get(

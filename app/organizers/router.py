@@ -26,20 +26,20 @@ organizers_users_router = APIRouter(
 )
 
 
-@organizers_events_router.post("", status_code=201)
-async def create_organizer(
-    event_id: str,
-    _: EventOrganizerDep,
-    organizer: OrganizerRequestSchema,
-    db: SessionDep
-) -> str:
-    organizer_user = await get_user_by_email(db, organizer.email_organizer)
-    organizer = await organizers_crud.add_organizer_to_event(
-        db,
-        organizer_user.id,
-        event_id
-    )
-    return organizer.id_organizer
+# @organizers_events_router.post("", status_code=201)
+# async def create_organizer(
+#     event_id: str,
+#     _: EventOrganizerDep,
+#     organizer: OrganizerRequestSchema,
+#     db: SessionDep
+# ) -> str:
+#     organizer_user = await get_user_by_email(db, organizer.email_organizer)
+#     organizer = await organizers_crud.add_organizer_to_event(
+#         db,
+#         organizer_user.id,
+#         event_id
+#     )
+#     return organizer.id_organizer
 
 
 @organizers_events_router.get(
