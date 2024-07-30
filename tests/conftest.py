@@ -1,5 +1,4 @@
 from app.repository.users_repository import UsersRepository
-from app.repository.users_crud import get_user_by_id
 from app.schemas.events.create_event import CreateEventSchema
 from app.storage.schemas import DownloadURLSchema, UploadURLSchema
 from app.schemas.users.user import UserReply, UserSchema
@@ -108,7 +107,7 @@ async def admin_data():
     )
     users_repo = UsersRepository(session)
     await users_repo.create(user_to_create)
-    user = await get_user_by_id(session, id_user)
+    user = await users_repo.get(id_user)
     await session.close()
     return user
 

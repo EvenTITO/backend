@@ -11,9 +11,7 @@ from app.events.utils import get_event
 from app.schemas.events.public_event import PublicEventSchema
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.public_event_with_roles import PublicEventWithRolesSchema
-from app.schemas.events.schemas import (
-    EventRol,
-)
+from app.schemas.events.schemas import EventRol
 from app.routers.events.media import events_media_router
 from app.routers.events.configuration.configuration import events_configuration_router
 from app.routers.events.administration import events_admin_router
@@ -27,12 +25,14 @@ events_router.include_router(events_admin_router)
 
 @events_router.get("/my-events", response_model=List[PublicEventWithRolesSchema], tags=["Events: General"], dependencies=[Depends(verify_user_exists)])
 async def read_my_events(
-        db: SessionDep,
-        caller_id: CallerIdDep,
-        offset: int = 0,
-        limit: int = Query(default=100, le=100)  # TODO: use offset & limit.
+    db: SessionDep,
+    caller_id: CallerIdDep,
+    events_service: EventsServiceDep,
+    offset: int = 0,
+    limit: int = Query(default=100, le=100)  # TODO: use offset & limit.
 ):
     return await events_crud.get_all_events_for_user(db, caller_id)
+    return await events_service.get_my_events(caller_id, offset=offset, limit=limit)
 
 
 @events_router.get("/", response_model=List[PublicEventSchema], tags=["Events: General"])

@@ -4,6 +4,7 @@ from app.exceptions.events_exceptions import InvalidEventSameTitle
 from app.repository.events_repository import EventsRepository
 from app.schemas.events.configuration import EventConfigurationSchema
 from app.schemas.events.create_event import CreateEventSchema
+from app.schemas.events.public_event_with_roles import PublicEventWithRolesSchema
 from app.services.services import BaseService
 
 
@@ -27,3 +28,6 @@ class EventsService(BaseService):
         )
         event_created = await self.events_repository.create(creator_id, event)
         return event_created.id
+
+    async def get_my_events(self, caller_id: str, offset: int, limit: int) -> list[PublicEventWithRolesSchema]:
+        await self.events_repository.get_many(offset=offset, limit=limit)

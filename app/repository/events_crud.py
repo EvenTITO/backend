@@ -5,46 +5,11 @@ from ..schemas.events.public_event_with_roles import PublicEventWithRolesSchema
 from ..schemas.events.review_skeleton.review_skeleton import ReviewSkeletonSchema
 from ..database.models.event import EventModel, EventStatus
 from ..schemas.events.schemas import (
-    DatesCompleteSchema,
     EventRol,
-    PricingSchema,
-)
-from ..schemas.events.create_event import (
-    CreateEventSchema
 )
 from sqlalchemy.future import select
-from app.database.models.organizer import InvitationStatus, OrganizerModel
+from app.database.models.organizer import OrganizerModel
 from sqlalchemy.ext.asyncio import AsyncSession
-
-
-async def get_dates(db: AsyncSession, event_id: str, user_id: str):
-    query = select(EventModel.dates).where(
-        EventModel.id == event_id,
-        EventModel.id_creator == user_id
-    )
-
-    result = await db.execute(query)
-    return result.scalars().first()
-
-
-async def get_pricing(db: AsyncSession, event_id: str, user_id: str):
-    query = select(EventModel.pricing).where(
-        EventModel.id == event_id,
-        EventModel.id_creator == user_id
-    )
-
-    result = await db.execute(query)
-    return result.scalars().first()
-
-
-async def get_review_sckeletor(db: AsyncSession, event_id: str, user_id: str):
-    query = select(EventModel.review_skeleton).where(
-        EventModel.id == event_id,
-        EventModel.id_creator == user_id
-    )
-
-    result = await db.execute(query)
-    return result.scalars().first()
 
 
 async def get_all_events_for_user(db: AsyncSession, user_id: str):
@@ -93,13 +58,6 @@ async def get_event_by_id(db: AsyncSession, event_id: str):
     event = await db.get(EventModel, event_id)
     return event
 
-
-async def get_event_by_title(db: AsyncSession, event_title: str):
-    query = select(EventModel).where(EventModel.title == event_title)
-    result = await db.execute(query)
-    return result.scalars().first()
-
-
 async def get_all_events(
     db: AsyncSession,
     offset: int,
@@ -114,107 +72,6 @@ async def get_all_events(
         query = query.filter(EventModel.title.ilike(f'%{title_search}%'))
     result = await db.execute(query)
     return result.scalars().all()
-
-
-async def create_event(db: AsyncSession, event: CreateEventSchema, user_id: str, user_role: UserRole):
-    if user_role == UserRole.EVENT_CREATOR:
-        status = EventStatus.CREATED
-    else:
-        status = EventStatus.WAITING_APPROVAL
-    db_event = EventModel(
-        **event.model_dump(mode='json'),
-        id_creator=user_id,
-        status=status,
-        notification_mails=[]
-    )
-    print('llegaaste')
-    db.add(db_event)
-    await db.flush()
-    print('llegaas')
-
-    db_organizer = OrganizerModel(
-        id_organizer=user_id,
-        id_event=db_event.id,
-        invitation_status=InvitationStatus.ACCEPTED,
-    )
-    db.add(db_organizer)
-
-    await db.commit()
-    await db.refresh(db_event)
-    return db_event
-
-
-async def update_general_event(
-        db: AsyncSession,
-        current_event: EventModel,
-        event_modification
-):
-    orig_title = current_event.title
-    for attr, value in event_modification.model_dump().items():
-        setattr(current_event, attr, value)
-    current_event.title = orig_title
-    await db.commit()
-    await db.refresh(current_event)
-
-    return current_event
-
-
-async def update_event(
-    db: AsyncSession,
-    current_event: EventModel,
-    event_modification: ConfigurationGeneralEventSchema
-):
-    for attr, value in event_modification.model_dump().items():
-        setattr(current_event, attr, value)
-    await db.commit()
-    await db.refresh(current_event)
-
-    return current_event
-
-
-async def update_status(
-    db: AsyncSession,
-    event: EventModel,
-    status_modification: EventStatus
-):
-    event.status = status_modification
-    await db.commit()
-    await db.refresh(event)
-    return event
-
-
-async def update_pricing(
-    db: AsyncSession,
-    event: EventModel,
-    pricing: PricingSchema
-):
-    event.pricing = pricing.model_dump()
-    await db.commit()
-    await db.refresh(event)
-    return event
-
-
-async def update_dates(
-    db: AsyncSession,
-    event: EventModel,
-    dates: DatesCompleteSchema
-):
-    dates = dates.model_dump(mode='json')
-    event.dates = dates["dates"]
-    await db.commit()
-    await db.refresh(event)
-    return event
-
-
-async def update_review_skeleton(
-    db: AsyncSession,
-    event: EventModel,
-    review_skeleton: ReviewSkeletonSchema
-):
-    event.review_skeleton = review_skeleton.model_dump()
-    await db.commit()
-    await db.refresh(event)
-    return event
 
 
 async def is_creator(

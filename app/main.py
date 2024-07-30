@@ -22,30 +22,33 @@ from app.reviewers.routers.reviewer import reviewers_router
 
 from app.database.database import Base, engine
 from app.database.session_dep import get_db
-from app.repository.users_crud import create_user
 from app.repository.users_repository import UsersRepository
-from app.schemas.users.user import UserSchema
+from app.schemas.users.user import UserReply
 import os
 from dotenv import load_dotenv
 
-from app.schemas.users.user_role import UserRoleSchema
 
 load_dotenv()
 
 
 async def add_first_admin():
+    # TODO: Use migrations to add the first admin.
     db_gen = get_db()
     db = await anext(db_gen)
-    admin_user = UserSchema(
-        name=os.getenv("ADMIN_NAME"),
-        lastname=os.getenv("ADMIN_LASTNAME"),
-        email=os.getenv("ADMIN_EMAIL")
-    )
+    name = os.getenv("ADMIN_NAME"),
+    lastname = os.getenv("ADMIN_LASTNAME"),
+    email = os.getenv("ADMIN_EMAIL")
     admin_id = os.getenv("ADMIN_ID")
     try:
-        await create_user(db, admin_id, admin_user)
         repository = UsersRepository(db)
-        await repository.update(admin_id, UserRoleSchema(role=UserRole.ADMIN))
+        admin_user = UserReply(
+            id=admin_id,
+            role=UserRole.ADMIN,
+            name=name,
+            lastname=lastname,
+            email=email
+        )
+        repository.create(admin_user)
     except Exception:
         print('Admin already exists.')
 
