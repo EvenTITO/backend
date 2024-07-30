@@ -9,14 +9,12 @@ from app.services.services import BaseService
 from app.database.models.user import UserRole
 
 
-class EventsService(BaseService):
+class EventsAdministationService(BaseService):
     def __init__(self, events_repository: EventsRepository):
         self.events_repository = events_repository
 
-    async def modify_status(self, event_id: str, new_status: EventStatusSchema, caller_role: Union[EventRol, UserRole]):
-        print('staaat', new_status)
+    async def update_status(self, event_id: str, new_status: EventStatusSchema, caller_role: Union[EventRol, UserRole]):
         event_status = await self.events_repository.get_status(event_id)
-        print('uy', event_status)
         admin_status = [
             EventStatus.WAITING_APPROVAL,
             EventStatus.NOT_APPROVED,
@@ -26,12 +24,8 @@ class EventsService(BaseService):
             (caller_role != UserRole.ADMIN) and
             (event_status in admin_status or new_status.status in admin_status)
         ):
-            print('el rol es', caller_role)
-            print('el rol es', caller_role)
             raise HTTPException(status_code=400)
-        print('esa', event_status)
 
         update_ok = await self.events_repository.update(event_id, new_status)
-        print('el new status es', new_status)
         if not update_ok:
             raise EventNotFound(event_id)
