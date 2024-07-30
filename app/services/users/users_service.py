@@ -33,6 +33,9 @@ class UsersService(BaseService):
         self.users_repository = users_repository
         self.user_id = user_id
 
+    async def exists(self, user_id: str) -> bool:
+        return await self.users_repository.exists(user_id)
+
     async def create(self, user: UserSchema) -> str:
         user_in_db = await self.users_repository.get(self.user_id)
         if user_in_db:
