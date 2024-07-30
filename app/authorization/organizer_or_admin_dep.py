@@ -12,12 +12,13 @@ class OrganizerOrAdminChecker:
     async def __call__(
         self,
         caller_id: CallerIdDep,
+        event_id: str,
         organizers_service: EventOrganizersServiceDep,
         role: UserDep,
     ) -> Union[EventRol, UserRole]:
         if role == UserRole.ADMIN:
             return UserRole.ADMIN
-        if not await organizers_service.is_organizer(caller_id):
+        if not await organizers_service.is_organizer(event_id, caller_id):
             raise HTTPException(status_code=403)
         return EventRol.ORGANIZER
 

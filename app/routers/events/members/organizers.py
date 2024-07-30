@@ -14,19 +14,21 @@ event_organizers_router = APIRouter(
 async def invite_organizer(
     service: EventOrganizersServiceDep,
     organizer: OrganizerRequestSchema,
+    event_id: str,
 ) -> str:
-    return await service.invite(organizer)
+    return await service.invite(organizer, event_id)
 
 
 @event_organizers_router.get(
     "",
     response_model=List[OrganizerInEventResponseSchema],
-    dependencies=[Depends(verify_is_organizer)]
+    dependencies=[Depends(verify_is_organizer)],
 )
 async def read_event_organizers(
     service: EventOrganizersServiceDep,
+    event_id: str,
 ):
-    return await service.get_organizers()
+    return await service.get_organizers(event_id)
     
 #organizers_crud.get_organizers_in_event(db, event_id)
 

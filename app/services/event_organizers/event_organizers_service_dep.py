@@ -10,11 +10,10 @@ from app.services.event_organizers.event_organizers_service import EventOrganize
 class EventsOrganizerChecker:
     async def __call__(
         self,
-        event_id: str,
         users_repository: UsersRepository = Depends(get_repository(UsersRepository)),
         organizers_repository: OrganizersRepository = Depends(get_repository(OrganizersRepository)),
     ) -> EventOrganizersService:
-        return EventOrganizersService(organizers_repository, users_repository, event_id)
+        return EventOrganizersService(organizers_repository, users_repository)
 
 
 event_organizers_checker = EventsOrganizerChecker()
