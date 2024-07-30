@@ -1,5 +1,5 @@
 from fastapi.encoders import jsonable_encoder
-from app.schemas.organizers.schemas import OrganizerRequestSchema
+from app.schemas.members.organizers.organizer_schema import OrganizerRequestSchema
 from ..common import create_headers
 
 

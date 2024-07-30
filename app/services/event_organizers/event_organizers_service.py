@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from app.database.models.organizer import InvitationStatus
 from app.exceptions.expiration_date_exception import ExpirationDateException
 from app.exceptions.users_exceptions import UserNotFound
-from app.schemas.organizers.schemas import ModifyInvitationStatusSchema, OrganizerRequestSchema
+from app.schemas.members.organizers.organizer_schema import ModifyInvitationStatusSchema, OrganizerRequestSchema
 from app.repository.organizers_repository import OrganizersRepository
 from app.repository.users_repository import UsersRepository
 from app.services.services import BaseService
@@ -22,7 +22,8 @@ class EventOrganizersService(BaseService):
         if organizer_id is None:
             raise UserNotFound(organizer.email_organizer)
         invite_expiration_date = datetime.now() + INVITE_ORGANIZER_EXPIRATION_TIME
-        organizer = await self.organizers_repository.create(
+        # todo chequear que no lo invitaste antes
+        await self.organizers_repository.create_organizer(
             event_id,
             organizer_id,
             expiration_date=invite_expiration_date
@@ -52,11 +53,8 @@ class EventOrganizersService(BaseService):
             raise HTTPException(status_code=404)  # TODO: mejor excepcion.
         if organizer.invitation_status == InvitationStatus.REJECTED:
             raise HTTPException(status_code=409)  # TODO: mejor excepcion.
-        if (
-            status_modification.invitation_status == InvitationStatus.ACCEPTED and
-            organizer.invitation_expiration_date < datetime.now()
-        ):
-            await self.organizers_repository.delete(event_id, user_id)
+        if organizer.invitation_expiration_date < datetime.now():
+            # await self.organizers_repository.delete(event_id, user_id) TODO codear delete
             raise ExpirationDateException()
 
         await self.organizers_repository.update_invitation(event_id, user_id, status_modification)

@@ -1,5 +1,5 @@
 from app.database.models.chair import ChairModel
-from app.reviewers.schemas.reviewer import (
+from app.schemas.members.chairs.chair_schema import (
     ReviewerSchema
 )
 from sqlalchemy.future import select

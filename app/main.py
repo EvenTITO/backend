@@ -14,7 +14,6 @@ from app.routers.works.works import works_router
 # from app.routers.works.submissions import submissions_router
 # from app.routers.works.reviews import reviews_router
 # from app.routers.works.reviews_management import review_management_router
-from app.reviewers.routers.reviewer import reviewers_router
 
 from app.database.database import Base, engine
 from app.database.session_dep import get_db
@@ -96,7 +95,6 @@ app.include_router(users_router)
 app.include_router(events_router)
 app.include_router(inscriptions_events_router)
 app.include_router(inscriptions_users_router)
-app.include_router(reviewers_router)
 
 
 # Submissions Routers

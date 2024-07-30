@@ -7,6 +7,8 @@ from datetime import datetime
 from typing_extensions import Self
 from app.database.models.organizer import InvitationStatus
 
+class ChairRequestSchema(BaseModel):
+    email_organizer: str
 
 class ReviewerSchema(BaseModel):
     invitation_expiration_date: datetime | None = \

@@ -1,6 +1,6 @@
 from fastapi.encoders import jsonable_encoder
 from ..common import create_headers
-from app.schemas.organizers.schemas import OrganizerRequestSchema
+from app.schemas.members.organizers.organizer_schema import OrganizerRequestSchema
 
 
 async def test_get_organizers_with_new_organizer(

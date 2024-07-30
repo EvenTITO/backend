@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import select
 from app.database.models.organizer import OrganizerModel
 from app.database.models.user import UserModel
-from app.schemas.organizers.schemas import ModifyInvitationStatusSchema, OrganizerInEventResponseSchema
+from app.schemas.members.organizers.organizer_schema import ModifyInvitationStatusSchema, OrganizerInEventResponseSchema
 from app.repository.crud_repository import Repository
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,7 +27,7 @@ class OrganizersRepository(Repository):
             OrganizerModel.id_organizer == id_organizer
         ]
 
-    async def create(self, id_event: str, id_organizer: str, expiration_date: datetime):
+    async def create_organizer(self, id_event: str, id_organizer: str, expiration_date: datetime):
         db_in = OrganizerModel(
             id_organizer=id_organizer,
             id_event=id_event,

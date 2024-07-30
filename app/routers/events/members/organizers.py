@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends
 from app.authorization.caller_id_dep import CallerIdDep
-from app.schemas.organizers.schemas import ModifyInvitationStatusSchema, OrganizerInEventResponseSchema, OrganizerRequestSchema
+from app.schemas.members.organizers.organizer_schema import ModifyInvitationStatusSchema, OrganizerInEventResponseSchema, OrganizerRequestSchema
 from app.authorization.organizer_or_admin_dep import verify_is_organizer
 from app.authorization.user_id_dep import verify_user_exists
 from app.services.event_organizers.event_organizers_service_dep import EventOrganizersServiceDep
