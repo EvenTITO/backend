@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import select
 from app.database.models.organizer import OrganizerModel
 from app.database.models.user import UserModel
-from app.organizers.schemas import OrganizerInEventResponseSchema
+from app.organizers.schemas import ModifyInvitationStatusSchema, OrganizerInEventResponseSchema
 from app.repository.crud_repository import Repository
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,8 +17,8 @@ class OrganizersRepository(Repository):
     async def is_organizer(self, id_event: str, id_organizer: str):
         return await self.exists((id_event, id_organizer))
 
-    # async def get(self, id_event, id_organizer):
-    #     return await self.
+    async def get_organizer(self, id_event, id_organizer):
+        return await self.get((id_event, id_organizer))
 
     async def _primary_key_conditions(self, primary_key):
         id_event, id_organizer = primary_key
@@ -35,10 +35,18 @@ class OrganizersRepository(Repository):
         )
         await self._create(db_in)
 
-    async def get_event_organizers(self, event_id: str):
+    async def update_invitation(
+        self,
+        id_event: str,
+        id_organizer: str,
+        status_modification: ModifyInvitationStatusSchema
+    ):
+        return await self.update((id_event, id_organizer), status_modification)
+
+    async def get_event_organizers(self, id_event: str):
         # TODO: va aca o a otro repository? Agregar limit offset, o limitar las invitaciones.
         query = select(UserModel, OrganizerModel).where(
-            OrganizerModel.id_event == event_id,
+            OrganizerModel.id_event == id_event,
             OrganizerModel.id_organizer == UserModel.id
         )
         result = await self.session.execute(query)

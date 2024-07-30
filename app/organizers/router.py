@@ -27,21 +27,21 @@ organizers_users_router = APIRouter(
 
 
 
-@organizers_events_router.patch("", status_code=200)
-async def update_status_organizer(
-    caller_id: CallerIdDep,
-    event_id: str,
-    _: EventOrganizerDep,
-    status_modification: ModifyInvitationStatusSchema,
-    db: SessionDep
-):
-    await organizers_crud.update_invitation_status(
-        db,
-        caller_id,
-        event_id,
-        status_modification.invitation_status
-    )
-    return
+# @organizers_events_router.patch("", status_code=200)
+# async def update_status_organizer(
+#     caller_id: CallerIdDep,
+#     event_id: str,
+#     _: EventOrganizerDep,
+#     status_modification: ModifyInvitationStatusSchema,
+#     db: SessionDep
+# ):
+#     await organizers_crud.update_invitation_status(
+#         db,
+#         caller_id,
+#         event_id,
+#         status_modification.invitation_status
+#     )
+#     return
 
 
 @organizers_users_router.get(

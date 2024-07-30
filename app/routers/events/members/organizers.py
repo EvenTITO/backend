@@ -1,7 +1,9 @@
 from typing import List
 from fastapi import APIRouter, Depends
-from app.organizers.schemas import OrganizerInEventResponseSchema, OrganizerRequestSchema
+from app.authorization.caller_id_dep import CallerIdDep
+from app.organizers.schemas import ModifyInvitationStatusSchema, OrganizerInEventResponseSchema, OrganizerRequestSchema
 from app.authorization.organizer_or_admin_dep import verify_is_organizer
+from app.authorization.user_id_dep import verify_user_exists
 from app.services.event_organizers.event_organizers_service_dep import EventOrganizersServiceDep
 
 event_organizers_router = APIRouter(
@@ -29,33 +31,18 @@ async def read_event_organizers(
     event_id: str,
 ):
     return await service.get_organizers(event_id)
-    
-#organizers_crud.get_organizers_in_event(db, event_id)
 
 
-# @event_organizers_router.get(
-#     "", response_model=List[OrganizerInEventResponseSchema]
-# )
-# async def read_event_organizers(
-#     event_id: str,
-#     _: EventOrganizerDep,
-#     db: SessionDep
-# ):
-#     return await organizers_crud.get_organizers_in_event(db, event_id)
+@event_organizers_router.patch("", status_code=200, dependencies=[Depends(verify_user_exists)],)
+async def accept_or_decline_organizer_invitation(
+    caller_id: CallerIdDep,
+    event_id: str,
+    service: EventOrganizersServiceDep,
+    status_modification: ModifyInvitationStatusSchema,
+):
+    await service.update_invitation_status(
+        caller_id,
+        event_id,
+        status_modification
+    )
 
-
-# @event_organizers_router.patch("", status_code=200)
-# async def update_status_organizer(
-#     caller_id: CallerIdDep,
-#     event_id: str,
-#     _: EventOrganizerDep,
-#     status_modification: ModifyInvitationStatusSchema,
-#     db: SessionDep
-# ):
-#     await organizers_crud.update_invitation_status(
-#         db,
-#         caller_id,
-#         event_id,
-#         status_modification.invitation_status
-#     )
-#     return

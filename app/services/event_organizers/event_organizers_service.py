@@ -1,5 +1,7 @@
+from fastapi import HTTPException
+from app.database.models.organizer import InvitationStatus
 from app.exceptions.users_exceptions import UserNotFound
-from app.organizers.schemas import OrganizerRequestSchema
+from app.organizers.schemas import ModifyInvitationStatusSchema, OrganizerRequestSchema
 from app.repository.organizers_repository import OrganizersRepository
 from app.repository.users_repository import UsersRepository
 from app.services.services import BaseService
@@ -31,4 +33,29 @@ class EventOrganizersService(BaseService):
         return organizers
 
     async def is_organizer(self, event_id: str, user_id: str):
-        return await self.organizers_repository.is_organizer(event_id, user_id)
+        organizer = await self.organizers_repository.get_organizer(event_id, user_id)
+        if organizer is None or organizer.invitation_status != InvitationStatus.ACCEPTED:
+            return False
+        return True
+
+    async def update_invitation_status(
+        self,
+        user_id: str,
+        event_id: str,
+        status_modification: ModifyInvitationStatusSchema
+    ):
+        if status_modification.invitation_status == InvitationStatus.INVITED:
+            raise HTTPException(status_code=400)  # TODO: mejor excepcion.
+        organizer = await self.organizers_repository.get_organizer(event_id, user_id)
+        if organizer is None:
+            raise HTTPException(status_code=404)  # TODO: mejor excepcion.
+        if organizer.invitation_status == InvitationStatus.REJECTED:
+            raise HTTPException(status_code=409)  # TODO: mejor excepcion.
+        if (
+            status_modification.invitation_status == InvitationStatus.ACCEPTED and
+            organizer.invitation_expiration_date < datetime.now()
+        ):
+            await self.organizers_repository.delete(event_id, user_id)
+            raise HTTPException(status_code=409)  # TODO: mejor excepcion.
+
+        await self.organizers_repository.update_invitation(event_id, user_id, status_modification)
