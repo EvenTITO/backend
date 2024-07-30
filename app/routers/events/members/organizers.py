@@ -1,5 +1,6 @@
+from typing import List
 from fastapi import APIRouter, Depends
-from app.organizers.schemas import OrganizerRequestSchema
+from app.organizers.schemas import OrganizerInEventResponseSchema, OrganizerRequestSchema
 from app.authorization.organizer_or_admin_dep import verify_is_organizer
 from app.services.event_organizers.event_organizers_service_dep import EventOrganizersServiceDep
 
@@ -15,6 +16,20 @@ async def invite_organizer(
     organizer: OrganizerRequestSchema,
 ) -> str:
     return await service.invite(organizer)
+
+
+@event_organizers_router.get(
+    "",
+    response_model=List[OrganizerInEventResponseSchema],
+    dependencies=[Depends(verify_is_organizer)]
+)
+async def read_event_organizers(
+    service: EventOrganizersServiceDep,
+):
+    return await service.get_organizers()
+    
+#organizers_crud.get_organizers_in_event(db, event_id)
+
 
 # @event_organizers_router.get(
 #     "", response_model=List[OrganizerInEventResponseSchema]

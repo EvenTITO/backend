@@ -26,3 +26,7 @@ class EventOrganizersService(BaseService):
             expiration_date=invite_expiration_date
         )
         return organizer_id
+
+    async def get_organizers(self):
+        organizers = await self.organizers_repository.get_event_organizers(self.event_id)
+        return organizers

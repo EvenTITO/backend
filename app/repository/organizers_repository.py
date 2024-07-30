@@ -1,7 +1,13 @@
 from datetime import datetime
+
+from sqlalchemy import select
 from app.database.models.organizer import OrganizerModel
+from app.database.models.user import UserModel
+from app.organizers.schemas import OrganizerInEventResponseSchema
 from app.repository.crud_repository import Repository
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.schemas.users.user import UserSchema
 
 
 class OrganizersRepository(Repository):
@@ -25,3 +31,25 @@ class OrganizersRepository(Repository):
             invitation_expiration_date=expiration_date
         )
         await self._create(db_in)
+
+    async def get_event_organizers(self, event_id: str):
+        # TODO: va aca o a otro repository? Agregar limit offset, o limitar las invitaciones.
+        query = select(UserModel, OrganizerModel).where(
+            OrganizerModel.id_event == event_id,
+            OrganizerModel.id_organizer == UserModel.id
+        )
+        result = await self.session.execute(query)
+        users_organizers = result.fetchall()
+        response = []
+        for user, organizer in users_organizers:
+            response.append(OrganizerInEventResponseSchema(
+                id_event=organizer.id_event,
+                id_organizer=organizer.id_organizer,
+                invitation_date=organizer.creation_date,
+                organizer=UserSchema(
+                    email=user.email,
+                    name=user.name,
+                    lastname=user.lastname
+                )
+            ))
+        return response

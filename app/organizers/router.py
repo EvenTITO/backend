@@ -13,7 +13,6 @@ from fastapi import APIRouter
 from app.routers.users.users import users_router
 from app.routers.events.events import events_router
 from app.organizers.dependencies import EventOrganizerDep
-from app.services.users.users_service import get_user_by_email
 
 organizers_events_router = APIRouter(
     prefix=events_router.prefix + "/{event_id}" + '/organizers',
@@ -26,31 +25,6 @@ organizers_users_router = APIRouter(
 )
 
 
-# @organizers_events_router.post("", status_code=201)
-# async def create_organizer(
-#     event_id: str,
-#     _: EventOrganizerDep,
-#     organizer: OrganizerRequestSchema,
-#     db: SessionDep
-# ) -> str:
-#     organizer_user = await get_user_by_email(db, organizer.email_organizer)
-#     organizer = await organizers_crud.add_organizer_to_event(
-#         db,
-#         organizer_user.id,
-#         event_id
-#     )
-#     return organizer.id_organizer
-
-
-@organizers_events_router.get(
-    "", response_model=List[OrganizerInEventResponseSchema]
-)
-async def read_event_organizers(
-    event_id: str,
-    _: EventOrganizerDep,
-    db: SessionDep
-):
-    return await organizers_crud.get_organizers_in_event(db, event_id)
 
 
 @organizers_events_router.patch("", status_code=200)
