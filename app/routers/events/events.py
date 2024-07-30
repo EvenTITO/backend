@@ -2,9 +2,8 @@ from fastapi import APIRouter, Depends, Header, Query
 from typing import List
 from app.authorization.caller_id_dep import CallerIdDep
 from app.authorization.user_id_dep import UserDep
-from app.repository import events_crud
+from app.database.models.event import EventStatus
 from app.database.session_dep import SessionDep
-from app.events.dependencies import GetEventsQuerysDep
 from app.repository.organizers_crud import is_organizer
 from app.authorization.user_id_dep import verify_user_exists
 from app.events.utils import get_event
@@ -23,33 +22,40 @@ events_router.include_router(events_configuration_router)
 events_router.include_router(events_admin_router)
 
 
-@events_router.get("/my-events", response_model=List[PublicEventWithRolesSchema], tags=["Events: General"], dependencies=[Depends(verify_user_exists)])
+@events_router.get(
+    "/my-events",
+    response_model=List[PublicEventWithRolesSchema],
+    tags=["Events: General"],
+    dependencies=[Depends(verify_user_exists)]
+)
 async def read_my_events(
-    db: SessionDep,
     caller_id: CallerIdDep,
     events_service: EventsServiceDep,
     offset: int = 0,
-    limit: int = Query(default=100, le=100)  # TODO: use offset & limit.
+    limit: int = Query(default=100, le=100)
 ):
-    return await events_crud.get_all_events_for_user(db, caller_id)
     return await events_service.get_my_events(caller_id, offset=offset, limit=limit)
 
 
 @events_router.get("/", response_model=List[PublicEventSchema], tags=["Events: General"])
 async def read_all_events(
         db: SessionDep,
-        status_query: GetEventsQuerysDep,
+        user_role: UserDep,
+        events_service: EventsServiceDep,
+        status: EventStatus | None = None,
         offset: int = 0,
         limit: int = Query(default=100, le=100),
-        search: str | None = None
+        search: str | None = None,
 ):
-    return await events_crud.get_all_events(
-        db=db,
-        offset=offset,
-        limit=limit,
-        status=status_query,
-        title_search=search
-    )
+    return await events_service.get_all_events(offset, limit, status, search, user_role)
+
+    # return await events_crud.get_all_events(
+    #     db=db,
+    #     offset=offset,
+    #     limit=limit,
+    #     status=status_query,
+    #     title_search=search
+    # )
 
 
 @events_router.post("", status_code=201, response_model=str, tags=["Events: General"])
