@@ -24,10 +24,6 @@ async def get_user_by_email(db, email):
     return user
 
 
-async def get_users(db, skip, limit):
-    return await users_crud.get_users(db, skip, limit)
-
-
 class UsersService(BaseService):
     def __init__(self, users_repository: UsersRepository, user_id: str):
         self.users_repository = users_repository

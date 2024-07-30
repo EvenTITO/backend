@@ -41,8 +41,8 @@ async def create_user(user: UserSchema, users_service: UsersServiceDep):
 
 
 @users_router.put(
-    "/me",
-    status_code=204, 
+    "/{user_id}",
+    status_code=204,
     response_model=None,
     tags=["Users: General"],
     dependencies=[Depends(verify_user_exists)]

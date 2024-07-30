@@ -28,5 +28,5 @@ class OrganizerOrAdminChecker:
         return EventRol.ORGANIZER
 
 
-organizer_or_admin_checker = OrganizerOrAdminChecker()
-OrganizerOrAdminDep = Annotated[str, Depends(organizer_or_admin_checker)]
+verify_is_organizer = OrganizerOrAdminChecker()
+OrganizerOrAdminDep = Annotated[str, Depends(verify_is_organizer)]

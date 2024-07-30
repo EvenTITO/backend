@@ -13,7 +13,6 @@ class UsersDependencyChecker:
         caller_id: CallerIdDep,
         users_repository: UsersRepository = Depends(get_repository(UsersRepository)),
     ) -> UsersService:
-        print('pide users service')
         return UsersService(users_repository, caller_id)
 
 
