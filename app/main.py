@@ -8,10 +8,6 @@ from app.inscriptions.router import (
     inscriptions_events_router,
     inscriptions_users_router
 )
-from app.organizers.router import (
-    organizers_events_router,
-    organizers_users_router
-)
 # from app.routers.works.my_reviews import my_reviews_router
 # from app.routers.works.my_works import my_works_router
 from app.routers.works.works import works_router
@@ -100,8 +96,6 @@ app.include_router(users_router)
 app.include_router(events_router)
 app.include_router(inscriptions_events_router)
 app.include_router(inscriptions_users_router)
-app.include_router(organizers_users_router)
-app.include_router(organizers_events_router)
 app.include_router(reviewers_router)
 
 
