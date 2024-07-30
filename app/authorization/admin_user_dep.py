@@ -6,7 +6,6 @@ from fastapi import HTTPException, Depends
 
 class AdminUser:
     async def __call__(self, role: UserDep) -> None:
-        print('el rol es ', role)
         if role != UserRole.ADMIN:
             raise HTTPException(status_code=403)
 
