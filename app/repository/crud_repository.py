@@ -66,6 +66,9 @@ class Repository:
 
     async def create(self, object_create: BaseModel):
         db_in = self.model(**object_create.model_dump(mode='json'))
+        return await self._create(db_in)
+
+    async def _create(self, db_in):
         self.session.add(db_in)
         await self.session.commit()
         await self.session.refresh(db_in)

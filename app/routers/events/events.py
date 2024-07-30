@@ -5,11 +5,8 @@ from app.authorization.user_id_dep import UserDep
 from app.repository import events_crud
 from app.database.session_dep import SessionDep
 from app.events.dependencies import GetEventsQuerysDep
-from app.database.models.event import EventStatus
 from app.repository.organizers_crud import is_organizer
 from app.authorization.user_id_dep import verify_user_exists
-from app.events import validations
-import app.notifications.events as notifications
 from app.events.utils import get_event
 from app.schemas.events.public_event import PublicEventSchema
 from app.schemas.events.create_event import CreateEventSchema
@@ -20,7 +17,7 @@ from app.schemas.events.schemas import (
 from app.routers.events.media import events_media_router
 from app.routers.events.configuration.configuration import events_configuration_router
 from app.routers.events.administration import events_admin_router
-from app.services.users import users_service
+from app.services.events.events_service_dep import EventsServiceDep
 
 events_router = APIRouter(prefix="/events")
 events_router.include_router(events_media_router)
@@ -57,24 +54,19 @@ async def read_all_events(
 
 @events_router.post("", status_code=201, response_model=str, tags=["Events: General"])
 async def create_event(
-        event: CreateEventSchema,
-        user_role: UserDep,
-        caller_id: CallerIdDep,
-        db: SessionDep
+    event: CreateEventSchema,
+    user_role: UserDep,
+    caller_id: CallerIdDep,
+    events_service: EventsServiceDep
 ):
-    await validations.validate_event_not_exists(db, event)
-    event_created = await events_crud.create_event(
-        db=db,
-        event=event,
-        user_id=caller_id,
-        user_role=user_role
-    )
-    caller_user = await users_service.get_user_by_id(db, caller_id)
-    if event_created.status == EventStatus.WAITING_APPROVAL:
-        await notifications.request_approve_event(
-            db, caller_user, event_created
-        )
-    return event_created.id
+    return await events_service.create(event, caller_id, user_role)
+    # TODO: add notifications in events_service.
+
+    # caller_user = await users_service.get_user_by_id(db, caller_id)
+    # if event_created.status == EventStatus.WAITING_APPROVAL:
+    #     await notifications.request_approve_event(
+    #         db, caller_user, event_created
+    #     )
 
 
 @events_router.get("/{event_id}/public", response_model=PublicEventWithRolesSchema, tags=["Events: General"])
