@@ -116,15 +116,14 @@ async def get_all_events(
     return result.scalars().all()
 
 
-async def create_event(db: AsyncSession, event: CreateEventSchema,
-                       user: UserModel):
-    if user.role == UserRole.EVENT_CREATOR:
+async def create_event(db: AsyncSession, event: CreateEventSchema, user_id: str, user_role: UserRole):
+    if user_role == UserRole.EVENT_CREATOR:
         status = EventStatus.CREATED
     else:
         status = EventStatus.WAITING_APPROVAL
     db_event = EventModel(
         **event.model_dump(mode='json'),
-        id_creator=user.id,
+        id_creator=user_id,
         status=status,
         notification_mails=[]
     )
@@ -134,7 +133,7 @@ async def create_event(db: AsyncSession, event: CreateEventSchema,
     print('llegaas')
 
     db_organizer = OrganizerModel(
-        id_organizer=user.id,
+        id_organizer=user_id,
         id_event=db_event.id,
         invitation_status=InvitationStatus.ACCEPTED,
     )

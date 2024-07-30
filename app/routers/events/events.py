@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Header, Query
 from typing import List
 from app.authorization.caller_id_dep import CallerIdDep
+from app.authorization.user_id_dep import UserDep
 from app.repository import events_crud
 from app.database.session_dep import SessionDep
 from app.events.dependencies import GetEventsQuerysDep
@@ -19,6 +20,8 @@ from app.schemas.events.schemas import (
 from app.routers.events.media import events_media_router
 from app.routers.events.configuration.configuration import events_configuration_router
 from app.routers.events.administration import events_admin_router
+from app.services.users import users_service
+from app.services.users.users_service_dep import UsersServiceDep
 
 events_router = APIRouter(prefix="/events")
 events_router.include_router(events_media_router)
@@ -56,15 +59,18 @@ async def read_all_events(
 @events_router.post("", status_code=201, response_model=str, tags=["Events: General"])
 async def create_event(
         event: CreateEventSchema,
-        caller_user: CallerUserDep,
+        user_role: UserDep,
+        caller_id: CallerIdDep,
         db: SessionDep
 ):
     await validations.validate_event_not_exists(db, event)
     event_created = await events_crud.create_event(
         db=db,
         event=event,
-        user=caller_user
+        user_id=caller_id,
+        user_role=user_role
     )
+    caller_user = await users_service.get_user_by_id(db, caller_id)
     if event_created.status == EventStatus.WAITING_APPROVAL:
         await notifications.request_approve_event(
             db, caller_user, event_created
