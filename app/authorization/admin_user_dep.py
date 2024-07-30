@@ -10,5 +10,5 @@ class AdminUser:
             raise HTTPException(status_code=403)
 
 
-admin_user_checker = AdminUser()
-AdminDep = Annotated[None, Depends(admin_user_checker)]
+verify_user_is_admin = AdminUser()
+AdminDep = Annotated[None, Depends(verify_user_is_admin)]

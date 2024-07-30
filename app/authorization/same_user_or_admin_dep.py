@@ -11,5 +11,5 @@ class SameUserOrAdmin:
             raise HTTPException(status_code=403)
 
 
-same_user_or_admin = SameUserOrAdmin()
-SameUserOrAdminDep = Annotated[None, Depends(same_user_or_admin)]
+verify_same_user_or_admin = SameUserOrAdmin()
+SameUserOrAdminDep = Annotated[None, Depends(verify_same_user_or_admin)]

@@ -2,7 +2,7 @@ from fastapi import Depends
 from typing import Annotated
 
 from app.database.models.user import UserRole
-from app.services.users.exceptions import UserNotFound
+from app.exceptions.users_exceptions import UserNotFound
 from app.authorization.caller_id_dep import CallerIdDep
 from app.services.users.users_service_dep import UsersServiceDep
 

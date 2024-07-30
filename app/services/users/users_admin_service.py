@@ -2,7 +2,7 @@ from app.database.models.user import UserRole
 from app.repository.users_repository import UsersRepository
 from app.schemas.users.user import UserReply
 from app.schemas.users.user_role import UserRoleSchema
-from app.services.users.exceptions import CantRemoveLastAdmin, UserNotFound
+from app.exceptions.users_exceptions import CantRemoveLastAdmin, UserNotFound
 from app.services.services import BaseService
 
 

@@ -1,5 +1,5 @@
 from app.repository import users_crud
-from .exceptions import (
+from ...exceptions.users_exceptions import (
     UserNotFound,
 )
 

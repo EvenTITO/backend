@@ -21,7 +21,6 @@ from app.routers.events.media import events_media_router
 from app.routers.events.configuration.configuration import events_configuration_router
 from app.routers.events.administration import events_admin_router
 from app.services.users import users_service
-from app.services.users.users_service_dep import UsersServiceDep
 
 events_router = APIRouter(prefix="/events")
 events_router.include_router(events_media_router)

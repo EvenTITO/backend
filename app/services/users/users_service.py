@@ -2,7 +2,7 @@ from app.database.models.user import UserRole
 from app.repository import users_crud
 from app.repository.users_repository import UsersRepository
 from app.schemas.users.user import UserModifySchema, UserReply, UserSchema
-from app.services.users.exceptions import (
+from app.exceptions.users_exceptions import (
     EmailAlreadyExists,
     IdAlreadyExists,
     UserNotFound
@@ -58,3 +58,6 @@ class UsersService(BaseService):
 
     async def get_role(self) -> UserRole:
         return await self.users_repository.get_role(self.user_id)
+
+    async def get(self, user_id: str) -> UserReply:
+        return await self.users_repository.get(user_id)
