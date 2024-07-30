@@ -10,4 +10,4 @@ class EventsRepository(Repository):
     async def get_status(self, event_id: str):
         conditions = await self._primary_key_conditions(event_id)
         event_status = await self._get_with_values(conditions, EventModel.status)
-        return event_status.status
+        return event_status

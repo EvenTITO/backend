@@ -1,5 +1,6 @@
-from fastapi import APIRouter
-from app.services.events.events_admin_dep import EventsAdminServiceDep
+from fastapi import APIRouter, Depends
+from app.authorization.organizer_or_admin_dep import OrganizerOrAdminDep, organizer_or_admin_checker
+from app.services.events.events_service_dep import EventsServiceDep
 from ...schemas.events.event_status import EventStatusSchema
 
 
@@ -9,20 +10,13 @@ events_admin_router = APIRouter(prefix="/{event_id}", tags=["Events: Administrat
 @events_admin_router.patch(
     "/status",
     status_code=204,
-    response_model=None
+    response_model=None,
+    dependencies=[Depends(organizer_or_admin_checker)]
 )
 async def change_event_status(
-    events_admin_service: EventsAdminServiceDep,
+    service: EventsServiceDep,
     event_id: str,
-    status_modification: EventStatusSchema
+    status_modification: EventStatusSchema,
+    user_role: OrganizerOrAdminDep
 ):
-    await events_admin_service.modify_status(event_id, status_modification)
-
-
-# THIS CODE IS FOR THE ORGANIZER.
-
-    # event = await get_event(db, event_id)
-    # await validations.validate_status_change(
-    #     db, caller, event, status_modification
-    # )
-    # await events_crud.update_status(db, event, status_modification.status)
+    await service.modify_status(event_id, status_modification, user_role)
