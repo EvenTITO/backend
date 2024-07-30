@@ -4,7 +4,7 @@ from app.repository import reviewers_crud as reviewers_crud
 from app.database.models.event import EventStatus
 from app.database.models.user import UserRole
 from ..schemas.events.create_event import CreateEventSchema
-from .exceptions import (
+from ..exceptions.events_exceptions import (
     InvalidEventSameTitle,
     EventNotFound, ReviewerFound
 )
