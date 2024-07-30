@@ -1,7 +1,7 @@
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.event_status import EventStatusSchema
 from app.schemas.media.image import ImgSchema
-from app.storage.events_storage import EventsStaticFiles, get_public_event_url
+from app.services.storage.events_storage import EventsStaticFiles, get_public_event_url
 
 
 from pydantic import Field, computed_field

@@ -1,5 +1,5 @@
 from app.repository import inscriptions_crud
-from app.inscriptions.exceptions import InscriptionAlreadyExists
+from app.exceptions.inscriptions_exceptions import InscriptionAlreadyExists
 from app.events.utils import get_event
 
 

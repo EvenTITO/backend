@@ -8,7 +8,6 @@ from app.authorization.user_id_dep import verify_user_exists
 from app.schemas.events.public_event import PublicEventSchema
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.public_event_with_roles import PublicEventWithRolesSchema
-from app.schemas.events.schemas import EventRol
 from app.routers.events.media import events_media_router
 from app.routers.events.configuration.configuration import events_configuration_router
 from app.routers.events.administration import events_admin_router

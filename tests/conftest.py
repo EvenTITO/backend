@@ -1,6 +1,6 @@
 from app.repository.users_repository import UsersRepository
 from app.schemas.events.create_event import CreateEventSchema
-from app.storage.schemas import DownloadURLSchema, UploadURLSchema
+from app.schemas.storage.schemas import DownloadURLSchema, UploadURLSchema
 from app.schemas.users.user import UserReply, UserSchema
 import pytest
 from app.database.models.event import EventStatus, EventType
@@ -70,7 +70,7 @@ async def client(session_override):
 @pytest.fixture(scope="function")
 async def mock_storage(mocker):
     generate_upload_url_mock = mocker.patch(
-        'app.storage.events_storage.generate_signed_upload_url'
+        'app.services.storage.events_storage.generate_signed_upload_url'
     )
     generate_upload_url_mock.return_value = UploadURLSchema(
         upload_url='mocked-url-upload',
@@ -79,7 +79,7 @@ async def mock_storage(mocker):
     )
 
     generate_download_url_mock = mocker.patch(
-        'app.storage.storage.generate_signed_read_url'
+        'app.services.storage.storage.generate_signed_read_url'
     )
     generate_download_url_mock.return_value = DownloadURLSchema(
         download_url='mocked-url-download',

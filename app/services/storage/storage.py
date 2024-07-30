@@ -1,7 +1,7 @@
 import os
 import json
 from google.cloud import storage
-from app.storage.schemas import DownloadURLSchema, UploadURLSchema
+from app.schemas.storage.schemas import DownloadURLSchema, UploadURLSchema
 from google.oauth2 import service_account
 from app.settings.settings import StorageSettings
 

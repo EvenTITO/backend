@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from app.storage.events_storage import EventsStaticFiles, get_upload_url
-from app.storage.schemas import UploadURLSchema
+from app.services.storage.events_storage import EventsStaticFiles, get_upload_url
+from app.schemas.storage.schemas import UploadURLSchema
 from app.organizers.dependencies import EventOrganizerDep
 
 
