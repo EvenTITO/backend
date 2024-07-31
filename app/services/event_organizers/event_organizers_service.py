@@ -4,7 +4,6 @@ from datetime import timedelta
 from fastapi import HTTPException
 
 from app.database.models.organizer import InvitationStatus
-from app.exceptions.events_exceptions import OrganizerFound
 from app.exceptions.expiration_date_exception import ExpirationDateException
 from app.exceptions.users_exceptions import UserNotFound
 from app.repository.organizers_repository import OrganizersRepository
@@ -26,8 +25,8 @@ class EventOrganizersService(BaseService):
             raise UserNotFound(organizer.email)
         invite_expiration_date = datetime.now() + INVITE_ORGANIZER_EXPIRATION_TIME
         # TODO esto resuelve lo de que haya invite pero rompe test obviamente
-        #if self.organizers_repository.is_organizer(event_id, organizer_id):
-         #   raise OrganizerFound(event_id, organizer.email)
+        # if self.organizers_repository.is_organizer(event_id, organizer_id):
+        #   raise OrganizerFound(event_id, organizer.email)
         await self.organizers_repository.create_organizer(
             event_id,
             organizer_id,
