@@ -239,8 +239,7 @@ async def inscription_data(client, user_data, event_data):
 
 
 @pytest.fixture(scope="function")
-async def organizer_id_from_event(client, event_creator_data,
-                                  event_from_event_creator):
+async def organizer_id_from_event(client, event_creator_data, event_from_event_creator):
     organizer = UserSchema(
         name="Martina",
         lastname="Rodriguez",

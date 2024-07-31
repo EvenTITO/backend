@@ -10,7 +10,7 @@ from app.schemas.members.member_schema import MemberResponseSchema, ModifyInvita
 from app.schemas.users.user import UserSchema
 
 
-class ChairsRepository(Repository):
+class ChairRepository(Repository):
     def __init__(self, session: AsyncSession):
         super().__init__(session, ChairModel)
 
@@ -27,7 +27,7 @@ class ChairsRepository(Repository):
             ChairModel.id_chair == id_chair
         ]
 
-    async def create_organizer(self, id_event: str, id_chair: str, expiration_date: datetime):
+    async def create_chair(self, id_event: str, id_chair: str, expiration_date: datetime):
         db_in = ChairModel(
             id_chair=id_chair,
             id_event=id_event,
@@ -43,7 +43,7 @@ class ChairsRepository(Repository):
     ):
         return await self.update((id_event, id_chair), status_modification)
 
-    async def get_event_organizers(self, id_event: str):
+    async def get_event_chairs(self, id_event: str):
         query = select(UserModel, ChairModel).where(
             ChairModel.id_event == id_event,
             ChairModel.id_chair == UserModel.id

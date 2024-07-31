@@ -15,8 +15,8 @@ class EventNotFound(HTTPException):
         super().__init__(status_code=self.status_code, detail=self.detail)
 
 
-class ReviewerFound(HTTPException):
-    def __init__(self, event_id, user_id):
+class OrganizerFound(HTTPException):
+    def __init__(self, event_id, email):
         self.status_code = 409
-        self.detail = f"Reviewer with {event_id} and {user_id} already exists"
+        self.detail = f"Organizer with email: {email} in event: {event_id} already exists"
         super().__init__(status_code=self.status_code, detail=self.detail)

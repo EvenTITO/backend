@@ -1,9 +1,17 @@
-from app.database.models.utils import DateTemplate
-from datetime import datetime
-from app.exceptions.dates_exception import DatesException
+from enum import Enum
+
 from sqlalchemy import Column, String, Date
+from sqlalchemy.orm import relationship
+
 from app.database.database import Base
-from sqlalchemy.orm import validates, relationship
+from app.database.models.utils import DateTemplate
+
+
+# TODO duplicado con organizer, mejorar esto
+class InvitationStatus(str, Enum):
+    INVITED = "INVITED"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
 
 
 class ChairModel(DateTemplate, Base):
@@ -18,12 +26,3 @@ class ChairModel(DateTemplate, Base):
 
     chair = relationship("UserModel", back_populates="chairs")
     event = relationship("EventModel", back_populates="chairs")
-
-    @validates("invitation_expiration_date") # todo esto queremos validarlo asi ??
-    def validate_date(self, key, invitation_expiration_date):
-        if invitation_expiration_date is None:
-            return datetime.now()
-        if datetime.now() > invitation_expiration_date:
-            raise DatesException()
-        else:
-            return invitation_expiration_date
