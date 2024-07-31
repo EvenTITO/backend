@@ -1,27 +1,11 @@
 from app.database.models.user import UserRole
-from app.repository import users_crud
 from app.repository.users_repository import UsersRepository
 from app.schemas.users.user import UserModifySchema, UserReply, UserSchema
 from app.exceptions.users_exceptions import (
     EmailAlreadyExists,
     IdAlreadyExists,
-    UserNotFound
 )
 from app.services.services import BaseService
-
-
-async def get_user_by_id(db, user_id):
-    user = await users_crud.get_user_by_id(db, user_id=user_id)
-    if not user:
-        raise UserNotFound(user_id)
-    return user
-
-
-async def get_user_by_email(db, email):
-    user = await users_crud.get_user_by_email(db, email)
-    if not user:
-        raise UserNotFound(email)
-    return user
 
 
 class UsersService(BaseService):
