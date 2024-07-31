@@ -25,4 +25,6 @@ async def test_get_event_upload_url_must_be_event_organizer(
         f"events/{event_from_event_creator}/upload_url/main_image",
         headers=create_headers(organizer_id_from_event)
     )
+
+    assert response.status_code == 200
     assert response.json()["upload_url"] is not None

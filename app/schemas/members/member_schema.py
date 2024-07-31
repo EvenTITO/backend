@@ -18,10 +18,6 @@ class MemberResponseSchema(BaseModel):
     event_id: str
     user_id: str
     invitation_date: datetime
+    invitation_status: MemberInvitationStatus
     user: UserSchema
-
-
-class ModifyInvitationStatusSchema(BaseModel):
-    invitation_status: MemberInvitationStatus = Field(
-        examples=[MemberInvitationStatus.INVITED])
 
