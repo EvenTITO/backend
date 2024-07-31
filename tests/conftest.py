@@ -1,20 +1,22 @@
+from uuid import uuid4
+
+import pytest
+from fastapi.encoders import jsonable_encoder
+from httpx import AsyncClient, ASGITransport
+
+from app.database.database import SessionLocal, engine, Base
+from app.database.models.event import EventStatus, EventType
+from app.database.models.user import UserRole
+from app.database.session_dep import get_db
+from app.main import app
 from app.repository.users_repository import UsersRepository
 from app.schemas.events.create_event import CreateEventSchema
+from app.schemas.events.event_status import EventStatusSchema
+from app.schemas.members.member_schema import MemberRequestSchema
 from app.schemas.storage.schemas import DownloadURLSchema, UploadURLSchema
 from app.schemas.users.user import UserReply, UserSchema
-import pytest
-from app.database.models.event import EventStatus, EventType
-from app.schemas.events.event_status import EventStatusSchema
-from fastapi.encoders import jsonable_encoder
-from app.schemas.members.member_schema import MemberRequestSchema, MemberInvitationStatus, ModifyInvitationStatusSchema
-from app.database.session_dep import get_db
-from app.database.models.user import UserRole
 from app.schemas.users.user_role import UserRoleSchema
-from app.main import app
-from app.database.database import SessionLocal, engine, Base
 from .common import WORKS, create_headers, EVENTS, get_user_method, USERS
-from uuid import uuid4
-from httpx import AsyncClient, ASGITransport
 
 
 @pytest.fixture(scope="session")
@@ -255,18 +257,16 @@ async def organizer_id_from_event(client, event_creator_data, event_from_event_c
         email=organizer.email
     )
     # invite organizer
-    await client.post(f"/events/{event_from_event_creator}/organizers",
-                      json=jsonable_encoder(request),
-                      headers=create_headers(event_creator_data['id']))
+    response = await client.post(f"/events/{event_from_event_creator}/organizers",
+                                 json=jsonable_encoder(request),
+                                 headers=create_headers(event_creator_data['id']))
 
-    # organizer accepts invitation:
-    accept_invitation = ModifyInvitationStatusSchema(
-        invitation_status=MemberInvitationStatus.ACCEPTED
-    )
+    assert response.status_code == 201
 
-    await client.patch(f"/events/{event_from_event_creator}/organizers",
-                       json=jsonable_encoder(accept_invitation),
-                       headers=create_headers(organizer_id))
+    # accept organizer invite
+    response = await client.patch(f"/events/{event_from_event_creator}/organizers/accept",
+                                  headers=create_headers(organizer_id))
+    assert response.status_code == 204
     return organizer_id
 
 

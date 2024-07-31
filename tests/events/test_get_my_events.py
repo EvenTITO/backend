@@ -9,7 +9,6 @@ from ..common import create_headers
 async def test_get_my_events_no_events_empty_list(client, user_data):
     response = await client.get("/events/my-events",
                                 headers=create_headers(user_data['id']))
-    print(response.json())
     assert len(response.json()) == 0
 
 

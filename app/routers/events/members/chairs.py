@@ -21,6 +21,11 @@ async def invite_chair(chair_service: EventChairServiceDep, chair: ChairRequestS
     return await chair_service.invite_chair(chair, event_id)
 
 
-@event_chairs_router.patch("", status_code=200, dependencies=[Depends(verify_user_exists)])
+@event_chairs_router.patch(
+    path="/accept",
+    status_code=204,
+    response_model=None,
+    dependencies=[Depends(verify_user_exists)]
+)
 async def accept_chair_invitation(caller_id: CallerIdDep, event_id: str, chair_service: EventChairServiceDep):
     await chair_service.accept_chair_invitation(caller_id, event_id)

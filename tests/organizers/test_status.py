@@ -1,23 +1,44 @@
 from fastapi.encoders import jsonable_encoder
 
-from app.database.models.member import InvitationStatus
-from app.schemas.members.member_schema import ModifyInvitationStatusSchema
-from ..common import create_headers_organization
+from app.schemas.members.member_schema import MemberRequestSchema
+from app.schemas.users.user import UserSchema
+from ..common import create_headers
 
 
-async def test_event_creator_can_add_other_user_as_event_organizer(
-        client, event_creator_data, event_from_event_creator,
+async def test_user_accept_organizer_invitation(
+        client,
+        event_creator_data,
+        event_from_event_creator,
         organizer_id_from_event
 ):
-    request = ModifyInvitationStatusSchema(
-        invitation_status=InvitationStatus.ACCEPTED)
-    response = await client.patch(
-        f"/events/{event_from_event_creator}/organizers",
-        json=jsonable_encoder(request),
-        headers=create_headers_organization(organizer_id_from_event,
-                                            event_creator_data["id"])
+    new_organizer = UserSchema(
+        name="Fernando",
+        lastname="Sinisi",
+        email="fsinisi@email.com",
     )
-    print(response.json())
-    assert response.status_code == 200
+    new_organizer_id = "122490u39nf93"
+    await client.post(
+        "/users",
+        json=jsonable_encoder(new_organizer),
+        headers=create_headers(new_organizer_id)
+    )
+    request = MemberRequestSchema(
+        email=new_organizer.email
+    )
+    # invite organizer
+    response = await client.post(f"/events/{event_from_event_creator}/organizers",
+                                 json=jsonable_encoder(request),
+                                 headers=create_headers(event_creator_data['id']))
 
-# TODO: add more test for patch and event status & expiration date
+    assert response.status_code == 201
+    response = await client.patch(
+        f"/events/{event_from_event_creator}/organizers/accept",
+        headers=create_headers(new_organizer_id)
+    )
+    assert response.status_code == 204
+
+# TODO: agregar mas test de aceptar invitacion en casos donde no corresponde como:
+#  ya fue aceptada
+#  no existe la invitacion
+#  ya expiro
+#  no existe ese usuario
