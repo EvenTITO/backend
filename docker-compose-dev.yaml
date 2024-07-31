@@ -13,6 +13,7 @@ services:
       - GCP_CREDENTIALS=${GCP_CREDENTIALS}
       - EVENTS_BUCKET=${EVENTS_BUCKET}
       - PUBLIC_BASE_URL=${PUBLIC_BASE_URL}
+      - GCP_STORAGE=${GCP_STORAGE}
     volumes:
       - ./app:/code/app
       - ./tests:/code/test
