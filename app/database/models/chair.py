@@ -1,6 +1,6 @@
 from enum import Enum
 
-from sqlalchemy import Column, String, Date
+from sqlalchemy import Column, String, Date, ARRAY
 from sqlalchemy.orm import relationship
 
 from app.database.database import Base
@@ -22,7 +22,7 @@ class ChairModel(DateTemplate, Base):
 
     invitation_expiration_date = Column(Date)
     invitation_status = Column(String, nullable=False)
-    tracks = Column(String)
+    tracks = Column(ARRAY(String))
 
     chair = relationship("UserModel", back_populates="chairs")
     event = relationship("EventModel", back_populates="chairs")

@@ -26,9 +26,9 @@ class EventChairService(BaseService):
         chair_id = await self.users_repository.get_user_id_by_email(chair.email)
         if chair_id is None:
             raise UserNotFound(chair.email)
+        if await self.chair_repository.is_chair(event_id, chair_id):
+            raise ChairAlreadyExist(event_id, chair.email) #todo, rompe si quiero invitar a algjuien que antes rechazo
         invite_expiration_date = datetime.now() + INVITE_ORGANIZER_EXPIRATION_TIME
-        if self.chair_repository.is_chair(event_id, chair_id):
-            raise ChairAlreadyExist(event_id, chair.email)
         await self.chair_repository.create_chair(event_id, chair_id, expiration_date=invite_expiration_date)
         return chair_id
 

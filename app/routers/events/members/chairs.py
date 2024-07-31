@@ -37,7 +37,7 @@ async def read_event_chairs(
 
 
 @event_chairs_router.patch("", status_code=200, dependencies=[Depends(verify_user_exists)])
-async def accept_or_decline_chair_invitation(
+async def accept_chair_invitation(
         caller_id: CallerIdDep,
         event_id: str,
         chair_service: EventChairServiceDep,
