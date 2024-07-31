@@ -1,9 +1,12 @@
 from ..common import create_headers
 
 
-async def test_get_inscription(client, inscription_data):
+async def test_get_inscription(client, inscription_data, admin_data):
     event_id = inscription_data['event_id']
-    response = await client.get(f"/events/{event_id}/inscriptions")
+    response = await client.get(
+        f"/events/{event_id}/inscriptions",
+        headers=create_headers(admin_data.id)
+    )
 
     assert response.status_code == 200
     inscriptions = response.json()
@@ -26,7 +29,7 @@ async def test_user_inscribes_to_two_events(
     )
 
     response = await client.get(
-        f"/users/{user_data['id']}/inscriptions",
+        "/events/my-events",
         headers=create_headers(user_data['id'])
     )
 
@@ -36,4 +39,4 @@ async def test_user_inscribes_to_two_events(
     inscripted_events = [all_events_data[0], all_events_data[1]]
     assert len(inscriptions_response) == 2
     for inscription in inscriptions_response:
-        assert inscription['event_id'] in inscripted_events
+        assert inscription['id'] in inscripted_events

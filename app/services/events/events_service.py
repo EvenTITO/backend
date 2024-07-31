@@ -62,3 +62,9 @@ class EventsService(BaseService):
         if await self.organizers_service.is_organizer(event_id, caller_id):
             event.roles.append(EventRol.ORGANIZER)
         return event
+
+    async def get_event_status(self, event_id: str):
+        event_status = await self.events_repository.get_status(event_id)
+        if event_status is None:
+            raise EventNotFound(event_id)
+        return event_status

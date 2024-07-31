@@ -13,6 +13,7 @@ from app.routers.events.configuration.configuration import events_configuration_
 from app.routers.events.administration import events_admin_router
 from app.services.events.events_service_dep import EventsServiceDep
 from app.routers.events.members.organizers import event_organizers_router
+from app.routers.events.inscriptions.inscriptions_router import inscriptions_events_router
 from app.routers.events.members.chairs import event_chairs_router
 
 
@@ -22,6 +23,7 @@ events_router.include_router(events_configuration_router)
 events_router.include_router(events_admin_router)
 events_router.include_router(event_organizers_router)
 events_router.include_router(event_chairs_router)
+events_router.include_router(inscriptions_events_router)
 
 
 @events_router.get(
