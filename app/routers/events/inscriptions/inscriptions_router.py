@@ -3,7 +3,7 @@ from typing import List
 from app.authorization.caller_id_dep import CallerIdDep
 from app.authorization.user_id_dep import verify_user_exists
 from app.authorization.same_user_or_admin_dep import SameUserOrAdminDep
-from ..schemas.inscriptions.schemas import (
+from ....schemas.inscriptions.schemas import (
     InscriptionReplySchema
 )
 from app.database.session_dep import SessionDep
@@ -19,12 +19,6 @@ inscriptions_events_router = APIRouter(
     prefix=events_router.prefix + "/{event_id}" + inscriptions_PREFIX,
     tags=["Event inscriptions"]
 )
-
-inscriptions_users_router = APIRouter(
-    prefix=users_router.prefix + "/{user_id}" + inscriptions_PREFIX,
-    tags=["User inscriptions"]
-)
-
 
 @inscriptions_events_router.post(
     "",
@@ -50,21 +44,3 @@ async def create_inscription(
 )
 async def read_event_inscriptions(event_id: str, db: SessionDep):
     return await inscriptions_crud.get_event_inscriptions(db, event_id)
-
-
-@inscriptions_users_router.get(
-    "", response_model=List[InscriptionReplySchema]
-)
-async def read_user_inscriptions(
-    user_id: str,
-    _: SameUserOrAdminDep,
-    db: SessionDep,
-    offset: int = 0,
-    limit: int = Query(default=100, le=100)
-):
-    return await inscriptions_crud.read_user_inscriptions(
-        db,
-        user_id,
-        offset,
-        limit
-    )
