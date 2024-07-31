@@ -27,8 +27,10 @@ async def test_get_chairs_with_new_chair(
     assert response.status_code == 200
     chair_list = response.json()
     assert len(chair_list) == 1
-    chairs_ids = [chair['user_id'] for chair in chair_list]
-    assert user_data['id'] in chairs_ids
+    unique_chair = chair_list[0]
+    assert unique_chair['user_id'] == user_data['id']
+    for track in unique_chair['tracks']:
+        assert track in ['futbol', 'tenis']
 
 
 async def test_get_chairs_empty(client, event_creator_data, event_from_event_creator):
