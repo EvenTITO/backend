@@ -258,12 +258,14 @@ async def organizer_id_from_event(client, event_creator_data, event_from_event_c
     )
     # invite organizer
     response = await client.post(f"/events/{event_from_event_creator}/organizers",
-                      json=jsonable_encoder(request),
-                      headers=create_headers(event_creator_data['id']))
+                                 json=jsonable_encoder(request),
+                                 headers=create_headers(event_creator_data['id']))
 
     assert response.status_code == 201
+
     # accept organizer invite
-    response = await client.patch(f"/events/{event_from_event_creator}/organizers/accept", headers=create_headers(organizer_id))
+    response = await client.patch(f"/events/{event_from_event_creator}/organizers/accept",
+                                  headers=create_headers(organizer_id))
     assert response.status_code == 204
     return organizer_id
 

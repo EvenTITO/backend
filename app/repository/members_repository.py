@@ -44,10 +44,12 @@ class MemberRepository(Repository):
         query = (update(self.model)
                  .where(and_(self.model.user_id == user_id, self.model.event_id == event_id))
                  .values(expiration_date=expiration_date))
-        return await self.session.execute(query)
+        await self.session.execute(query)
+        return await self.session.commit()
 
     async def accept_invitation(self, event_id: str, user_id: str):
         query = (update(self.model)
                  .where(and_(self.model.user_id == user_id, self.model.event_id == event_id))
                  .values(invitation_status=InvitationStatus.ACCEPTED))
-        return await self.session.execute(query)
+        await self.session.execute(query)
+        return await self.session.commit()

@@ -30,7 +30,6 @@ class EventOrganizersService(BaseService):
 
     async def is_organizer(self, event_id: str, user_id: str):
         organizer = await self.organizer_repository.get_organizer(event_id, user_id)
-        print(organizer.invitation_status)
         return organizer is not None and organizer.invitation_status == InvitationStatus.ACCEPTED
 
     async def invite_organizer(self, organizer: MemberRequestSchema, event_id: str):
@@ -53,7 +52,6 @@ class EventOrganizersService(BaseService):
         chair = await self.organizer_repository.get_organizer(event_id, user_id)
         if chair.invitation_expiration_date < datetime.now():
             raise ExpiredOrganizerInvitation(event_id, user_id)
-        print("esta aceptando para userid:" + str(user_id) + " evento: " + str(event_id))
         await self.organizer_repository.accept_invitation(event_id, user_id)
 
     @staticmethod
