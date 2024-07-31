@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import select
 from app.database.models.organizer import OrganizerModel
 from app.database.models.user import UserModel
-from app.schemas.members.organizers.organizer_schema import ModifyInvitationStatusSchema, OrganizerInEventResponseSchema
+from app.schemas.members.member_schema import MemberResponseSchema, ModifyInvitationStatusSchema
 from app.repository.crud_repository import Repository
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -53,11 +53,11 @@ class OrganizersRepository(Repository):
         users_organizers = result.fetchall()
         response = []
         for user, organizer in users_organizers:
-            response.append(OrganizerInEventResponseSchema(
+            response.append(MemberResponseSchema(
                 id_event=organizer.id_event,
-                id_organizer=organizer.id_organizer,
+                id_user=organizer.id_organizer,
                 invitation_date=organizer.creation_date,
-                organizer=UserSchema(
+                user=UserSchema(
                     email=user.email,
                     name=user.name,
                     lastname=user.lastname

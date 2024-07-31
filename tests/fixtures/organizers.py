@@ -1,6 +1,7 @@
 import pytest
 from fastapi.encoders import jsonable_encoder
-from app.schemas.members.organizers.organizer_schema import OrganizerRequestSchema
+
+from app.schemas.members.member_schema import MemberRequestSchema
 from ..common import create_headers
 
 
@@ -11,7 +12,7 @@ def make_organizer_request(post_user):
             user_dict = post_user()
             id_user = user_dict['id']
 
-        request = jsonable_encoder(OrganizerRequestSchema(
+        request = jsonable_encoder(MemberRequestSchema(
             id_organizer=id_user
         ))
 

@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from app.database.models.organizer import InvitationStatus
 from app.exceptions.expiration_date_exception import ExpirationDateException
 from app.exceptions.users_exceptions import UserNotFound
-from app.schemas.members.organizers.organizer_schema import ModifyInvitationStatusSchema, OrganizerRequestSchema
+from app.schemas.members.member_schema import MemberRequestSchema, ModifyInvitationStatusSchema
 from app.repository.organizers_repository import OrganizersRepository
 from app.repository.users_repository import UsersRepository
 from app.services.services import BaseService
@@ -17,10 +17,10 @@ class EventOrganizersService(BaseService):
         self.organizers_repository = organizers_repository
         self.users_repository = users_repository
 
-    async def invite(self, organizer: OrganizerRequestSchema, event_id: str):
-        organizer_id = await self.users_repository.get_user_id_by_email(organizer.email_organizer)
+    async def invite(self, organizer: MemberRequestSchema, event_id: str):
+        organizer_id = await self.users_repository.get_user_id_by_email(organizer.email)
         if organizer_id is None:
-            raise UserNotFound(organizer.email_organizer)
+            raise UserNotFound(organizer.email)
         invite_expiration_date = datetime.now() + INVITE_ORGANIZER_EXPIRATION_TIME
         # todo chequear que no lo invitaste antes
         await self.organizers_repository.create_organizer(

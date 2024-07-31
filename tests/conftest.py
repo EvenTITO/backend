@@ -1,4 +1,3 @@
-from app.database.models.organizer import InvitationStatus
 from app.repository.users_repository import UsersRepository
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.storage.schemas import DownloadURLSchema, UploadURLSchema
@@ -7,7 +6,7 @@ import pytest
 from app.database.models.event import EventStatus, EventType
 from app.schemas.events.event_status import EventStatusSchema
 from fastapi.encoders import jsonable_encoder
-from app.schemas.members.organizers.organizer_schema import ModifyInvitationStatusSchema, OrganizerRequestSchema
+from app.schemas.members.member_schema import MemberRequestSchema, MemberInvitationStatus, ModifyInvitationStatusSchema
 from app.database.session_dep import get_db
 from app.database.models.user import UserRole
 from app.schemas.users.user_role import UserRoleSchema
@@ -253,8 +252,8 @@ async def organizer_id_from_event(client, event_creator_data,
         json=jsonable_encoder(organizer),
         headers=create_headers(organizer_id)
     )
-    request = OrganizerRequestSchema(
-        email_organizer=organizer.email
+    request = MemberRequestSchema(
+        email=organizer.email
     )
     # invite organizer
     await client.post(f"/events/{event_from_event_creator}/organizers",
@@ -263,7 +262,7 @@ async def organizer_id_from_event(client, event_creator_data,
 
     # organizer accepts invitation:
     accept_invitation = ModifyInvitationStatusSchema(
-        invitation_status=InvitationStatus.ACCEPTED
+        invitation_status=MemberInvitationStatus.ACCEPTED
     )
 
     await client.patch(f"/events/{event_from_event_creator}/organizers",

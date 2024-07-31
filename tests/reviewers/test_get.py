@@ -2,7 +2,7 @@ from fastapi.encoders import jsonable_encoder
 from ..common import create_headers
 from app.schemas.members.member_schema import MemberRequestSchema
 
-
+#todo cambiar a test de chairs
 async def test_get_organizers_with_new_organizer(
     client,
     user_data,
