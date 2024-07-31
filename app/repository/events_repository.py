@@ -1,8 +1,10 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.database.models.event import EventModel, EventStatus
 from app.database.models.inscription import InscriptionModel
-from app.database.models.organizer import InvitationStatus, OrganizerModel
+from app.database.models.member import InvitationStatus
+from app.database.models.organizer import OrganizerModel
 from app.repository.crud_repository import Repository
 from app.schemas.events.public_event_with_roles import PublicEventWithRolesSchema
 from app.schemas.events.schemas import EventRol
@@ -33,7 +35,7 @@ class EventsRepository(Repository):
         )
         OrganizerModel(
             event=new_event,
-            organizer_id=new_event.creator_id,
+            user_id=new_event.creator_id,
             invitation_status=InvitationStatus.ACCEPTED,
         )
         return await self._create(new_event)
@@ -41,14 +43,14 @@ class EventsRepository(Repository):
     async def get_all_events_for_user(self, user_id: str, offset: int, limit: int) -> list[PublicEventWithRolesSchema]:
         # TODO: refactor query and whole method.
         inscriptions_q = (select(EventModel)
-                        .join(InscriptionModel,
+                          .join(InscriptionModel,
                                 InscriptionModel.event_id == EventModel.id)
-                        .where(InscriptionModel.inscriptor_id == user_id))
+                          .where(InscriptionModel.inscriptor_id == user_id))
 
         organizations_q = (select(EventModel)
-                        .join(OrganizerModel,
-                                OrganizerModel.event_id == EventModel.id)
-                        .where(OrganizerModel.organizer_id == user_id))
+                           .join(OrganizerModel,
+                                 OrganizerModel.event_id == EventModel.id)
+                           .where(OrganizerModel.user_id == user_id))
 
         inscr = self.session.execute(inscriptions_q)
         org = self.session.execute(organizations_q)
@@ -75,17 +77,18 @@ class EventsRepository(Repository):
                         roles=[role]
                     )
             return response
+
         response = {}
         response = add_events(EventRol.INSCRIPTED, inscriptions, response)
         response = add_events(EventRol.ORGANIZER, organizations, response)
         return list(response.values())
 
     async def get_all_events(
-        self,
-        offset: int,
-        limit: int,
-        status: EventStatus | None,
-        title_search: str | None
+            self,
+            offset: int,
+            limit: int,
+            status: EventStatus | None,
+            title_search: str | None
     ):
         query = select(EventModel).offset(offset).limit(limit)
         if status is not None:
