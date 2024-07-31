@@ -4,9 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database.models.user import UserRole
 from app.routers.users.users import users_router
 from app.routers.events.events import events_router
-from app.routers.events.inscriptions.inscriptions_router import (
-    inscriptions_events_router,
-)
 # from app.routers.works.my_reviews import my_reviews_router
 # from app.routers.works.my_works import my_works_router
 from app.routers.works.works import works_router
@@ -92,7 +89,6 @@ app.add_middleware(
 
 app.include_router(users_router)
 app.include_router(events_router)
-app.include_router(inscriptions_events_router)
 
 
 # Submissions Routers
