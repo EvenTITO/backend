@@ -1,47 +1,45 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.models.user import UserRole
+from app.database.models.user import UserRole
 from app.routers.users.users import users_router
 from app.routers.events.events import events_router
-from app.inscriptions.router import (
-    inscriptions_events_router,
-    inscriptions_users_router
-)
-from app.organizers.router import (
-    organizers_events_router,
-    organizers_users_router
-)
 # from app.routers.works.my_reviews import my_reviews_router
 # from app.routers.works.my_works import my_works_router
 from app.routers.works.works import works_router
 # from app.routers.works.submissions import submissions_router
 # from app.routers.works.reviews import reviews_router
 # from app.routers.works.reviews_management import review_management_router
-from app.reviewers.routers.reviewer import reviewers_router
 
 from app.database.database import Base, engine
-from app.dependencies.database.session_dep import get_db
-from app.repository.users_crud import create_user, update_role
-from app.schemas.users.user import UserSchema
+from app.database.session_dep import get_db
+from app.repository.users_repository import UsersRepository
+from app.schemas.users.user import UserReply
 import os
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
 
 async def add_first_admin():
+    # TODO: Use migrations to add the first admin.
     db_gen = get_db()
     db = await anext(db_gen)
-    admin_user = UserSchema(
-        name=os.getenv("ADMIN_NAME"),
-        lastname=os.getenv("ADMIN_LASTNAME"),
-        email=os.getenv("ADMIN_EMAIL")
-    )
+    name = os.getenv("ADMIN_NAME"),
+    lastname = os.getenv("ADMIN_LASTNAME"),
+    email = os.getenv("ADMIN_EMAIL")
     admin_id = os.getenv("ADMIN_ID")
     try:
-        db_admin = await create_user(db, admin_id, admin_user)
-        await update_role(db, db_admin, UserRole.ADMIN)
+        repository = UsersRepository(db)
+        admin_user = UserReply(
+            id=admin_id,
+            role=UserRole.ADMIN,
+            name=name,
+            lastname=lastname,
+            email=email
+        )
+        repository.create(admin_user)
     except Exception:
         print('Admin already exists.')
 
@@ -91,11 +89,6 @@ app.add_middleware(
 
 app.include_router(users_router)
 app.include_router(events_router)
-app.include_router(inscriptions_events_router)
-app.include_router(inscriptions_users_router)
-app.include_router(organizers_users_router)
-app.include_router(organizers_events_router)
-app.include_router(reviewers_router)
 
 
 # Submissions Routers

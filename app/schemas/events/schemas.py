@@ -4,7 +4,7 @@ from pydantic import (
     Field,
 )
 
-from ...models.event import EventType
+from ...database.models.event import EventType
 from app.schemas.events.dates import DatesCompleteSchema
 from app.schemas.events.pricing import PricingSchema
 
@@ -44,5 +44,5 @@ class DynamicGeneralEventSchema(DatesCompleteSchema):
     )
 
 
-class DynamicEventSchema(DynamicGeneralEventSchema, DatesCompleteSchema):
-    pricing: PricingSchema | None = None  # TODO: AGREGAR DEFAULT EN VEZ DE NONE.
+class DynamicEventSchema(DynamicGeneralEventSchema, DatesCompleteSchema, PricingSchema):
+    pass

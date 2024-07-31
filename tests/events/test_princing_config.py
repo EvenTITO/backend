@@ -15,7 +15,7 @@ async def test_put_pricing_config(client, admin_data, event_data):
         need_verification=True
     )
     pricing_config = PricingSchema(
-        rates=[
+        pricing=[
             students_fee
         ]
     )
@@ -34,4 +34,4 @@ async def test_put_pricing_config(client, admin_data, event_data):
 
     assert response.status_code == 200
     print(response.json())
-    assert response.json()["pricing"]["rates"][0]["name"] == students_fee.name
+    assert response.json()["pricing"][0]["name"] == students_fee.name

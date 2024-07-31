@@ -1,5 +1,5 @@
 from fastapi.encoders import jsonable_encoder
-from app.models.event import EventStatus
+from app.database.models.event import EventStatus
 from app.schemas.events.event_status import EventStatusSchema
 from ..common import create_headers, EVENTS
 
@@ -28,7 +28,7 @@ async def test_get_all_events_not_admin_error(
 ):
     response = await client.get("/events/",
                                 headers=create_headers(user_data['id']))
-    assert response.status_code == 403
+    assert response.status_code == 400
 
 
 async def test_get_all_events_admin_gets_all(
@@ -102,7 +102,7 @@ async def test_get_all_events_non_admin_can_not_query_created(
         params={'status': EventStatus.CREATED.value}
     )
     print(response.json())
-    assert response.status_code == 403
+    assert response.status_code == 400
 
 
 async def test_get_all_events_query_by_title_same_title(
@@ -149,9 +149,9 @@ async def test_get_all_events_public_is_status_created2(
     )
     n_events = len(all_events_data)
 
-    for id_event in all_events_data:
+    for event_id in all_events_data:
         await client.patch(
-            f"/events/{id_event}/status",
+            f"/events/{event_id}/status",
             json=jsonable_encoder(status_update),
             headers=create_headers(admin_data.id)
         )

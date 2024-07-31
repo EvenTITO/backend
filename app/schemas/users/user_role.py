@@ -1,4 +1,4 @@
-from app.models.user import UserRole
+from app.database.models.user import UserRole
 from pydantic import BaseModel
 
 

@@ -1,9 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from app.dependencies.database.session_dep import SessionDep
-from app.dependencies.user_roles.admin_user_dep import AdminDep
-from app.services.users import users_service
+from app.services.users.users_admin_service_dep import UsersAdminServiceDep
 from app.schemas.users.user_role import UserRoleSchema
+from app.authorization.admin_user_dep import verify_user_is_admin
 
 
 user_roles_router = APIRouter(
@@ -12,6 +11,6 @@ user_roles_router = APIRouter(
 )
 
 
-@user_roles_router.patch("", status_code=204, response_model=None)
-async def update_user_role(user_id: str, role: UserRoleSchema, admin_user: AdminDep, db: SessionDep):
-    await users_service.update_role(db, admin_user.id, user_id, role.role)
+@user_roles_router.patch("", status_code=204, response_model=None, dependencies=[Depends(verify_user_is_admin)])
+async def update_user_role(user_id: str, role: UserRoleSchema, users_admin_service: UsersAdminServiceDep):
+    await users_admin_service.update_role(user_id, role)

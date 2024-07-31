@@ -1,13 +1,13 @@
-from app.models.inscription import InscriptionStatus
+from app.database.models.inscription import InscriptionStatus
 from ..common import create_headers
 
 PAYMENT_INCOMPLETED = InscriptionStatus.PAYMENT_INCOMPLETED.value
 
 
 async def test_post_inscription(client, user_data, event_data):
-    id_event = event_data['id']
+    event_id = event_data['id']
     response = await client.post(
-        f"/events/{id_event}/inscriptions",
+        f"/events/{event_id}/inscriptions",
         headers=create_headers(user_data["id"])
     )
     assert response.status_code == 201
@@ -18,10 +18,10 @@ async def test_post_inscription_without_event_fails(
         client,
         user_data
 ):
-    id_event = "event-does-not-exists"
+    event_id = "event-does-not-exists"
 
     response = await client.post(
-        f"/events/{id_event}/inscriptions",
+        f"/events/{event_id}/inscriptions",
         headers=create_headers(user_data["id"])
     )
     assert response.status_code == 404
@@ -29,11 +29,11 @@ async def test_post_inscription_without_event_fails(
 
 
 async def test_post_inscription_without_user_fails(client, event_data):
-    id_event = event_data['id']
-    id_user_not_exists = 'id-user-does-not-exists'
+    event_id = event_data['id']
+    user_id_not_exists = 'id-user-does-not-exists'
     response = await client.post(
-        f"/events/{id_event}/inscriptions",
-        headers=create_headers(id_user_not_exists)
+        f"/events/{event_id}/inscriptions",
+        headers=create_headers(user_id_not_exists)
     )
     assert response.status_code == 404
     # assert response.json()["detail"] == USER_NOT_FOUNT

@@ -1,4 +1,4 @@
-from app.storage.schemas import DownloadURLSchema, UploadURLSchema
+from app.schemas.storage.schemas import DownloadURLSchema, UploadURLSchema
 from .works import submissions_router
 
 

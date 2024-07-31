@@ -1,6 +1,6 @@
 from fastapi.encoders import jsonable_encoder
 
-from app.models.event import EventStatus
+from app.database.models.event import EventStatus
 from app.schemas.events.event_status import EventStatusSchema
 from ..common import create_headers
 
@@ -28,6 +28,31 @@ async def test_event_created_organizer_cant_change_status(
     )
 
     assert response.status_code == 403
+
+
+async def test_organizer_can_change_status_to_started_after_created(
+        client, event_from_event_creator, organizer_id_from_event, admin_data
+):
+    status_update = EventStatusSchema(
+        status=EventStatus.CREATED
+    )
+    response = await client.patch(
+        f"/events/{event_from_event_creator}/status",
+        json=jsonable_encoder(status_update),
+        headers=create_headers(admin_data.id)
+    )
+
+    assert response.status_code == 204
+    status_update = EventStatusSchema(
+        status=EventStatus.STARTED
+    )
+    response = await client.patch(
+        f"/events/{event_from_event_creator}/status",
+        json=jsonable_encoder(status_update),
+        headers=create_headers(organizer_id_from_event)
+    )
+
+    assert response.status_code == 204
 
 
 async def test_event_created_admin_can_change_status(

@@ -3,5 +3,10 @@ from app.schemas.events.review_skeleton.review_skeleton import ReviewSkeletonSch
 from app.schemas.events.schemas import DynamicEventSchema, StaticEventSchema
 
 
-class EventConfigurationSchema(ConfigurationGeneralEventSchema, DynamicEventSchema, StaticEventSchema):
-    review_skeleton: ReviewSkeletonSchema | None
+class EventConfigurationSchema(
+    ConfigurationGeneralEventSchema,
+    DynamicEventSchema,
+    StaticEventSchema,
+    ReviewSkeletonSchema
+):
+    pass

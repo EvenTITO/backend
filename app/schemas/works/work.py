@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict
-from app.models.work import WorkStates
+from app.database.models.work import WorkStates
 from app.schemas.works.author import AuthorInformation
 
 

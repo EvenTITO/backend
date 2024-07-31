@@ -7,10 +7,10 @@ async def test_put_event(client, admin_data, event_data):
     update_event_data["title"] = "new event"
     update_event_data["end_date"] = "2024-09-05T00:00:00"
     update_event_data["notification_mails"] = []
-    id_event = update_event_data.pop('id')
+    event_id = update_event_data.pop('id')
 
     response = await client.put(
-        f"/events/{id_event}/configuration/general",
+        f"/events/{event_id}/configuration/general",
         json=jsonable_encoder(update_event_data),
         headers=create_headers(admin_data.id)
     )
@@ -29,15 +29,15 @@ async def test_put_event_different_notif_mails(
     added_mail = 'mateo@mail.com'
     update_event_data["notification_mails"] = [
         added_mail, 'someother@mail.com']
-    id_event = update_event_data.pop('id')
+    event_id = update_event_data.pop('id')
 
     _ = await client.put(
-        f"/events/{id_event}/configuration/general",
+        f"/events/{event_id}/configuration/general",
         json=jsonable_encoder(update_event_data),
         headers=create_headers(admin_data.id)
     )
     response = await client.get(
-        f"/events/{id_event}/configuration",
+        f"/events/{event_id}/configuration",
         headers=create_headers(admin_data.id)
     )
 
@@ -55,15 +55,15 @@ async def test_put_event_change_tracks(
     new_tracks = ["first_track", "second_track"]
     update_event_data["tracks"] = new_tracks
     update_event_data["notification_mails"] = []
-    id_event = update_event_data.pop('id')
+    event_id = update_event_data.pop('id')
 
     _ = await client.put(
-        f"/events/{id_event}/configuration/general",
+        f"/events/{event_id}/configuration/general",
         json=jsonable_encoder(update_event_data),
         headers=create_headers(admin_data.id)
     )
     response = await client.get(
-        f"/events/{id_event}/configuration",
+        f"/events/{event_id}/configuration",
         headers=create_headers(admin_data.id)
     )
 
@@ -86,15 +86,15 @@ async def test_put_many_changes(
     update_event_data["location"] = 'New Event Location'
     update_event_data["contact"] = 'New Event Contact Info'
     update_event_data["notification_mails"] = []
-    id_event = update_event_data.pop('id')
+    event_id = update_event_data.pop('id')
 
     _ = await client.put(
-        f"/events/{id_event}/configuration/general",
+        f"/events/{event_id}/configuration/general",
         json=jsonable_encoder(update_event_data),
         headers=create_headers(admin_data.id)
     )
     response = await client.get(
-        f"/events/{id_event}/configuration",
+        f"/events/{event_id}/configuration",
         headers=create_headers(admin_data.id)
     )
 

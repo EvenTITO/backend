@@ -1,7 +1,7 @@
 from fastapi.encoders import jsonable_encoder
 from app.schemas.users.user import UserSchema
 from ..common import create_headers
-from app.services.users.exceptions import UserNotFound
+from app.exceptions.users_exceptions import UserNotFound
 
 
 async def test_get_user(client, user_data):
@@ -12,11 +12,11 @@ async def test_get_user(client, user_data):
 
 
 async def test_get_no_user_cant_get_other(client, user_data):
-    id_new_user = 'user-not-exists'
+    new_user_id = 'user-not-exists'
 
     response = await client.get(f"/users/{user_data['id']}",
-                                headers=create_headers(id_new_user))
-    expected_error = UserNotFound(id_new_user)
+                                headers=create_headers(new_user_id))
+    expected_error = UserNotFound(new_user_id)
     assert response.status_code == 404
     assert response.json()['detail'] == expected_error.detail
 

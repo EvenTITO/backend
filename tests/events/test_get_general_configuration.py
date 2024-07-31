@@ -16,6 +16,6 @@ async def test_get_event_configuration_organizer_gets_dates_pricing_review_skele
     assert response.status_code == 200
     print(response.json())
     assert event_config['dates'] is not None
-    assert event_config['pricing'] is None
+    assert len(event_config['pricing']) == 0
     assert len(event_config['notification_mails']) == 0
-    assert event_config['review_skeleton'] is None
+    assert len(event_config['review_skeleton']['questions']) == 0

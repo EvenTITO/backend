@@ -8,5 +8,5 @@ class PublicEventWithRolesSchema(PublicEventSchema):
     model_config = ConfigDict(from_attributes=True)
     roles: list[str] = Field(
         examples=[["ORGANIZER"]],
-        default=[]
+        default_factory=list
     )

@@ -1,21 +1,22 @@
-from app.schemas.events.create_event import CreateEventSchema
-from app.storage.schemas import DownloadURLSchema, UploadURLSchema
-from app.schemas.users.user import UserSchema
-import pytest
-from app.models.event import EventStatus, EventType
-from app.schemas.events.event_status import EventStatusSchema
-from fastapi.encoders import jsonable_encoder
-from app.organizers.schemas import OrganizerRequestSchema
-from app.dependencies.database.session_dep import get_db
-from app.models.user import UserRole
-from app.schemas.users.user_role import UserRoleSchema
-from app.repository.users_crud import update_role
-from app.services.users.users_service import create_user, get_user_by_id
-from app.main import app
-from app.database.database import SessionLocal, engine, Base
-from .common import WORKS, create_headers, EVENTS, get_user_method, USERS
 from uuid import uuid4
+
+import pytest
+from fastapi.encoders import jsonable_encoder
 from httpx import AsyncClient, ASGITransport
+
+from app.database.database import SessionLocal, engine, Base
+from app.database.models.event import EventStatus, EventType
+from app.database.models.user import UserRole
+from app.database.session_dep import get_db
+from app.main import app
+from app.repository.users_repository import UsersRepository
+from app.schemas.events.create_event import CreateEventSchema
+from app.schemas.events.event_status import EventStatusSchema
+from app.schemas.members.member_schema import MemberRequestSchema
+from app.schemas.storage.schemas import DownloadURLSchema, UploadURLSchema
+from app.schemas.users.user import UserReply, UserSchema
+from app.schemas.users.user_role import UserRoleSchema
+from .common import WORKS, create_headers, EVENTS, get_user_method, USERS
 
 
 @pytest.fixture(scope="session")
@@ -71,7 +72,7 @@ async def client(session_override):
 @pytest.fixture(scope="function")
 async def mock_storage(mocker):
     generate_upload_url_mock = mocker.patch(
-        'app.storage.events_storage.generate_signed_upload_url'
+        'app.services.storage.events_storage.generate_signed_upload_url'
     )
     generate_upload_url_mock.return_value = UploadURLSchema(
         upload_url='mocked-url-upload',
@@ -80,7 +81,7 @@ async def mock_storage(mocker):
     )
 
     generate_download_url_mock = mocker.patch(
-        'app.storage.storage.generate_signed_read_url'
+        'app.services.storage.storage.generate_signed_read_url'
     )
     generate_download_url_mock.return_value = DownloadURLSchema(
         download_url='mocked-url-download',
@@ -97,21 +98,20 @@ async def admin_data():
     session = SessionLocal(
         bind=engine,
     )
-    new_user = UserSchema(
+
+    user_id = "iuaealdasldanfas98298329"
+    user_to_create = UserReply(
         name="Jorge",
         lastname="Benitez",
         email="jbenitez@email.com",
+        id=user_id,
+        role=UserRole.ADMIN
     )
-    id_user = "iuaealdasldanfas98298329"
-
-    await create_user(session, id_user, new_user)
-    user = await get_user_by_id(session, id_user)
-
-    user_updated = await update_role(
-        session, user, UserRole.ADMIN.value
-    )
+    users_repo = UsersRepository(session)
+    await users_repo.create(user_to_create)
+    user = await users_repo.get(user_id)
     await session.close()
-    return user_updated
+    return user
 
 
 @pytest.fixture(scope="function")
@@ -231,18 +231,17 @@ async def all_events_data(client, admin_data):
 
 @pytest.fixture(scope="function")
 async def inscription_data(client, user_data, event_data):
-    id_event = event_data['id']
+    event_id = event_data['id']
     response = await client.post(
-        f"/events/{id_event}/inscriptions",
+        f"/events/{event_id}/inscriptions",
         headers=create_headers(user_data["id"])
     )
-    id_inscriptor = response.json()
-    return {'id_event': id_event, 'id_inscriptor': id_inscriptor}
+    inscriptor_id = response.json()
+    return {'event_id': event_id, 'inscriptor_id': inscriptor_id}
 
 
 @pytest.fixture(scope="function")
-async def organizer_id_from_event(client, event_creator_data,
-                                  event_from_event_creator):
+async def organizer_id_from_event(client, event_creator_data, event_from_event_creator):
     organizer = UserSchema(
         name="Martina",
         lastname="Rodriguez",
@@ -254,13 +253,20 @@ async def organizer_id_from_event(client, event_creator_data,
         json=jsonable_encoder(organizer),
         headers=create_headers(organizer_id)
     )
-    request = OrganizerRequestSchema(
-        email_organizer=organizer.email
+    request = MemberRequestSchema(
+        email=organizer.email
     )
-    await client.post(f"/events/{event_from_event_creator}/organizers",
-                      json=jsonable_encoder(request),
-                      headers=create_headers(event_creator_data['id']))
+    # invite organizer
+    response = await client.post(f"/events/{event_from_event_creator}/organizers",
+                                 json=jsonable_encoder(request),
+                                 headers=create_headers(event_creator_data['id']))
 
+    assert response.status_code == 201
+
+    # accept organizer invite
+    response = await client.patch(f"/events/{event_from_event_creator}/organizers/accept",
+                                  headers=create_headers(organizer_id))
+    assert response.status_code == 204
     return organizer_id
 
 
@@ -279,10 +285,10 @@ async def event_started(client, event_data, admin_data):
 
 @pytest.fixture(scope="function")
 async def event_works(client, user_data, event_data):
-    id_event = event_data['id']
+    event_id = event_data['id']
     for work in WORKS:
         response = await client.post(
-            f"/events/{id_event}/works",
+            f"/events/{event_id}/works",
             json=jsonable_encoder(work),
             headers=create_headers(user_data["id"])
         )

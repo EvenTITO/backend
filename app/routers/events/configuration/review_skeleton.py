@@ -1,30 +1,28 @@
-from fastapi import APIRouter
-from app.dependencies.user_roles.caller_user_dep import CallerUserDep
-from app.repository import events_crud
-from app.dependencies.database.session_dep import SessionDep
-from app.organizers.dependencies import EventOrganizerDep
-from app.events.utils import get_event
+from fastapi import APIRouter, Depends
+from app.authorization.user_id_dep import verify_user_exists
 from app.schemas.events.review_skeleton.review_skeleton import ReviewSkeletonSchema
+from app.authorization.organizer_or_admin_dep import verify_is_organizer
+from app.services.events.events_configuration_service_dep import EventsConfigurationServiceDep
 
 review_skeleton_configuration_router = APIRouter(prefix="/review-skeleton")
 
 
-@review_skeleton_configuration_router.put("", status_code=204, response_model=None)
+@review_skeleton_configuration_router.put(
+    "",
+    status_code=204,
+    response_model=None,
+    dependencies=[Depends(verify_is_organizer)]
+)
 async def change_review_skeleton(
-    _: EventOrganizerDep,
-    event_id: str,
     review_skeleton: ReviewSkeletonSchema,
-    db: SessionDep
+    events_configuration_service: EventsConfigurationServiceDep,
 ):
-    event = await get_event(db, event_id)
-    await events_crud.update_review_skeleton(db, event, review_skeleton)
+    await events_configuration_service.update_review_skeleton(review_skeleton)
 
 
-@review_skeleton_configuration_router.get("", status_code=200)
+@review_skeleton_configuration_router.get("", status_code=200, dependencies=[Depends(verify_user_exists)])
 async def get_review_skeleton(
-        _: EventOrganizerDep,
-        caller: CallerUserDep,
-        event_id: str,
-        db: SessionDep
+    events_configuration_service: EventsConfigurationServiceDep,
 ) -> ReviewSkeletonSchema:
-    return await events_crud.get_review_sckeletor(db, event_id, caller.id)
+    res = await events_configuration_service.get_review_skeleton()
+    return res
