@@ -1,4 +1,5 @@
 from fastapi import HTTPException
+
 from app.database.models.event import EventStatus
 from app.database.models.user import UserRole
 from app.exceptions.events_exceptions import EventNotFound, InvalidEventSameTitle
@@ -39,14 +40,14 @@ class EventsService(BaseService):
         return await self.events_repository.get_all_events_for_user(caller_id, offset=offset, limit=limit)
 
     async def get_all_events(
-        self,
-        offset: int,
-        limit: int,
-        status: EventStatus | None,
-        title_search: str | None,
-        user_role: UserRole
+            self,
+            offset: int,
+            limit: int,
+            status: EventStatus | None,
+            title_search: str | None,
+            user_role: UserRole
     ):
-        if (status != EventStatus.STARTED and user_role != UserRole.ADMIN):
+        if status != EventStatus.STARTED and user_role != UserRole.ADMIN:
             raise HTTPException(status_code=400)  # TODO: change to custom exception.
 
         return await self.events_repository.get_all_events(offset, limit, status, title_search)

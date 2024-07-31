@@ -12,9 +12,9 @@ class EventsChairChecker:
     async def __call__(
             self,
             users_repository: UsersRepository = Depends(get_repository(UsersRepository)),
-            chairs_repository: ChairRepository = Depends(get_repository(ChairRepository)),
+            chair_repository: ChairRepository = Depends(get_repository(ChairRepository)),
     ) -> EventChairService:
-        return EventChairService(chairs_repository, users_repository)
+        return EventChairService(chair_repository, users_repository)
 
 
 event_chair_checker = EventsChairChecker()

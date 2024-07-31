@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field, model_validator
 from typing_extensions import Self
 
-from app.database.models.organizer import InvitationStatus
+from app.database.models.member import InvitationStatus
 from app.schemas.members.member_schema import MemberRequestSchema, MemberResponseSchema
 
 

@@ -1,16 +1,16 @@
 from datetime import datetime
 
 from sqlalchemy import select
-from app.database.models.organizer import OrganizerModel
-from app.database.models.user import UserModel
-from app.schemas.members.member_schema import MemberResponseSchema, ModifyInvitationStatusSchema
-from app.repository.crud_repository import Repository
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.database.models.organizer import OrganizerModel
+from app.database.models.user import UserModel
+from app.repository.members_repository import MemberRepository
+from app.schemas.members.member_schema import MemberResponseSchema, ModifyInvitationStatusSchema
 from app.schemas.users.user import UserSchema
 
 
-class OrganizersRepository(Repository):
+class OrganizersRepository(MemberRepository):
     def __init__(self, session: AsyncSession):
         super().__init__(session, OrganizerModel)
 
@@ -24,12 +24,12 @@ class OrganizersRepository(Repository):
         event_id, organizer_id = primary_key
         return [
             OrganizerModel.event_id == event_id,
-            OrganizerModel.organizer_id == organizer_id
+            OrganizerModel.user_id == organizer_id
         ]
 
     async def create_organizer(self, event_id: str, organizer_id: str, expiration_date: datetime):
         db_in = OrganizerModel(
-            organizer_id=organizer_id,
+            user_id=organizer_id,
             event_id=event_id,
             invitation_expiration_date=expiration_date
         )
@@ -47,7 +47,7 @@ class OrganizersRepository(Repository):
         # TODO: va aca o a otro repository? Agregar limit offset, o limitar las invitaciones.
         query = select(UserModel, OrganizerModel).where(
             OrganizerModel.event_id == event_id,
-            OrganizerModel.organizer_id == UserModel.id
+            OrganizerModel.user_id == UserModel.id
         )
         result = await self.session.execute(query)
         users_organizers = result.fetchall()
@@ -55,7 +55,7 @@ class OrganizersRepository(Repository):
         for user, organizer in users_organizers:
             response.append(MemberResponseSchema(
                 event_id=organizer.event_id,
-                user_id=organizer.organizer_id,
+                user_id=organizer.user_id,
                 invitation_date=organizer.creation_date,
                 user=UserSchema(
                     email=user.email,

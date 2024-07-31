@@ -30,6 +30,10 @@ class UserModel(ModelTemplate, Base):
         "OrganizerModel",
         back_populates="organizer"
     )
+    chairs = relationship(
+        "ChairModel",
+        back_populates="chair"
+    )
     works_as_author = relationship(
         WorkModel,
         foreign_keys=WorkModel.author_id,

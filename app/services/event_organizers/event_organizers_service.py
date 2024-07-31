@@ -3,8 +3,7 @@ from datetime import timedelta
 
 from fastapi import HTTPException
 
-from app.database.models.organizer import InvitationStatus
-from app.exceptions.events_exceptions import OrganizerFound
+from app.database.models.member import InvitationStatus
 from app.exceptions.expiration_date_exception import ExpirationDateException
 from app.exceptions.users_exceptions import UserNotFound
 from app.repository.organizers_repository import OrganizersRepository
@@ -20,13 +19,13 @@ class EventOrganizersService(BaseService):
         self.organizers_repository = organizers_repository
         self.users_repository = users_repository
 
-    async def invite(self, organizer: MemberRequestSchema, event_id: str):
+    async def invite_organizer(self, organizer: MemberRequestSchema, event_id: str):
         organizer_id = await self.users_repository.get_user_id_by_email(organizer.email)
         if organizer_id is None:
             raise UserNotFound(organizer.email)
         invite_expiration_date = datetime.now() + INVITE_ORGANIZER_EXPIRATION_TIME
         # TODO esto resuelve lo de que haya invite pero rompe test obviamente
-        #if self.organizers_repository.is_organizer(event_id, organizer_id):
+        #if await self.organizers_repository.has_invitation_or_is_member(event_id, organizer_id):
          #   raise OrganizerFound(event_id, organizer.email)
         await self.organizers_repository.create_organizer(
             event_id,
@@ -56,8 +55,6 @@ class EventOrganizersService(BaseService):
         organizer = await self.organizers_repository.get_organizer(event_id, user_id)
         if organizer is None:
             raise HTTPException(status_code=404)  # TODO: mejor excepcion.
-        if organizer.invitation_status == InvitationStatus.REJECTED:
-            raise HTTPException(status_code=409)  # TODO: mejor excepcion.
         if organizer.invitation_expiration_date < datetime.now():
             # await self.organizers_repository.delete(event_id, user_id) TODO codear delete
             raise ExpirationDateException()

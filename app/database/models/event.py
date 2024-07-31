@@ -44,4 +44,5 @@ class EventModel(ModelTemplate, Base):
     creator = relationship("UserModel", foreign_keys=[creator_id], back_populates="events")
     inscriptions = relationship("InscriptionModel", back_populates="event")
     organizers = relationship("OrganizerModel", back_populates="event")
+    chairs = relationship("ChairModel", back_populates="event")
     works = relationship("WorkModel", back_populates="event")
