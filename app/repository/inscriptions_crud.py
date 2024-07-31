@@ -34,58 +34,58 @@ async def get_event_inscriptions(db, event_id):
     return response
 
 
-async def user_already_inscribed(db, user_id, event_id):
-    query = select(InscriptionModel).where(
-        InscriptionModel.event_id == event_id,
-        InscriptionModel.inscriptor_id == user_id
-    )
-    result = await db.execute(query)
-    return result.first() is not None
+# async def user_already_inscribed(db, user_id, event_id):
+#     query = select(InscriptionModel).where(
+#         InscriptionModel.event_id == event_id,
+#         InscriptionModel.inscriptor_id == user_id
+#     )
+#     result = await db.execute(query)
+#     return result.first() is not None
 
 
-async def inscribe_user_to_event(
-        db: AsyncSession,
-        event_id: str,
-        inscriptor_id: str
-):
-    db_inscription = InscriptionModel(
-        event_id=event_id,
-        inscriptor_id=inscriptor_id
-    )
-    db.add(db_inscription)
-    await db.commit()
-    await db.refresh(db_inscription)
-    return db_inscription
+# async def inscribe_user_to_event(
+#         db: AsyncSession,
+#         event_id: str,
+#         inscriptor_id: str
+# ):
+#     db_inscription = InscriptionModel(
+#         event_id=event_id,
+#         inscriptor_id=inscriptor_id
+#     )
+#     db.add(db_inscription)
+#     await db.commit()
+#     await db.refresh(db_inscription)
+#     return db_inscription
 
 
-async def read_user_inscriptions(
-    db: AsyncSession,
-    user_id: str,
-    offset: int,
-    limit: int
-):
-    query = select(EventModel, InscriptionModel).where(
-        InscriptionModel.inscriptor_id == user_id,
-        InscriptionModel.event_id == EventModel.id
-    ).offset(offset).limit(limit)
-    result = await db.execute(query)
-    events_inscription = result.fetchall()
-    response = []
-    for event, inscription in events_inscription:
-        response.append(InscriptionsForUserSchema(
-            event_id=inscription.event_id,
-            inscriptor_id=inscription.inscriptor_id,
-            status=inscription.status,
-            creation_date=inscription.creation_date,
-            event=CreateEventSchema(
-                title=event.title,
-                event_type=event.event_type,
-                description=event.description,
-                location=event.location,
-                tracks=event.tracks,
-            )
-        ))
-    return response
+# async def read_user_inscriptions(
+#     db: AsyncSession,
+#     user_id: str,
+#     offset: int,
+#     limit: int
+# ):
+#     query = select(EventModel, InscriptionModel).where(
+#         InscriptionModel.inscriptor_id == user_id,
+#         InscriptionModel.event_id == EventModel.id
+#     ).offset(offset).limit(limit)
+#     result = await db.execute(query)
+#     events_inscription = result.fetchall()
+#     response = []
+#     for event, inscription in events_inscription:
+#         response.append(InscriptionsForUserSchema(
+#             event_id=inscription.event_id,
+#             inscriptor_id=inscription.inscriptor_id,
+#             status=inscription.status,
+#             creation_date=inscription.creation_date,
+#             event=CreateEventSchema(
+#                 title=event.title,
+#                 event_type=event.event_type,
+#                 description=event.description,
+#                 location=event.location,
+#                 tracks=event.tracks,
+#             )
+#         ))
+#     return response
 
 
 # # def delete_inscriptions_to_event(db: AsyncSession,

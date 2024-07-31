@@ -1,17 +1,10 @@
 from fastapi import APIRouter, Depends
 from typing import List
-from app.authorization.caller_id_dep import CallerIdDep
 from app.authorization.user_id_dep import verify_user_exists
 from app.services.event_inscriptions.event_inscriptions_service_dep import EventInscriptionsServiceDep
-from ....schemas.inscriptions.schemas import (
-    InscriptionReplySchema
-)
-from app.database.session_dep import SessionDep
-from app.repository import inscriptions_crud
-from app.inscriptions import validations
+from app.schemas.inscriptions.schemas import InscriptionReplySchema
+from app.authorization.organizer_or_admin_dep import verify_is_organizer
 
-
-inscriptions_PREFIX = '/'
 
 inscriptions_events_router = APIRouter(
     prefix="/{event_id}/inscriptions",
@@ -20,7 +13,7 @@ inscriptions_events_router = APIRouter(
 
 
 @inscriptions_events_router.post(
-    "",
+    path="",
     status_code=201,
     dependencies=[Depends(verify_user_exists)]
 )
@@ -31,7 +24,9 @@ async def create_inscription(
 
 
 @inscriptions_events_router.get(
-    "", response_model=List[InscriptionReplySchema]
+    path="",
+    response_model=List[InscriptionReplySchema],
+    dependencies=[Depends(verify_is_organizer)]
 )
-async def read_event_inscriptions(event_id: str, db: SessionDep):
-    return await inscriptions_crud.get_event_inscriptions(db, event_id)
+async def read_event_inscriptions(inscriptions_service: EventInscriptionsServiceDep):
+    return await inscriptions_service.get_event_inscriptions()

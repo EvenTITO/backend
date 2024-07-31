@@ -1,9 +1,12 @@
 from ..common import create_headers
 
 
-async def test_get_inscription(client, inscription_data):
+async def test_get_inscription(client, inscription_data, admin_data):
     event_id = inscription_data['event_id']
-    response = await client.get(f"/events/{event_id}/inscriptions")
+    response = await client.get(
+        f"/events/{event_id}/inscriptions",
+        headers=create_headers(admin_data.id)
+    )
 
     assert response.status_code == 200
     inscriptions = response.json()

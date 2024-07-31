@@ -28,3 +28,8 @@ class EventInscriptionsService(BaseService):
             raise InscriptionAlreadyExists(self.user_id, self.event_id)
         await self.inscriptions_repository.inscribe(self.event_id, self.user_id)
         return self.user_id
+
+    async def get_event_inscriptions(self):
+        resp = await self.inscriptions_repository.get_event_inscriptions(self.event_id)
+        print(resp)
+        return resp
