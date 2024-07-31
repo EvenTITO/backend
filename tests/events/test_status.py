@@ -42,6 +42,7 @@ async def test_organizer_can_change_status_to_started_after_created(
         headers=create_headers(admin_data.id)
     )
 
+    assert response.status_code == 204
     status_update = EventStatusSchema(
         status=EventStatus.STARTED
     )

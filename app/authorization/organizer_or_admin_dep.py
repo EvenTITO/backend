@@ -18,9 +18,9 @@ class OrganizerOrAdminChecker:
     ) -> Union[EventRol, UserRole]:
         if role == UserRole.ADMIN:
             return UserRole.ADMIN
-        if not await organizers_service.is_organizer(event_id, caller_id):
-            raise HTTPException(status_code=403)
-        return EventRol.ORGANIZER
+        if await organizers_service.is_organizer(event_id, caller_id):
+            return EventRol.ORGANIZER
+        raise HTTPException(status_code=403)
 
 
 verify_is_organizer = OrganizerOrAdminChecker()
