@@ -25,7 +25,7 @@ class WorkModel(Base):
     __tablename__ = "works"
 
     id = Column(Integer, primary_key=True)
-    id_event = Column(String, ForeignKey("events.id"), primary_key=True)
+    event_id = Column(String, ForeignKey("events.id"), primary_key=True)
 
     title = Column(String, nullable=False)
     track = Column(String, nullable=False)
@@ -36,16 +36,16 @@ class WorkModel(Base):
     state = Column(String, nullable=False, default=WorkStates.SUBMITTED)
     deadline_date = Column(DateTime, nullable=False)
 
-    id_author = Column(String, ForeignKey("users.id"), nullable=False)
+    author_id = Column(String, ForeignKey("users.id"), nullable=False)
 
     __table_args__ = (
-        UniqueConstraint('id_event', 'title', name='event_id_title_uc'),
+        UniqueConstraint('event_id', 'title', name='event_id_title_uc'),
     )
 
     author = relationship(
         "UserModel",
-        foreign_keys=[id_author],
+        foreign_keys=[author_id],
         back_populates="works_as_author"
     )
-    event = relationship("EventModel", foreign_keys=[id_event], back_populates="works")
+    event = relationship("EventModel", foreign_keys=[event_id], back_populates="works")
     submissions = relationship("SubmissionModel", back_populates="work")

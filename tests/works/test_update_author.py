@@ -4,9 +4,9 @@ from .test_create_work import USER_WORK
 
 
 async def test_get_work_author_can_update_his_work(client, user_data, event_data):
-    id_event = event_data['id']
+    event_id = event_data['id']
     response = await client.post(
-        f"/events/{id_event}/works",
+        f"/events/{event_id}/works",
         json=jsonable_encoder(USER_WORK),
         headers=create_headers(user_data["id"])
     )
@@ -15,7 +15,7 @@ async def test_get_work_author_can_update_his_work(client, user_data, event_data
     update_work.title = 'new work title'
 
     response = await client.put(
-        f"/events/{id_event}/works/{work_id}",
+        f"/events/{event_id}/works/{work_id}",
         json=jsonable_encoder(update_work),
         headers=create_headers(user_data["id"])
     )
@@ -23,7 +23,7 @@ async def test_get_work_author_can_update_his_work(client, user_data, event_data
     assert response.status_code == 204
 
     work_response = await client.get(
-        f"/events/{id_event}/works/{work_id}",
+        f"/events/{event_id}/works/{work_id}",
         headers=create_headers(user_data["id"])
     )
     work_get = work_response.json()

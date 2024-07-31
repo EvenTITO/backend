@@ -42,7 +42,7 @@ async def test_post_event_with_event_creator(client, event_creator_data):
     assert response.status_code == 201
 
 
-async def test_post_event_invalid_user(client):
+async def test_post_event_invaluser_id(client):
     event = CreateEventSchema(
         title="Another Event Title",
         description="This is a nice event",

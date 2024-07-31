@@ -149,9 +149,9 @@ async def test_get_all_events_public_is_status_created2(
     )
     n_events = len(all_events_data)
 
-    for id_event in all_events_data:
+    for event_id in all_events_data:
         await client.patch(
-            f"/events/{id_event}/status",
+            f"/events/{event_id}/status",
             json=jsonable_encoder(status_update),
             headers=create_headers(admin_data.id)
         )

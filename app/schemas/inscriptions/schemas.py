@@ -6,8 +6,8 @@ from app.schemas.users.user import UserSchema
 
 
 class InscriptionReplySchema(BaseModel):
-    id_event: str
-    id_inscriptor: str
+    event_id: str
+    inscriptor_id: str
     status: str
     creation_date: datetime
 

@@ -13,16 +13,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 async def get_event_inscriptions(db, event_id):
     query = select(UserModel, InscriptionModel).where(
-        InscriptionModel.id_event == event_id,
-        InscriptionModel.id_inscriptor == UserModel.id
+        InscriptionModel.event_id == event_id,
+        InscriptionModel.inscriptor_id == UserModel.id
     )
     result = await db.execute(query)
     users_inscriptions = result.fetchall()
     response = []
     for user, inscription in users_inscriptions:
         response.append(InscriptionsInEventResponseSchema(
-            id_event=inscription.id_event,
-            id_inscriptor=inscription.id_inscriptor,
+            event_id=inscription.event_id,
+            inscriptor_id=inscription.inscriptor_id,
             status=inscription.status,
             creation_date=inscription.creation_date,
             inscripted_user=UserSchema(
@@ -36,8 +36,8 @@ async def get_event_inscriptions(db, event_id):
 
 async def user_already_inscribed(db, user_id, event_id):
     query = select(InscriptionModel).where(
-        InscriptionModel.id_event == event_id,
-        InscriptionModel.id_inscriptor == user_id
+        InscriptionModel.event_id == event_id,
+        InscriptionModel.inscriptor_id == user_id
     )
     result = await db.execute(query)
     return result.first() is not None
@@ -45,12 +45,12 @@ async def user_already_inscribed(db, user_id, event_id):
 
 async def inscribe_user_to_event(
         db: AsyncSession,
-        id_event: str,
-        id_inscriptor: str
+        event_id: str,
+        inscriptor_id: str
 ):
     db_inscription = InscriptionModel(
-        id_event=id_event,
-        id_inscriptor=id_inscriptor
+        event_id=event_id,
+        inscriptor_id=inscriptor_id
     )
     db.add(db_inscription)
     await db.commit()
@@ -65,16 +65,16 @@ async def read_user_inscriptions(
     limit: int
 ):
     query = select(EventModel, InscriptionModel).where(
-        InscriptionModel.id_inscriptor == user_id,
-        InscriptionModel.id_event == EventModel.id
+        InscriptionModel.inscriptor_id == user_id,
+        InscriptionModel.event_id == EventModel.id
     ).offset(offset).limit(limit)
     result = await db.execute(query)
     events_inscription = result.fetchall()
     response = []
     for event, inscription in events_inscription:
         response.append(InscriptionsForUserSchema(
-            id_event=inscription.id_event,
-            id_inscriptor=inscription.id_inscriptor,
+            event_id=inscription.event_id,
+            inscriptor_id=inscription.inscriptor_id,
             status=inscription.status,
             creation_date=inscription.creation_date,
             event=CreateEventSchema(

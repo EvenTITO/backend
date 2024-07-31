@@ -22,24 +22,24 @@ class ReviewStatus(str, enum.Enum):
 class ReviewModel(Base):
     __tablename__ = "reviews"
 
-    id_event = Column(String, primary_key=True)
-    id_work = Column(Integer, primary_key=True)
-    id_submission = Column(Integer, primary_key=True)
+    event_id = Column(String, primary_key=True)
+    work_id = Column(Integer, primary_key=True)
+    submission_id = Column(Integer, primary_key=True)
 
-    id_reviewer = Column(String, ForeignKey("users.id"), primary_key=True)
+    reviewer_id = Column(String, ForeignKey("users.id"), primary_key=True)
 
     review = Column(JSON)
     review_status = Column(String, nullable=False)
     __table_args__ = (
         ForeignKeyConstraint(
             [
-                id_event,
-                id_work,
-                id_submission
+                event_id,
+                work_id,
+                submission_id
             ],
             [
-                SubmissionModel.id_event,
-                SubmissionModel.id_work,
+                SubmissionModel.event_id,
+                SubmissionModel.work_id,
                 SubmissionModel.id,
             ],
             name="fk_submission_from_review"

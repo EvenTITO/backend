@@ -32,11 +32,11 @@ class UserModel(ModelTemplate, Base):
     )
     works_as_author = relationship(
         WorkModel,
-        foreign_keys=WorkModel.id_author,
+        foreign_keys=WorkModel.author_id,
         back_populates="author"
     )
     reviews = relationship(
         ReviewModel,
-        foreign_keys=ReviewModel.id_reviewer,
+        foreign_keys=ReviewModel.reviewer_id,
         back_populates="reviewer"
     )

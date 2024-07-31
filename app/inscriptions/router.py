@@ -42,7 +42,7 @@ async def create_inscription(
     new_entry = await inscriptions_crud.inscribe_user_to_event(
         db, event_id, caller_id
     )
-    return new_entry.id_inscriptor
+    return new_entry.inscriptor_id
 
 
 @inscriptions_events_router.get(

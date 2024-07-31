@@ -15,8 +15,8 @@ class MemberRequestSchema(BaseModel):
 
 
 class MemberResponseSchema(BaseModel):
-    id_event: str
-    id_user: str
+    event_id: str
+    user_id: str
     invitation_date: datetime
     user: UserSchema
 

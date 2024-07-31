@@ -4,7 +4,7 @@ from ...exceptions.users_exceptions import (
 )
 
 
-async def validate_user_exists_with_id(db, id_user):
-    user = await users_crud.get_user_by_id(db, id_user)
+async def validate_user_exists_with_id(db, user_id):
+    user = await users_crud.get_user_by_id(db, user_id)
     if not user:
-        raise UserNotFound(id_user)
+        raise UserNotFound(user_id)

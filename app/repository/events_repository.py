@@ -26,14 +26,14 @@ class EventsRepository(Repository):
         conditions = [EventModel.title == title]
         return await self._exists_with_conditions(conditions)
 
-    async def create(self, id_creator, event_create):
+    async def create(self, creator_id, event_create):
         new_event = EventModel(
             **event_create.model_dump(mode='json'),
-            id_creator=id_creator
+            creator_id=creator_id
         )
         OrganizerModel(
             event=new_event,
-            id_organizer=new_event.id_creator,
+            organizer_id=new_event.creator_id,
             invitation_status=InvitationStatus.ACCEPTED,
         )
         return await self._create(new_event)
@@ -42,13 +42,13 @@ class EventsRepository(Repository):
         # TODO: refactor query and whole method.
         inscriptions_q = (select(EventModel)
                         .join(InscriptionModel,
-                                InscriptionModel.id_event == EventModel.id)
-                        .where(InscriptionModel.id_inscriptor == user_id))
+                                InscriptionModel.event_id == EventModel.id)
+                        .where(InscriptionModel.inscriptor_id == user_id))
 
         organizations_q = (select(EventModel)
                         .join(OrganizerModel,
-                                OrganizerModel.id_event == EventModel.id)
-                        .where(OrganizerModel.id_organizer == user_id))
+                                OrganizerModel.event_id == EventModel.id)
+                        .where(OrganizerModel.organizer_id == user_id))
 
         inscr = self.session.execute(inscriptions_q)
         org = self.session.execute(organizations_q)

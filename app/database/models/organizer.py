@@ -14,8 +14,8 @@ class InvitationStatus(str, Enum):
 class OrganizerModel(DateTemplate, Base):
     __tablename__ = "organizers"
 
-    id_organizer = Column(String, ForeignKey("users.id"), primary_key=True)
-    id_event = Column(String, ForeignKey("events.id"), primary_key=True)
+    organizer_id = Column(String, ForeignKey("users.id"), primary_key=True)
+    event_id = Column(String, ForeignKey("events.id"), primary_key=True)
     invitation_expiration_date = Column(DateTime, nullable=True)
     invitation_status = Column(String, default=InvitationStatus.INVITED.value)
 

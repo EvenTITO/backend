@@ -14,47 +14,47 @@ class ChairRepository(Repository):
     def __init__(self, session: AsyncSession):
         super().__init__(session, ChairModel)
 
-    async def is_chair(self, id_event: str, id_chair: str):
-        return await self.exists((id_event, id_chair))
+    async def is_chair(self, event_id: str, chair_id: str):
+        return await self.exists((event_id, chair_id))
 
-    async def get_chair(self, id_event, id_chair):
-        return await self.get((id_event, id_chair))
+    async def get_chair(self, event_id, chair_id):
+        return await self.get((event_id, chair_id))
 
     async def _primary_key_conditions(self, primary_key):
-        id_event, id_chair = primary_key
+        event_id, chair_id = primary_key
         return [
-            ChairModel.id_event == id_event,
-            ChairModel.id_chair == id_chair
+            ChairModel.event_id == event_id,
+            ChairModel.chair_id == chair_id
         ]
 
-    async def create_chair(self, id_event: str, id_chair: str, expiration_date: datetime):
+    async def create_chair(self, event_id: str, chair_id: str, expiration_date: datetime):
         db_in = ChairModel(
-            id_chair=id_chair,
-            id_event=id_event,
+            chair_id=chair_id,
+            event_id=event_id,
             invitation_expiration_date=expiration_date
         )
         await self._create(db_in)
 
     async def update_invitation(
             self,
-            id_event: str,
-            id_chair: str,
+            event_id: str,
+            chair_id: str,
             status_modification: ModifyInvitationStatusSchema
     ):
-        return await self.update((id_event, id_chair), status_modification)
+        return await self.update((event_id, chair_id), status_modification)
 
-    async def get_event_chairs(self, id_event: str):
+    async def get_event_chairs(self, event_id: str):
         query = select(UserModel, ChairModel).where(
-            ChairModel.id_event == id_event,
-            ChairModel.id_chair == UserModel.id
+            ChairModel.event_id == event_id,
+            ChairModel.chair_id == UserModel.id
         )
         result = await self.session.execute(query)
         users_chairs = result.fetchall()
         response = []
         for user, chair in users_chairs:
             response.append(MemberResponseSchema(
-                id_event=chair.id_event,
-                id_user=chair.id_chair,
+                event_id=chair.event_id,
+                user_id=chair.chair_id,
                 invitation_date=chair.creation_date,
                 user=UserSchema(
                     email=user.email,

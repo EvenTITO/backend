@@ -25,5 +25,5 @@ async def test_get_organizers_with_new_organizer(
 
     organizers_list = response.json()
     assert len(organizers_list) == 2
-    organizers_ids = [organizer['id_user'] for organizer in organizers_list]
+    organizers_ids = [organizer['user_id'] for organizer in organizers_list]
     assert user_data['id'] in organizers_ids

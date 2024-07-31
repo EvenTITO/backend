@@ -97,17 +97,17 @@ async def admin_data():
         bind=engine,
     )
 
-    id_user = "iuaealdasldanfas98298329"
+    user_id = "iuaealdasldanfas98298329"
     user_to_create = UserReply(
         name="Jorge",
         lastname="Benitez",
         email="jbenitez@email.com",
-        id=id_user,
+        id=user_id,
         role=UserRole.ADMIN
     )
     users_repo = UsersRepository(session)
     await users_repo.create(user_to_create)
-    user = await users_repo.get(id_user)
+    user = await users_repo.get(user_id)
     await session.close()
     return user
 
@@ -229,13 +229,13 @@ async def all_events_data(client, admin_data):
 
 @pytest.fixture(scope="function")
 async def inscription_data(client, user_data, event_data):
-    id_event = event_data['id']
+    event_id = event_data['id']
     response = await client.post(
-        f"/events/{id_event}/inscriptions",
+        f"/events/{event_id}/inscriptions",
         headers=create_headers(user_data["id"])
     )
-    id_inscriptor = response.json()
-    return {'id_event': id_event, 'id_inscriptor': id_inscriptor}
+    inscriptor_id = response.json()
+    return {'event_id': event_id, 'inscriptor_id': inscriptor_id}
 
 
 @pytest.fixture(scope="function")
@@ -285,10 +285,10 @@ async def event_started(client, event_data, admin_data):
 
 @pytest.fixture(scope="function")
 async def event_works(client, user_data, event_data):
-    id_event = event_data['id']
+    event_id = event_data['id']
     for work in WORKS:
         response = await client.post(
-            f"/events/{id_event}/works",
+            f"/events/{event_id}/works",
             json=jsonable_encoder(work),
             headers=create_headers(user_data["id"])
         )

@@ -19,7 +19,7 @@ class AuthorWorksService(BaseService):
         if my_work is None:
             raise Exception('None work')
 
-        if my_work.id_author != self.user_id:
+        if my_work.author_id != self.user_id:
             raise Exception('Not my work')
         # TODO: tambien deberia poder traerlo si soy reviewer org o chair del track.
 

@@ -13,8 +13,8 @@ from app.database.models.work import WorkModel
 class SubmissionModel(Base):
     __tablename__ = "submissions"
 
-    id_event = Column(String, primary_key=True)
-    id_work = Column(Integer, primary_key=True)
+    event_id = Column(String, primary_key=True)
+    work_id = Column(Integer, primary_key=True)
     id = Column(Integer, primary_key=True)
 
     review_decision = Column(String, nullable=True)
@@ -23,8 +23,8 @@ class SubmissionModel(Base):
 
     __table_args__ = (
         ForeignKeyConstraint(
-            [id_event, id_work],
-            [WorkModel.id_event, WorkModel.id],
+            [event_id, work_id],
+            [WorkModel.event_id, WorkModel.id],
             name="fk_work_from_submission"
         ),
         {}

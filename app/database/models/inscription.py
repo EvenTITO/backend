@@ -13,8 +13,8 @@ class InscriptionStatus(str, Enum):
 class InscriptionModel(DateTemplate, Base):
     __tablename__ = "inscriptions"
 
-    id_inscriptor = Column(String, ForeignKey("users.id"), primary_key=True)
-    id_event = Column(String, ForeignKey("events.id"), primary_key=True)
+    inscriptor_id = Column(String, ForeignKey("users.id"), primary_key=True)
+    event_id = Column(String, ForeignKey("events.id"), primary_key=True)
     status = Column(
         String, default=InscriptionStatus.PAYMENT_INCOMPLETED.value
     )
@@ -24,6 +24,6 @@ class InscriptionModel(DateTemplate, Base):
 
     def to_dict(self):
         return {
-            "id_event": self.id_event,
+            "event_id": self.event_id,
             "status": self.status,
         }

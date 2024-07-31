@@ -18,7 +18,7 @@
 #         event_from_event_creator, user_data
 # ):
 #     request = OrganizerRequestSchema(
-#         id_organizer=user_data['id']
+#         organizer_id=user_data['id']
 #     )
 #     await client.post(f"/events/{event_from_event_creator}/organizers",
 #                       json=jsonable_encoder(request),

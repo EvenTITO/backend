@@ -14,48 +14,48 @@ class OrganizersRepository(Repository):
     def __init__(self, session: AsyncSession):
         super().__init__(session, OrganizerModel)
 
-    async def is_organizer(self, id_event: str, id_organizer: str):
-        return await self.exists((id_event, id_organizer))
+    async def is_organizer(self, event_id: str, organizer_id: str):
+        return await self.exists((event_id, organizer_id))
 
-    async def get_organizer(self, id_event, id_organizer):
-        return await self.get((id_event, id_organizer))
+    async def get_organizer(self, event_id, organizer_id):
+        return await self.get((event_id, organizer_id))
 
     async def _primary_key_conditions(self, primary_key):
-        id_event, id_organizer = primary_key
+        event_id, organizer_id = primary_key
         return [
-            OrganizerModel.id_event == id_event,
-            OrganizerModel.id_organizer == id_organizer
+            OrganizerModel.event_id == event_id,
+            OrganizerModel.organizer_id == organizer_id
         ]
 
-    async def create_organizer(self, id_event: str, id_organizer: str, expiration_date: datetime):
+    async def create_organizer(self, event_id: str, organizer_id: str, expiration_date: datetime):
         db_in = OrganizerModel(
-            id_organizer=id_organizer,
-            id_event=id_event,
+            organizer_id=organizer_id,
+            event_id=event_id,
             invitation_expiration_date=expiration_date
         )
         await self._create(db_in)
 
     async def update_invitation(
         self,
-        id_event: str,
-        id_organizer: str,
+        event_id: str,
+        organizer_id: str,
         status_modification: ModifyInvitationStatusSchema
     ):
-        return await self.update((id_event, id_organizer), status_modification)
+        return await self.update((event_id, organizer_id), status_modification)
 
-    async def get_event_organizers(self, id_event: str):
+    async def get_event_organizers(self, event_id: str):
         # TODO: va aca o a otro repository? Agregar limit offset, o limitar las invitaciones.
         query = select(UserModel, OrganizerModel).where(
-            OrganizerModel.id_event == id_event,
-            OrganizerModel.id_organizer == UserModel.id
+            OrganizerModel.event_id == event_id,
+            OrganizerModel.organizer_id == UserModel.id
         )
         result = await self.session.execute(query)
         users_organizers = result.fetchall()
         response = []
         for user, organizer in users_organizers:
             response.append(MemberResponseSchema(
-                id_event=organizer.id_event,
-                id_user=organizer.id_organizer,
+                event_id=organizer.event_id,
+                user_id=organizer.organizer_id,
                 invitation_date=organizer.creation_date,
                 user=UserSchema(
                     email=user.email,

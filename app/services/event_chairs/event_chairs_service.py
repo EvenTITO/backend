@@ -41,8 +41,8 @@ class EventChairService(BaseService):
         # TODO: mejorar, esta duplicado con organizer service
         if status_modification.invitation_status == InvitationStatus.INVITED:
             raise HTTPException(status_code=400)
-        # TODO usar event_id o id_event unificar
-        conditions = [ChairModel.id_chair == user_id, ChairModel.id_event == event_id]
+        # TODO usar event_id o event_id unificar
+        conditions = [ChairModel.chair_id == user_id, ChairModel.event_id == event_id]
         if not await self.chair_repository.exists(conditions):
             raise NotExistChairInvitation(event_id, user_id)
         chair = await self.chair_repository.get_chair(event_id, user_id)

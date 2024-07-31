@@ -17,8 +17,8 @@ class InvitationStatus(str, Enum):
 class ChairModel(DateTemplate, Base):
     __tablename__ = "chairs"
 
-    id_chair = Column(String, primary_key=True)
-    id_event = Column(String, primary_key=True)
+    chair_id = Column(String, primary_key=True)
+    event_id = Column(String, primary_key=True)
 
     invitation_expiration_date = Column(Date)
     invitation_status = Column(String, nullable=False)
