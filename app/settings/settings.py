@@ -11,4 +11,5 @@ class StorageSettings(BaseSettings):
     EVENTS_BUCKET: str
     PUBLIC_BASE_URL: str
     TYPE_STORAGE: StorageTypes
-    GCP_CREDENTIALS: str | None
+    GCP_CREDENTIALS: str | None = None
+
