@@ -5,7 +5,7 @@ from app.schemas.events.dates import (
     DatesCompleteSchema,
     MandatoryDates
 )
-from ..common import create_headers
+from ..commontest import create_headers
 
 
 async def test_put_dates_config(client, admin_data, event_data):

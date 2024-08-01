@@ -2,7 +2,7 @@ from fastapi.encoders import jsonable_encoder
 
 from app.schemas.members.member_schema import MemberRequestSchema
 from app.schemas.users.user import UserSchema
-from ..common import create_headers
+from ..commontest import create_headers
 
 
 async def test_user_accept_organizer_invitation(

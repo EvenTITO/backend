@@ -11,9 +11,9 @@ class UserId:
     async def __call__(
         self,
         caller_id: CallerIdDep,
-        users_servide: UsersServiceDep,
+        users_service: UsersServiceDep,
     ) -> UserRole:
-        user_role = await users_servide.get_role()
+        user_role = await users_service.get_role()
         if user_role is None:
             raise UserNotFound(caller_id)
         return user_role

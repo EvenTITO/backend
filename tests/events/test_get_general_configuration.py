@@ -1,4 +1,4 @@
-from ..common import create_headers
+from ..commontest import create_headers
 
 
 async def test_get_event_configuration_organizer_gets_dates_pricing_review_skeleton_and_emails(

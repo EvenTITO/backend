@@ -3,7 +3,7 @@ from fastapi.encoders import jsonable_encoder
 from app.database.models.event import EventType
 from app.schemas.events.schemas import EventRol
 from app.schemas.events.create_event import CreateEventSchema
-from ..common import create_headers
+from ..commontest import create_headers
 
 
 async def test_get_my_events_no_events_empty_list(client, user_data):

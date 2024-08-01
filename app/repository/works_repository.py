@@ -1,18 +1,33 @@
 from datetime import datetime
-from sqlalchemy.future import select
 
 from sqlalchemy import func
-from app.database.models.work import WorkModel
-from app.schemas.works.work import WorkSchema
-from app.repository.crud_repository import Repository
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+
+from app.database.models.work import WorkModel
+from app.repository.crud_repository import Repository
+from app.schemas.works.work import WorkSchema
 
 
 class WorksRepository(Repository):
     def __init__(self, session: AsyncSession):
         super().__init__(session, WorkModel)
 
-    async def create(self, work: WorkSchema, event_id: str, deadline_date: datetime, author_id: str):
+    async def get_work(self, event_id: str, work_id: int) -> WorkModel:
+        conditions = await self.__primary_key_conditions(event_id, work_id)
+        return await self._get_with_conditions(conditions)
+
+    async def get_all_works_for_event(self, event_id: str, offset: int, limit: int) -> list[WorkModel]:
+        query = select(WorkModel).where(WorkModel.event_id == event_id).offset(offset).limit(limit)
+        result = await self.session.execute(query)
+        return result.scalars().all()
+
+    async def get_all_works_for_user(self, user_id: str, offset: int, limit: int) -> list[WorkModel]:
+        query = select(WorkModel).where(WorkModel.author_id == user_id).offset(offset).limit(limit)
+        result = await self.session.execute(query)
+        return result.scalars().all()
+
+    async def create_work(self, work: WorkSchema, event_id: str, deadline_date: datetime, author_id: str) -> WorkModel:
         next_work_id = await self.__find_next_id(event_id)
         work_model = WorkModel(
             **work.model_dump(),
@@ -26,15 +41,11 @@ class WorksRepository(Repository):
         await self.session.refresh(work_model)
         return work_model
 
-    async def get_work(self, event_id: str, work_id: int) -> WorkSchema:
-        conditions = await self.__primary_key_conditions(event_id, work_id)
-        return await self._get_with_conditions(conditions)
-
     async def get_works_in_tracks(self, event_id: str, tracks: list[str], limit: int, offset: int):
         conditions = [WorkModel.event_id == event_id, WorkModel.track.in_(tracks)]
         await self._get_many_with_conditions(conditions, limit, offset)
 
-    async def update(self, work_update: WorkSchema, event_id: str, work_id: int):
+    async def update_work(self, work_update: WorkSchema, event_id: str, work_id: int):
         conditions = await self.__primary_key_conditions(event_id, work_id)
         return await self._update_with_conditions(conditions, work_update)
 
@@ -48,7 +59,6 @@ class WorksRepository(Repository):
     async def __find_next_id(self, event_id):
         query = select(func.max(WorkModel.id)).filter_by(event_id=event_id)
         result = await self.session.execute(query)
-
         max_id = result.scalar() or 0
         next_id = max_id + 1
         return next_id

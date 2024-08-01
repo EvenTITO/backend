@@ -4,7 +4,7 @@ from app.database.models.event import EventType
 import datetime
 
 from app.schemas.events.dates import DateSchema, MandatoryDates
-from ..common import create_headers
+from ..commontest import create_headers
 
 
 async def test_post_event(client, admin_data):

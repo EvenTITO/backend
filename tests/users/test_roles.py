@@ -2,7 +2,7 @@ from app.database.models.user import UserRole
 from app.schemas.users.user import UserSchema
 from app.schemas.users.user_role import UserRoleSchema
 from fastapi.encoders import jsonable_encoder
-from ..common import create_headers, get_user_method
+from ..commontest import create_headers, get_user_method
 
 
 async def test_basic_user_has_DEFAULT(client, user_data):

@@ -2,7 +2,7 @@ from fastapi.encoders import jsonable_encoder
 
 from app.schemas.members.chair_schema import ChairRequestSchema
 from app.schemas.members.member_schema import MemberRequestSchema
-from ..common import create_headers
+from ..commontest import create_headers
 
 
 async def test_creator_can_add_user_as_chair(client, event_creator_data, event_from_event_creator, user_data):

@@ -1,7 +1,7 @@
 from fastapi.encoders import jsonable_encoder
 
 from app.schemas.members.chair_schema import ChairRequestSchema
-from ..common import create_headers
+from ..commontest import create_headers
 
 
 async def test_get_chairs_with_new_chair(
