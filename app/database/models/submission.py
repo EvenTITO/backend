@@ -6,7 +6,7 @@ from sqlalchemy import (
     Boolean
 )
 from sqlalchemy.orm import relationship
-from app.database.database import Base
+from app.database.models.base import Base
 from app.database.models.work import WorkModel
 
 

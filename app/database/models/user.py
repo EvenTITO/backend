@@ -1,6 +1,6 @@
 from enum import Enum
 from sqlalchemy import Column, String
-from app.database.database import Base
+from app.database.models.base import Base
 from sqlalchemy.orm import relationship
 from app.database.models.utils import ModelTemplate
 from app.database.models.work import WorkModel

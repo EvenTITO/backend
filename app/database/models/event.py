@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, ForeignKey, JSON, ARRAY
-from app.database.database import Base
+from app.database.models.base import Base
 from app.database.models.utils import ModelTemplate
 from enum import Enum
 from sqlalchemy.orm import relationship
