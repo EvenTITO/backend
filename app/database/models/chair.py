@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, ARRAY
 from sqlalchemy.orm import relationship
 
-from app.database.database import Base
+from app.database.models.base import Base
 from app.database.models.member import MemberModel
 
 

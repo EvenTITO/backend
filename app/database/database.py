@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker
 )
 from sqlalchemy.pool import NullPool
-from sqlalchemy.orm import declarative_base
 
 
 load_dotenv()
@@ -16,4 +15,3 @@ SessionLocal = async_sessionmaker(
     expire_on_commit=False,
     autocommit=False
 )
-Base = declarative_base()

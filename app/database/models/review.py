@@ -8,7 +8,7 @@ from sqlalchemy import (
     ForeignKeyConstraint
 )
 import enum
-from app.database.database import Base
+from app.database.models.base import Base
 from app.database.models.submission import SubmissionModel
 
 

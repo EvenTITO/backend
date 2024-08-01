@@ -9,7 +9,7 @@ from sqlalchemy import (
     JSON,
 )
 from sqlalchemy.orm import relationship
-from app.database.database import Base
+from app.database.models.base import Base
 import enum
 
 
