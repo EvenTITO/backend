@@ -75,10 +75,10 @@ class Repository:
         await self.session.refresh(db_in)
         return db_in
 
-    def remove(self, id):
+    async def remove(self, id):
         obj = self.model.query.filter_by(id=id).one()
-        self.session.delete(obj)
-        self.session.commit()
+        await self.session.delete(obj)
+        await self.session.commit()
         return obj
 
     # def create(self, obj_in):
