@@ -44,3 +44,17 @@ async def accept_organizer_invitation(
         organizer_service: EventOrganizersServiceDep
 ):
     await organizer_service.accept_organizer_invitation(caller_id, event_id)
+
+
+@event_organizers_router.delete(
+    path="/{user_id}",
+    status_code=201,
+    response_model=None,
+    dependencies=[Depends(verify_is_organizer)]
+)
+async def remove_organizer(
+        event_id: str,
+        user_id: str,
+        organizer_service: EventOrganizersServiceDep
+) -> None:
+    await organizer_service.remove_organizer(event_id, user_id)

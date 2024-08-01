@@ -3,7 +3,8 @@ from datetime import timedelta, datetime
 from app.database.models.chair import ChairModel
 from app.database.models.member import InvitationStatus
 from app.database.models.user import UserModel
-from app.exceptions.members.chair.chair_exceptions import NotExistPendingChairInvitation, ExpiredChairInvitation
+from app.exceptions.members.chair.chair_exceptions import NotExistPendingChairInvitation, ExpiredChairInvitation, \
+    UserNotIsChairAndNotExistInvitation
 from app.exceptions.users_exceptions import UserNotFound
 from app.repository.chairs_repository import ChairRepository
 from app.repository.users_repository import UsersRepository
@@ -48,6 +49,11 @@ class EventChairService(BaseService):
         if chair.invitation_expiration_date < datetime.now():
             raise ExpiredChairInvitation(event_id, user_id)
         await self.chair_repository.accept_invitation(event_id, user_id)
+
+    async def remove_organizer(self, event_id: str, user_id: str) -> None:
+        if not await self.chair_repository.has_invitation_or_is_member(event_id, user_id):
+            raise UserNotIsChairAndNotExistInvitation(event_id, user_id)
+        await self.chair_repository.remove_member(event_id, user_id)
 
     @staticmethod
     def __map_to_schema(model: (UserModel, ChairModel)) -> ChairResponseSchema:
