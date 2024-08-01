@@ -1,7 +1,7 @@
 from fastapi.encoders import jsonable_encoder
 from app.database.models.event import EventStatus
 from app.schemas.events.event_status import EventStatusSchema
-from ..common import create_headers, EVENTS
+from ..commontest import create_headers, EVENTS
 
 
 async def test_get_event(client, event_data, user_data):

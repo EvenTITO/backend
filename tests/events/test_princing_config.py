@@ -3,7 +3,7 @@ from app.schemas.events.pricing import (
     FeeSchema,
     PricingSchema
 )
-from ..common import create_headers
+from ..commontest import create_headers
 
 
 async def test_put_pricing_config(client, admin_data, event_data):

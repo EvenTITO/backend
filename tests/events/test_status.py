@@ -2,7 +2,7 @@ from fastapi.encoders import jsonable_encoder
 
 from app.database.models.event import EventStatus
 from app.schemas.events.event_status import EventStatusSchema
-from ..common import create_headers
+from ..commontest import create_headers
 
 
 async def test_event_created_has_waiting_approved_status(

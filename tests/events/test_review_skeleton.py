@@ -4,7 +4,7 @@ from app.schemas.events.review_skeleton.multiples_choice_question import (
     MultipleChoiceQuestion
 )
 from fastapi.encoders import jsonable_encoder
-from ..common import create_headers
+from ..commontest import create_headers
 
 
 async def test_put_review_skeleton(client, admin_data, event_data):

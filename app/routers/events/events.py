@@ -43,7 +43,6 @@ async def read_my_events(
 
 @events_router.get("/", response_model=List[PublicEventSchema], tags=["Events: General"])
 async def read_all_events(
-        db: SessionDep,
         user_role: UserDep,
         events_service: EventsServiceDep,
         status: EventStatus | None = None,

@@ -1,7 +1,7 @@
 from fastapi.encoders import jsonable_encoder
 
 from app.schemas.members.member_schema import MemberRequestSchema
-from ..common import create_headers
+from ..commontest import create_headers
 
 
 async def test_event_creator_can_add_other_user_as_event_organizer(

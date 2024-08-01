@@ -29,3 +29,17 @@ async def invite_chair(chair_service: EventChairServiceDep, chair: ChairRequestS
 )
 async def accept_chair_invitation(caller_id: CallerIdDep, event_id: str, chair_service: EventChairServiceDep):
     await chair_service.accept_chair_invitation(caller_id, event_id)
+
+
+@event_chairs_router.delete(
+    path="/{user_id}",
+    status_code=201,
+    response_model=None,
+    dependencies=[Depends(verify_is_organizer)]
+)
+async def remove_chair(
+        event_id: str,
+        user_id: str,
+        chair_service: EventChairServiceDep
+) -> None:
+    await chair_service.remove_chair(event_id, user_id)

@@ -1,14 +1,15 @@
 from pydantic import BaseModel
 from sqlalchemy import and_, exists, func
-from sqlalchemy.future import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import update
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 
 class Repository:
     """
     Base class for repositories
     """
+
     def __init__(self, session: AsyncSession, model):
         self.session = session
         self.model = model
@@ -74,6 +75,12 @@ class Repository:
         await self.session.refresh(db_in)
         return db_in
 
+    async def remove(self, id):
+        obj = self.model.query.filter_by(id=id).one()
+        await self.session.delete(obj)
+        await self.session.commit()
+        return obj
+
     # def create(self, obj_in):
     #     obj_in_data = jsonable_encoder(obj_in)
     #     db_obj = self.model(**obj_in_data)
@@ -95,9 +102,3 @@ class Repository:
     #     self.session.commit()
     #     self.session.refresh(db_obj)
     #     return db_obj
-
-    # def remove(self, id):
-    #     obj = self.session.query(self.model).get(id)
-    #     self.session.delete(obj)
-    #     self.session.commit()
-    #     return obj

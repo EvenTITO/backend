@@ -17,8 +17,3 @@ class WorkWithState(WorkSchema):
     id: int
     state: WorkStates
     deadline_date: datetime
-
-
-# class BasicWorkInfo(BasicWorkInfoForAuthor):
-#     main_author_name: str
-#     reviewer_name: str | None = None

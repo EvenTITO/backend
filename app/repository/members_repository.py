@@ -53,3 +53,6 @@ class MemberRepository(Repository):
                  .values(invitation_status=InvitationStatus.ACCEPTED))
         await self.session.execute(query)
         return await self.session.commit()
+
+    async def remove_member(self, event_id, user_id):
+        return await self.remove((event_id, user_id))

@@ -1,9 +1,12 @@
-from app.database.models.work import WorkStates
+from datetime import datetime
+
+from app.database.models.work import WorkStates, WorkModel
+from app.exceptions.works.works_exceptions import TitleAlreadyExists, WorkNotFound, NotIsMyWork, \
+    StatusNotAllowWorkUpdate, CannotUpdateWorkAfterDeadlineDate
 from app.repository.works_repository import WorksRepository
 from app.schemas.works.work import WorkSchema, WorkWithState
-from app.services.works.exceptions.title_already_exists import TitleAlreadyExists
 from app.services.services import BaseService
-from datetime import datetime
+from app.services.works.works_service import WorksService
 
 
 class AuthorWorksService(BaseService):
@@ -14,29 +17,27 @@ class AuthorWorksService(BaseService):
         self.work_id = work_id
 
     async def get_work(self) -> WorkWithState:
+        my_work = await self.get_my_work()
+        return WorksService.map_to_schema(my_work)
+
+    async def get_my_work(self) -> WorkModel:
         my_work = await self.works_repository.get_work(event_id=self.event_id, work_id=self.work_id)
-
         if my_work is None:
-            raise Exception('None work')
-
+            raise WorkNotFound(event_id=self.event_id, work_id=self.work_id)
         if my_work.author_id != self.user_id:
-            raise Exception('Not my work')
-        # TODO: tambien deberia poder traerlo si soy reviewer org o chair del track.
-
+            raise NotIsMyWork(event_id=self.event_id, work_id=self.work_id)
         return my_work
 
-    async def update(self, work_update: WorkSchema):
-        if not await self.__is_before_first_deadline():
-            raise Exception('TODO: better exception. Cant update after first submission.')
+    async def update_work(self, work_update: WorkSchema) -> None:
+        await self.__validate_update_work()
         repeated_title = await self.works_repository.work_with_title_exists(self.event_id, work_update.title)
         if repeated_title:
             raise TitleAlreadyExists(work_update.title, self.event_id)
-        await self.works_repository.update(work_update, self.event_id, self.work_id)
+        await self.works_repository.update_work(work_update, self.event_id, self.work_id)
 
-    async def __is_before_first_deadline(self):
-        work = await self.get_work()
-        print(work.state)
-        print(work.deadline_date)
-        if work.state == WorkStates.SUBMITTED and datetime.today() < work.deadline_date:
-            return True
-        return False
+    async def __validate_update_work(self):
+        work = await self.get_my_work()
+        if work.state not in [WorkStates.SUBMITTED, WorkStates.RE_SUBMIT]:
+            raise StatusNotAllowWorkUpdate(status=work.state, work_id=self.work_id)
+        if datetime.today() > work.deadline_date:
+            raise CannotUpdateWorkAfterDeadlineDate(deadline_date=work.deadline_date, work_id=self.work_id)

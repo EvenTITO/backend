@@ -1,71 +1,62 @@
-# flake8: noqa
-from fastapi import APIRouter
-from app.services.works.author_works_dep import AuthorWorksServiceDep
-from app.services.works.works_dep import WorksServiceDep
+from typing import List
+
+from fastapi import APIRouter, Depends, Query
+
+from app.authorization.organizer_or_admin_dep import verify_is_organizer
+from app.authorization.user_id_dep import verify_user_exists
 from app.schemas.works.work import WorkSchema, WorkWithState
-# from app.services.works import works_service
-# from app.schemas.works.work_stages import BeforeDeadline, NoReviewStages
+from app.services.works.author_works_service_dep import AuthorWorksServiceDep
+from app.services.works.works_service_dep import WorksServiceDep
 
-works_router = APIRouter(prefix="/events/{event_id}/works", tags=["Works"])
-
-
-@works_router.post("", status_code=201)
-async def create_work(work: WorkSchema, works_service: WorksServiceDep) -> int:
-    """
-    Creates the Work. This call is made by the work author.
-    """
-    work_id = await works_service.create_work(work)
-    return work_id
+works_router = APIRouter(
+    prefix="/events/{event_id}/works",
+    tags=["Works"]
+)
 
 
-@works_router.put("/{work_id}", status_code=204)
-async def update_work(work_update: WorkSchema, works_service: AuthorWorksServiceDep) -> None:
-    """
-    Author updates the work with work_id. This method is used only
-    in the first stage before the first submission deadline date.
-    """
-    await works_service.update(work_update)
+@works_router.get(
+    path="/",
+    status_code=200,
+    response_model=List[WorkWithState],
+    dependencies=[Depends(verify_is_organizer)]
+)
+async def get_all_works(
+        work_service: WorksServiceDep,
+        offset: int = 0,
+        limit: int = Query(default=100, le=100)
+) -> list[WorkWithState]:
+    return await work_service.get_all_event_works(offset, limit)
 
 
-@works_router.get("/{work_id}")
+@works_router.get(
+    path="/my-works",
+    status_code=200,
+    response_model=List[WorkWithState],
+    dependencies=[Depends(verify_user_exists)]
+)
+async def read_my_works(
+        work_service: WorksServiceDep,
+        offset: int = 0,
+        limit: int = Query(default=100, le=100)
+) -> list[WorkWithState]:
+    return await work_service.get_my_works(offset, limit)
+
+
+@works_router.get(
+    path="/{work_id}",
+    status_code=200,
+    response_model=WorkWithState,
+    dependencies=[Depends(verify_user_exists)]
+)
 async def get_work_author_information(works_service: AuthorWorksServiceDep) -> WorkWithState:
-    """
-    Obtain all the work information that the author is allowed
-    to see.
-    This method is used by the work author.
-    """
-    work = await works_service.get_work()
-    return work
+    return await works_service.get_work()
 
 
-# @works_router.get("/")
-# async def get_all_works_basic_information() -> list[BasicWorkInfo]:
-#     """
-#     Obtain a resumee of all the works in the event.
-#     This method is used by the event organizer.
-#     """
-#     return [
-#         BasicWorkInfo(
-#             main_author_name='Martin Sanchez',
-#             reviewer_name='Juana Gomez',
-#             title=(
-#                 'Comparación del Rendimiento de Curve25519, '
-#                 'P-256 y Curvas de Edwards en Algoritmos '
-#                 'de Criptografía Cuántica'
-#             ),
-#             track='cibersecurity',
-#             id=3,
-#             stage=NoReviewStages.BEFORE_DEADLINE,
-#         ),
-#         BasicWorkInfo(
-#             main_author_name='Martina Federer',
-#             reviewer_name=None,
-#             title=(
-#                 'Aplicaciones de los Toros de Clifford en '
-#                 'la Teoría de Códigos Correctores de Errores'
-#             ),
-#             track='math',
-#             id=2,
-#             stage=NoReviewStages.BEFORE_DEADLINE,
-#         ),
-#     ]
+@works_router.post(path="", status_code=201, dependencies=[Depends(verify_user_exists)])
+async def create_work(work: WorkSchema, works_service: WorksServiceDep) -> int:
+    return await works_service.create_work(work)
+
+
+@works_router.put(path="/{work_id}", status_code=204, dependencies=[Depends(verify_user_exists)])
+async def update_work(work_update: WorkSchema, works_service: AuthorWorksServiceDep) -> None:
+    await works_service.update_work(work_update)

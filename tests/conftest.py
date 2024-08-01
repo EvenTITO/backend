@@ -17,7 +17,7 @@ from app.schemas.members.member_schema import MemberRequestSchema
 from app.schemas.storage.schemas import DownloadURLSchema, UploadURLSchema
 from app.schemas.users.user import UserReply, UserSchema
 from app.schemas.users.user_role import UserRoleSchema
-from .common import WORKS, create_headers, EVENTS, get_user_method, USERS
+from .commontest import WORKS, create_headers, EVENTS, get_user_method, USERS
 
 
 @pytest.fixture(scope="session")

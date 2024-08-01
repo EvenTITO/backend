@@ -1,4 +1,4 @@
-from ..common import create_headers
+from ..commontest import create_headers
 
 
 async def test_get_event_contains_event_public_url(
