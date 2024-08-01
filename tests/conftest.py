@@ -4,7 +4,8 @@ import pytest
 from fastapi.encoders import jsonable_encoder
 from httpx import AsyncClient, ASGITransport
 
-from app.database.database import SessionLocal, engine, Base
+from app.database.database import SessionLocal, engine
+from app.database.models.base import Base
 from app.database.models.event import EventStatus, EventType
 from app.database.models.user import UserRole
 from app.database.session_dep import get_db
