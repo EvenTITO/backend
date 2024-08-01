@@ -2,7 +2,6 @@
 import sys
 import os
 from dotenv import load_dotenv
-# from sqlalchemy import text
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
@@ -49,22 +48,7 @@ async def add_first_admin():
     print('SUCCESS')
 
 
-# async def truncate_all_tables():
-#     async with engine.begin() as conn:
-#         # Fetch all table names
-#         tables = await conn.run_sync(lambda s: s.execute(text(
-#             "SELECT tablename FROM pg_tables WHERE schemaname = 'public';"
-#         )))
-#         table_names = [row['tablename'] for row in tables]
-
-#         # Truncate all tables
-#         for table_name in table_names:
-#             await conn.run_sync(text(f"TRUNCATE TABLE {table_name} CASCADE;"))
-
-
-
 async def create_models():
-    # await truncate_all_tables()
     try:
         print("Creating DB Connection...")
         async with engine.begin() as conn:
