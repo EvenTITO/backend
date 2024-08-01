@@ -30,7 +30,7 @@ jobs:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/
       EVENTS_BUCKET: events-bucket
       PUBLIC_BASE_URL: https://storage.googleapis.com/
-      TYPE_STORAGE: GCP_STORAGE
+      TYPE_STORAGE: NO_STORAGE
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5

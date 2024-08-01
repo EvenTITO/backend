@@ -4,6 +4,7 @@ from pydantic_settings import BaseSettings
 
 class StorageTypes(str, Enum):
     GCP_STORAGE = "GCP_STORAGE"
+    NO_STORAGE = "NO_STORAGE"
 
 
 class StorageSettings(BaseSettings):
