@@ -10,7 +10,7 @@ from app.services.works.works_service_dep import WorksServiceDep
 
 works_router = APIRouter(
     prefix="/events/{event_id}/works",
-    tags=["Works"]
+    tags=["Events: Works"]
 )
 
 
@@ -48,15 +48,15 @@ async def read_my_works(
     response_model=WorkWithState,
     dependencies=[Depends(verify_user_exists)]
 )
-async def get_work_author_information(works_service: AuthorWorksServiceDep) -> WorkWithState:
-    return await works_service.get_work()
+async def get_work_author_information(work_service: AuthorWorksServiceDep) -> WorkWithState:
+    return await work_service.get_work()
 
 
 @works_router.post(path="", status_code=201, dependencies=[Depends(verify_user_exists)])
-async def create_work(work: WorkSchema, works_service: WorksServiceDep) -> int:
-    return await works_service.create_work(work)
+async def create_work(work: WorkSchema, work_service: WorksServiceDep) -> int:
+    return await work_service.create_work(work)
 
 
 @works_router.put(path="/{work_id}", status_code=204, dependencies=[Depends(verify_user_exists)])
-async def update_work(work_update: WorkSchema, works_service: AuthorWorksServiceDep) -> None:
-    await works_service.update_work(work_update)
+async def update_work(work_update: WorkSchema, work_service: AuthorWorksServiceDep) -> None:
+    await work_service.update_work(work_update)

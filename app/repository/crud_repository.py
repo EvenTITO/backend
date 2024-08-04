@@ -76,7 +76,7 @@ class Repository:
         return db_in
 
     async def remove(self, id):
-        obj = self.model.query.filter_by(id=id).one()
+        obj = await self.get(id)
         await self.session.delete(obj)
         await self.session.commit()
         return obj
