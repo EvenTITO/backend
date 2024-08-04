@@ -50,7 +50,7 @@ class EventChairService(BaseService):
             raise ExpiredChairInvitation(event_id, user_id)
         await self.chair_repository.accept_invitation(event_id, user_id)
 
-    async def remove_organizer(self, event_id: str, user_id: str) -> None:
+    async def remove_chair(self, event_id: str, user_id: str) -> None:
         if not await self.chair_repository.has_invitation_or_is_member(event_id, user_id):
             raise UserNotIsChairAndNotExistInvitation(event_id, user_id)
         await self.chair_repository.remove_member(event_id, user_id)
