@@ -17,27 +17,27 @@ class AuthorWorksService(BaseService):
         self.work_id = work_id
 
     async def get_work(self) -> WorkWithState:
-        my_work = await self.get_my_work()
+        my_work = await self.__get_my_work()
         return WorksService.map_to_schema(my_work)
 
-    async def get_my_work(self) -> WorkModel:
+    async def update_work(self, work_update: WorkSchema) -> None:
+        await self.validate_update_work()
+        repeated_title = await self.works_repository.work_with_title_exists(self.event_id, work_update.title)
+        if repeated_title:
+            raise TitleAlreadyExists(work_update.title, self.event_id)
+        await self.works_repository.update_work(work_update, self.event_id, self.work_id)
+
+    async def validate_update_work(self):
+        work = await self.__get_my_work()
+        if work.state not in [WorkStates.SUBMITTED, WorkStates.RE_SUBMIT]:
+            raise StatusNotAllowWorkUpdate(status=work.state, work_id=self.work_id)
+        if datetime.today() > work.deadline_date:
+            raise CannotUpdateWorkAfterDeadlineDate(deadline_date=work.deadline_date, work_id=self.work_id)
+
+    async def __get_my_work(self) -> WorkModel:
         my_work = await self.works_repository.get_work(event_id=self.event_id, work_id=self.work_id)
         if my_work is None:
             raise WorkNotFound(event_id=self.event_id, work_id=self.work_id)
         if my_work.author_id != self.user_id:
             raise NotIsMyWork(event_id=self.event_id, work_id=self.work_id)
         return my_work
-
-    async def update_work(self, work_update: WorkSchema) -> None:
-        await self.__validate_update_work()
-        repeated_title = await self.works_repository.work_with_title_exists(self.event_id, work_update.title)
-        if repeated_title:
-            raise TitleAlreadyExists(work_update.title, self.event_id)
-        await self.works_repository.update_work(work_update, self.event_id, self.work_id)
-
-    async def __validate_update_work(self):
-        work = await self.get_my_work()
-        if work.state not in [WorkStates.SUBMITTED, WorkStates.RE_SUBMIT]:
-            raise StatusNotAllowWorkUpdate(status=work.state, work_id=self.work_id)
-        if datetime.today() > work.deadline_date:
-            raise CannotUpdateWorkAfterDeadlineDate(deadline_date=work.deadline_date, work_id=self.work_id)

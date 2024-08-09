@@ -2,33 +2,21 @@ from sqlalchemy import (
     Column,
     String,
     Integer,
-    ForeignKeyConstraint,
-    Boolean
+    ForeignKey
 )
 from sqlalchemy.orm import relationship
+
 from app.database.models.base import Base
-from app.database.models.work import WorkModel
+from app.database.models.utils import DateTemplate
 
 
-class SubmissionModel(Base):
+class SubmissionModel(DateTemplate, Base):
     __tablename__ = "submissions"
 
-    event_id = Column(String, primary_key=True)
-    work_id = Column(Integer, primary_key=True)
+    event_id = Column(String, ForeignKey("events.id"), primary_key=True)
+    work_id = Column(Integer, ForeignKey("works.id"), primary_key=True)
     id = Column(Integer, primary_key=True)
 
-    review_decision = Column(String, nullable=True)
-    review_comments = Column(String, nullable=True)
-    public_review = Column(Boolean, nullable=False)
+    work = relationship("WorkModel", foreign_keys=[work_id], back_populates="submissions")
+    event = relationship("EventModel", foreign_keys=[event_id], back_populates="events")
 
-    __table_args__ = (
-        ForeignKeyConstraint(
-            [event_id, work_id],
-            [WorkModel.event_id, WorkModel.id],
-            name="fk_work_from_submission"
-        ),
-        {}
-    )
-
-    work = relationship("WorkModel", back_populates="submissions")
-    reviews = relationship("ReviewModel", back_populates="submission")
