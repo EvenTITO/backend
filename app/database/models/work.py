@@ -12,6 +12,8 @@ from sqlalchemy.orm import relationship
 from app.database.models.base import Base
 import enum
 
+from app.database.models.utils import DateTemplate
+
 
 class WorkStates(str, enum.Enum):
     ACCEPTED = "ACCEPTED"
@@ -21,7 +23,7 @@ class WorkStates(str, enum.Enum):
     SUBMITTED = "SUBMITTED"
 
 
-class WorkModel(Base):
+class WorkModel(DateTemplate, Base):
     __tablename__ = "works"
 
     id = Column(Integer, primary_key=True)

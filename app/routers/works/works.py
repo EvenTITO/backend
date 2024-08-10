@@ -4,14 +4,13 @@ from fastapi import APIRouter, Depends, Query
 
 from app.authorization.organizer_or_admin_dep import verify_is_organizer
 from app.authorization.user_id_dep import verify_user_exists
+from app.routers.works.submissions import submissions_router
 from app.schemas.works.work import WorkSchema, WorkWithState
 from app.services.works.author_works_service_dep import AuthorWorksServiceDep
 from app.services.works.works_service_dep import WorksServiceDep
 
-works_router = APIRouter(
-    prefix="/events/{event_id}/works",
-    tags=["Events: Works"]
-)
+works_router = APIRouter(prefix="/{event_id}/works", tags=["Events: Works"])
+works_router.include_router(submissions_router)
 
 
 @works_router.get(

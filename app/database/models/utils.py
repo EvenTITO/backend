@@ -1,5 +1,6 @@
 from datetime import datetime
 from uuid import uuid4
+
 from sqlalchemy import Column, DateTime, String
 from sqlalchemy.orm import declarative_mixin
 
@@ -7,6 +8,7 @@ from sqlalchemy.orm import declarative_mixin
 @declarative_mixin
 class DateTemplate:
     creation_date = Column(DateTime, default=datetime.now(), nullable=False)
+    last_update = Column(DateTime, server_default=datetime.now(), onupdate=datetime.now())
 
 
 @declarative_mixin

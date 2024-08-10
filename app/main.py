@@ -41,6 +41,3 @@ app.add_middleware(
 
 app.include_router(users_router)
 app.include_router(events_router)
-
-
-app.include_router(works_router)
