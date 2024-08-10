@@ -1,3 +1,4 @@
+from app.database.models.work import WorkStates
 from app.repository.submissions_repository import SubmissionsRepository
 from app.schemas.works.submission import SubmissionSchema
 from app.services.services import BaseService
@@ -22,7 +23,10 @@ class AuthorSubmissionsService(BaseService):
 
     async def do_submit(self) -> SubmissionSchema:
         await self.work_service.validate_update_work()
-        # todo -> falta validar el estado para ver si es una submission nueva o no y actualizar la fecha
-        submission_id = await self.submission_repository.do_submit(self.event_id, self.work_id)
-        upload_url = await self.storage_service.get_submission_upload_url(self.event_id, self.work_id, submission_id)
-        return SubmissionSchema(id=submission_id, upload_url=upload_url)
+        my_work = await self.work_service.get_work()
+        if my_work.state == WorkStates.RE_SUBMIT:
+            submission = await self.submission_repository.do_new_submit(self.event_id, self.work_id)
+        else:
+            submission = await self.submission_repository.update_submit(self.event_id, self.work_id)
+        upload_url = await self.storage_service.get_submission_upload_url(self.event_id, self.work_id, submission.id)
+        return SubmissionSchema(id=submission.id, upload_url=upload_url)
