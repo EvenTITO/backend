@@ -27,4 +27,3 @@ class AtLeastOneOrganizer(HTTPException):
         self.status_code = 403
         self.detail = f"There must be at least one organizer. Cannot delete {organizer_id} in event: {event_id}"
         super().__init__(status_code=self.status_code, detail=self.detail)
-

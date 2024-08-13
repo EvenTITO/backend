@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from app.schemas.users.user import UserSchema
 
 
@@ -20,4 +20,3 @@ class MemberResponseSchema(BaseModel):
     invitation_date: datetime
     invitation_status: MemberInvitationStatus
     user: UserSchema
-

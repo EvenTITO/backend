@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import func, select, and_, update
+from sqlalchemy import func, and_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.submission import SubmissionModel
