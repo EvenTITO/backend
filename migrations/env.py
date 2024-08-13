@@ -4,7 +4,19 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
-from app.main import Base
+
+"""
+All Models must be included so that the Base variable metadata is updated with the models.
+"""
+from app.database.models.chair import ChairModel
+from app.database.models.event import EventModel
+from app.database.models.inscription import InscriptionModel
+from app.database.models.organizer import OrganizerModel
+from app.database.models.review import ReviewModel
+from app.database.models.submission import SubmissionModel
+from app.database.models.user import UserModel
+from app.database.models.work import WorkModel
+from app.database.models.base import Base
 from dotenv import load_dotenv
 import os
 
