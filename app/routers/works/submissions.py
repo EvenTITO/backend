@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends
-from app.authorization.user_id_dep import verify_user_exists
-from app.schemas.works.submission import SubmissionSchema
-from app.services.submissions.author_submissions_service_dep import AuthorSubmissionsServiceDep
+from fastapi import APIRouter
+# from fastapi import Depends
+# from app.authorization.user_id_dep import verify_user_exists
+# from app.schemas.works.submission import SubmissionSchema
+# from app.services.submissions.author_submissions_service_dep import AuthorSubmissionsServiceDep
 
 submissions_router = APIRouter(prefix="/{work_id}/submissions", tags=["Event: Works Submissions"])
 
