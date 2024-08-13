@@ -1,14 +1,13 @@
-from datetime import datetime
 from uuid import uuid4
 
-from sqlalchemy import Column, DateTime, String
+from sqlalchemy import Column, DateTime, String, func
 from sqlalchemy.orm import declarative_mixin
 
 
 @declarative_mixin
 class DateTemplate:
-    creation_date = Column(DateTime, default=datetime.now(), nullable=False)
-    last_update = Column(DateTime, server_default=datetime.now(), onupdate=datetime.now())
+    creation_date = Column(DateTime, default=func.now(), nullable=False)
+    last_update = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
 
 @declarative_mixin

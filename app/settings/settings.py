@@ -13,4 +13,3 @@ class StorageSettings(BaseSettings):
     PUBLIC_BASE_URL: str
     TYPE_STORAGE: StorageTypes
     GCP_CREDENTIALS: str | None = None
-
