@@ -17,6 +17,7 @@ def get_public_event_url(event_id: str, file_to_get: EventsStaticFiles):
         blob=f"{event_id}/{file_to_get.value}"
     )
 
+
 def get_upload_url(event_id: str, file_to_get: EventsStaticFiles):
     storage_settings = StorageSettings()
     return generate_signed_upload_url(

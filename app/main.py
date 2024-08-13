@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers.users.users import users_router
 from app.routers.events.events import events_router
-from app.routers.works.works import works_router
 
 
 # TODO: Change email.

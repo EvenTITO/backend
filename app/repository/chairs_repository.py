@@ -3,7 +3,6 @@ from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.chair import ChairModel
-from app.database.models.member import InvitationStatus
 from app.repository.members_repository import MemberRepository
 
 
