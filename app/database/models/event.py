@@ -46,4 +46,3 @@ class EventModel(ModelTemplate, Base):
     organizers = relationship("OrganizerModel", back_populates="event")
     chairs = relationship("ChairModel", back_populates="event")
     works = relationship("WorkModel", back_populates="event")
-    submissions = relationship("SubmissionModel", back_populates="event")

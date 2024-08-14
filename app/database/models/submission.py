@@ -32,4 +32,4 @@ class SubmissionModel(DateTemplate, Base):
 
 # TODO: revisar si en los requests que se hacen se esta trayendo todo por estas relationships o la carga es lazy
     work = relationship("WorkModel", back_populates="submissions")
-    event = relationship("EventModel", back_populates="events")
+    reviews = relationship("ReviewModel", back_populates="submission")
