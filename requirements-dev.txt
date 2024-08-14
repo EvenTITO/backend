@@ -10,3 +10,4 @@ pydantic
 google-cloud-storage
 pydantic-settings
 pytest-mock==3.14.0
+pydantic[email]
