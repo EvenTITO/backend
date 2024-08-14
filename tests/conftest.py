@@ -73,7 +73,7 @@ async def client(session_override):
 @pytest.fixture(scope="function")
 async def mock_storage(mocker):
     generate_upload_url_mock = mocker.patch(
-        'app.services.storage.events_storage.generate_signed_upload_url'
+        'app.services.storage.storage.generate_signed_upload_url'
     )
     generate_upload_url_mock.return_value = UploadURLSchema(
         upload_url='mocked-url-upload',

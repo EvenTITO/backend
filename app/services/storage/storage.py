@@ -3,7 +3,6 @@ import json
 from google.cloud import storage
 from app.schemas.storage.schemas import DownloadURLSchema, UploadURLSchema
 from google.oauth2 import service_account
-from app.settings.settings import StorageSettings
 
 json_file_content_string = os.getenv('GCP_CREDENTIALS')
 
@@ -19,10 +18,6 @@ else:
     except Exception as e:
         print(f"Error initializing storage client: {e}")
         storage_client = None
-
-
-def get_public_url(bucket, blob):
-    return StorageSettings().PUBLIC_BASE_URL + bucket + '/' + blob
 
 
 def generate_signed_upload_url(

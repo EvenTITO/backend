@@ -23,6 +23,4 @@ storage_client = get_storage_client()
 class StorageService(BaseService):
     def __init__(self):
         self.storage_client = storage_client
-
-    async def get_public_url(self, bucket, blob):
-        return StorageSettings().PUBLIC_BASE_URL + bucket + '/' + blob
+        self.storage_settings = storage_settings

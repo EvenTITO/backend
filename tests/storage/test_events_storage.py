@@ -11,7 +11,7 @@ async def test_get_event_contains_event_public_url(
 
     assert response.status_code == 200
     assert response.json()["title"] == event_data["title"]
-    assert response.json()["media"][0]["name"] == 'main_image_url'
+    assert response.json()["media"][0]["name"] == 'main_image'
     assert len(response.json()["roles"]) == 0
 
 
@@ -22,7 +22,7 @@ async def test_get_event_upload_url_must_be_event_organizer(
     event_from_event_creator,
 ):
     response = await client.get(
-        f"events/{event_from_event_creator}/upload_url/main_image",
+        f"/events/{event_from_event_creator}/upload_url/main_image",
         headers=create_headers(organizer_id_from_event)
     )
 
