@@ -21,10 +21,6 @@ else:
         storage_client = None
 
 
-def get_public_url(bucket, blob):
-    return StorageSettings().PUBLIC_BASE_URL + bucket + '/' + blob
-
-
 def generate_signed_upload_url(
     bucket_name,
     blob_name,
