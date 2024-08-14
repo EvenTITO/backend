@@ -3,7 +3,6 @@ import json
 from google.cloud import storage
 from app.schemas.storage.schemas import DownloadURLSchema, UploadURLSchema
 from google.oauth2 import service_account
-from app.settings.settings import StorageSettings
 
 json_file_content_string = os.getenv('GCP_CREDENTIALS')
 
