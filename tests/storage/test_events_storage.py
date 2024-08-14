@@ -11,7 +11,7 @@ async def test_get_event_contains_event_public_url(
 
     assert response.status_code == 200
     assert response.json()["title"] == event_data["title"]
-    assert response.json()["media"][0]["name"] == 'main_image_url'
+    assert response.json()["media"][0]["name"] == 'main_image'
     assert len(response.json()["roles"]) == 0
 
 
