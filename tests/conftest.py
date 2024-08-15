@@ -3,71 +3,17 @@ from uuid import uuid4
 import pytest
 from fastapi.encoders import jsonable_encoder
 
-from app.database.database import SessionLocal, engine
 from app.database.models.event import EventStatus, EventType
 from app.database.models.user import UserRole
-from app.repository.users_repository import UsersRepository
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.event_status import EventStatusSchema
 from app.schemas.members.member_schema import MemberRequestSchema
-from app.schemas.storage.schemas import DownloadURLSchema, UploadURLSchema
-from app.schemas.users.user import UserReply, UserSchema
+from app.schemas.users.user import UserSchema
 from app.schemas.users.user_role import UserRoleSchema
 from .commontest import WORKS, create_headers, EVENTS, get_user_method, USERS
-from .fixtures.session_fixtures import *  # noqa: F401, F403
-
-
-@pytest.fixture(scope="function")
-async def mock_storage(mocker):
-    base_path = 'app.services.storage.storage_clients'
-    gcp_path = base_path + '.gcp_storage_client.GCPStorageClient'
-    no_client_path = base_path + '.no_storage_provided_client.NoStorageProvidedClient'
-
-    def mock_generate_upload_url(method_to_mock):
-        mock_value = mocker.patch(method_to_mock)
-        mock_value.return_value = UploadURLSchema(
-            upload_url='mocked-url-upload',
-            expiration_time_seconds=3600,
-            max_upload_size_mb=5
-        )
-
-    def mock_generate_download_url_mock(method_to_mock):
-        mock_value = mocker.patch(method_to_mock)
-        mock_value.return_value = DownloadURLSchema(
-            download_url='mocked-url-download',
-            expiration_time_seconds=3600,
-        )
-
-    mock_generate_upload_url(gcp_path+'.generate_signed_upload_url')
-    mock_generate_download_url_mock(gcp_path+'.generate_signed_read_url')
-
-    mock_generate_upload_url(no_client_path+'.generate_signed_upload_url')
-    mock_generate_download_url_mock(no_client_path+'.generate_signed_read_url')
-
-    yield
-
-
-# ------------------------- DATA FIXTURES --------------------------
-
-@pytest.fixture(scope="session")
-async def admin_data():
-    session = SessionLocal(
-        bind=engine,
-    )
-
-    user_id = "iuaealdasldanfas98298329"
-    user_to_create = UserReply(
-        name="Jorge",
-        lastname="Benitez",
-        email="jbenitez@email.com",
-        id=user_id,
-        role=UserRole.ADMIN
-    )
-    users_repo = UsersRepository(session)
-    await users_repo.create(user_to_create)
-    user = await users_repo.get(user_id)
-    await session.close()
-    return user
+from .fixtures.tests_configuration_fixtures import *  # noqa: F401, F403
+from .fixtures.storage_mock_fixtures import *  # noqa: F401, F403
+from .fixtures.application_setup_fixtures import *  # noqa: F401, F403
 
 
 @pytest.fixture(scope="function")

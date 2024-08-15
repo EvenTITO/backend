@@ -4,6 +4,8 @@ from httpx import AsyncClient, ASGITransport
 from app.database.database import SessionLocal, engine
 from app.database.models.base import Base
 from app.database.session_dep import get_db
+
+# With this import, the Base metadate is filled with the Database Models.
 from app.main import app
 
 
