@@ -1,76 +1,18 @@
-from uuid import uuid4
-
 import pytest
-from fastapi.encoders import jsonable_encoder
 
+from fastapi.encoders import jsonable_encoder
 from app.database.models.event import EventStatus, EventType
-from app.database.models.user import UserRole
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.event_status import EventStatusSchema
 from app.schemas.members.member_schema import MemberRequestSchema
 from app.schemas.users.user import UserSchema
-from app.schemas.users.user_role import UserRoleSchema
-from .commontest import WORKS, create_headers, EVENTS, get_user_method, USERS
+from .commontest import WORKS, create_headers, EVENTS
+
 from .fixtures.tests_configuration_fixtures import *  # noqa: F401, F403
 from .fixtures.storage_mock_fixtures import *  # noqa: F401, F403
 from .fixtures.application_setup_fixtures import *  # noqa: F401, F403
-
-
-@pytest.fixture(scope="function")
-async def user_data(client):
-    new_user = UserSchema(
-        name="Lio",
-        lastname="Messi",
-        email="lio_messi@email.com",
-    )
-    response = await client.post(
-        "/users",
-        json=jsonable_encoder(new_user),
-        headers=create_headers("iuaealdasldanfasdlasd")
-    )
-    user_data_id = response.json()
-    user = await get_user_method(client, user_data_id)
-    return user
-
-
-@pytest.fixture(scope="function")
-async def post_users(client):
-    ids = []
-    for user in USERS:
-        id = str(uuid4())
-        _ = await client.post(
-            "/users",
-            json=jsonable_encoder(user),
-            headers=create_headers(id)
-        )
-        ids.append(id)
-    return ids
-
-
-@pytest.fixture(scope="function")
-async def event_creator_data(client, admin_data):
-    event_creator = UserSchema(
-        name="Juan",
-        lastname="Martinez",
-        email="jmartinez@email.com",
-    )
-    user_id = await client.post(
-        "/users",
-        json=jsonable_encoder(event_creator),
-        headers=create_headers("lakjsdeuimx213klasmd3")
-    )
-    user_id = user_id.json()
-    new_role = UserRoleSchema(
-        role=UserRole.EVENT_CREATOR.value
-    )
-    _ = await client.patch(
-        f"/users/{user_id}/roles",
-        json=jsonable_encoder(new_role),
-        headers=create_headers(admin_data.id)
-    )
-
-    event_creator_user = await get_user_method(client, user_id)
-    return event_creator_user
+from .fixtures.data.users_fixtures import *  # noqa: F401, F403
+from .fixtures.data.event_creator_fixtures import *  # noqa: F401, F403
 
 
 @pytest.fixture(scope="function")
