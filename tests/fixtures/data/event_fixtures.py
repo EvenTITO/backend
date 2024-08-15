@@ -1,8 +1,9 @@
 import pytest
 
 from fastapi.encoders import jsonable_encoder
-from app.database.models.event import EventType
+from app.database.models.event import EventType, EventStatus
 from app.schemas.events.create_event import CreateEventSchema
+from app.schemas.events.event_status import EventStatusSchema
 from ...commontest import create_headers, EVENTS
 
 
@@ -43,3 +44,16 @@ async def all_events_data(client, admin_data):
         ids_events.append(response.json())
 
     return ids_events
+
+
+@pytest.fixture(scope="function")
+async def event_started(client, event_data, admin_data):
+    status_update = EventStatusSchema(
+        status=EventStatus.STARTED
+    )
+    await client.patch(
+        f"/events/{event_data['id']}/status",
+        json=jsonable_encoder(status_update),
+        headers=create_headers(admin_data.id)
+    )
+    return event_data['id']
