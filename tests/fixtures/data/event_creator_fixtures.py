@@ -4,6 +4,9 @@ from fastapi.encoders import jsonable_encoder
 from app.database.models.user import UserRole
 from app.schemas.users.user import UserSchema
 from app.schemas.users.user_role import UserRoleSchema
+from app.schemas.events.create_event import CreateEventSchema
+from app.database.models.event import EventType
+
 from ...commontest import create_headers, get_user_method
 
 
@@ -31,3 +34,22 @@ async def event_creator_data(client, admin_data):
 
     event_creator_user = await get_user_method(client, user_id)
     return event_creator_user
+
+
+@pytest.fixture(scope="function")
+async def event_from_event_creator(client, event_creator_data):
+    new_event = CreateEventSchema(
+        title="Event Creator Event",
+        start_date="2024-09-02",
+        end_date="2024-09-04",
+        description="This is a nice event",
+        event_type=EventType.CONFERENCE,
+        location='Paseo Colon 850',
+        tracks=['math', 'chemistry', 'phisics'],
+    )
+    response = await client.post(
+        "/events",
+        json=jsonable_encoder(new_event),
+        headers=create_headers(event_creator_data["id"])
+    )
+    return response.json()
