@@ -2,14 +2,10 @@ from uuid import uuid4
 
 import pytest
 from fastapi.encoders import jsonable_encoder
-from httpx import AsyncClient, ASGITransport
 
 from app.database.database import SessionLocal, engine
-from app.database.models.base import Base
 from app.database.models.event import EventStatus, EventType
 from app.database.models.user import UserRole
-from app.database.session_dep import get_db
-from app.main import app
 from app.repository.users_repository import UsersRepository
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.event_status import EventStatusSchema
@@ -18,56 +14,7 @@ from app.schemas.storage.schemas import DownloadURLSchema, UploadURLSchema
 from app.schemas.users.user import UserReply, UserSchema
 from app.schemas.users.user_role import UserRoleSchema
 from .commontest import WORKS, create_headers, EVENTS, get_user_method, USERS
-
-
-@pytest.fixture(scope="session")
-def anyio_backend():
-    return 'asyncio'
-
-
-@pytest.fixture(scope="session", autouse=True)
-async def setup_database(anyio_backend):
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
-    await engine.dispose()
-    yield
-
-
-@pytest.fixture(scope="session")
-async def connection(anyio_backend):
-    async with engine.connect() as connection:
-        yield connection
-
-
-@pytest.fixture()
-async def transaction(connection):
-    async with connection.begin() as transaction:
-        yield transaction
-
-
-@pytest.fixture(scope="function")
-async def session_override(connection, transaction):
-    async def get_db_session_override():
-        async_session = SessionLocal(
-            bind=connection,
-            join_transaction_mode="create_savepoint",
-        )
-        async with async_session:
-            yield async_session
-
-    app.dependency_overrides[get_db] = get_db_session_override
-    yield
-    del app.dependency_overrides[get_db]
-
-    await transaction.rollback()
-
-
-@pytest.fixture(scope="function")
-async def client(session_override):
-    async with AsyncClient(transport=ASGITransport(app=app),
-                           base_url="http://test") as ac:
-        yield ac
+from .fixtures.session_fixtures import *  # noqa: F401, F403
 
 
 @pytest.fixture(scope="function")
