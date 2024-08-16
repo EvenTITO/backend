@@ -5,7 +5,12 @@ from app.schemas.members.member_schema import MemberRequestSchema
 from ..commontest import create_headers
 
 
-async def test_creator_can_add_user_as_chair(client, create_event_creator, create_event_from_event_creator, create_user):
+async def test_creator_can_add_user_as_chair(
+    client,
+    create_event_creator,
+    create_event_from_event_creator,
+    create_user
+):
     request = ChairRequestSchema(
         email=create_user["email"],
         tracks=["química", "física", "matemática"]
