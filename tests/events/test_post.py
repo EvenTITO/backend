@@ -139,7 +139,6 @@ async def test_post_event_with_dates(client, admin_data):
         'location': 'Paseo Colon 850',
         'tracks': ['math, chemistry, phisics']
     })
-    print(json)
     response = await client.post(
         "/events",
         json=json,

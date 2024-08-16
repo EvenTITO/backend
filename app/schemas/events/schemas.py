@@ -11,7 +11,8 @@ from app.schemas.events.pricing import PricingSchema
 
 class EventRol(str, Enum):
     ORGANIZER = "ORGANIZER"
-    INSCRIPTED = "INSCRIPTED"
+    SPEAKER = "SPEAKER"
+    ATTENDEE = "ATTENDEE"
 
 
 class StaticEventSchema(BaseModel):

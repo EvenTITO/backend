@@ -33,5 +33,4 @@ async def test_put_pricing_config(client, admin_data, create_event):
     )
 
     assert response.status_code == 200
-    print(response.json())
     assert response.json()["pricing"][0]["name"] == students_fee.name

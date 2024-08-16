@@ -36,10 +36,7 @@ class WorksRepository(Repository):
             deadline_date=deadline_date,
             author_id=author_id
         )
-        self.session.add(work_model)
-        await self.session.commit()
-        await self.session.refresh(work_model)
-        return work_model
+        return await self._create(work_model)
 
     async def get_works_in_tracks(self, event_id: str, tracks: list[str], limit: int, offset: int):
         conditions = [WorkModel.event_id == event_id, WorkModel.track.in_(tracks)]

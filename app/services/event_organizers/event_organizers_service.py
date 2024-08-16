@@ -58,7 +58,7 @@ class EventOrganizersService(BaseService):
         if not await self.organizer_repository.has_invitation_or_is_member(event_id, user_id):
             raise UserNotIsOrganizerAndNotExistInvitation(event_id, user_id)
         users_organizers = await self.organizer_repository.get_all(event_id)
-        if users_organizers.length <= 1:
+        if len(users_organizers) <= 1:
             raise AtLeastOneOrganizer(event_id, user_id)
         await self.organizer_repository.remove_member(event_id, user_id)
 
