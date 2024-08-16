@@ -1,19 +1,14 @@
-from typing import Self
+from typing import Annotated
 
-from pydantic import BaseModel, model_validator, ConfigDict
+from annotated_types import Len
+from pydantic import BaseModel, ConfigDict
 
 from app.database.models.inscription import InscriptionRole, InscriptionStatus
 
 
 class InscriptionRequestSchema(BaseModel):
-    roles: list[InscriptionRole]
+    roles: Annotated[list[InscriptionRole], Len(min_length=1)]
     affiliation: str | None
-
-    @model_validator(mode='after')
-    def check_mandatory_roles(self) -> Self:
-        if self.roles is None or len(self.roles) == 0:
-            raise ValueError("There must be at least one role in the inscription.")
-        return self
 
 
 class InscriptionResponseSchema(BaseModel):

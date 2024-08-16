@@ -52,7 +52,7 @@ async def read_my_works(
         offset: int = 0,
         limit: int = Query(default=100, le=100)
 ) -> list[InscriptionResponseSchema]:
-    return await inscriptions_service.get_my_inscriptions(offset, limit)
+    return await inscriptions_service.get_my_event_inscriptions(offset, limit)
 
 
 @inscriptions_events_router.put("/{inscription_id}/pay", status_code=200, dependencies=[Depends(verify_user_exists)])

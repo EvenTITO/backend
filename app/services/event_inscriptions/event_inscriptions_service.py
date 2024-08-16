@@ -1,6 +1,6 @@
 from app.database.models.event import EventStatus
 from app.database.models.inscription import InscriptionModel, InscriptionStatus
-from app.exceptions.inscriptions_exceptions import InscriptionAlreadyExists, EventNotStarted, InscriptionAlreadyPaid, \
+from app.exceptions.inscriptions_exceptions import EventNotStarted, InscriptionAlreadyPaid, \
     InscriptionNotFound
 from app.repository.inscriptions_repository import InscriptionsRepository
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema, InscriptionResponseSchema, \
@@ -29,8 +29,6 @@ class EventInscriptionsService(BaseService):
         event_status = await self.events_service.get_event_status(self.event_id)
         if event_status != EventStatus.STARTED:
             raise EventNotStarted(self.event_id, event_status)
-        if await self.inscriptions_repository.inscription_exists(self.event_id, self.user_id):
-            raise InscriptionAlreadyExists(self.user_id, self.event_id)
         saved_inscription = await self.inscriptions_repository.inscribe(self.event_id, self.user_id, inscription)
         response = EventInscriptionsService.map_to_schema(saved_inscription)
         if saved_inscription.affiliation is not None:
@@ -42,15 +40,20 @@ class EventInscriptionsService(BaseService):
             response.affiliation_upload_url = upload_url
         return response
 
-    async def get_event_inscriptions(self, offset: int, limit: int):
+    async def get_event_inscriptions(self, offset: int, limit: int) -> list[InscriptionResponseSchema]:
         inscriptions = await self.inscriptions_repository.get_event_inscriptions(self.event_id, offset, limit)
         return list(map(EventInscriptionsService.map_to_schema, inscriptions))
 
-    async def get_my_inscriptions(self, offset: int, limit: int):
-        inscriptions = await self.inscriptions_repository.get_user_inscriptions(self.user_id, offset, limit)
+    async def get_my_event_inscriptions(self, offset: int, limit: int) -> list[InscriptionResponseSchema]:
+        inscriptions = await self.inscriptions_repository.get_event_user_inscriptions(
+            self.event_id,
+            self.user_id,
+            offset,
+            limit
+        )
         return list(map(EventInscriptionsService.map_to_schema, inscriptions))
 
-    async def get_my_inscription(self, inscription_id: str):
+    async def get_my_inscription(self, inscription_id: str) -> InscriptionResponseSchema:
         inscription = await self.inscriptions_repository.get_user_inscription_by_id(self.user_id, inscription_id)
         return EventInscriptionsService.map_to_schema(inscription)
 
@@ -60,7 +63,6 @@ class EventInscriptionsService(BaseService):
             raise InscriptionNotFound(self.event_id, inscription_id)
         if my_inscription.status != InscriptionStatus.PENDING_PAYMENT:
             raise InscriptionAlreadyPaid(inscription_id, self.user_id, self.event_id)
-
         await self.inscriptions_repository.pay(inscription_id)
         upload_url = await self.storage_service.get_payment_upload_url(self.event_id, self.user_id, inscription_id)
         return InscriptionPayResponseSchema(id=inscription_id, upload_url=upload_url)
