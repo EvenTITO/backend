@@ -25,19 +25,19 @@ USER_WORK = WorkSchema(
 )
 
 
-async def test_create_work(client, user_data, event_data):
+async def test_create_work(client, create_user, event_data):
     event_id = event_data['id']
     response = await client.post(
         f"/events/{event_id}/works",
         json=jsonable_encoder(USER_WORK),
-        headers=create_headers(user_data["id"])
+        headers=create_headers(create_user["id"])
     )
     first_work_id = 1
     assert response.status_code == 201
     assert response.json() == first_work_id
 
 
-async def test_create_work_two_works_different_events_same_work_id(client, user_data, all_events_data):
+async def test_create_work_two_works_different_events_same_work_id(client, create_user, all_events_data):
     """
     When a new work is created, it should have the id as the next id available (incremental).
     This increment should be for each event.
@@ -48,13 +48,13 @@ async def test_create_work_two_works_different_events_same_work_id(client, user_
     first_work_response = await client.post(
         f"/events/{id_first_event}/works",
         json=jsonable_encoder(USER_WORK),
-        headers=create_headers(user_data["id"])
+        headers=create_headers(create_user["id"])
     )
 
     second_work_response = await client.post(
         f"/events/{id_second_event}/works",
         json=jsonable_encoder(USER_WORK),
-        headers=create_headers(user_data["id"])
+        headers=create_headers(create_user["id"])
     )
 
     first_work_id_for_both_events = 1
@@ -65,7 +65,7 @@ async def test_create_work_two_works_different_events_same_work_id(client, user_
     assert second_work_response.json() == first_work_id_for_both_events
 
 
-async def test_create_lots_works_in_same_event_should_have_incremental_ids(client, user_data, event_data):
+async def test_create_lots_works_in_same_event_should_have_incremental_ids(client, create_user, event_data):
     """
     When many works are created in the same event, they all should have a different incremental id.
     """
@@ -78,7 +78,7 @@ async def test_create_lots_works_in_same_event_should_have_incremental_ids(clien
         response = await client.post(
             f"/events/{event_id}/works",
             json=jsonable_encoder(work),
-            headers=create_headers(user_data["id"])
+            headers=create_headers(create_user["id"])
         )
         work_id = response.json()
         ids_results.append(work_id)
@@ -90,7 +90,7 @@ async def test_create_lots_works_in_same_event_should_have_incremental_ids(clien
         assert i == ids_results[i-1]
 
 
-async def test_create_two_works_same_title_same_event_fails(client, user_data, event_data):
+async def test_create_two_works_same_title_same_event_fails(client, create_user, event_data):
     """
     When many works are created in the same event, they all should have a different incremental id.
     """
@@ -99,13 +99,13 @@ async def test_create_two_works_same_title_same_event_fails(client, user_data, e
     response = await client.post(
         f"/events/{event_id}/works",
         json=jsonable_encoder(USER_WORK),
-        headers=create_headers(user_data["id"])
+        headers=create_headers(create_user["id"])
     )
 
     second_response = await client.post(
         f"/events/{event_id}/works",
         json=jsonable_encoder(USER_WORK),
-        headers=create_headers(user_data["id"])
+        headers=create_headers(create_user["id"])
     )
 
     assert response.status_code == 201

@@ -4,10 +4,10 @@ from ..commontest import create_headers
 async def test_get_event_contains_event_public_url(
     client,
     event_data,
-    user_data
+    create_user
 ):
     response = await client.get(f"/events/{event_data['id']}/public",
-                                headers=create_headers(user_data['id']))
+                                headers=create_headers(create_user['id']))
 
     assert response.status_code == 200
     assert response.json()["title"] == event_data["title"]

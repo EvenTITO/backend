@@ -15,17 +15,17 @@
 
 # async def test_event_organizer_can_remove_other_event_organizer(
 #         client, organizer_id_from_event,
-#         event_from_event_creator, user_data
+#         event_from_event_creator, create_user
 # ):
 #     request = OrganizerRequestSchema(
-#         organizer_id=user_data['id']
+#         organizer_id=create_user['id']
 #     )
 #     await client.post(f"/events/{event_from_event_creator}/organizers",
 #                       json=jsonable_encoder(request),
 #                       headers=create_headers(organizer_id_from_event))
 
 #     response = await client.delete(f"/events/{event_from_event_creator}"
-#                                    f"/organizers/{user_data['id']}",
+#                                    f"/organizers/{create_user['id']}",
 #                                    headers=create_headers(organizer_id_from_event))
 #     assert response.status_code == 204
 
@@ -42,10 +42,10 @@
 
 # async def test_simple_user_tries_remove_organizer_fails(
 #         client, organizer_id_from_event,
-#         event_from_event_creator, user_data
+#         event_from_event_creator, create_user
 # ):
 #     response = await client.delete(f"/events/{event_from_event_creator}"
 #                                    f"/organizers/{organizer_id_from_event}",
-#                                    headers=create_headers(user_data["id"]))
+#                                    headers=create_headers(create_user["id"]))
 
 #     assert response.status_code == 404

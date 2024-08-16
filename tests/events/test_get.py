@@ -4,9 +4,9 @@ from app.schemas.events.event_status import EventStatusSchema
 from ..commontest import create_headers, EVENTS
 
 
-async def test_get_event(client, event_data, user_data):
+async def test_get_event(client, event_data, create_user):
     response = await client.get(f"/events/{event_data['id']}/public",
-                                headers=create_headers(user_data['id']))
+                                headers=create_headers(create_user['id']))
 
     assert response.status_code == 200
     assert response.json()["title"] == event_data["title"]
@@ -14,20 +14,20 @@ async def test_get_event(client, event_data, user_data):
     assert len(response.json()["roles"]) == 0
 
 
-async def test_get_event_not_exists_fails(client, user_data):
+async def test_get_event_not_exists_fails(client, create_user):
     id = "this-id-does-not-exist"
     response = await client.get(f"/events/{id}/public",
-                                headers=create_headers(user_data['id']))
+                                headers=create_headers(create_user['id']))
 
     assert response.status_code == 404
     # assert response.json()["detail"] == EVENT_NOT_FOUND
 
 
 async def test_get_all_events_not_admin_error(
-        client, all_events_data, user_data
+        client, all_events_data, create_user
 ):
     response = await client.get("/events/",
-                                headers=create_headers(user_data['id']))
+                                headers=create_headers(create_user['id']))
     assert response.status_code == 400
 
 
@@ -63,7 +63,7 @@ async def test_get_all_events_admin_gets_all(
 
 
 async def test_get_all_events_non_admin_can_query_started(
-        client, all_events_data, admin_data, user_data
+        client, all_events_data, admin_data, create_user
 ):
     status_update = EventStatusSchema(
         status=EventStatus.STARTED
@@ -76,7 +76,7 @@ async def test_get_all_events_non_admin_can_query_started(
 
     response = await client.get(
         "/events/",
-        headers=create_headers(user_data['id']),
+        headers=create_headers(create_user['id']),
         params={'status': EventStatus.STARTED.value}
     )
     print(response.json())
@@ -85,7 +85,7 @@ async def test_get_all_events_non_admin_can_query_started(
 
 
 async def test_get_all_events_non_admin_can_not_query_created(
-        client, all_events_data, admin_data, user_data
+        client, all_events_data, admin_data, create_user
 ):
     status_update = EventStatusSchema(
         status=EventStatus.STARTED
@@ -98,7 +98,7 @@ async def test_get_all_events_non_admin_can_not_query_created(
 
     response = await client.get(
         "/events/",
-        headers=create_headers(user_data['id']),
+        headers=create_headers(create_user['id']),
         params={'status': EventStatus.CREATED.value}
     )
     print(response.json())

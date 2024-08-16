@@ -3,7 +3,7 @@ from ..commontest import create_headers
 
 async def test_get_event_configuration_organizer_gets_dates_pricing_review_skeleton_and_emails(
     client,
-    user_data,
+    create_user,
     event_creator_data,
     event_from_event_creator
 ):

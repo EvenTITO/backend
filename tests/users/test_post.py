@@ -6,13 +6,13 @@ from app.exceptions.users_exceptions import EmailAlreadyExists, IdAlreadyExists
 
 async def test_create_user(client):
     user_id = "aasjdfvhasdvnlaksdj"
-    user_data = UserSchema(
+    create_user = UserSchema(
         name="Lio",
         lastname="Messi",
         email="email@email.com"
     )
     response = await client.post("/users",
-                                 json=jsonable_encoder(user_data),
+                                 json=jsonable_encoder(create_user),
                                  headers=create_headers(user_id))
     assert response.status_code == 201
     response_data = response.json()
@@ -21,29 +21,29 @@ async def test_create_user(client):
     response = await client.get(f"/users/{user_id}",
                                 headers=create_headers(user_id))
     assert response.status_code == 200
-    assert response.json()["name"] == user_data.name
-    assert response.json()["email"] == user_data.email
-    assert response.json()["lastname"] == user_data.lastname
+    assert response.json()["name"] == create_user.name
+    assert response.json()["email"] == create_user.email
+    assert response.json()["lastname"] == create_user.lastname
 
 
-async def test_create_same_email_fails(client, user_data):
-    new_user_same_email = user_data.copy()
+async def test_create_same_email_fails(client, create_user):
+    new_user_same_email = create_user.copy()
     new_user_same_email.pop("id")
     caller_id = "other-id"
     response = await client.post("/users",
                                  json=new_user_same_email,
                                  headers=create_headers(caller_id))
 
-    expected_error = EmailAlreadyExists(user_data['email'])
+    expected_error = EmailAlreadyExists(create_user['email'])
     assert response.status_code == 409
     assert response.json()["detail"] == expected_error.detail
 
 
-async def test_create_same_user_twice_fails(client, user_data):
-    user_data["email"] = "other-email@email.com"
-    caller_id = user_data.pop("id")
+async def test_create_same_user_twice_fails(client, create_user):
+    create_user["email"] = "other-email@email.com"
+    caller_id = create_user.pop("id")
     response = await client.post("/users",
-                                 json=user_data,
+                                 json=create_user,
                                  headers=create_headers(caller_id))
 
     expected_error = IdAlreadyExists(caller_id)

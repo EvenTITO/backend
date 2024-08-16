@@ -6,13 +6,13 @@ from app.schemas.events.create_event import CreateEventSchema
 from ..commontest import create_headers
 
 
-async def test_get_my_events_no_events_empty_list(client, user_data):
+async def test_get_my_events_no_events_empty_list(client, create_user):
     response = await client.get("/events/my-events",
-                                headers=create_headers(user_data['id']))
+                                headers=create_headers(create_user['id']))
     assert len(response.json()) == 0
 
 
-async def test_get_my_events(client, event_data, user_data):
+async def test_get_my_events(client, event_data, create_user):
     new_event = CreateEventSchema(
         title="Some Event Title",
         start_date=datetime(2024, 9, 2),
@@ -25,7 +25,7 @@ async def test_get_my_events(client, event_data, user_data):
     response = await client.post(
         "/events",
         json=jsonable_encoder(new_event),
-        headers=create_headers(user_data['id'])
+        headers=create_headers(create_user['id'])
     )  # Organizer in this event
 
     organizer_event_id = response.json()
@@ -34,21 +34,21 @@ async def test_get_my_events(client, event_data, user_data):
     response = await client.post(
         "/events",
         json=jsonable_encoder(new_event),
-        headers=create_headers(user_data['id'])
+        headers=create_headers(create_user['id'])
     )
     organizer_inscripted_event_id = response.json()
     await client.post(
         f"/events/{organizer_inscripted_event_id}/inscriptions",
-        headers=create_headers(user_data['id'])
+        headers=create_headers(create_user['id'])
     )  # Organizer & Incripted in this event
 
     inscripted_event_id = event_data['id']
     await client.post(
         f"/events/{inscripted_event_id}/inscriptions",
-        headers=create_headers(user_data['id'])
+        headers=create_headers(create_user['id'])
     )  # Incripted in this event
     response = await client.get("/events/my-events",
-                                headers=create_headers(user_data['id']))
+                                headers=create_headers(create_user['id']))
 
     events = response.json()
     print(events)

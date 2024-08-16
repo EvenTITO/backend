@@ -6,17 +6,17 @@ from ..commontest import create_headers
 
 
 async def test_event_created_has_waiting_approved_status(
-        client, event_data, user_data
+        client, event_data, create_user
 ):
     response = await client.get(
         f"/events/{event_data['id']}/public",
-        headers=create_headers(user_data['id'])
+        headers=create_headers(create_user['id'])
     )
     assert response.json()['status'] == EventStatus.WAITING_APPROVAL
 
 
 async def test_event_created_organizer_cant_change_status(
-        client, event_data, user_data
+        client, event_data, create_user
 ):
     status_update = EventStatusSchema(
         status=EventStatus.CREATED
@@ -24,7 +24,7 @@ async def test_event_created_organizer_cant_change_status(
     response = await client.patch(
         f"/events/{event_data['id']}/status",
         json=jsonable_encoder(status_update),
-        headers=create_headers(user_data['id'])
+        headers=create_headers(create_user['id'])
     )
 
     assert response.status_code == 403

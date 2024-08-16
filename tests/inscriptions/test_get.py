@@ -16,21 +16,21 @@ async def test_get_inscription(client, inscription_data, admin_data):
 
 
 async def test_user_inscribes_to_two_events(
-        client, user_data, all_events_data
+        client, create_user, all_events_data
 ):
     _ = await client.post(
         f"/events/{all_events_data[0]}/inscriptions",
-        headers=create_headers(user_data['id'])
+        headers=create_headers(create_user['id'])
     )
 
     _ = await client.post(
         f"/events/{all_events_data[1]}/inscriptions",
-        headers=create_headers(user_data['id'])
+        headers=create_headers(create_user['id'])
     )
 
     response = await client.get(
         "/events/my-events",
-        headers=create_headers(user_data['id'])
+        headers=create_headers(create_user['id'])
     )
 
     assert response.status_code == 200

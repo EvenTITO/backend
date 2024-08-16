@@ -6,7 +6,7 @@ from ...commontest import create_headers, get_user_method, USERS
 
 
 @pytest.fixture(scope="function")
-async def user_data(client):
+async def create_user(client):
     new_user = UserSchema(
         name="Lio",
         lastname="Messi",
@@ -17,8 +17,8 @@ async def user_data(client):
         json=jsonable_encoder(new_user),
         headers=create_headers("iuaealdasldanfasdlasd")
     )
-    user_data_id = response.json()
-    user = await get_user_method(client, user_data_id)
+    create_user_id = response.json()
+    user = await get_user_method(client, create_user_id)
     return user
 
 

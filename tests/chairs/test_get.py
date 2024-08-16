@@ -6,12 +6,12 @@ from ..commontest import create_headers
 
 async def test_get_chairs_with_new_chair(
         client,
-        user_data,
+        create_user,
         event_creator_data,
         event_from_event_creator
 ):
     request = ChairRequestSchema(
-        email=user_data["email"],
+        email=create_user["email"],
         tracks=["futbol", "tenis"]
     )
 
@@ -28,7 +28,7 @@ async def test_get_chairs_with_new_chair(
     chair_list = response.json()
     assert len(chair_list) == 1
     unique_chair = chair_list[0]
-    assert unique_chair['user_id'] == user_data['id']
+    assert unique_chair['user_id'] == create_user['id']
     for track in unique_chair['tracks']:
         assert track in ['futbol', 'tenis']
 

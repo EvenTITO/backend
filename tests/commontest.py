@@ -16,13 +16,6 @@ async def get_user_method(client, user_id):
     return response.json()
 
 
-def create_headers_organization(organization_user_id, event_id):
-    return {
-        "X-User-Id": organization_user_id,
-        "event_id": event_id
-    }
-
-
 def create_headers(user_id):
     return {
         "X-User-Id": user_id
