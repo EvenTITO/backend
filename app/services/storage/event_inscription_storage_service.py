@@ -1,4 +1,4 @@
-from app.schemas.storage.schemas import UploadURLSchema
+from app.schemas.storage.schemas import UploadURLSchema, DownloadURLSchema
 from app.services.storage.storage_service import StorageService
 
 
@@ -10,7 +10,7 @@ class EventInscriptionStorageService(StorageService):
             blob_name=f"{event_id}/users/{user_id}/affiliations/{inscription_id}",
         )
 
-    async def get_affiliation_read_url(self, event_id: str, user_id: str, inscription_id: int) -> UploadURLSchema:
+    async def get_affiliation_read_url(self, event_id: str, user_id: str, inscription_id: int) -> DownloadURLSchema:
         return await self.storage_client.generate_signed_read_url(
             bucket_name=self.storage_settings.CERTIFICATES_BUCKET,
             blob_name=f"{event_id}/users/{user_id}/affiliations/{inscription_id}",
@@ -22,7 +22,7 @@ class EventInscriptionStorageService(StorageService):
             blob_name=f"{event_id}/users/{user_id}/payments/{inscription_id}",
         )
 
-    async def get_payment_read_url(self, event_id: str, user_id: str, inscription_id: str) -> UploadURLSchema:
+    async def get_payment_read_url(self, event_id: str, user_id: str, inscription_id: str) -> DownloadURLSchema:
         return await self.storage_client.generate_signed_read_url(
             bucket_name=self.storage_settings.CERTIFICATES_BUCKET,
             blob_name=f"{event_id}/users/{user_id}/payments/{inscription_id}",
