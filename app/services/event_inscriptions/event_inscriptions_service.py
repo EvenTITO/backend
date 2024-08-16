@@ -29,10 +29,15 @@ class EventInscriptionsService(BaseService):
             raise EventNotStarted(self.event_id, event_status)
         if await self.inscriptions_repository.inscription_exists(self.event_id, self.user_id):
             raise InscriptionAlreadyExists(self.user_id, self.event_id)
-        inscription = await self.inscriptions_repository.inscribe(self.event_id, self.user_id, inscription)
-        upload_url = await self.storage_service.get_affiliation_upload_url(self.event_id, self.user_id, inscription.id)
-        response = EventInscriptionsService.map_to_schema(inscription)
-        response.affiliation_upload_url = upload_url
+        saved_inscription = await self.inscriptions_repository.inscribe(self.event_id, self.user_id, inscription)
+        response = EventInscriptionsService.map_to_schema(saved_inscription)
+        if saved_inscription.affiliation is not None:
+            upload_url = await self.storage_service.get_affiliation_upload_url(
+                self.event_id,
+                self.user_id,
+                saved_inscription.id
+            )
+            response.affiliation_upload_url = upload_url
         return response
 
     @staticmethod
