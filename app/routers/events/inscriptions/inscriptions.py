@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends, Query
 
 from app.authorization.organizer_or_admin_dep import verify_is_organizer
 from app.authorization.user_id_dep import verify_user_exists
-from app.schemas.inscriptions.inscription import InscriptionResponseSchema, InscriptionRequestSchema
+from app.schemas.inscriptions.inscription import InscriptionResponseSchema, InscriptionRequestSchema, \
+    InscriptionPayResponseSchema
 from app.services.event_inscriptions.event_inscriptions_service_dep import EventInscriptionsServiceDep
 
 inscriptions_events_router = APIRouter(
@@ -52,3 +53,8 @@ async def read_my_works(
         limit: int = Query(default=100, le=100)
 ) -> list[InscriptionResponseSchema]:
     return await inscriptions_service.get_my_inscriptions(offset, limit)
+
+
+@inscriptions_events_router.put("/{inscription_id}/pay", status_code=200, dependencies=[Depends(verify_user_exists)])
+async def submit(inscription_id: str, inscription_service: EventInscriptionsServiceDep) -> InscriptionPayResponseSchema:
+    return await inscription_service.pay(inscription_id)

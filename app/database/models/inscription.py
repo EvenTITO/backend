@@ -8,8 +8,9 @@ from app.database.models.utils import DateTemplate
 
 
 class InscriptionStatus(str, Enum):
-    PAYMENT_INCOMPLETE = "PAYMENT_INCOMPLETE"
-    PAYMENT_COMPLETED = "PAYMENT_COMPLETED"
+    PENDING_PAYMENT = "PENDING_PAYMENT"
+    PAYMENT_MADE = "PAYMENT_MADE"
+    CONFIRMED_PAYMENT = "CONFIRMED_PAYMENT"
 
 
 class InscriptionRole(str, Enum):
@@ -23,8 +24,8 @@ class InscriptionModel(DateTemplate, Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(String, ForeignKey("users.id"), )
     event_id = Column(String, ForeignKey("events.id"))
-    status = Column(String, default=InscriptionStatus.PAYMENT_INCOMPLETE.value, nullable=False)
-    roles = Column(ARRAY(InscriptionRole), default=[InscriptionRole.ATTENDEE.value], nullable=False)
+    status = Column(String, default=InscriptionStatus.PENDING_PAYMENT.value, nullable=False)
+    roles = Column(ARRAY(String), default=[InscriptionRole.ATTENDEE.value], nullable=False)
     affiliation = Column(String, default=None, nullable=True)
 
     user = relationship("UserModel", back_populates="inscriptions")

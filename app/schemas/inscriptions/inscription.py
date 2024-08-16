@@ -1,6 +1,6 @@
 from typing import Self
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, model_validator, ConfigDict
 
 from app.database.models.inscription import InscriptionRole, InscriptionStatus
 
@@ -26,18 +26,7 @@ class InscriptionResponseSchema(BaseModel):
     affiliation_upload_url: str | None
 
 
-"""
-class InscriptionReplySchema(BaseModel):
-    event_id: str
-    inscriptor_id: str
-    status: str
-    creation_date: datetime
-
-
-class InscriptionsInEventResponseSchema(InscriptionReplySchema):
-    inscripted_user: UserSchema
-
-
-class InscriptionsForUserSchema(InscriptionReplySchema):
-    event: CreateEventSchema
-"""
+class InscriptionPayResponseSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    upload_url: str

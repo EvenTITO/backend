@@ -1,8 +1,10 @@
 from app.database.models.event import EventStatus
-from app.database.models.inscription import InscriptionModel
-from app.exceptions.inscriptions_exceptions import InscriptionAlreadyExists, EventNotStarted
+from app.database.models.inscription import InscriptionModel, InscriptionStatus
+from app.exceptions.inscriptions_exceptions import InscriptionAlreadyExists, EventNotStarted, InscriptionAlreadyPaid, \
+    InscriptionNotFound
 from app.repository.inscriptions_repository import InscriptionsRepository
-from app.schemas.inscriptions.inscription import InscriptionRequestSchema, InscriptionResponseSchema
+from app.schemas.inscriptions.inscription import InscriptionRequestSchema, InscriptionResponseSchema, \
+    InscriptionPayResponseSchema
 from app.services.events.events_service import EventsService
 from app.services.services import BaseService
 from app.services.storage.event_inscription_storage_service import EventInscriptionStorageService
@@ -47,6 +49,21 @@ class EventInscriptionsService(BaseService):
     async def get_my_inscriptions(self, offset: int, limit: int):
         inscriptions = await self.inscriptions_repository.get_user_inscriptions(self.user_id, offset, limit)
         return list(map(EventInscriptionsService.map_to_schema, inscriptions))
+
+    async def get_my_inscription(self, inscription_id: str):
+        inscription = await self.inscriptions_repository.get_user_inscription_by_id(self.user_id, inscription_id)
+        return EventInscriptionsService.map_to_schema(inscription)
+
+    async def pay(self, inscription_id: str) -> InscriptionPayResponseSchema:
+        my_inscription = await self.get_my_inscription(inscription_id)
+        if my_inscription is None:
+            raise InscriptionNotFound(self.event_id, inscription_id)
+        if my_inscription.status != InscriptionStatus.PENDING_PAYMENT:
+            raise InscriptionAlreadyPaid(inscription_id, self.user_id, self.event_id)
+
+        await self.inscriptions_repository.pay(inscription_id)
+        upload_url = await self.storage_service.get_payment_upload_url(self.event_id, self.user_id, inscription_id)
+        return InscriptionPayResponseSchema(id=inscription_id, upload_url=upload_url)
 
     @staticmethod
     def map_to_schema(model: InscriptionModel) -> InscriptionResponseSchema:

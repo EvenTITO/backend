@@ -1,7 +1,7 @@
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.models.inscription import InscriptionModel
+from app.database.models.inscription import InscriptionModel, InscriptionStatus
 from app.repository.crud_repository import Repository
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 
@@ -46,3 +46,17 @@ class InscriptionsRepository(Repository):
                  .limit(limit))
         result = await self.session.execute(query)
         return result.scalars().all()
+
+    async def get_user_inscription_by_id(self, user_id: str, inscription_id: str) -> InscriptionModel:
+        query = select(InscriptionModel).where(
+            and_(InscriptionModel.id == inscription_id, InscriptionModel.user_id == user_id))
+        result = await self.session.execute(query)
+        return result.scalars().first()
+
+    async def pay(self, inscription_id: str) -> None:
+        update_query = (
+            update(InscriptionModel).where(InscriptionModel.id == inscription_id).values(
+                status=InscriptionStatus.PAYMENT_MADE.value())
+        )
+        await self.session.execute(update_query)
+        await self.session.commit()
