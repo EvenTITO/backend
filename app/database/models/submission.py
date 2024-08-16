@@ -33,5 +33,5 @@ class SubmissionModel(DateTemplate, Base):
             [event_id, work_id],
             [WorkModel.event_id, WorkModel.id],
             name="fk_work_from_submission"
-        ),
+        )
     )
