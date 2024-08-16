@@ -3,13 +3,13 @@ from ..commontest import create_headers
 
 async def test_get_event_configuration_organizer_gets_dates_pricing_review_skeleton_and_emails(
     client,
-    user_data,
-    event_creator_data,
-    event_from_event_creator
+    create_user,
+    create_event_creator,
+    create_event_from_event_creator
 ):
     response = await client.get(
-        f"/events/{event_from_event_creator}/configuration",
-        headers=create_headers(event_creator_data["id"])
+        f"/events/{create_event_from_event_creator}/configuration",
+        headers=create_headers(create_event_creator["id"])
     )
     event_config = response.json()
 

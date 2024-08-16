@@ -6,7 +6,7 @@ from app.schemas.events.pricing import (
 from ..commontest import create_headers
 
 
-async def test_put_pricing_config(client, admin_data, event_data):
+async def test_put_pricing_config(client, admin_data, create_event):
     students_fee = FeeSchema(
         name="Students Only Fee",
         description="Only Students with certificate",
@@ -21,14 +21,14 @@ async def test_put_pricing_config(client, admin_data, event_data):
     )
 
     response = await client.put(
-        f"/events/{event_data['id']}/configuration/pricing",
+        f"/events/{create_event['id']}/configuration/pricing",
         json=jsonable_encoder(pricing_config),
         headers=create_headers(admin_data.id)
     )
     assert response.status_code == 204
 
     response = await client.get(
-        f"/events/{event_data['id']}/public",
+        f"/events/{create_event['id']}/public",
         headers=create_headers(admin_data.id)
     )
 
