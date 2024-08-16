@@ -1,5 +1,4 @@
 from app.schemas.events.dates import DateSchema, MandatoryDates
-from app.schemas.users.user import UserSchema
 from app.schemas.events.create_event import CreateEventSchema
 from app.database.models.event import EventType
 from app.schemas.works.author import AuthorInformation
@@ -20,25 +19,6 @@ def create_headers(user_id):
     return {
         "X-User-Id": user_id
     }
-
-
-USERS = [
-    UserSchema(
-        name="Lucia",
-        lastname="Benitez",
-        email="lbenitez@email.com",
-    ),
-    UserSchema(
-        name="Marta",
-        lastname="Benitez",
-        email="mbenitez@email.com",
-    ),
-    UserSchema(
-        name="Pedro",
-        lastname="Benitez",
-        email="pbenitez@email.com",
-    )
-]
 
 
 EVENTS = [
