@@ -18,10 +18,10 @@ class InscriptionRequestSchema(BaseModel):
 
 class InscriptionResponseSchema(BaseModel):
     id: str
-    user_id = str
-    event_id = str
+    user_id: str
+    event_id: str
     roles: list[InscriptionRole]
-    status = InscriptionStatus
+    status: InscriptionStatus
     affiliation: str | None
     affiliation_upload_url: str | None
 
