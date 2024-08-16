@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from app.services.storage.events_storage_service import EventsStorageService
+from app.services.storage.event_storage_service import EventsStorageService
 
 
 class EventStorage:

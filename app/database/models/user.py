@@ -20,6 +20,11 @@ class UserModel(ModelTemplate, Base):
     name = Column(String, nullable=False)
     lastname = Column(String, nullable=False)
     role = Column(String, default=UserRole.DEFAULT.value)
+    identification_number = Column(String, nullable=True)
+    phone = Column(String, nullable=True)
+    address = Column(String, nullable=True)
+    city = Column(String, nullable=True)
+    country = Column(String, nullable=True)
 
     events = relationship("EventModel", back_populates="creator")
     inscriptions = relationship(

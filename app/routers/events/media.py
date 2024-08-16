@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from app.authorization.organizer_or_admin_dep import verify_is_organizer
 from app.schemas.storage.schemas import UploadURLSchema
 from app.services.storage.event_storage_service_dep import EventStorageServiceDep
-from app.services.storage.events_storage_service import EventsStaticFiles
+from app.services.storage.event_storage_service import EventsStaticFiles
 
 events_media_router = APIRouter(
     prefix="/{event_id}/upload_url",

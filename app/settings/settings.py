@@ -10,6 +10,8 @@ class StorageTypes(str, Enum):
 class StorageSettings(BaseSettings):
     EVENTS_BUCKET: str
     WORKS_BUCKET: str
+    CERTIFICATES_BUCKET: str
+    USERS_BUCKET: str
     PUBLIC_BASE_URL: str
     TYPE_STORAGE: StorageTypes
     GCP_CREDENTIALS: str | None = None

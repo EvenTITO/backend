@@ -1,29 +1,34 @@
 from enum import Enum
-from sqlalchemy import Column, String, ForeignKey
-from app.database.models.base import Base
+
+from sqlalchemy import Column, String, ForeignKey, Integer, ARRAY, Index
 from sqlalchemy.orm import relationship
+
+from app.database.models.base import Base
 from app.database.models.utils import DateTemplate
 
 
 class InscriptionStatus(str, Enum):
-    PAYMENT_INCOMPLETED = "PAYMENT_INCOMPLETED"
+    PAYMENT_INCOMPLETE = "PAYMENT_INCOMPLETE"
     PAYMENT_COMPLETED = "PAYMENT_COMPLETED"
+
+
+class InscriptionRole(str, Enum):
+    SPEAKER = "SPEAKER"
+    ATTENDEE = "ATTENDEE"
 
 
 class InscriptionModel(DateTemplate, Base):
     __tablename__ = "inscriptions"
 
-    inscriptor_id = Column(String, ForeignKey("users.id"), primary_key=True)
-    event_id = Column(String, ForeignKey("events.id"), primary_key=True)
-    status = Column(
-        String, default=InscriptionStatus.PAYMENT_INCOMPLETED.value
-    )
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(String, ForeignKey("users.id"), )
+    event_id = Column(String, ForeignKey("events.id"))
+    status = Column(String, default=InscriptionStatus.PAYMENT_INCOMPLETE.value, nullable=False)
+    roles = Column(ARRAY(InscriptionRole), default=[InscriptionRole.ATTENDEE.value], nullable=False)
+    affiliation = Column(String, default=None, nullable=True)
 
-    inscriptor = relationship("UserModel", back_populates="inscriptions")
+    user = relationship("UserModel", back_populates="inscriptions")
     event = relationship("EventModel", back_populates="inscriptions")
-
-    def to_dict(self):
-        return {
-            "event_id": self.event_id,
-            "status": self.status,
-        }
+    __table_args__ = (
+        Index('ix_event_id_user_id', 'event_id', 'user_id')
+    )

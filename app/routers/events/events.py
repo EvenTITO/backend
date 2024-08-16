@@ -8,7 +8,7 @@ from app.authorization.user_id_dep import verify_user_exists
 from app.database.models.event import EventStatus
 from app.routers.events.administration import events_admin_router
 from app.routers.events.configuration.configuration import events_configuration_router
-from app.routers.events.inscriptions.inscriptions_router import inscriptions_events_router
+from app.routers.events.inscriptions.inscriptions import inscriptions_events_router
 from app.routers.events.media import events_media_router
 from app.routers.events.members.chairs import event_chairs_router
 from app.routers.events.members.organizers import event_organizers_router
