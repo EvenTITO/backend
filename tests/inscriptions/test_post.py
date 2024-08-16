@@ -1,7 +1,4 @@
-from app.database.models.inscription import InscriptionStatus
 from ..commontest import create_headers
-
-PAYMENT_INCOMPLETED = InscriptionStatus.PAYMENT_INCOMPLETED.value
 
 
 async def test_post_inscription(client, create_user, create_event):
