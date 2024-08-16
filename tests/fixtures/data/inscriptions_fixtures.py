@@ -4,8 +4,8 @@ from ...commontest import create_headers
 
 
 @pytest.fixture(scope="function")
-async def inscription_data(client, create_user, event_data):
-    event_id = event_data['id']
+async def inscription_data(client, create_user, create_event):
+    event_id = create_event['id']
     response = await client.post(
         f"/events/{event_id}/inscriptions",
         headers=create_headers(create_user["id"])

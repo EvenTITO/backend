@@ -4,12 +4,12 @@ from app.schemas.events.event_status import EventStatusSchema
 from ..commontest import create_headers, EVENTS
 
 
-async def test_get_event(client, event_data, create_user):
-    response = await client.get(f"/events/{event_data['id']}/public",
+async def test_get_event(client, create_event, create_user):
+    response = await client.get(f"/events/{create_event['id']}/public",
                                 headers=create_headers(create_user['id']))
 
     assert response.status_code == 200
-    assert response.json()["title"] == event_data["title"]
+    assert response.json()["title"] == create_event["title"]
     assert response.json()["status"] == EventStatus.WAITING_APPROVAL
     assert len(response.json()["roles"]) == 0
 

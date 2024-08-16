@@ -5,8 +5,8 @@ from ..commontest import create_headers
 from .test_create_work import USER_WORK
 
 
-async def test_get_work_retrieves_work_data(client, create_user, event_data):
-    event_id = event_data['id']
+async def test_get_work_retrieves_work_data(client, create_user, create_event):
+    event_id = create_event['id']
     response = await client.post(
         f"/events/{event_id}/works",
         json=jsonable_encoder(USER_WORK),
@@ -30,8 +30,8 @@ async def test_get_work_retrieves_work_data(client, create_user, event_data):
     assert work_get["track"] == USER_WORK.track
 
 
-# async def test_create_work_deadline_date_is_event_deadline_date(client, create_user, event_data, event_works):
-#     event_id = event_data['id']
+# async def test_create_work_deadline_date_is_event_deadline_date(client, create_user, create_event, event_works):
+#     event_id = create_event['id']
 #     work_id = event_works[0]['id']
 #     get_work_resp = await client.get(
 #         f"/events/{event_id}/works/{work_id}",

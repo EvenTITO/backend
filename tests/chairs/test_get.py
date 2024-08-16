@@ -7,21 +7,21 @@ from ..commontest import create_headers
 async def test_get_chairs_with_new_chair(
         client,
         create_user,
-        event_creator_data,
-        event_from_event_creator
+        create_event_creator,
+        create_event_from_event_creator
 ):
     request = ChairRequestSchema(
         email=create_user["email"],
         tracks=["futbol", "tenis"]
     )
 
-    _ = await client.post(f"/events/{event_from_event_creator}/chairs",
+    _ = await client.post(f"/events/{create_event_from_event_creator}/chairs",
                           json=jsonable_encoder(request),
-                          headers=create_headers(event_creator_data["id"]))
+                          headers=create_headers(create_event_creator["id"]))
 
     response = await client.get(
-        f"/events/{event_from_event_creator}/chairs",
-        headers=create_headers(event_creator_data["id"])
+        f"/events/{create_event_from_event_creator}/chairs",
+        headers=create_headers(create_event_creator["id"])
     )
 
     assert response.status_code == 200
@@ -33,10 +33,10 @@ async def test_get_chairs_with_new_chair(
         assert track in ['futbol', 'tenis']
 
 
-async def test_get_chairs_empty(client, event_creator_data, event_from_event_creator):
+async def test_get_chairs_empty(client, create_event_creator, create_event_from_event_creator):
     response = await client.get(
-        f"/events/{event_from_event_creator}/chairs",
-        headers=create_headers(event_creator_data["id"])
+        f"/events/{create_event_from_event_creator}/chairs",
+        headers=create_headers(create_event_creator["id"])
     )
 
     assert response.status_code == 200

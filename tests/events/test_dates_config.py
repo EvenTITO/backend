@@ -8,7 +8,7 @@ from app.schemas.events.dates import (
 from ..commontest import create_headers
 
 
-async def test_put_dates_config(client, admin_data, event_data):
+async def test_put_dates_config(client, admin_data, create_event):
     dates = DatesCompleteSchema(
         dates=[
             DateSchema(
@@ -40,14 +40,14 @@ async def test_put_dates_config(client, admin_data, event_data):
         ]
     )
     response = await client.put(
-        f"/events/{event_data['id']}/configuration/dates",
+        f"/events/{create_event['id']}/configuration/dates",
         json=jsonable_encoder(dates),
         headers=create_headers(admin_data.id)
     )
     assert response.status_code == 204
 
     response = await client.get(
-        f"/events/{event_data['id']}/public",
+        f"/events/{create_event['id']}/public",
         headers=create_headers(admin_data.id)
     )
 

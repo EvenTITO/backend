@@ -2,16 +2,16 @@ from fastapi.encoders import jsonable_encoder
 from ..commontest import create_headers
 
 
-async def test_put_event(client, admin_data, event_data):
-    update_event_data = event_data.copy()
-    update_event_data["title"] = "new event"
-    update_event_data["end_date"] = "2024-09-05T00:00:00"
-    update_event_data["notification_mails"] = []
-    event_id = update_event_data.pop('id')
+async def test_put_event(client, admin_data, create_event):
+    update_create_event = create_event.copy()
+    update_create_event["title"] = "new event"
+    update_create_event["end_date"] = "2024-09-05T00:00:00"
+    update_create_event["notification_mails"] = []
+    event_id = update_create_event.pop('id')
 
     response = await client.put(
         f"/events/{event_id}/configuration/general",
-        json=jsonable_encoder(update_event_data),
+        json=jsonable_encoder(update_create_event),
         headers=create_headers(admin_data.id)
     )
 
@@ -21,19 +21,19 @@ async def test_put_event(client, admin_data, event_data):
 async def test_put_event_different_notif_mails(
     client,
     admin_data,
-    event_data
+    create_event
 ):
-    update_event_data = event_data.copy()
-    update_event_data["title"] = "new event"
-    update_event_data["end_date"] = "2024-09-05T00:00:00"
+    update_create_event = create_event.copy()
+    update_create_event["title"] = "new event"
+    update_create_event["end_date"] = "2024-09-05T00:00:00"
     added_mail = 'mateo@mail.com'
-    update_event_data["notification_mails"] = [
+    update_create_event["notification_mails"] = [
         added_mail, 'someother@mail.com']
-    event_id = update_event_data.pop('id')
+    event_id = update_create_event.pop('id')
 
     _ = await client.put(
         f"/events/{event_id}/configuration/general",
-        json=jsonable_encoder(update_event_data),
+        json=jsonable_encoder(update_create_event),
         headers=create_headers(admin_data.id)
     )
     response = await client.get(
@@ -48,18 +48,18 @@ async def test_put_event_different_notif_mails(
 async def test_put_event_change_tracks(
     client,
     admin_data,
-    event_data
+    create_event
 ):
-    update_event_data = event_data.copy()
-    update_event_data["title"] = "new event"
+    update_create_event = create_event.copy()
+    update_create_event["title"] = "new event"
     new_tracks = ["first_track", "second_track"]
-    update_event_data["tracks"] = new_tracks
-    update_event_data["notification_mails"] = []
-    event_id = update_event_data.pop('id')
+    update_create_event["tracks"] = new_tracks
+    update_create_event["notification_mails"] = []
+    event_id = update_create_event.pop('id')
 
     _ = await client.put(
         f"/events/{event_id}/configuration/general",
-        json=jsonable_encoder(update_event_data),
+        json=jsonable_encoder(update_create_event),
         headers=create_headers(admin_data.id)
     )
     response = await client.get(
@@ -75,22 +75,22 @@ async def test_put_event_change_tracks(
 async def test_put_many_changes(
     client,
     admin_data,
-    event_data
+    create_event
 ):
-    update_event_data = event_data.copy()
-    update_event_data["title"] = "new event"
+    update_create_event = create_event.copy()
+    update_create_event["title"] = "new event"
     new_tracks = ["first_track", "second_track"]
-    update_event_data["tracks"] = new_tracks
-    update_event_data["title"] = 'New Event Title'
-    update_event_data["description"] = 'New Event Description'
-    update_event_data["location"] = 'New Event Location'
-    update_event_data["contact"] = 'New Event Contact Info'
-    update_event_data["notification_mails"] = []
-    event_id = update_event_data.pop('id')
+    update_create_event["tracks"] = new_tracks
+    update_create_event["title"] = 'New Event Title'
+    update_create_event["description"] = 'New Event Description'
+    update_create_event["location"] = 'New Event Location'
+    update_create_event["contact"] = 'New Event Contact Info'
+    update_create_event["notification_mails"] = []
+    event_id = update_create_event.pop('id')
 
     _ = await client.put(
         f"/events/{event_id}/configuration/general",
-        json=jsonable_encoder(update_event_data),
+        json=jsonable_encoder(update_create_event),
         headers=create_headers(admin_data.id)
     )
     response = await client.get(
@@ -104,8 +104,8 @@ async def test_put_many_changes(
     assert response.json()['tracks'][1] == new_tracks[1]
 
     # the title and description do not change.
-    assert response.json()['title'] == event_data["title"]
-    assert response.json()['description'] == event_data["description"]
+    assert response.json()['title'] == create_event["title"]
+    assert response.json()['description'] == create_event["description"]
 
-    assert response.json()['location'] == update_event_data["location"]
-    assert response.json()['contact'] == update_event_data["contact"]
+    assert response.json()['location'] == update_create_event["location"]
+    assert response.json()['contact'] == update_create_event["contact"]

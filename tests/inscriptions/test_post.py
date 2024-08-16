@@ -4,8 +4,8 @@ from ..commontest import create_headers
 PAYMENT_INCOMPLETED = InscriptionStatus.PAYMENT_INCOMPLETED.value
 
 
-async def test_post_inscription(client, create_user, event_data):
-    event_id = event_data['id']
+async def test_post_inscription(client, create_user, create_event):
+    event_id = create_event['id']
     response = await client.post(
         f"/events/{event_id}/inscriptions",
         headers=create_headers(create_user["id"])
@@ -28,8 +28,8 @@ async def test_post_inscription_without_event_fails(
     # assert response.json()["detail"] == EVENT_NOT_FOUND
 
 
-async def test_post_inscription_without_user_fails(client, event_data):
-    event_id = event_data['id']
+async def test_post_inscription_without_user_fails(client, create_event):
+    event_id = create_event['id']
     user_id_not_exists = 'id-user-does-not-exists'
     response = await client.post(
         f"/events/{event_id}/inscriptions",

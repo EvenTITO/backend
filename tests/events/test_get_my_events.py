@@ -12,7 +12,7 @@ async def test_get_my_events_no_events_empty_list(client, create_user):
     assert len(response.json()) == 0
 
 
-async def test_get_my_events(client, event_data, create_user):
+async def test_get_my_events(client, create_event, create_user):
     new_event = CreateEventSchema(
         title="Some Event Title",
         start_date=datetime(2024, 9, 2),
@@ -42,7 +42,7 @@ async def test_get_my_events(client, event_data, create_user):
         headers=create_headers(create_user['id'])
     )  # Organizer & Incripted in this event
 
-    inscripted_event_id = event_data['id']
+    inscripted_event_id = create_event['id']
     await client.post(
         f"/events/{inscripted_event_id}/inscriptions",
         headers=create_headers(create_user['id'])

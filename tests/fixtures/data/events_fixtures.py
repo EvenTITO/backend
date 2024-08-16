@@ -8,7 +8,7 @@ from ...commontest import create_headers, EVENTS
 
 
 @pytest.fixture(scope="function")
-async def event_data(client, admin_data):
+async def create_event(client, admin_data):
     new_event = CreateEventSchema(
         title="Event Title",
         start_date="2024-09-02",
@@ -47,13 +47,13 @@ async def all_events_data(client, admin_data):
 
 
 @pytest.fixture(scope="function")
-async def event_started(client, event_data, admin_data):
+async def event_started(client, create_event, admin_data):
     status_update = EventStatusSchema(
         status=EventStatus.STARTED
     )
     await client.patch(
-        f"/events/{event_data['id']}/status",
+        f"/events/{create_event['id']}/status",
         json=jsonable_encoder(status_update),
         headers=create_headers(admin_data.id)
     )
-    return event_data['id']
+    return create_event['id']

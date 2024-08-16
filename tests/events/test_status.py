@@ -6,23 +6,23 @@ from ..commontest import create_headers
 
 
 async def test_event_created_has_waiting_approved_status(
-        client, event_data, create_user
+        client, create_event, create_user
 ):
     response = await client.get(
-        f"/events/{event_data['id']}/public",
+        f"/events/{create_event['id']}/public",
         headers=create_headers(create_user['id'])
     )
     assert response.json()['status'] == EventStatus.WAITING_APPROVAL
 
 
 async def test_event_created_organizer_cant_change_status(
-        client, event_data, create_user
+        client, create_event, create_user
 ):
     status_update = EventStatusSchema(
         status=EventStatus.CREATED
     )
     response = await client.patch(
-        f"/events/{event_data['id']}/status",
+        f"/events/{create_event['id']}/status",
         json=jsonable_encoder(status_update),
         headers=create_headers(create_user['id'])
     )
@@ -31,13 +31,13 @@ async def test_event_created_organizer_cant_change_status(
 
 
 async def test_organizer_can_change_status_to_started_after_created(
-        client, event_from_event_creator, organizer_id_from_event, admin_data
+        client, create_event_from_event_creator, organizer_id_from_event, admin_data
 ):
     status_update = EventStatusSchema(
         status=EventStatus.CREATED
     )
     response = await client.patch(
-        f"/events/{event_from_event_creator}/status",
+        f"/events/{create_event_from_event_creator}/status",
         json=jsonable_encoder(status_update),
         headers=create_headers(admin_data.id)
     )
@@ -47,7 +47,7 @@ async def test_organizer_can_change_status_to_started_after_created(
         status=EventStatus.STARTED
     )
     response = await client.patch(
-        f"/events/{event_from_event_creator}/status",
+        f"/events/{create_event_from_event_creator}/status",
         json=jsonable_encoder(status_update),
         headers=create_headers(organizer_id_from_event)
     )
@@ -56,19 +56,19 @@ async def test_organizer_can_change_status_to_started_after_created(
 
 
 async def test_event_created_admin_can_change_status(
-        client, event_data, admin_data
+        client, create_event, admin_data
 ):
     status_update = EventStatusSchema(
         status=EventStatus.CREATED
     )
     response = await client.patch(
-        f"/events/{event_data['id']}/status",
+        f"/events/{create_event['id']}/status",
         json=jsonable_encoder(status_update),
         headers=create_headers(admin_data.id)
     )
     assert response.status_code == 204
     response = await client.get(
-        f"/events/{event_data['id']}/public",
+        f"/events/{create_event['id']}/public",
         headers=create_headers(admin_data.id)
     )
     assert response.json()['status'] == status_update.status

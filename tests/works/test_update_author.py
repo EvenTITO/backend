@@ -3,8 +3,8 @@ from ..commontest import create_headers
 from .test_create_work import USER_WORK
 
 
-async def test_get_work_author_can_update_his_work(client, create_user, event_data):
-    event_id = event_data['id']
+async def test_get_work_author_can_update_his_work(client, create_user, create_event):
+    event_id = create_event['id']
     response = await client.post(
         f"/events/{event_id}/works",
         json=jsonable_encoder(USER_WORK),

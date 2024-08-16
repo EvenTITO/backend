@@ -11,7 +11,7 @@ from ...commontest import create_headers, get_user_method
 
 
 @pytest.fixture(scope="function")
-async def event_creator_data(client, admin_data):
+async def create_event_creator(client, admin_data):
     event_creator = UserSchema(
         name="Juan",
         lastname="Martinez",
@@ -37,7 +37,7 @@ async def event_creator_data(client, admin_data):
 
 
 @pytest.fixture(scope="function")
-async def event_from_event_creator(client, event_creator_data):
+async def create_event_from_event_creator(client, create_event_creator):
     new_event = CreateEventSchema(
         title="Event Creator Event",
         start_date="2024-09-02",
@@ -50,6 +50,6 @@ async def event_from_event_creator(client, event_creator_data):
     response = await client.post(
         "/events",
         json=jsonable_encoder(new_event),
-        headers=create_headers(event_creator_data["id"])
+        headers=create_headers(create_event_creator["id"])
     )
     return response.json()

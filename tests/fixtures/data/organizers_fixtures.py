@@ -7,7 +7,7 @@ from ...commontest import create_headers
 
 
 @pytest.fixture(scope="function")
-async def organizer_id_from_event(client, event_creator_data, event_from_event_creator):
+async def organizer_id_from_event(client, create_event_creator, create_event_from_event_creator):
     organizer = UserSchema(
         name="Martina",
         lastname="Rodriguez",
@@ -23,14 +23,14 @@ async def organizer_id_from_event(client, event_creator_data, event_from_event_c
         email=organizer.email
     )
     # invite organizer
-    response = await client.post(f"/events/{event_from_event_creator}/organizers",
+    response = await client.post(f"/events/{create_event_from_event_creator}/organizers",
                                  json=jsonable_encoder(request),
-                                 headers=create_headers(event_creator_data['id']))
+                                 headers=create_headers(create_event_creator['id']))
 
     assert response.status_code == 201
 
     # accept organizer invite
-    response = await client.patch(f"/events/{event_from_event_creator}/organizers/accept",
+    response = await client.patch(f"/events/{create_event_from_event_creator}/organizers/accept",
                                   headers=create_headers(organizer_id))
     assert response.status_code == 204
     return organizer_id

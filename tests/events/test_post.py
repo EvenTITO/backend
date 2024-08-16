@@ -26,7 +26,7 @@ async def test_post_event(client, admin_data):
     assert response_data is not None
 
 
-async def test_post_event_with_event_creator(client, event_creator_data):
+async def test_post_event_with_event_creator(client, create_event_creator):
     new_event = CreateEventSchema(
         title="Event Title",
         description="This is a nice event",
@@ -37,7 +37,7 @@ async def test_post_event_with_event_creator(client, event_creator_data):
     response = await client.post(
         "/events",
         json=jsonable_encoder(new_event),
-        headers=create_headers(event_creator_data['id'])
+        headers=create_headers(create_event_creator['id'])
     )
     assert response.status_code == 201
 

@@ -7,7 +7,7 @@ from fastapi.encoders import jsonable_encoder
 from ..commontest import create_headers
 
 
-async def test_put_review_skeleton(client, admin_data, event_data):
+async def test_put_review_skeleton(client, admin_data, create_event):
     first_question = 'This is a simple question that has a str answer'
     review_skeleton = ReviewSkeletonSchema(
         review_skeleton=ReviewScheletonQuestions(
@@ -26,14 +26,14 @@ async def test_put_review_skeleton(client, admin_data, event_data):
         )
     )
     response = await client.put(
-        f"/events/{event_data['id']}/configuration/review-skeleton",
+        f"/events/{create_event['id']}/configuration/review-skeleton",
         json=jsonable_encoder(review_skeleton),
         headers=create_headers(admin_data.id)
     )
     assert response.status_code == 204
 
     response = await client.get(
-        f"/events/{event_data['id']}/configuration/review-skeleton",
+        f"/events/{create_event['id']}/configuration/review-skeleton",
         headers=create_headers(admin_data.id)
     )
 
