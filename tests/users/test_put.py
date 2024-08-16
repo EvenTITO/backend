@@ -1,26 +1,26 @@
 from ..commontest import create_headers
 
 
-async def test_put_user(client, user_data):
-    update_user_data = user_data.copy()
-    update_user_data["name"] = "new name"
-    update_user_data["lastname"] = "new lastname"
-    caller_id = update_user_data.pop('id')
+async def test_put_user(client, create_user):
+    update_create_user = create_user.copy()
+    update_create_user["name"] = "new name"
+    update_create_user["lastname"] = "new lastname"
+    caller_id = update_create_user.pop('id')
     response = await client.put("/users/me",
-                                json=update_user_data,
+                                json=update_create_user,
                                 headers=create_headers(caller_id))
 
     assert response.status_code == 204
     response = await client.get(f"/users/{caller_id}",
                                 headers=create_headers(caller_id))
     assert response.status_code == 200
-    assert response.json()["name"] == update_user_data["name"]
-    assert response.json()["email"] == update_user_data["email"]
-    assert response.json()["lastname"] == update_user_data["lastname"]
+    assert response.json()["name"] == update_create_user["name"]
+    assert response.json()["email"] == update_create_user["email"]
+    assert response.json()["lastname"] == update_create_user["lastname"]
 
 
-async def test_put_user_not_exists(client, user_data):
-    user_changes = user_data.copy()
+async def test_put_user_not_exists(client, create_user):
+    user_changes = create_user.copy()
     different_id = "this-id-does-not-exist"
     new_lastname = "Rocuzzo"
     user_changes.pop('id')
@@ -31,15 +31,15 @@ async def test_put_user_not_exists(client, user_data):
     assert response.status_code == 404
 
 
-async def test_email_cant_change(client, user_data):
-    update_user_data = user_data.copy()
-    update_user_data["email"] = "nuevo_email@gmail.com"
-    caller_id = update_user_data.pop('id')
+async def test_email_cant_change(client, create_user):
+    update_create_user = create_user.copy()
+    update_create_user["email"] = "nuevo_email@gmail.com"
+    caller_id = update_create_user.pop('id')
     response = await client.put("/users/me",
-                                json=update_user_data,
+                                json=update_create_user,
                                 headers=create_headers(caller_id))
 
     response = await client.get(f"/users/{caller_id}",
                                 headers=create_headers(caller_id))
 
-    assert response.json()["email"] == user_data["email"]
+    assert response.json()["email"] == create_user["email"]

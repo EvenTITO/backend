@@ -7,9 +7,9 @@ from ..commontest import create_headers
 
 async def test_user_accept_organizer_invitation(
         client,
-        event_creator_data,
-        event_from_event_creator,
-        organizer_id_from_event
+        create_event_creator,
+        create_event_from_event_creator,
+        create_organizer
 ):
     new_organizer = UserSchema(
         name="Fernando",
@@ -26,13 +26,13 @@ async def test_user_accept_organizer_invitation(
         email=new_organizer.email
     )
     # invite organizer
-    response = await client.post(f"/events/{event_from_event_creator}/organizers",
+    response = await client.post(f"/events/{create_event_from_event_creator}/organizers",
                                  json=jsonable_encoder(request),
-                                 headers=create_headers(event_creator_data['id']))
+                                 headers=create_headers(create_event_creator['id']))
 
     assert response.status_code == 201
     response = await client.patch(
-        f"/events/{event_from_event_creator}/organizers/accept",
+        f"/events/{create_event_from_event_creator}/organizers/accept",
         headers=create_headers(new_organizer_id)
     )
     assert response.status_code == 204
