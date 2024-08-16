@@ -24,11 +24,11 @@ class InscriptionModel(DateTemplate, Base):
     user_id = Column(String, ForeignKey("users.id"), )
     event_id = Column(String, ForeignKey("events.id"))
     status = Column(String, default=InscriptionStatus.PAYMENT_INCOMPLETE.value, nullable=False)
-    roles = Column(ARRAY(InscriptionRole), default=[InscriptionRole.ATTENDEE.value], nullable=False)
+    roles = Column(ARRAY(String), default=[InscriptionRole.ATTENDEE.value], nullable=False)
     affiliation = Column(String, default=None, nullable=True)
 
     user = relationship("UserModel", back_populates="inscriptions")
     event = relationship("EventModel", back_populates="inscriptions")
     __table_args__ = (
-        Index('ix_event_id_user_id', 'event_id', 'user_id')
+        Index('ix_event_id_user_id', 'event_id', 'user_id'),
     )
