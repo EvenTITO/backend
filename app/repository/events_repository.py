@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.event import EventModel, EventStatus
-from app.database.models.inscription import InscriptionModel, InscriptionRole
+from app.database.models.inscription import InscriptionModel
 from app.database.models.member import InvitationStatus
 from app.database.models.organizer import OrganizerModel
 from app.repository.crud_repository import Repository
