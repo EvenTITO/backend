@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.event import EventModel, EventStatus
-from app.database.models.inscription import InscriptionModel
+from app.database.models.inscription import InscriptionModel, InscriptionRole
 from app.database.models.member import InvitationStatus
 from app.database.models.organizer import OrganizerModel
 from app.repository.crud_repository import Repository
@@ -45,7 +45,7 @@ class EventsRepository(Repository):
         inscriptions_q = (select(EventModel)
                           .join(InscriptionModel,
                                 InscriptionModel.event_id == EventModel.id)
-                          .where(InscriptionModel.inscriptor_id == user_id))
+                          .where(InscriptionModel.user_id == user_id))
 
         organizations_q = (select(EventModel)
                            .join(OrganizerModel,
@@ -61,7 +61,6 @@ class EventsRepository(Repository):
 
         def add_events(role, events, response):
             for event in events:
-                print(event)
                 if event.id in response:
                     response[event.id].roles.append(role)
                 else:
@@ -79,7 +78,8 @@ class EventsRepository(Repository):
             return response
 
         response = {}
-        response = add_events(EventRol.INSCRIPTED, inscriptions, response)
+        response = add_events(EventRol.ATTENDEE, inscriptions, response)
+        response = add_events(EventRol.SPEAKER, inscriptions, response)
         response = add_events(EventRol.ORGANIZER, organizations, response)
         return list(response.values())
 

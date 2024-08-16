@@ -20,7 +20,6 @@ async def test_creator_can_add_user_as_chair(
         json=jsonable_encoder(request),
         headers=create_headers(create_event_creator["id"])
     )
-    print(response.json())
     assert response.status_code == 201
     assert response.json() == create_user["id"]
 

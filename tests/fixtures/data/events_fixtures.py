@@ -57,3 +57,26 @@ async def create_event_started(client, create_event, admin_data):
         headers=create_headers(admin_data.id)
     )
     return create_event['id']
+
+
+@pytest.fixture(scope="function")
+async def create_many_events_started(client, admin_data):
+    ids_events = []
+    status_update = EventStatusSchema(
+        status=EventStatus.STARTED
+    )
+    for event in EVENTS:
+        response = await client.post(
+            "/events",
+            json=jsonable_encoder(event),
+            headers=create_headers(admin_data.id)
+        )
+        event_id = response.json()
+        await client.patch(
+            f"/events/{event_id}/status",
+            json=jsonable_encoder(status_update),
+            headers=create_headers(admin_data.id)
+        )
+        ids_events.append(event_id)
+
+    return ids_events

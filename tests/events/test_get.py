@@ -79,7 +79,6 @@ async def test_get_all_events_non_admin_can_query_started(
         headers=create_headers(create_user['id']),
         params={'status': EventStatus.STARTED.value}
     )
-    print(response.json())
     assert response.status_code == 200
     assert len(response.json()) == 1
 
@@ -101,7 +100,6 @@ async def test_get_all_events_non_admin_can_not_query_created(
         headers=create_headers(create_user['id']),
         params={'status': EventStatus.CREATED.value}
     )
-    print(response.json())
     assert response.status_code == 400
 
 
@@ -129,9 +127,7 @@ async def test_get_all_events_query_by_title_contains(
     assert len(response.json()) == 2
 
 
-async def test_get_all_events_public_is_status_created(
-        client, create_event_started, admin_data
-):
+async def test_get_all_events_public_is_status_created(client, create_event_started, admin_data):
     response = await client.get(
         "/events/",
         params={'status': EventStatus.STARTED.value},

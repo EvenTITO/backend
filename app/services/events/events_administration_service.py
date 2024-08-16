@@ -24,8 +24,10 @@ class EventsAdministationService(BaseService):
             (caller_role != UserRole.ADMIN) and
             (event_status in admin_status or new_status.status in admin_status)
         ):
+            print("error 400 no soy admin")
             raise HTTPException(status_code=400)
 
         update_ok = await self.events_repository.update(event_id, new_status)
+        print("actualizo ok: " + str(update_ok))
         if not update_ok:
             raise EventNotFound(event_id)

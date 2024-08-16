@@ -57,10 +57,7 @@ async def test_create_empty_user_fails(client):
         "lastname": "",
         "email": ""
     }
-    response = await client.post("/users", json=empty_user,
-                                 headers=create_headers("a-valid-id"))
-    print(response.json())
-
+    response = await client.post("/users", json=empty_user, headers=create_headers("a-valid-id"))
     assert response.status_code == 422
 
 

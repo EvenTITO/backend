@@ -1,4 +1,5 @@
-from sqlalchemy.orm import relationship
+import enum
+
 from sqlalchemy import (
     Column,
     String,
@@ -7,7 +8,8 @@ from sqlalchemy import (
     JSON,
     ForeignKeyConstraint
 )
-import enum
+from sqlalchemy.orm import relationship
+
 from app.database.models.base import Base
 from app.database.models.submission import SubmissionModel
 
@@ -25,26 +27,16 @@ class ReviewModel(Base):
     event_id = Column(String, primary_key=True)
     work_id = Column(Integer, primary_key=True)
     submission_id = Column(Integer, primary_key=True)
-
     reviewer_id = Column(String, ForeignKey("users.id"), primary_key=True)
 
     review = Column(JSON)
     review_status = Column(String, nullable=False)
     __table_args__ = (
         ForeignKeyConstraint(
-            [
-                event_id,
-                work_id,
-                submission_id
-            ],
-            [
-                SubmissionModel.event_id,
-                SubmissionModel.work_id,
-                SubmissionModel.id,
-            ],
+            [submission_id],
+            [SubmissionModel.id],
             name="fk_submission_from_review"
         ),
-        {}
     )
 
     submission = relationship("SubmissionModel", back_populates="reviews")

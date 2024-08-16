@@ -29,7 +29,7 @@ class UserModel(ModelTemplate, Base):
     events = relationship("EventModel", back_populates="creator")
     inscriptions = relationship(
         "InscriptionModel",
-        back_populates="inscriptor"
+        back_populates="user"
     )
     organizers = relationship(
         "OrganizerModel",

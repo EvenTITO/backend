@@ -38,5 +38,4 @@ async def test_put_review_skeleton(client, admin_data, create_event):
     )
 
     assert response.status_code == 200
-    print(response.json())
     assert response.json()["review_skeleton"]["questions"][0]["question"] == first_question

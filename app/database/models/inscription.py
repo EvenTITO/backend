@@ -31,6 +31,6 @@ class InscriptionModel(DateTemplate, Base):
     user = relationship("UserModel", back_populates="inscriptions")
     event = relationship("EventModel", back_populates="inscriptions")
     __table_args__ = (
-        Index('ix_user_id', 'user_id'),
-        Index('ix_event_id', 'event_id'),
+        Index('ix_inscription_user_id', 'user_id'),
+        Index('ix_inscription_event_id', 'event_id'),
     )

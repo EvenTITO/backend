@@ -70,10 +70,11 @@ class EventInscriptionsService(BaseService):
     @staticmethod
     def map_to_schema(model: InscriptionModel) -> InscriptionResponseSchema:
         return InscriptionResponseSchema(
-            id=model.id,
+            id=str(model.id),
             user_id=model.user_id,
             event_id=model.event_id,
             status=model.status,
             roles=model.roles,
-            affiliation=model.affiliation
+            affiliation=model.affiliation,
+            affiliation_upload_url=None
         )

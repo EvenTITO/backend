@@ -99,7 +99,6 @@ async def test_put_many_changes(
     )
 
     assert response.status_code == 200
-    print(response.json())
     assert response.json()['tracks'][0] == new_tracks[0]
     assert response.json()['tracks'][1] == new_tracks[1]
 
