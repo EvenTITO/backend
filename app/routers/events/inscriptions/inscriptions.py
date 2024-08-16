@@ -1,5 +1,8 @@
-from fastapi import APIRouter, Depends
+from typing import List
 
+from fastapi import APIRouter, Depends, Query
+
+from app.authorization.organizer_or_admin_dep import verify_is_organizer
 from app.authorization.user_id_dep import verify_user_exists
 from app.schemas.inscriptions.inscription import InscriptionResponseSchema, InscriptionRequestSchema
 from app.services.event_inscriptions.event_inscriptions_service_dep import EventInscriptionsServiceDep
@@ -23,12 +26,29 @@ async def create_inscription(
     return await inscriptions_service.inscribe_user_to_event(inscription)
 
 
-"""
 @inscriptions_events_router.get(
     path="",
-    response_model=List[InscriptionReplySchema],
+    status_code=200,
+    response_model=List[InscriptionResponseSchema],
     dependencies=[Depends(verify_is_organizer)]
 )
-async def read_event_inscriptions(inscriptions_service: EventInscriptionsServiceDep):
-    return await inscriptions_service.get_event_inscriptions()
-"""
+async def read_event_inscriptions(
+        inscriptions_service: EventInscriptionsServiceDep,
+        offset: int = 0,
+        limit: int = Query(default=100, le=100)
+) -> List[InscriptionResponseSchema]:
+    return await inscriptions_service.get_event_inscriptions(offset, limit)
+
+
+@inscriptions_events_router.get(
+    path="/my-inscriptions",
+    status_code=200,
+    response_model=List[InscriptionResponseSchema],
+    dependencies=[Depends(verify_user_exists)]
+)
+async def read_my_works(
+        inscriptions_service: EventInscriptionsServiceDep,
+        offset: int = 0,
+        limit: int = Query(default=100, le=100)
+) -> list[InscriptionResponseSchema]:
+    return await inscriptions_service.get_my_inscriptions(offset, limit)

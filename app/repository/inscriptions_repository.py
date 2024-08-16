@@ -1,3 +1,4 @@
+from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.inscription import InscriptionModel
@@ -22,29 +23,26 @@ class InscriptionsRepository(Repository):
         )
         return await self._create(db_inscription)
 
-
-"""
-    async def get_event_inscriptions(self, event_id: str):
-        # TODO: mejorar query. No deberia ir a este repository, sino pasar por este
-        # repository para buscar ids, y luego ir a users_service para buscar
-        # usuarios.
-        query = select(UserModel, InscriptionModel).where(
-            InscriptionModel.event_id == event_id,
-            InscriptionModel.inscriptor_id == UserModel.id
-        )
+    async def get_event_inscriptions(self, event_id: str, offset: int, limit: int) -> list[InscriptionModel]:
+        query = select(InscriptionModel).where(InscriptionModel.event_id == event_id).offset(offset).limit(limit)
         result = await self.session.execute(query)
-        users_inscriptions = result.fetchall()
-        response = []
-        for user, inscription in users_inscriptions:
-            response.append(InscriptionsInEventResponseSchema(
-                event_id=inscription.event_id,
-                inscriptor_id=inscription.inscriptor_id,
-                status=inscription.status,
-                creation_date=inscription.creation_date,
-                inscripted_user=UserSchema(
-                    email=user.email,
-                    name=user.name,
-                    lastname=user.lastname
-                )
-            ))
-        return response """
+        return result.scalars().all()
+
+    async def get_user_inscriptions(self, user_id: str, offset: int, limit: int) -> list[InscriptionModel]:
+        query = select(InscriptionModel).where(InscriptionModel.user_id == user_id).offset(offset).limit(limit)
+        result = await self.session.execute(query)
+        return result.scalars().all()
+
+    async def get_event_user_inscriptions(
+            self,
+            event_id: str,
+            user_id: str,
+            offset: int,
+            limit: int
+    ) -> list[InscriptionModel]:
+        query = (select(InscriptionModel)
+                 .where(and_(InscriptionModel.user_id == user_id, InscriptionModel.event_id == event_id))
+                 .offset(offset)
+                 .limit(limit))
+        result = await self.session.execute(query)
+        return result.scalars().all()

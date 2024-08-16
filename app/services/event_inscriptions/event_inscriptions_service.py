@@ -40,6 +40,14 @@ class EventInscriptionsService(BaseService):
             response.affiliation_upload_url = upload_url
         return response
 
+    async def get_event_inscriptions(self, offset: int, limit: int):
+        inscriptions = await self.inscriptions_repository.get_event_inscriptions(self.event_id, offset, limit)
+        return list(map(EventInscriptionsService.map_to_schema, inscriptions))
+
+    async def get_my_inscriptions(self, offset: int, limit: int):
+        inscriptions = await self.inscriptions_repository.get_user_inscriptions(self.user_id, offset, limit)
+        return list(map(EventInscriptionsService.map_to_schema, inscriptions))
+
     @staticmethod
     def map_to_schema(model: InscriptionModel) -> InscriptionResponseSchema:
         return InscriptionResponseSchema(
@@ -50,11 +58,3 @@ class EventInscriptionsService(BaseService):
             roles=model.roles,
             affiliation=model.affiliation
         )
-
-
-"""
-    async def get_event_inscriptions(self):
-        resp = await self.inscriptions_repository.get_event_inscriptions(self.event_id)
-        print(resp)
-        return resp
-"""
