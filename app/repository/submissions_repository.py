@@ -19,17 +19,14 @@ class SubmissionsRepository(Repository):
                 func.max(self.model.id)
             ))
 
-    async def do_new_submit(self, event_id, work_id) -> SubmissionModel:
+    async def do_new_submit(self, event_id, work_id) -> int:
         new_submission = SubmissionModel(event_id=event_id, work_id=work_id)
-        return await self._create(new_submission)
+        return (await self._create(new_submission)).id
 
-    async def update_submit(self, event_id, work_id) -> SubmissionModel:
-        last_submission = await self.get_last_submission(event_id, work_id)
-        if last_submission is None:
-            return await self.do_new_submit(event_id, work_id)
+    async def update_submit(self, submission_id) -> SubmissionModel:
         update_query = (
-            update(self.model).where(self.model.id == last_submission.id).values(last_update=datetime.now())
+            update(self.model).where(self.model.id == submission_id).values(last_update=datetime.now())
         )
         await self.session.execute(update_query)
         await self.session.commit()
-        return last_submission
+        return submission_id

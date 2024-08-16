@@ -25,8 +25,12 @@ class AuthorSubmissionsService(BaseService):
         await self.work_service.validate_update_work()
         my_work = await self.work_service.get_work()
         if my_work.state == WorkStates.RE_SUBMIT:
-            submission = await self.submission_repository.do_new_submit(self.event_id, self.work_id)
+            submission_id = await self.submission_repository.do_new_submit(self.event_id, self.work_id)
         else:
-            submission = await self.submission_repository.update_submit(self.event_id, self.work_id)
-        upload_url = await self.storage_service.get_submission_upload_url(self.event_id, self.work_id, submission.id)
-        return SubmissionSchema(id=submission.id, upload_url=upload_url)
+            last_submission = await self.submission_repository.get_last_submission(self.event_id, self.work_id)
+            if last_submission is None:
+                submission_id = await self.submission_repository.do_new_submit(self.event_id, self.work_id)
+            else:
+                submission_id = await self.submission_repository.update_submit(last_submission.id)
+        upload_url = await self.storage_service.get_submission_upload_url(self.event_id, self.work_id, submission_id)
+        return SubmissionSchema(id=submission_id, upload_url=upload_url)
