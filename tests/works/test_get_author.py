@@ -30,9 +30,9 @@ async def test_get_work_retrieves_work_data(client, create_user, create_event):
     assert work_get["track"] == USER_WORK.track
 
 
-# async def test_create_work_deadline_date_is_event_deadline_date(client, create_user, create_event, event_works):
+# async def test_create_work_deadline_date_is_event_deadline_date(client, create_user, create_event, create_many_works):
 #     event_id = create_event['id']
-#     work_id = event_works[0]['id']
+#     work_id = create_many_works[0]['id']
 #     get_work_resp = await client.get(
 #         f"/events/{event_id}/works/{work_id}",
 #         headers=create_headers(create_user["id"])

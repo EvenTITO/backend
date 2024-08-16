@@ -5,7 +5,7 @@ from ...commontest import create_headers, WORKS
 
 
 @pytest.fixture(scope="function")
-async def event_works(client, create_user, create_event):
+async def create_many_works(client, create_user, create_event):
     event_id = create_event['id']
     for work in WORKS:
         response = await client.post(
