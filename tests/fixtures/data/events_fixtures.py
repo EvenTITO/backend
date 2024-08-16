@@ -33,7 +33,7 @@ async def create_event(client, admin_data):
 
 
 @pytest.fixture(scope="function")
-async def all_events_data(client, admin_data):
+async def create_many_events(client, admin_data):
     ids_events = []
     for event in EVENTS:
         response = await client.post(
@@ -47,7 +47,7 @@ async def all_events_data(client, admin_data):
 
 
 @pytest.fixture(scope="function")
-async def event_started(client, create_event, admin_data):
+async def create_event_started(client, create_event, admin_data):
     status_update = EventStatusSchema(
         status=EventStatus.STARTED
     )

@@ -7,7 +7,7 @@ from ...commontest import create_headers
 
 
 @pytest.fixture(scope="function")
-async def organizer_id_from_event(client, create_event_creator, create_event_from_event_creator):
+async def create_organizer(client, create_event_creator, create_event_from_event_creator):
     organizer = UserSchema(
         name="Martina",
         lastname="Rodriguez",

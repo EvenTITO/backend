@@ -22,7 +22,7 @@ async def test_event_creator_can_add_other_user_as_event_organizer(
 async def test_event_organizer_can_add_other_user_as_event_organizer(
         client,
         create_event_from_event_creator,
-        organizer_id_from_event,
+        create_organizer,
         create_user
 ):
     request = MemberRequestSchema(
@@ -31,7 +31,7 @@ async def test_event_organizer_can_add_other_user_as_event_organizer(
     response = await client.post(
         f"events/{create_event_from_event_creator}/organizers",
         json=jsonable_encoder(request),
-        headers=create_headers(organizer_id_from_event)
+        headers=create_headers(create_organizer)
     )
 
     assert response.status_code == 201

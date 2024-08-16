@@ -24,7 +24,7 @@ async def test_get_event_not_exists_fails(client, create_user):
 
 
 async def test_get_all_events_not_admin_error(
-        client, all_events_data, create_user
+        client, create_many_events, create_user
 ):
     response = await client.get("/events/",
                                 headers=create_headers(create_user['id']))
@@ -32,7 +32,7 @@ async def test_get_all_events_not_admin_error(
 
 
 async def test_get_all_events_admin_gets_all(
-        client, all_events_data, admin_data
+        client, create_many_events, admin_data
 ):
     response = await client.get("/events/",
                                 headers=create_headers(admin_data.id))
@@ -41,13 +41,13 @@ async def test_get_all_events_admin_gets_all(
 
 # TODO: reveer!
 # async def test_get_all_events_admin_status_waiting_approval_is_zero(
-#         client, all_events_data, admin_data
+#         client, create_many_events, admin_data
 # ):
 #     status_update = EventStatusSchema(
 #         status=EventStatus.CREATED
 #     )
 #     response = await client.patch(
-#         f"/events/{all_events_data[0]}/status",
+#         f"/events/{create_many_events[0]}/status",
 #         json=jsonable_encoder(status_update),
 #         headers=create_headers(admin_data.id)
 #     )
@@ -63,13 +63,13 @@ async def test_get_all_events_admin_gets_all(
 
 
 async def test_get_all_events_non_admin_can_query_started(
-        client, all_events_data, admin_data, create_user
+        client, create_many_events, admin_data, create_user
 ):
     status_update = EventStatusSchema(
         status=EventStatus.STARTED
     )
     response = await client.patch(
-        f"/events/{all_events_data[0]}/status",
+        f"/events/{create_many_events[0]}/status",
         json=jsonable_encoder(status_update),
         headers=create_headers(admin_data.id)
     )
@@ -85,13 +85,13 @@ async def test_get_all_events_non_admin_can_query_started(
 
 
 async def test_get_all_events_non_admin_can_not_query_created(
-        client, all_events_data, admin_data, create_user
+        client, create_many_events, admin_data, create_user
 ):
     status_update = EventStatusSchema(
         status=EventStatus.STARTED
     )
     response = await client.patch(
-        f"/events/{all_events_data[0]}/status",
+        f"/events/{create_many_events[0]}/status",
         json=jsonable_encoder(status_update),
         headers=create_headers(admin_data.id)
     )
@@ -106,7 +106,7 @@ async def test_get_all_events_non_admin_can_not_query_created(
 
 
 async def test_get_all_events_query_by_title_same_title(
-        client, all_events_data, admin_data
+        client, create_many_events, admin_data
 ):
     response = await client.get(
         "/events/",
@@ -118,7 +118,7 @@ async def test_get_all_events_query_by_title_same_title(
 
 
 async def test_get_all_events_query_by_title_contains(
-        client, all_events_data, admin_data
+        client, create_many_events, admin_data
 ):
     response = await client.get(
         "/events/",
@@ -130,7 +130,7 @@ async def test_get_all_events_query_by_title_contains(
 
 
 async def test_get_all_events_public_is_status_created(
-        client, event_started, admin_data
+        client, create_event_started, admin_data
 ):
     response = await client.get(
         "/events/",
@@ -142,14 +142,14 @@ async def test_get_all_events_public_is_status_created(
 
 
 async def test_get_all_events_public_is_status_created2(
-        client, all_events_data, admin_data
+        client, create_many_events, admin_data
 ):
     status_update = EventStatusSchema(
         status=EventStatus.STARTED
     )
-    n_events = len(all_events_data)
+    n_events = len(create_many_events)
 
-    for event_id in all_events_data:
+    for event_id in create_many_events:
         await client.patch(
             f"/events/{event_id}/status",
             json=jsonable_encoder(status_update),

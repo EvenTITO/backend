@@ -9,7 +9,7 @@ async def test_user_accept_organizer_invitation(
         client,
         create_event_creator,
         create_event_from_event_creator,
-        organizer_id_from_event
+        create_organizer
 ):
     new_organizer = UserSchema(
         name="Fernando",

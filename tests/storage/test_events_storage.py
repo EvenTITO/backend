@@ -18,12 +18,12 @@ async def test_get_event_contains_event_public_url(
 async def test_get_event_upload_url_must_be_event_organizer(
     mock_storage,
     client,
-    organizer_id_from_event,
+    create_organizer,
     create_event_from_event_creator,
 ):
     response = await client.get(
         f"/events/{create_event_from_event_creator}/upload_url/main_image",
-        headers=create_headers(organizer_id_from_event)
+        headers=create_headers(create_organizer)
     )
 
     assert response.status_code == 200

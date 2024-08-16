@@ -37,13 +37,13 @@ async def test_create_work(client, create_user, create_event):
     assert response.json() == first_work_id
 
 
-async def test_create_work_two_works_different_events_same_work_id(client, create_user, all_events_data):
+async def test_create_work_two_works_different_events_same_work_id(client, create_user, create_many_events):
     """
     When a new work is created, it should have the id as the next id available (incremental).
     This increment should be for each event.
     """
-    id_first_event = all_events_data[0]
-    id_second_event = all_events_data[1]
+    id_first_event = create_many_events[0]
+    id_second_event = create_many_events[1]
 
     first_work_response = await client.post(
         f"/events/{id_first_event}/works",
