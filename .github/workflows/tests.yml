@@ -30,8 +30,8 @@ jobs:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/
       EVENTS_BUCKET: events-bucket
       WORKS_BUCKET: works-bucket
-      CERTIFICATES_BUCKET: works-bucket
-      USERS_BUCKET: works-bucket
+      CERTIFICATES_BUCKET: certificates-bucket
+      USERS_BUCKET: users-bucket
       PUBLIC_BASE_URL: https://storage.googleapis.com/
       TYPE_STORAGE: NO_STORAGE
     steps:
