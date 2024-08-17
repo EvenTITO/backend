@@ -71,3 +71,16 @@ async def test_create_invalid_email_fails(client):
                                  headers=create_headers("a-valid-id"))
 
     assert response.status_code == 422
+
+
+async def test_create_user_no_id_in_headers_fails(client):
+    create_user = UserSchema(
+        name="Lio",
+        lastname="Messi",
+        email="email@email.com"
+    )
+    response = await client.post(
+        "/users",
+        json=jsonable_encoder(create_user),
+    )
+    assert response.status_code == 422
