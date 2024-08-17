@@ -1,15 +1,31 @@
 from fastapi.encoders import jsonable_encoder
 
-from app.database.models.event import EventStatus
+from app.database.models.event import EventStatus, EventType
+from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.event_status import EventStatusSchema
 from ..commontest import create_headers
 
 
-async def test_event_created_has_waiting_approved_status(
-        client, create_event, create_user
+async def test_event_created_by_user_has_waiting_approved_status(
+        client, create_user
 ):
+    new_event = CreateEventSchema(
+        title="Event Title",
+        start_date="2024-09-02",
+        end_date="2024-09-04",
+        description="This is a nice event",
+        event_type=EventType.CONFERENCE,
+        location='Paseo Colon 850',
+        tracks=['math', 'chemistry', 'phisics']
+    )
+    event_id = await client.post(
+        "/events",
+        json=jsonable_encoder(new_event),
+        headers=create_headers(create_user['id'])
+    )
+    event_id = event_id.json()
     response = await client.get(
-        f"/events/{create_event['id']}/public",
+        f"/events/{event_id}/public",
         headers=create_headers(create_user['id'])
     )
     assert response.json()['status'] == EventStatus.WAITING_APPROVAL

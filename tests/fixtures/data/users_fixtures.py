@@ -17,6 +17,8 @@ async def create_user(client):
         json=jsonable_encoder(new_user),
         headers=create_headers("iuaealdasldanfasdlasd")
     )
+    assert response.status_code == 201
     create_user_id = response.json()
     user = await get_user_method(client, create_user_id)
+    print(user)
     return user

@@ -28,3 +28,17 @@ async def test_get_event_upload_url_must_be_event_organizer(
 
     assert response.status_code == 200
     assert response.json()["upload_url"] is not None
+
+
+async def test_get_event_upload_url_not_organizer_fails(
+    mock_storage,
+    client,
+    create_user,
+    create_event_from_event_creator,
+):
+    response = await client.get(
+        f"/events/{create_event_from_event_creator}/upload_url/main_image",
+        headers=create_headers(create_user['id'])
+    )
+
+    assert response.status_code == 403

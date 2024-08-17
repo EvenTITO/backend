@@ -57,4 +57,4 @@ async def test_post_inscription_in_event_not_started(client, create_user, create
     )
     assert response.status_code == 409
     assert response.json()["detail"] == "The event " + event_id + (" has not started."
-                                                                   " The current event status is WAITING_APPROVAL")
+                                                                   " The current event status is CREATED")
