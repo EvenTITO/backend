@@ -10,7 +10,7 @@ async def test_get_event(client, create_event, create_user):
 
     assert response.status_code == 200
     assert response.json()["title"] == create_event["title"]
-    assert response.json()["status"] == EventStatus.WAITING_APPROVAL
+    assert response.json()["status"] == EventStatus.CREATED  # The admin created it.
     assert len(response.json()["roles"]) == 0
 
 
