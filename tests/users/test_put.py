@@ -1,3 +1,5 @@
+from fastapi.encoders import jsonable_encoder
+from app.schemas.users.user import UserSchema
 from ..commontest import create_headers
 
 
@@ -6,9 +8,11 @@ async def test_put_user(client, create_user):
     update_create_user["name"] = "new name"
     update_create_user["lastname"] = "new lastname"
     caller_id = update_create_user.pop('id')
-    response = await client.put("/users/me",
-                                json=update_create_user,
-                                headers=create_headers(caller_id))
+    response = await client.put(
+        f"/users/{caller_id}",
+        json=update_create_user,
+        headers=create_headers(caller_id)
+    )
 
     assert response.status_code == 204
     response = await client.get(f"/users/{caller_id}",
@@ -25,7 +29,7 @@ async def test_put_user_not_exists(client, create_user):
     new_lastname = "Rocuzzo"
     user_changes.pop('id')
     user_changes["lastname"] = new_lastname
-    response = await client.put("/users/me",
+    response = await client.put("/users/other-user-id",
                                 json=user_changes,
                                 headers=create_headers(different_id))
     assert response.status_code == 404
@@ -35,7 +39,7 @@ async def test_email_cant_change(client, create_user):
     update_create_user = create_user.copy()
     update_create_user["email"] = "nuevo_email@gmail.com"
     caller_id = update_create_user.pop('id')
-    response = await client.put("/users/me",
+    response = await client.put(f"/users/{caller_id}",
                                 json=update_create_user,
                                 headers=create_headers(caller_id))
 
@@ -43,3 +47,38 @@ async def test_email_cant_change(client, create_user):
                                 headers=create_headers(caller_id))
 
     assert response.json()["email"] == create_user["email"]
+
+
+async def test_user_cant_change_other_user(client, create_user):
+    other = UserSchema(
+        name="Lio",
+        lastname="Messi",
+        email="other_user@email.com",
+    )
+    other_user_id = "iasdiohvklaspiolsds"
+    response = await client.post(
+        "/users",
+        json=jsonable_encoder(other),
+        headers=create_headers(other_user_id)
+    )
+    assert response.status_code == 201
+
+    update_create_user = create_user.copy()
+    update_create_user["email"] = "nuevo_email@gmail.com"
+    caller_id = update_create_user.pop('id')
+    response = await client.put(f"/users/{other_user_id}",
+                                json=update_create_user,
+                                headers=create_headers(caller_id))
+
+    assert response.status_code == 403
+
+
+async def test_admin_user_can_change_other_user(client, create_user, admin_data):
+    update_create_user = create_user.copy()
+    update_create_user["name"] = "Martina"
+    caller_id = update_create_user.pop('id')
+    response = await client.put(f"/users/{caller_id}",
+                                json=update_create_user,
+                                headers=create_headers(admin_data.id))
+
+    assert response.status_code == 204
