@@ -1,3 +1,4 @@
+from app.exceptions.events_exceptions import InvalidEventSameTitle
 from app.schemas.events.create_event import CreateEventSchema
 from fastapi.encoders import jsonable_encoder
 from app.database.models.event import EventStatus, EventType
@@ -172,3 +173,4 @@ async def test_post_event_same_title_fails(client, create_event, create_user, ad
         headers=create_headers(admin_data.id)
     )
     assert response.status_code == 409
+    assert response.json()['detail'] == InvalidEventSameTitle(title).detail
