@@ -1,5 +1,5 @@
 from app.database.models.user import UserRole
-from app.exceptions.events_exceptions import InvalidQueryEventNotCreatedNotAdmin
+from app.exceptions.events_exceptions import EventNotFound, InvalidQueryEventNotCreatedNotAdmin
 import pytest
 from fastapi.encoders import jsonable_encoder
 from app.database.models.event import EventStatus
@@ -23,6 +23,7 @@ async def test_get_event_not_exists_fails(client, create_user):
                                 headers=create_headers(create_user['id']))
 
     assert response.status_code == 404
+    assert response.json()['detail'] == EventNotFound(id).detail
 
 
 async def test_get_all_events_not_admin_error(

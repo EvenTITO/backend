@@ -1,5 +1,3 @@
-from fastapi import HTTPException
-
 from app.database.models.event import EventStatus
 from app.database.models.user import UserRole
 from app.exceptions.events_exceptions import EventNotFound, InvalidEventSameTitle, InvalidQueryEventNotCreatedNotAdmin
