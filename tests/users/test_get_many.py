@@ -22,7 +22,7 @@ USERS = [
 ]
 
 
-async def test_get_all_users(client, admin_data):
+async def create_all_users(client):
     ids = []
     for user in USERS:
         id = str(uuid4())
@@ -32,7 +32,11 @@ async def test_get_all_users(client, admin_data):
             headers=create_headers(id)
         )
         ids.append(id)
+    return ids
 
+
+async def test_get_all_users(client, admin_data):
+    ids = await create_all_users(client)
     response = await client.get(
         "/users",
         headers=create_headers(admin_data.id)
@@ -44,3 +48,12 @@ async def test_get_all_users(client, admin_data):
     assert len(all_users) == len(ids)
     for user in all_users:
         assert user['id'] in ids
+
+
+async def test_get_all_users_non_admin_fails(client, create_user):
+    await create_all_users(client)
+    response = await client.get(
+        "/users",
+        headers=create_headers(create_user['id'])
+    )
+    assert response.status_code == 403
