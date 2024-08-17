@@ -1,6 +1,6 @@
 from app.schemas.events.create_event import CreateEventSchema
 from fastapi.encoders import jsonable_encoder
-from app.database.models.event import EventType
+from app.database.models.event import EventStatus, EventType
 import datetime
 
 from app.schemas.events.dates import DateSchema, MandatoryDates
@@ -26,7 +26,7 @@ async def test_post_event(client, admin_data):
     assert response_data is not None
 
 
-async def test_post_event_with_event_creator(client, create_event_creator):
+async def test_post_event_with_event_creator_the_event_is_created(client, create_event_creator):
     new_event = CreateEventSchema(
         title="Event Title",
         description="This is a nice event",
@@ -40,6 +40,13 @@ async def test_post_event_with_event_creator(client, create_event_creator):
         headers=create_headers(create_event_creator['id'])
     )
     assert response.status_code == 201
+    event_id = response.json()
+
+    response = await client.get(
+        f"/events/{event_id}/public",
+        headers=create_headers(create_event_creator['id'])
+    )
+    assert response.json()['status'] == EventStatus.CREATED
 
 
 async def test_post_event_invaluser_id(client):
@@ -56,7 +63,6 @@ async def test_post_event_invaluser_id(client):
                                  headers=create_headers('invalid-creator-id'))
 
     assert response.status_code == 404
-    # assert response.json()["detail"] == USER_NOT_FOUND_DETAIL
 
 
 async def test_post_event_same_without_optional_args(client, admin_data):
