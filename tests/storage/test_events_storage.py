@@ -12,9 +12,10 @@ async def test_get_event_contains_event_public_url(
 
     assert response.status_code == 200
     assert response.json()["title"] == create_event["title"]
+    assert len(response.json()["media"]) == len(EventsStaticFiles)
     assert response.json()["media"][0]["name"] == EventsStaticFiles.MAIN_IMAGE
-    assert response.json()["media"][0]["name"] == EventsStaticFiles.BROCHURE
-    assert response.json()["media"][0]["name"] == EventsStaticFiles.BANNER_IMAGE
+    assert response.json()["media"][1]["name"] == EventsStaticFiles.BROCHURE
+    assert response.json()["media"][2]["name"] == EventsStaticFiles.BANNER_IMAGE
     assert len(response.json()["roles"]) == 0
 
 
