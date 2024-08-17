@@ -1,3 +1,4 @@
+import pytest
 from datetime import datetime
 
 from fastapi.encoders import jsonable_encoder
@@ -91,3 +92,54 @@ async def test_get_my_events(client, mock_storage, create_event_started, create_
             n_events += 1
 
     assert n_events == 3
+
+
+async def test_get_my_events_includes_event_from_event_creator(
+    client,
+    create_event_creator,
+    create_event_from_event_creator
+):
+    response = await client.get("/events/my-events",
+                                headers=create_headers(create_event_creator['id']))
+    assert len(response.json()) == 1
+    assert response.json()[0]['id'] == create_event_from_event_creator
+
+
+async def test_get_my_events_includes_event_from_organizer(client, create_organizer, create_event_from_event_creator):
+    response = await client.get("/events/my-events",
+                                headers=create_headers(create_organizer))
+    assert len(response.json()) == 1
+    assert response.json()[0]['id'] == create_event_from_event_creator
+
+
+async def test_get_my_events_should_not_include_an_event_where_i_do_not_participate(
+    client,
+    create_organizer,
+    create_user
+):
+    response = await client.get("/events/my-events",
+                                headers=create_headers(create_organizer))
+    assert len(response.json()) == 1
+    response = await client.get("/events/my-events",
+                                headers=create_headers(create_user['id']))
+    assert len(response.json()) == 0
+
+
+@pytest.mark.skip(reason="TODO: If I have an invitation pending for organizer, should I get this event in my events?")
+async def test_get_my_events_includes_events_where_i_have_organizer_invitation_pending():
+    assert False
+
+
+@pytest.mark.skip(reason="TODO: If I have an invitation pending for chair, should I get this event in my events?")
+async def test_get_my_events_includes_events_where_i_have_chair_invitation_pending():
+    assert False
+
+
+@pytest.mark.skip(reason="TODO: I dont know wheater we have the chairs implementation or not.")
+async def test_get_my_events_includes_events_where_i_am_chair():
+    assert False
+
+
+@pytest.mark.skip(reason="TODO: Write this code. Which date should we take? Or add a param for ordering?")
+async def test_get_my_events_should_be_ordered_by_date():
+    assert False

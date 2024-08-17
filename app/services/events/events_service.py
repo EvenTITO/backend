@@ -1,8 +1,6 @@
-from fastapi import HTTPException
-
 from app.database.models.event import EventStatus
 from app.database.models.user import UserRole
-from app.exceptions.events_exceptions import EventNotFound, InvalidEventSameTitle
+from app.exceptions.events_exceptions import EventNotFound, InvalidEventSameTitle, InvalidQueryEventNotCreatedNotAdmin
 from app.repository.events_repository import EventsRepository
 from app.schemas.events.configuration import EventConfigurationSchema
 from app.schemas.events.create_event import CreateEventSchema
@@ -23,7 +21,6 @@ class EventsService(BaseService):
             raise InvalidEventSameTitle(event.title)
 
         if user_role in [UserRole.EVENT_CREATOR, UserRole.ADMIN]:
-            print(f'tiene rol: {user_role}')
             status = EventStatus.CREATED
         else:
             status = EventStatus.WAITING_APPROVAL
@@ -49,7 +46,7 @@ class EventsService(BaseService):
             user_role: UserRole
     ):
         if status != EventStatus.STARTED and user_role != UserRole.ADMIN:
-            raise HTTPException(status_code=400)  # TODO: change to custom exception.
+            raise InvalidQueryEventNotCreatedNotAdmin(status, user_role)  # TODO: change to custom exception.
 
         return await self.events_repository.get_all_events(offset, limit, status, title_search)
 

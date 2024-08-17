@@ -1,3 +1,4 @@
+from app.exceptions.events_exceptions import InvalidEventSameTitle
 from app.schemas.events.create_event import CreateEventSchema
 from fastapi.encoders import jsonable_encoder
 from app.database.models.event import EventStatus, EventType
@@ -151,3 +152,25 @@ async def test_post_event_with_dates(client, admin_data):
         headers=create_headers(admin_data.id)
     )
     assert response.status_code == 201
+
+
+async def test_post_event_same_title_fails(client, create_event, create_user, admin_data):
+    response = await client.get(f"/events/{create_event['id']}/public",
+                                headers=create_headers(create_user['id']))
+    assert response.status_code == 200
+    title = response.json()["title"]
+
+    new_event = CreateEventSchema(
+        title=title,
+        description="This is a nice event",
+        event_type=EventType.CONFERENCE,
+        location='Paseo Colon 850',
+        tracks=['math', 'chemistry', 'phisics']
+    )
+    response = await client.post(
+        "/events",
+        json=jsonable_encoder(new_event),
+        headers=create_headers(admin_data.id)
+    )
+    assert response.status_code == 409
+    assert response.json()['detail'] == InvalidEventSameTitle(title).detail
