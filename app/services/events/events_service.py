@@ -23,7 +23,6 @@ class EventsService(BaseService):
             raise InvalidEventSameTitle(event.title)
 
         if user_role in [UserRole.EVENT_CREATOR, UserRole.ADMIN]:
-            print(f'tiene rol: {user_role}')
             status = EventStatus.CREATED
         else:
             status = EventStatus.WAITING_APPROVAL

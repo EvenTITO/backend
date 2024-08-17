@@ -1,3 +1,4 @@
+import pytest
 from fastapi.encoders import jsonable_encoder
 from app.database.models.event import EventStatus
 from app.schemas.events.event_status import EventStatusSchema
@@ -20,7 +21,6 @@ async def test_get_event_not_exists_fails(client, create_user):
                                 headers=create_headers(create_user['id']))
 
     assert response.status_code == 404
-    # assert response.json()["detail"] == EVENT_NOT_FOUND
 
 
 async def test_get_all_events_not_admin_error(
@@ -39,27 +39,27 @@ async def test_get_all_events_admin_gets_all(
     assert response.status_code == 200
     assert len(response.json()) == 3
 
-# TODO: reveer!
-# async def test_get_all_events_admin_status_waiting_approval_is_zero(
-#         client, create_many_events, admin_data
-# ):
-#     status_update = EventStatusSchema(
-#         status=EventStatus.CREATED
-#     )
-#     response = await client.patch(
-#         f"/events/{create_many_events[0]}/status",
-#         json=jsonable_encoder(status_update),
-#         headers=create_headers(admin_data.id)
-#     )
 
-#     response = await client.get(
-#         "/events/",
-#         headers=create_headers(admin_data.id),
-#         params={'status': EventStatus.WAITING_APPROVAL.value}
-#     )
-#     print(response.json())
-#     assert response.status_code == 200
-#     assert len(response.json()) == 0
+async def test_get_all_events_admin_status_waiting_approval_is_zero(
+        client, create_many_events, admin_data
+):
+    status_update = EventStatusSchema(
+        status=EventStatus.CREATED
+    )
+    response = await client.patch(
+        f"/events/{create_many_events[0]}/status",
+        json=jsonable_encoder(status_update),
+        headers=create_headers(admin_data.id)
+    )
+
+    response = await client.get(
+        "/events/",
+        headers=create_headers(admin_data.id),
+        params={'status': EventStatus.WAITING_APPROVAL.value}
+    )
+    print(response.json())
+    assert response.status_code == 200
+    assert len(response.json()) == 0
 
 
 async def test_get_all_events_non_admin_can_query_started(
@@ -159,3 +159,8 @@ async def test_get_all_events_public_is_status_created2(
     )
     assert response.status_code == 200
     assert len(response.json()) == n_events
+
+
+@pytest.mark.skip(reason="TODO: Write this code. Which date should we take? Or add a param for ordering?")
+async def test_get_all_events_should_be_ordered_by_something():
+    assert False
