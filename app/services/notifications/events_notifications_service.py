@@ -2,5 +2,5 @@ from app.services.notifications.notifications_service import NotificationsServic
 
 
 class EventsNotificationsService(NotificationsService):
-    async def notify_event_approved(self, user_from, event):
+    def notify_event_approved(self, user_from, event):
         raise 'TODO'
