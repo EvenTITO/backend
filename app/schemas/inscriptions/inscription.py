@@ -4,7 +4,7 @@ from annotated_types import Len
 from pydantic import BaseModel, ConfigDict
 
 from app.database.models.inscription import InscriptionRole, InscriptionStatus
-from app.schemas.storage.schemas import UploadURLSchema
+from app.schemas.storage.schemas import UploadURLSchema, DownloadURLSchema
 
 
 class InscriptionRequestSchema(BaseModel):
@@ -26,3 +26,15 @@ class InscriptionPayResponseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: str
     upload_url: UploadURLSchema
+
+
+class InscriptionAffiliationUploadSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    upload_url: UploadURLSchema
+
+
+class InscriptionAffiliationDownloadSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    download_url: DownloadURLSchema

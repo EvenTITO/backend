@@ -7,22 +7,22 @@ from app.repository.repository import get_repository
 from app.repository.submissions_repository import SubmissionsRepository
 from app.repository.works_repository import WorksRepository
 from app.services.storage.work_storage_service_dep import WorkStorageServiceDep
-from app.services.submissions.author_submissions_service import AuthorSubmissionsService
-from app.services.works.author_works_service import AuthorWorksService
+from app.services.submissions.submissions_service import SubmissionsService
+from app.services.works.works_service import WorksService
 
 
-class AuthorSubmissions:
+class Submissions:
     async def __call__(
             self,
             user_id: CallerIdDep,
             event_id: str,
-            work_id: int,
+            work_id: str,
             storage_service: WorkStorageServiceDep,
             submission_repository: SubmissionsRepository = Depends(get_repository(SubmissionsRepository)),
             work_repository: WorksRepository = Depends(get_repository(WorksRepository))
-    ) -> AuthorSubmissionsService:
-        work_service = AuthorWorksService(work_repository, user_id, event_id, work_id)
-        return AuthorSubmissionsService(
+    ) -> SubmissionsService:
+        work_service = WorksService(work_repository, user_id, event_id)
+        return SubmissionsService(
             submission_repository,
             work_service,
             storage_service,
@@ -32,5 +32,5 @@ class AuthorSubmissions:
         )
 
 
-author_submissions_service = AuthorSubmissions()
-AuthorSubmissionsServiceDep = Annotated[AuthorSubmissionsService, Depends(author_submissions_service)]
+submissions_service = Submissions()
+SubmissionsServiceDep = Annotated[SubmissionsService, Depends(submissions_service)]

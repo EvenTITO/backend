@@ -12,6 +12,7 @@ from app.routers.events.inscriptions.inscriptions import inscriptions_events_rou
 from app.routers.events.media import events_media_router
 from app.routers.events.members.chairs import event_chairs_router
 from app.routers.events.members.organizers import event_organizers_router
+from app.routers.works.submissions import works_submissions_router, submissions_router
 from app.routers.works.works import works_router
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.public_event import PublicEventSchema
@@ -26,6 +27,8 @@ events_router.include_router(event_organizers_router)
 events_router.include_router(event_chairs_router)
 events_router.include_router(works_router)
 events_router.include_router(inscriptions_events_router)
+events_router.include_router(works_submissions_router)
+events_router.include_router(submissions_router)
 
 
 @events_router.get(

@@ -1,9 +1,6 @@
 from fastapi import APIRouter
 
-reviews_router = APIRouter(
-    prefix="/events/{event_id}/works/{work_id}/reviews",
-    tags=["Work Reviews"]
-)
+reviews_router = APIRouter(prefix="/events/{event_id}/works/{work_id}/reviews", tags=["Event: Works Reviews"])
 
 
 @reviews_router.get("")
@@ -37,5 +34,13 @@ async def update_work_review_status():
 async def update_review(review_id: int):
     """
     The reviewer uses this method to update his review.
+    """
+    pass
+
+
+@reviews_router.get("")
+async def get_all_works_assigned_for_my_review():
+    """
+    This method is used by a reviewer to get all his asigned works.
     """
     pass

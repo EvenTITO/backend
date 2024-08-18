@@ -65,7 +65,6 @@ async def test_get_all_events_admin_status_waiting_approval_is_zero(
         headers=create_headers(admin_data.id),
         params={'status': EventStatus.WAITING_APPROVAL.value}
     )
-    print(response.json())
     assert response.status_code == 200
     assert len(response.json()) == 0
 

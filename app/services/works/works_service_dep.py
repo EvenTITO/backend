@@ -8,7 +8,7 @@ from app.repository.works_repository import WorksRepository
 from app.services.works.works_service import WorksService
 
 
-class AuthUserWorksService:
+class Works:
     async def __call__(
         self,
         _: UserDep,
@@ -19,5 +19,5 @@ class AuthUserWorksService:
         return WorksService(works_repository=works_repository, user_id=caller_id, event_id=event_id)
 
 
-auth_works_service = AuthUserWorksService()
+auth_works_service = Works()
 WorksServiceDep = Annotated[WorksService, Depends(auth_works_service)]
