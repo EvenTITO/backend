@@ -8,12 +8,37 @@ settings = NotificationsSettings()
 SLL_DEFAULT_CONTEXT = ssl.create_default_context()
 
 
+def load_file(file_path):
+    with open('./assets/'+file_path, 'r', encoding='utf-8') as file:
+        return file.read()
+
+
+def load_html(file_path):
+    return load_file('email-templates/'+file_path)
+
+
+def get_body_template():
+    styles = load_html('styles.html')
+    header = load_html('header.html')
+    logo = load_file('logo.svg')
+    header = header.replace('{{ logo }}', logo)
+
+    footer = load_html('footer.html')
+    body_template = load_html('body-template.html')
+
+    body_filled = body_template.replace('{{ styles }}', styles)
+    body_filled = body_filled.replace('{{ header }}', header)
+    body_filled = body_filled.replace('{{ footer }}', footer)
+    return body_filled
+
+
+BODY_TEMPLATE = get_body_template()
+
+
 class NotificationsService:
-    def send_email(self, message: EmailMessage):
-        print('el mensaje es', message)
+    def _send_email(self, message: EmailMessage):
         if not settings.ENABLE_SEND_EMAILS:
             return
-        message = self.__patch_message(message)
         message['From'] = settings.NOTIFICATIONS_EMAIL
         try:
             with smtplib.SMTP_SSL(
@@ -29,19 +54,11 @@ class NotificationsService:
                   f'sending an email: {message.as_string()}.')
             return False
 
-    def __patch_message(self, message):
-        message = self.__patch_subject(message)
-        message = self.__patch_body(message)
+    def _add_subject(self, message: EmailMessage, subject: str):
+        message['Subject'] = f'[EvenTITO] {subject}'
         return message
 
-    def __patch_subject(self, message):
-        subject = message.get('Subject', '')
-        message.replace_header('Subject', f'[EvenTITO] {subject}')
-        return message
-
-    def __patch_body(self, message):
-        body = message.get_payload()
-
+    def _add_body(self, message: EmailMessage, body):
         if message.get_content_type() != 'text/html':
             message.set_type('text/html')
 
@@ -49,7 +66,12 @@ class NotificationsService:
             "<br><br>Este mensaje fue enviado desde "
             f"<a href='{settings.FRONTEND_URL}'>EvenTITO</a>"
         )
-        new_body = f"{body}\n\n{end_text}"
+        body = f"{body}\n\n{end_text}"
 
-        message.set_payload(new_body)
+        message.set_payload(body)
         return message
+
+    def _add_body_2(self, message: EmailMessage, body):
+        body_filled = BODY_TEMPLATE.replace('{{ body }}', body)
+        message.set_content('This is a HTML email. If you see this text, your client does not support HTML.')
+        message.add_alternative(body_filled, subtype='html')

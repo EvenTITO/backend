@@ -1,0 +1,57 @@
+<svg width="468" height="333" viewBox="0 0 468 333" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .rect1, .rect2, .rect3 {
+        opacity: 0;
+        -webkit-animation: fadeIn 2s linear forwards 0.5s;
+        -o-animation: fadeIn 2s linear forwards 0.5s;
+        -moz-animation: fadeIn 2s linear forwards 0.5s;
+        animation: fadeIn 2s linear forwards 0.5s;
+      }
+
+      .rect1 {
+        -webkit-animation-delay: 0.5s;
+        -o-animation-delay: 0.5s;
+        -moz-animation-delay: 0.5s;
+        animation-delay: 0.5s;
+      }
+
+      .rect2 {
+        -webkit-animation-delay: 1.0s;
+        -o-animation-delay: 1.0s;
+        -moz-animation-delay: 1.0s;
+        animation-delay: 1.0s;
+      }
+
+      .rect3 {
+        -webkit-animation-delay: 1.5s;
+        -o-animation-delay: 1.5s;
+        -moz-animation-delay: 1.5s;
+        animation-delay: 1.5s;
+      }
+
+      @-webkit-keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+    </style>
+  </defs>
+  
+  <rect class="rect1" y="238" width="468" height="95" fill="#1167B9"/>
+  <rect class="rect2" y="119" width="214" height="95" fill="#147CC7"/>
+  <rect class="rect3" width="468" height="95" fill="#1895D4"/>
+</svg>
+
