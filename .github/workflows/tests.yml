@@ -26,6 +26,22 @@ jobs:
     defaults:
       run:
         working-directory: .
+    env:
+    # Database
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/
+    # Storage 
+      EVENTS_BUCKET: events-bucket
+      WORKS_BUCKET: works-bucket
+      CERTIFICATES_BUCKET: certificates-bucket
+      USERS_BUCKET: users-bucket
+      PUBLIC_BASE_URL: https://storage.googleapis.com/
+      TYPE_STORAGE: NO_STORAGE
+    # Notifications
+      NOTIFICATIONS_EMAIL: ''
+      NOTIFICATIONS_EMAIL_PASSWORD: ''
+      FRONTEND_URL: https://eventito-frontend.vercel.app/
+      ENABLE_SEND_EMAILS: False
+
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
@@ -33,17 +49,6 @@ jobs:
         python-version: '3.11'
     - name: Install requirements
       run: pip install -r requirements-dev.txt
-
-    - name: Install dotenv CLI
-      run: pip install python-dotenv
-
-    - name: Load environment variables from .env_example
-      run: |
-        # Export environment variables from .env_example
-        set -o allexport
-        source .env_example
-        set +o allexport
-
     - name: Run tests and collect coverage
       run: python3 -m pytest --cov=./ --cov-report=xml
     - name: Upload coverage reports to Codecov for main
