@@ -6,10 +6,6 @@ services:
       - RUN_MODE=DEV
       - PORT=8080
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/
-      - ADMIN_NAME=Juan
-      - ADMIN_LASTNAME=Admin
-      - ADMIN_EMAIL=string@email.com
-      - ADMIN_ID=azfWgbBRUYXf8xbil9FyXof1gl82
       - GCP_CREDENTIALS=${GCP_CREDENTIALS}
       - EVENTS_BUCKET=${EVENTS_BUCKET}
       - WORKS_BUCKET=${WORKS_BUCKET}
@@ -17,6 +13,10 @@ services:
       - USERS_BUCKET=${USERS_BUCKET}
       - PUBLIC_BASE_URL=${PUBLIC_BASE_URL}
       - TYPE_STORAGE=${TYPE_STORAGE}
+      - NOTIFICATIONS_EMAIL_PASSWORD=${NOTIFICATIONS_EMAIL_PASSWORD}
+      - NOTIFICATIONS_EMAIL=${NOTIFICATIONS_EMAIL}
+      - ENABLE_SEND_EMAILS=${ENABLE_SEND_EMAILS}
+      - FRONTEND_URL=${FRONTEND_URL}
     volumes:
       - ./app:/code/app
       - ./tests:/code/test
