@@ -14,10 +14,9 @@ class AdminsNotificationsService(NotificationsService):
         Nombre del evento: {event['title']}
         """
 
-        message['Subject'] = 'Ha llegado una nueva solicitud de Creación de Evento'
-
-        message.set_content(body)
-        return self.send_email(message)
+        self._add_subject(message, 'Ha llegado una nueva solicitud de Creación de Evento')
+        self._add_body(message, body)
+        return self._send_email(message)
 
     def notify_event_approved(user_from, event):
         pass

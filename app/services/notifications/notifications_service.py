@@ -9,11 +9,9 @@ SLL_DEFAULT_CONTEXT = ssl.create_default_context()
 
 
 class NotificationsService:
-    def send_email(self, message: EmailMessage):
-        print('el mensaje es', message)
+    def _send_email(self, message: EmailMessage):
         if not settings.ENABLE_SEND_EMAILS:
             return
-        message = self.__patch_message(message)
         message['From'] = settings.NOTIFICATIONS_EMAIL
         try:
             with smtplib.SMTP_SSL(
@@ -29,19 +27,11 @@ class NotificationsService:
                   f'sending an email: {message.as_string()}.')
             return False
 
-    def __patch_message(self, message):
-        message = self.__patch_subject(message)
-        message = self.__patch_body(message)
+    def _add_subject(self, message: EmailMessage, subject: str):
+        message['Subject'] = f'[EvenTITO] {subject}'
         return message
 
-    def __patch_subject(self, message):
-        subject = message.get('Subject', '')
-        message.replace_header('Subject', f'[EvenTITO] {subject}')
-        return message
-
-    def __patch_body(self, message):
-        body = message.get_payload()
-
+    def _add_body(self, message: EmailMessage, body):
         if message.get_content_type() != 'text/html':
             message.set_type('text/html')
 
@@ -49,7 +39,7 @@ class NotificationsService:
             "<br><br>Este mensaje fue enviado desde "
             f"<a href='{settings.FRONTEND_URL}'>EvenTITO</a>"
         )
-        new_body = f"{body}\n\n{end_text}"
+        body = f"{body}\n\n{end_text}"
 
-        message.set_payload(new_body)
+        message.set_payload(body)
         return message
