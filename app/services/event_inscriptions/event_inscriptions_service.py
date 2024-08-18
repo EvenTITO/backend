@@ -25,7 +25,7 @@ class EventInscriptionsService(BaseService):
         self.event_id = event_id
         self.user_id = user_id
 
-    async def inscribe_user_to_event(self, inscription: InscriptionRequestSchema):
+    async def inscribe_user_to_event(self, inscription: InscriptionRequestSchema) -> InscriptionResponseSchema:
         event_status = await self.events_service.get_event_status(self.event_id)
         if event_status != EventStatus.STARTED:
             raise EventNotStarted(self.event_id, event_status)
@@ -53,12 +53,8 @@ class EventInscriptionsService(BaseService):
         )
         return list(map(EventInscriptionsService.map_to_schema, inscriptions))
 
-    async def get_my_inscription(self, inscription_id: str) -> InscriptionResponseSchema:
-        inscription = await self.inscriptions_repository.get_user_inscription_by_id(self.user_id, inscription_id)
-        return EventInscriptionsService.map_to_schema(inscription)
-
     async def pay(self, inscription_id: str) -> InscriptionPayResponseSchema:
-        my_inscription = await self.get_my_inscription(inscription_id)
+        my_inscription = await self.inscriptions_repository.get_user_inscription_by_id(self.user_id, inscription_id)
         if my_inscription is None:
             raise InscriptionNotFound(self.event_id, inscription_id)
         if my_inscription.status != InscriptionStatus.PENDING_PAYMENT:

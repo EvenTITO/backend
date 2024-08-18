@@ -10,7 +10,7 @@ from app.services.event_inscriptions.event_inscriptions_service_dep import Event
 
 inscriptions_events_router = APIRouter(
     prefix="/{event_id}/inscriptions",
-    tags=["Event inscriptions"]
+    tags=["Event: Inscriptions"]
 )
 
 
@@ -55,6 +55,10 @@ async def read_my_works(
     return await inscriptions_service.get_my_event_inscriptions(offset, limit)
 
 
-@inscriptions_events_router.put("/{inscription_id}/pay", status_code=200, dependencies=[Depends(verify_user_exists)])
+@inscriptions_events_router.put(
+    path="/{inscription_id}/pay",
+    status_code=200,
+    dependencies=[Depends(verify_user_exists)]
+)
 async def submit(inscription_id: str, inscription_service: EventInscriptionsServiceDep) -> InscriptionPayResponseSchema:
     return await inscription_service.pay(inscription_id)

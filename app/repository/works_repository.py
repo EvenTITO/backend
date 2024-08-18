@@ -14,7 +14,7 @@ class WorksRepository(Repository):
         super().__init__(session, WorkModel)
 
     async def get_work(self, event_id: str, work_id: int) -> WorkModel:
-        conditions = await self.__primary_key_conditions(event_id, work_id)
+        conditions = [WorkModel.event_id == event_id, WorkModel.id == work_id]
         return await self._get_with_conditions(conditions)
 
     async def get_all_works_for_event(self, event_id: str, offset: int, limit: int) -> list[WorkModel]:
@@ -42,18 +42,15 @@ class WorksRepository(Repository):
         conditions = [WorkModel.event_id == event_id, WorkModel.track.in_(tracks)]
         await self._get_many_with_conditions(conditions, limit, offset)
 
-    async def update_work(self, work_update: WorkSchema, event_id: str, work_id: int):
-        conditions = await self.__primary_key_conditions(event_id, work_id)
+    async def update_work(self, work_update: WorkSchema, event_id: str, work_id: int) -> bool:
+        conditions = [WorkModel.event_id == event_id, WorkModel.id == work_id]
         return await self._update_with_conditions(conditions, work_update)
 
     async def work_with_title_exists(self, event_id: str, title: str):
         conditions = [WorkModel.event_id == event_id, WorkModel.title == title]
         return await self._exists_with_conditions(conditions)
 
-    async def __primary_key_conditions(self, event_id: str, work_id: int):
-        return [WorkModel.event_id == event_id, WorkModel.id == work_id]
-
-    async def __find_next_id(self, event_id):
+    async def __find_next_id(self, event_id: str):
         query = select(func.max(WorkModel.id)).filter_by(event_id=event_id)
         result = await self.session.execute(query)
         max_id = result.scalar() or 0
