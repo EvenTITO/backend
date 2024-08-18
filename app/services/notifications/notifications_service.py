@@ -8,6 +8,33 @@ settings = NotificationsSettings()
 SLL_DEFAULT_CONTEXT = ssl.create_default_context()
 
 
+def load_file(file_path):
+    with open('./assets/'+file_path, 'r', encoding='utf-8') as file:
+        return file.read()
+
+
+def load_html(file_path):
+    return load_file('email-templates/'+file_path)
+
+
+def get_body_template():
+    styles = load_html('styles.html')
+    header = load_html('header.html')
+    logo = load_file('logo.svg')
+    header = header.replace('{{ logo }}', logo)
+
+    footer = load_html('footer.html')
+    body_template = load_html('body-template.html')
+
+    body_filled = body_template.replace('{{ styles }}', styles)
+    body_filled = body_filled.replace('{{ header }}', header)
+    body_filled = body_filled.replace('{{ footer }}', footer)
+    return body_filled
+
+
+BODY_TEMPLATE = get_body_template()
+
+
 class NotificationsService:
     def _send_email(self, message: EmailMessage):
         if not settings.ENABLE_SEND_EMAILS:
@@ -43,3 +70,8 @@ class NotificationsService:
 
         message.set_payload(body)
         return message
+
+    def _add_body_2(self, message: EmailMessage, body):
+        body_filled = BODY_TEMPLATE.replace('{{ body }}', body)
+        message.set_content('This is a HTML email. If you see this text, your client does not support HTML.')
+        message.add_alternative(body_filled, subtype='html')
