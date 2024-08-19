@@ -47,7 +47,7 @@ async def read_event_inscriptions(
     response_model=List[InscriptionResponseSchema],
     dependencies=[Depends(verify_user_exists)]
 )
-async def read_my_works(
+async def read_my_inscriptions(
         inscriptions_service: EventInscriptionsServiceDep,
         offset: int = 0,
         limit: int = Query(default=100, le=100)
