@@ -4,7 +4,7 @@ from operator import itemgetter
 
 from app.database.models.member import MemberModel
 from app.database.models.user import UserModel
-from app.exceptions.members.organizer.organizer_exceptions import AlreadyOrganizerExist, AtLeastOneOrganizer
+from app.exceptions.members.organizer.organizer_exceptions import AlreadyOrganizerExist
 from app.exceptions.users_exceptions import UserNotFound
 from app.repository.chairs_repository import ChairRepository
 from app.repository.organizers_repository import OrganizerRepository
