@@ -125,16 +125,6 @@ async def test_get_my_events_should_not_include_an_event_where_i_do_not_particip
     assert len(response.json()) == 0
 
 
-@pytest.mark.skip(reason="TODO: If I have an invitation pending for organizer, should I get this event in my events?")
-async def test_get_my_events_includes_events_where_i_have_organizer_invitation_pending():
-    assert False
-
-
-@pytest.mark.skip(reason="TODO: If I have an invitation pending for chair, should I get this event in my events?")
-async def test_get_my_events_includes_events_where_i_have_chair_invitation_pending():
-    assert False
-
-
 @pytest.mark.skip(reason="TODO: I dont know wheater we have the chairs implementation or not.")
 async def test_get_my_events_includes_events_where_i_am_chair():
     assert False

@@ -1,18 +1,20 @@
 from fastapi.encoders import jsonable_encoder
-from ..commontest import create_headers
+
 from app.schemas.members.member_schema import MemberRequestSchema
+from ..commontest import create_headers
 
 
 async def test_get_organizers_with_new_organizer(
-    client,
-    create_user,
-    create_event_creator,
-    create_event_from_event_creator
+        client,
+        create_user,
+        create_event_creator,
+        create_event_from_event_creator
 ):
     request = MemberRequestSchema(
-        email=create_user["email"]
+        email=create_user["email"],
+        role="organizer"
     )
-    _ = await client.post(f"/events/{create_event_from_event_creator}/organizers",
+    _ = await client.post(f"/events/{create_event_from_event_creator}/members",
                           json=jsonable_encoder(request),
                           headers=create_headers(create_event_creator["id"]))
 

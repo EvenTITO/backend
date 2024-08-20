@@ -3,7 +3,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.event import EventModel, EventStatus
 from app.database.models.inscription import InscriptionModel
-from app.database.models.member import InvitationStatus
 from app.database.models.organizer import OrganizerModel
 from app.repository.crud_repository import Repository
 from app.schemas.events.public_event_with_roles import PublicEventWithRolesSchema
@@ -36,7 +35,6 @@ class EventsRepository(Repository):
         OrganizerModel(
             event=new_event,
             user_id=new_event.creator_id,
-            invitation_status=InvitationStatus.ACCEPTED,
         )
         return await self._create(new_event)
 

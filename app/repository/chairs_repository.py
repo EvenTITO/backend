@@ -19,12 +19,3 @@ class ChairRepository(MemberRepository):
 
     async def get_chair(self, event_id, user_id):
         return await self.get((event_id, user_id))
-
-    async def create_chair(self, event_id: str, chair_id: str, expiration_date: datetime, tracks: list[str]):
-        db_in = ChairModel(
-            user_id=chair_id,
-            event_id=event_id,
-            invitation_expiration_date=expiration_date,
-            tracks=tracks
-        )
-        await self._create(db_in)
