@@ -5,7 +5,7 @@ from app.repository.events_repository import EventsRepository
 from app.schemas.events.configuration import EventConfigurationSchema
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.public_event_with_roles import PublicEventWithRolesSchema
-from app.schemas.events.schemas import EventRol
+from app.schemas.events.schemas import EventRole
 from app.services.event_organizers.event_organizers_service import EventOrganizersService
 from app.services.services import BaseService
 
@@ -58,7 +58,7 @@ class EventsService(BaseService):
         if caller_id is None:
             return event
         if await self.organizers_service.is_organizer(event_id, caller_id):
-            event.roles.append(EventRol.ORGANIZER)
+            event.roles.append(EventRole.ORGANIZER)
         return event
 
     async def get_event_status(self, event_id: str):
@@ -66,3 +66,9 @@ class EventsService(BaseService):
         if event_status is None:
             raise EventNotFound(event_id)
         return event_status
+
+    async def get_event_tracks(self, event_id: str):
+        tracks = await self.events_repository.get_tracks(event_id)
+        if tracks is None:
+            raise EventNotFound(event_id)
+        return tracks

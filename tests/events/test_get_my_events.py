@@ -6,7 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from app.database.models.event import EventType, EventStatus
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.event_status import EventStatusSchema
-from app.schemas.events.schemas import EventRol
+from app.schemas.events.schemas import EventRole
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from ..commontest import create_headers
 
@@ -80,15 +80,15 @@ async def test_get_my_events(client, mock_storage, create_event_started, create_
     n_events = 0
     for event in events:
         if event['id'] == organizer_event_id:
-            assert EventRol.ORGANIZER in event['roles']
+            assert EventRole.ORGANIZER in event['roles']
             n_events += 1
         elif event['id'] == organizer_inscripted_event_id:
-            assert EventRol.ATTENDEE in event['roles']
-            assert EventRol.ORGANIZER in event['roles']
+            assert EventRole.ATTENDEE in event['roles']
+            assert EventRole.ORGANIZER in event['roles']
             n_events += 1
         elif event['id'] == inscripted_event_id:
-            assert EventRol.ATTENDEE in event['roles']
-            assert EventRol.SPEAKER in event['roles']
+            assert EventRole.ATTENDEE in event['roles']
+            assert EventRole.SPEAKER in event['roles']
             n_events += 1
 
     assert n_events == 3
@@ -123,16 +123,6 @@ async def test_get_my_events_should_not_include_an_event_where_i_do_not_particip
     response = await client.get("/events/my-events",
                                 headers=create_headers(create_user['id']))
     assert len(response.json()) == 0
-
-
-@pytest.mark.skip(reason="TODO: If I have an invitation pending for organizer, should I get this event in my events?")
-async def test_get_my_events_includes_events_where_i_have_organizer_invitation_pending():
-    assert False
-
-
-@pytest.mark.skip(reason="TODO: If I have an invitation pending for chair, should I get this event in my events?")
-async def test_get_my_events_includes_events_where_i_have_chair_invitation_pending():
-    assert False
 
 
 @pytest.mark.skip(reason="TODO: I dont know wheater we have the chairs implementation or not.")

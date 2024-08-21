@@ -11,6 +11,7 @@ from app.routers.events.configuration.configuration import events_configuration_
 from app.routers.events.inscriptions.inscriptions import inscriptions_events_router
 from app.routers.events.media import events_media_router
 from app.routers.events.members.chairs import event_chairs_router
+from app.routers.events.members.members import event_members_router
 from app.routers.events.members.organizers import event_organizers_router
 from app.routers.works.submissions import works_submissions_router, submissions_router
 from app.routers.works.works import works_router
@@ -23,6 +24,7 @@ events_router = APIRouter(prefix="/events")
 events_router.include_router(events_media_router)
 events_router.include_router(events_configuration_router)
 events_router.include_router(events_admin_router)
+events_router.include_router(event_members_router)
 events_router.include_router(event_organizers_router)
 events_router.include_router(event_chairs_router)
 events_router.include_router(works_router)

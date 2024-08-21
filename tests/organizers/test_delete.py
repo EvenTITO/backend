@@ -1,6 +1,7 @@
 # from fastapi.encoders import jsonable_encoder
 # from app.organizers.schemas import OrganizerRequestSchema
 # from ..common import create_headers
+import pytest
 
 
 # async def test_event_creator_can_remove_other_organizer(
@@ -49,3 +50,7 @@
 #                                    headers=create_headers(create_user["id"]))
 
 #     assert response.status_code == 404
+
+@pytest.mark.skip(reason="TODO: agregar estos test de borrar organizadores")
+async def test_delete_organizer():
+    pass

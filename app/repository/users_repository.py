@@ -25,5 +25,5 @@ class UsersRepository(Repository):
         return await self.create(db_user)
 
     async def get_role(self, id) -> UserRole:
-        conditions = await self._primary_key_conditions(id)
+        conditions = self._primary_key_conditions(id)
         return await self._get_with_values(conditions, UserModel.role)
