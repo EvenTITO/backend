@@ -9,7 +9,9 @@ from app.exceptions.users_exceptions import UserNotFound
 from app.repository.chairs_repository import ChairRepository
 from app.repository.organizers_repository import OrganizerRepository
 from app.repository.users_repository import UsersRepository
+from app.schemas.events.schemas import EventRole
 from app.schemas.members.member_schema import MemberRequestSchema, MemberResponseSchema, MemberResponseWithRolesSchema
+from app.schemas.members.member_schema import RolesRequestSchema
 from app.schemas.users.user import UserSchema
 from app.services.services import BaseService
 
@@ -22,7 +24,7 @@ class EventMembersService(BaseService):
             users_repository: UsersRepository,
     ):
         self.users_repository = users_repository
-        self.repositories = {"organizer": organizer_repository, "chair": chair_repository}
+        self.repositories = {EventRole.ORGANIZER: organizer_repository, EventRole.CHAIR: chair_repository}
 
     async def get_all_members(self, event_id: str) -> set[MemberResponseSchema]:
         result = []
@@ -55,19 +57,26 @@ class EventMembersService(BaseService):
     async def remove_member(self, event_id: str, user_id: str) -> None:
         for role, repository in self.repositories.items():
             if await repository.is_member(event_id, user_id):
-                if role == "organizer":
+                if role == EventRole.ORGANIZER:
                     users_organizers = await repository.get_all(event_id)
                     if len(users_organizers) <= 1:
                         continue
                 await repository.remove_member(event_id, user_id)
 
+    async def update_rol_member(self, event_id: str, user_id: str, role_schema: RolesRequestSchema):
+        for role, repository in self.repositories.items():
+            if (role not in role_schema.roles) and (await repository.is_member(event_id, user_id)):
+                await repository.remove_member(event_id, user_id)
+            if (role in role_schema.roles) and (not await repository.is_member(event_id, user_id)):
+                await repository.create_member(event_id, user_id)
+
     @staticmethod
-    def __map_to_schema(model: (UserModel, MemberModel), rol: str) -> MemberResponseWithRolesSchema:
+    def __map_to_schema(model: (UserModel, MemberModel), role: EventRole) -> MemberResponseWithRolesSchema:
         user, organizer = model
         return MemberResponseWithRolesSchema(
             event_id=organizer.event_id,
             user_id=organizer.user_id,
-            roles=[rol],
+            roles=[role],
             user=UserSchema(
                 email=user.email,
                 name=user.name,

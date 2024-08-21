@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends
 
 from app.authorization.organizer_or_admin_dep import verify_is_organizer
-from app.schemas.members.chair_schema import ChairResponseSchema
+from app.schemas.members.chair_schema import ChairResponseSchema, ChairRequestSchema
 from app.services.event_chairs.event_chairs_service_dep import EventChairServiceDep
 
 event_chairs_router = APIRouter(prefix="/{event_id}/chairs", tags=["Events: Chairs"])
@@ -26,3 +26,18 @@ async def remove_chair(
         chair_service: EventChairServiceDep
 ) -> None:
     await chair_service.remove_chair(event_id, user_id)
+
+
+@event_chairs_router.put(
+    path="/{user_id}/tracks",
+    status_code=201,
+    response_model=None,
+    dependencies=[Depends(verify_is_organizer)]
+)
+async def update(
+        tracks: ChairRequestSchema,
+        event_id: str,
+        user_id: str,
+        chair_service: EventChairServiceDep
+) -> None:
+    await chair_service.update_tracks(event_id, user_id, tracks)

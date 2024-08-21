@@ -1,3 +1,4 @@
+from sqlalchemy import update, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.chair import ChairModel
@@ -8,12 +9,19 @@ class ChairRepository(MemberRepository):
     def __init__(self, session: AsyncSession):
         super().__init__(session, ChairModel)
 
-    async def _primary_key_conditions(self, primary_key):
+    def _primary_key_conditions(self, primary_key):
         event_id, chair_id = primary_key
         return [
             ChairModel.event_id == event_id,
             ChairModel.user_id == chair_id
         ]
 
-    async def get_chair(self, event_id, user_id):
-        return await self.get((event_id, user_id))
+    async def update_tracks(self, event_id: str, user_id: str, tracks: list[str]):
+        update_query = (
+            update(ChairModel).where(and_(
+                ChairModel.event_id == event_id,
+                ChairModel.user_id == user_id)
+            ).values(tracks=tracks)
+        )
+        await self.session.execute(update_query)
+        await self.session.commit()

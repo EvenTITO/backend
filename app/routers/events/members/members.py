@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 
 from app.authorization.organizer_or_admin_dep import verify_is_organizer
 from app.schemas.members.member_schema import MemberRequestSchema, MemberResponseSchema
+from app.schemas.members.member_schema import RolesRequestSchema
 from app.services.event_members.event_members_service_dep import EventMembersServiceDep
 
 event_members_router = APIRouter(
@@ -42,3 +43,18 @@ async def remove_member(
         member_service: EventMembersServiceDep
 ) -> None:
     await member_service.remove_member(event_id, user_id)
+
+
+@event_members_router.put(
+    path="/{user_id}/roles",
+    status_code=201,
+    response_model=None,
+    dependencies=[Depends(verify_is_organizer)]
+)
+async def update(
+        roles: RolesRequestSchema,
+        event_id: str,
+        user_id: str,
+        member_service: EventMembersServiceDep
+) -> None:
+    await member_service.update_rol_member(event_id, user_id, roles)

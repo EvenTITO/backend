@@ -1,8 +1,12 @@
 from fastapi.encoders import jsonable_encoder
 
+from app.schemas.events.schemas import EventRole
 from app.schemas.members.member_schema import MemberRequestSchema
 from ..commontest import create_headers
 
+
+# TODO los test pasan pero ahora quedaron apuntando al /members porque estan en otro router, adecuar eso para que alla
+# test de los routers de members (incluido lo nuevo de roles), organizers y chairs
 
 async def test_get_organizers_with_new_organizer(
         client,
@@ -12,7 +16,7 @@ async def test_get_organizers_with_new_organizer(
 ):
     request = MemberRequestSchema(
         email=create_user["email"],
-        role="organizer"
+        role=EventRole.ORGANIZER
     )
     _ = await client.post(f"/events/{create_event_from_event_creator}/members",
                           json=jsonable_encoder(request),

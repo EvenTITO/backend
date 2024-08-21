@@ -1,11 +1,9 @@
 from app.database.models.member import MemberModel
 from app.database.models.user import UserModel
-from app.exceptions.members.organizer.organizer_exceptions import UserNotIsOrganizer, AtLeastOneOrganizer, \
-    AlreadyOrganizerExist
-from app.exceptions.users_exceptions import UserNotFound
+from app.exceptions.members.organizer.organizer_exceptions import UserNotIsOrganizer, AtLeastOneOrganizer
 from app.repository.organizers_repository import OrganizerRepository
 from app.repository.users_repository import UsersRepository
-from app.schemas.members.member_schema import MemberRequestSchema, MemberResponseSchema
+from app.schemas.members.member_schema import MemberResponseSchema
 from app.schemas.users.user import UserSchema
 from app.services.services import BaseService
 
@@ -21,18 +19,6 @@ class EventOrganizersService(BaseService):
 
     async def is_organizer(self, event_id: str, user_id: str) -> bool:
         return await self.organizer_repository.is_member(event_id, user_id)
-
-    async def invite_organizer(self, organizer: MemberRequestSchema, event_id: str) -> str:
-        user_id = await self.users_repository.get_user_id_by_email(organizer.email)
-        if user_id is None:
-            raise UserNotFound(organizer.email)
-        if await self.organizer_repository.is_member(event_id, user_id):
-            raise AlreadyOrganizerExist(event_id, user_id)
-        await self.organizer_repository.create_member(
-            event_id,
-            user_id,
-        )
-        return user_id
 
     async def remove_organizer(self, event_id: str, user_id: str) -> None:
         if not await self.organizer_repository.is_member(event_id, user_id):

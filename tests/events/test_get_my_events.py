@@ -6,7 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from app.database.models.event import EventType, EventStatus
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.event_status import EventStatusSchema
-from app.schemas.events.schemas import EventRol
+from app.schemas.events.schemas import EventRole
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from ..commontest import create_headers
 
@@ -80,15 +80,15 @@ async def test_get_my_events(client, mock_storage, create_event_started, create_
     n_events = 0
     for event in events:
         if event['id'] == organizer_event_id:
-            assert EventRol.ORGANIZER in event['roles']
+            assert EventRole.ORGANIZER in event['roles']
             n_events += 1
         elif event['id'] == organizer_inscripted_event_id:
-            assert EventRol.ATTENDEE in event['roles']
-            assert EventRol.ORGANIZER in event['roles']
+            assert EventRole.ATTENDEE in event['roles']
+            assert EventRole.ORGANIZER in event['roles']
             n_events += 1
         elif event['id'] == inscripted_event_id:
-            assert EventRol.ATTENDEE in event['roles']
-            assert EventRol.SPEAKER in event['roles']
+            assert EventRole.ATTENDEE in event['roles']
+            assert EventRole.SPEAKER in event['roles']
             n_events += 1
 
     assert n_events == 3

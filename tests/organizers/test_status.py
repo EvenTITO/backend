@@ -1,5 +1,6 @@
 from fastapi.encoders import jsonable_encoder
 
+from app.schemas.events.schemas import EventRole
 from app.schemas.members.member_schema import MemberRequestSchema
 from ..commontest import create_headers
 
@@ -7,7 +8,7 @@ from ..commontest import create_headers
 async def add_organizer(client, event_id, user_id, email):
     request = MemberRequestSchema(
         email=email,
-        role="organizer"
+        role=EventRole.ORGANIZER
     )
     return await client.post(
         f"/events/{event_id}/organizers",

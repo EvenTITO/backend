@@ -1,7 +1,9 @@
-from app.schemas.members.member_schema import MemberRequestSchema, MemberResponseSchema
+from pydantic import BaseModel
+
+from app.schemas.members.member_schema import MemberResponseSchema
 
 
-class ChairRequestSchema(MemberRequestSchema):
+class ChairRequestSchema(BaseModel):
     tracks: list[str]
 
 

@@ -9,8 +9,10 @@ from app.schemas.events.dates import DatesCompleteSchema
 from app.schemas.events.pricing import PricingSchema
 
 
-class EventRol(str, Enum):
+class EventRole(str, Enum):
     ORGANIZER = "ORGANIZER"
+    CHAIR = "CHAIR"
+    REVIEWER = "REVIEWER"
     SPEAKER = "SPEAKER"
     ATTENDEE = "ATTENDEE"
 

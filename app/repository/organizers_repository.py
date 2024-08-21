@@ -8,7 +8,7 @@ class OrganizerRepository(MemberRepository):
     def __init__(self, session: AsyncSession):
         super().__init__(session, OrganizerModel)
 
-    async def _primary_key_conditions(self, primary_key):
+    def _primary_key_conditions(self, primary_key):
         event_id, organizer_id = primary_key
         return [
             OrganizerModel.event_id == event_id,

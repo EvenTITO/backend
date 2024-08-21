@@ -1,6 +1,7 @@
 import pytest
 from fastapi.encoders import jsonable_encoder
 
+from app.schemas.events.schemas import EventRole
 from app.schemas.members.chair_schema import ChairRequestSchema
 from ..commontest import create_headers
 
@@ -15,7 +16,7 @@ async def test_get_chairs_with_new_chair(
     request = ChairRequestSchema(
         email=create_user["email"],
         tracks=["futbol", "tenis"],
-        role="chair"
+        role=EventRole.CHAIR
     )
 
     await client.post(f"/events/{create_event_from_event_creator}/members",

@@ -6,7 +6,7 @@ from app.database.models.inscription import InscriptionModel
 from app.database.models.organizer import OrganizerModel
 from app.repository.crud_repository import Repository
 from app.schemas.events.public_event_with_roles import PublicEventWithRolesSchema
-from app.schemas.events.schemas import EventRol
+from app.schemas.events.schemas import EventRole
 
 
 class EventsRepository(Repository):
@@ -14,14 +14,16 @@ class EventsRepository(Repository):
         super().__init__(session, EventModel)
 
     async def get_status(self, event_id: str):
-        conditions = await self._primary_key_conditions(event_id)
-        event_status = await self._get_with_values(conditions, EventModel.status)
-        return event_status
+        conditions = self._primary_key_conditions(event_id)
+        return await self._get_with_values(conditions, EventModel.status)
+
+    async def get_tracks(self, event_id: str):
+        conditions = self._primary_key_conditions(event_id)
+        return await self._get_with_values(conditions, EventModel.tracks)
 
     async def get_review_skeleton(self, event_id):
-        conditions = await self._primary_key_conditions(event_id)
-        review_skeleton = await self._get_with_values(conditions, EventModel.review_skeleton)
-        return review_skeleton
+        conditions = self._primary_key_conditions(event_id)
+        return await self._get_with_values(conditions, EventModel.review_skeleton)
 
     async def event_with_title_exists(self, title):
         conditions = [EventModel.title == title]
@@ -76,9 +78,9 @@ class EventsRepository(Repository):
             return response
 
         response = {}
-        response = add_events(EventRol.ATTENDEE, inscriptions, response)
-        response = add_events(EventRol.SPEAKER, inscriptions, response)
-        response = add_events(EventRol.ORGANIZER, organizations, response)
+        response = add_events(EventRole.ATTENDEE, inscriptions, response)
+        response = add_events(EventRole.SPEAKER, inscriptions, response)
+        response = add_events(EventRole.ORGANIZER, organizations, response)
         return list(response.values())
 
     async def get_all_events(
