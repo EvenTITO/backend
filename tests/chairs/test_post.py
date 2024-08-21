@@ -40,30 +40,30 @@ async def test_organizer_can_add_user_as_chair(client, create_organizer, create_
 
 
 @pytest.mark.skip(reason="TODO: agregar los test que validan agregar tracks de un evento a un chair")
-async def test_add_tracks():
+async def test_add_tracks_1():
     pass
 
 
 @pytest.mark.skip(reason="TODO: agregar los test que validan agregar tracks que no son de un evento a un chair")
-async def test_add_tracks():
+async def test_add_tracks_2():
     pass
 
 
 @pytest.mark.skip(reason="TODO: agregar los test que validan agregar tracks validos a un member que no es chair")
-async def test_add_tracks():
+async def test_add_tracks_3():
     pass
 
 
 @pytest.mark.skip(reason="TODO: agregar test que validen pisar tracks actuales con los nuevos")
-async def test_add_tracks():
+async def test_add_tracks_4():
     pass
 
 
 @pytest.mark.skip(reason="TODO: agregar test que validen pisar tracks actuales con lista vacia")
-async def test_add_tracks():
+async def test_add_tracks_5():
     pass
 
 
 @pytest.mark.skip(reason="TODO: agregar test que validen el delete de chair")
-async def test_add_tracks():
+async def test_add_tracks_6():
     pass
