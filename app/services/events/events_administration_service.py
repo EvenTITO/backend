@@ -11,7 +11,7 @@ from app.schemas.events.schemas import EventRole
 from app.services.services import BaseService
 
 
-class EventsAdministationService(BaseService):
+class EventsAdministrationService(BaseService):
     def __init__(self, events_repository: EventsRepository):
         self.events_repository = events_repository
 
