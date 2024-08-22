@@ -57,5 +57,5 @@ async def test_get_works_04(client, create_user, create_event, create_many_works
 
 
 @pytest.mark.skip(reason="TODO: (FALLAR): obtener los trabajos de un evento si soy chair sin parametro track")
-async def test_get_works_01(client, create_user, create_event, create_many_works):
+async def test_get_works_05(client, create_user, create_event, create_many_works):
     pass

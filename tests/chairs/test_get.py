@@ -82,6 +82,3 @@ async def test_get_chair_me_01():
 @pytest.mark.skip(reason="TODO:(FALLO) obtener mis datos como chair si no soy chair del evento")
 async def test_get_chair_me_02():
     pass
-
-
-

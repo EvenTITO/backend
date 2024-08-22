@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends
 from app.authorization.caller_id_dep import CallerIdDep
 from app.authorization.organizer_or_admin_dep import verify_is_organizer
 from app.authorization.organizer_or_chair_dep import verify_is_organizer_or_chair
-from app.authorization.same_user_or_admin_dep import verify_same_user_or_admin
 from app.schemas.members.chair_schema import ChairResponseSchema, ChairRequestSchema
 from app.services.event_chairs.event_chairs_service_dep import EventChairServiceDep
 
