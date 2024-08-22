@@ -24,10 +24,19 @@ class EventChairService(BaseService):
         users_chairs = await self.chair_repository.get_all(event_id)
         return list(map(EventChairService.__map_to_schema, users_chairs))
 
+    async def get_chair(self, event_id: str, user_id: str):
+        if not await self.chair_repository.is_member(event_id, user_id):
+            raise UserNotIsChair(event_id, user_id)
+        chair = await self.chair_repository.get_member(event_id, user_id)
+        return EventChairService.__map_to_schema(chair)
+
     async def remove_chair(self, event_id: str, user_id: str) -> None:
         if not await self.chair_repository.is_member(event_id, user_id):
             raise UserNotIsChair(event_id, user_id)
         await self.chair_repository.remove_member(event_id, user_id)
+
+    async def is_chair(self, event_id: str, user_id: str) -> None:
+        return await self.chair_repository.is_member(event_id, user_id)
 
     async def update_tracks(self, event_id: str, user_id: str, tracks_schema: ChairRequestSchema) -> None:
         if not await self.chair_repository.is_member(event_id, user_id):

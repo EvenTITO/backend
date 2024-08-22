@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import func
+from sqlalchemy import func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -18,12 +18,26 @@ class WorksRepository(Repository):
         return await self._get_with_conditions(conditions)
 
     async def get_all_works_for_event(self, event_id: str, offset: int, limit: int) -> list[WorkModel]:
-        query = select(WorkModel).where(WorkModel.event_id == event_id).offset(offset).limit(limit)
+        query = select(WorkModel).where(and_(WorkModel.event_id == event_id)).offset(offset).limit(limit)
         result = await self.session.execute(query)
         return result.scalars().all()
 
     async def get_all_works_for_user(self, user_id: str, offset: int, limit: int) -> list[WorkModel]:
-        query = select(WorkModel).where(WorkModel.author_id == user_id).offset(offset).limit(limit)
+        query = select(WorkModel).where(and_(WorkModel.author_id == user_id)).offset(offset).limit(limit)
+        result = await self.session.execute(query)
+        return result.scalars().all()
+
+    async def get_all_event_works_for_track(
+            self,
+            event_id: str,
+            track: str,
+            offset: int,
+            limit: int
+    ) -> list[WorkModel]:
+        query = (select(WorkModel)
+                 .where(and_(WorkModel.track == track, WorkModel.event_id == event_id))
+                 .offset(offset)
+                 .limit(limit))
         result = await self.session.execute(query)
         return result.scalars().all()
 

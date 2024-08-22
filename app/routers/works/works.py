@@ -2,8 +2,8 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Query
 
-from app.authorization.organizer_or_admin_dep import verify_is_organizer
 from app.authorization.organizer_or_author_dep import verify_is_organizer_or_author
+from app.authorization.organizer_or_chair_dep import verify_is_organizer_or_track_chair
 from app.authorization.user_id_dep import verify_user_exists
 from app.schemas.works.work import WorkSchema, WorkWithState
 from app.services.works.works_service_dep import WorksServiceDep
@@ -15,14 +15,15 @@ works_router = APIRouter(prefix="/{event_id}/works", tags=["Events: Works"])
     path="",
     status_code=200,
     response_model=List[WorkWithState],
-    dependencies=[Depends(verify_is_organizer)]
+    dependencies=[Depends(verify_is_organizer_or_track_chair)]
 )
-async def get_all_works(
+async def get_works(
         work_service: WorksServiceDep,
         offset: int = 0,
-        limit: int = Query(default=100, le=100)
+        limit: int = Query(default=100, le=100),
+        track: str | None = Query(...)
 ) -> list[WorkWithState]:
-    return await work_service.get_all_event_works(offset, limit)
+    return await work_service.get_all_event_works(track, offset, limit)
 
 
 @works_router.get(
@@ -45,8 +46,8 @@ async def read_my_works(
     response_model=WorkWithState,
     dependencies=[Depends(verify_is_organizer_or_author)]
 )
-#  TODO si sos reviewer de este trabajo tendrias que poder verlo,
-#  cambiar el verify_is_organizer_or_author cuando se haga la parte de review y reviewers
+#  TODO si sos reviewer de este trabajo o chair del track de este trabajo tendrias que poder verlo,
+#  cambiar el verify_is_organizer_or_author_or_track_chair_or_work_reviewer o similar
 async def get_work(work_id: str, work_service: WorksServiceDep) -> WorkWithState:
     print("entro al metodo paso la dependency")
     return await work_service.get_work(work_id)
