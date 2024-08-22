@@ -1,12 +1,13 @@
 from enum import Enum
+
 from pydantic import (
     BaseModel,
     Field,
 )
 
-from ...database.models.event import EventType
 from app.schemas.events.dates import DatesCompleteSchema
 from app.schemas.events.pricing import PricingSchema
+from ...database.models.event import EventType
 
 
 class EventRole(str, Enum):
@@ -49,3 +50,11 @@ class DynamicGeneralEventSchema(DatesCompleteSchema):
 
 class DynamicEventSchema(DynamicGeneralEventSchema, DatesCompleteSchema, PricingSchema):
     pass
+
+
+class DynamicTracksEventSchema(BaseModel):
+    tracks: list[str] = Field(
+        max_length=1000,
+        examples=[["track1", "track2", "track3"]],
+        default_factory=list
+    )

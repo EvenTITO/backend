@@ -1,8 +1,10 @@
+from enum import Enum
+
 from sqlalchemy import Column, String, ForeignKey, JSON, ARRAY
+from sqlalchemy.orm import relationship
+
 from app.database.models.base import Base
 from app.database.models.utils import ModelTemplate
-from enum import Enum
-from sqlalchemy.orm import relationship
 
 
 class EventStatus(str, Enum):
@@ -10,6 +12,7 @@ class EventStatus(str, Enum):
     NOT_APPROVED = "NOT_APPROVED"
     CREATED = "CREATED"
     STARTED = "STARTED"
+    FINISHED = "FINISHED"
     SUSPENDED = "SUSPENDED"
     CANCELED = "CANCELED"
     BLOCKED = "BLOCKED"
