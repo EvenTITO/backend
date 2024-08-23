@@ -1,4 +1,6 @@
+import pytest
 from fastapi.encoders import jsonable_encoder
+
 from ..commontest import create_headers
 
 
@@ -19,9 +21,9 @@ async def test_put_event(client, admin_data, create_event):
 
 
 async def test_put_event_different_notif_mails(
-    client,
-    admin_data,
-    create_event
+        client,
+        admin_data,
+        create_event
 ):
     update_create_event = create_event.copy()
     update_create_event["title"] = "new event"
@@ -46,9 +48,9 @@ async def test_put_event_different_notif_mails(
 
 
 async def test_put_event_change_tracks(
-    client,
-    admin_data,
-    create_event
+        client,
+        admin_data,
+        create_event
 ):
     update_create_event = create_event.copy()
     update_create_event["title"] = "new event"
@@ -73,9 +75,9 @@ async def test_put_event_change_tracks(
 
 
 async def test_put_many_changes(
-    client,
-    admin_data,
-    create_event
+        client,
+        admin_data,
+        create_event
 ):
     update_create_event = create_event.copy()
     update_create_event["title"] = "new event"
@@ -108,3 +110,18 @@ async def test_put_many_changes(
 
     assert response.json()['location'] == update_create_event["location"]
     assert response.json()['contact'] == update_create_event["contact"]
+
+
+@pytest.mark.skip(reason="TODO: validar agregar tracks nuevos despues de startup servicio PUT /general")
+async def test_add_tracks_1():
+    pass
+
+
+@pytest.mark.skip(reason="TODO: validar agregar tracks nuevos despues de startup servicio PUT /general/tracks")
+async def test_add_tracks_2():
+    pass
+
+
+@pytest.mark.skip(reason="TODO: validar agregar tracks nuevos antes de startup servicio PUT /general/tracks")
+async def test_add_tracks_3():
+    pass

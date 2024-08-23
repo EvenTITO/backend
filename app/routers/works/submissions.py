@@ -31,7 +31,7 @@ async def get_download_submission_file(
 @works_submissions_router.get(path="/latest", status_code=200, dependencies=[Depends(verify_is_organizer_or_author)])
 async def get_download_latest_submission_file(
         submission_service: SubmissionsServiceDep) -> SubmissionDownloadSchema:
-    return await submission_service.get_my_latest_submission()
+    return await submission_service.get_latest_submission()
 
 
 @submissions_router.get(path="", status_code=200, dependencies=[Depends(verify_is_organizer)])

@@ -47,3 +47,38 @@ async def test_get_chairs_empty(client, create_event_creator, create_event_from_
     assert response.status_code == 200
     chair_list = response.json()
     assert len(chair_list) == 0
+
+
+@pytest.mark.skip(reason="TODO: obtener el chair por user_id con sus tracks si ese chair soy yo mismo y soy organizer")
+async def test_get_chair_by_user_id_01():
+    pass
+
+
+@pytest.mark.skip(reason="TODO: obtener un chair por user_id con sus tracks si soy organizer")
+async def test_get_chair_by_user_id_02():
+    pass
+
+
+@pytest.mark.skip(reason="TODO: (FALLO) tratar de obtener un chair por user_id si no soy organizer")
+async def test_get_chair_by_user_id_03():
+    pass
+
+
+@pytest.mark.skip(reason="TODO: (FALLO) tratar de obtener un chair si no soy organizer pero ese user_id no es chair")
+async def test_get_chair_by_user_id_04():
+    pass
+
+
+@pytest.mark.skip(reason="TODO:(FALLO) tratar de obtener chair si soy organizer pero ese user_id no existe como user")
+async def test_get_chair_by_user_id_05():
+    pass
+
+
+@pytest.mark.skip(reason="TODO: obtener mis datos como chair si soy chair del evento")
+async def test_get_chair_me_01():
+    pass
+
+
+@pytest.mark.skip(reason="TODO:(FALLO) obtener mis datos como chair si no soy chair del evento")
+async def test_get_chair_me_02():
+    pass

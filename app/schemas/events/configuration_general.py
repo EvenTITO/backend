@@ -1,7 +1,6 @@
-from app.schemas.events.schemas import DynamicGeneralEventSchema
-
-
 from pydantic import Field
+
+from app.schemas.events.schemas import DynamicGeneralEventSchema
 
 
 class ConfigurationGeneralEventSchema(DynamicGeneralEventSchema):
