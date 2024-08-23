@@ -1,52 +1,44 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, Query
+from fastapi import Depends, HTTPException
 
-from app.authorization.caller_id_dep import CallerIdDep
-from app.services.event_chairs.event_chairs_service_dep import EventChairServiceDep
-from app.services.event_organizers.event_organizers_service_dep import EventOrganizersServiceDep
-from app.services.works.works_service_dep import WorksServiceDep
+from app.authorization.chair_dep import IsChairDep, IsTrackChairDep
+from app.authorization.organizer_dep import IsOrganizerDep
 
 
-class OrganizerOrTrackChairChecker:
-    async def __call__(
-            self,
-            caller_id: CallerIdDep,
-            event_id: str,
-            work_id: str,
-            organizers_service: EventOrganizersServiceDep,
-            work_service: WorksServiceDep,
-            chair_service: EventChairServiceDep,
-            track: str = Query(...)
-    ) -> None:
-        is_organizer = await organizers_service.is_organizer(event_id, caller_id)
-        if is_organizer:
-            return
-        if await chair_service.is_chair(event_id, caller_id):
-            chair = await chair_service.get_chair(event_id, caller_id)
-            if track in chair.tracks:
-                return
-        raise HTTPException(status_code=403)
+class IsOrganizerOrChair:
+    async def __call__(self, is_organizer: IsOrganizerDep, is_chair: IsChairDep) -> bool:
+        return is_organizer or is_chair
 
 
-class OrganizerOrChairChecker:
-    async def __call__(
-            self,
-            caller_id: CallerIdDep,
-            event_id: str,
-            work_id: str,
-            organizers_service: EventOrganizersServiceDep,
-            work_service: WorksServiceDep,
-            chair_service: EventChairServiceDep,
-    ) -> None:
-        is_organizer = await organizers_service.is_organizer(event_id, caller_id)
-        is_chair = await chair_service.is_chair(event_id, caller_id)
-        if is_organizer or is_chair:
-            return
-        raise HTTPException(status_code=403)
+is_organizer_or_chair = IsOrganizerOrChair()
+IsOrganizerOrChairDep = Annotated[bool, Depends(is_organizer_or_chair)]
 
 
-verify_is_organizer_or_track_chair = OrganizerOrTrackChairChecker()
-verify_is_organizer_or_chair = OrganizerOrChairChecker()
-OrganizerOrTracksChairDep = Annotated[str, Depends(verify_is_organizer_or_track_chair)]
+class VerifyIsOrganizerOrChair:
+    async def __call__(self, is_event_organizer_or_chair: IsOrganizerOrChairDep) -> None:
+        if not is_event_organizer_or_chair:
+            raise HTTPException(status_code=403)
+
+
+verify_is_organizer_or_chair = VerifyIsOrganizerOrChair()
 OrganizerOrChairDep = Annotated[str, Depends(verify_is_organizer_or_chair)]
+
+
+class IsOrganizerOrTrackChair:
+    async def __call__(self, is_organizer: IsOrganizerDep, is_track_chair: IsTrackChairDep) -> bool:
+        return is_organizer or is_track_chair
+
+
+is_organizer_or_track_chair = IsOrganizerOrTrackChair()
+IsOrganizerOrTrackChairDep = Annotated[bool, Depends(is_organizer_or_track_chair)]
+
+
+class VerifyIsOrganizerOrTrackChair:
+    async def __call__(self, is_organizer_or_event_track_chair: IsOrganizerOrTrackChairDep) -> None:
+        if not is_organizer_or_event_track_chair:
+            raise HTTPException(status_code=403)
+
+
+verify_is_organizer_or_track_chair = VerifyIsOrganizerOrTrackChair()
+OrganizerOrTracksChairDep = Annotated[None, Depends(verify_is_organizer_or_track_chair)]

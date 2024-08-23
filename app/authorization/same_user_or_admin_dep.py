@@ -1,15 +1,25 @@
 from typing import Annotated
-from app.authorization.caller_id_dep import CallerIdDep
-from app.authorization.user_id_dep import UserDep
-from app.database.models.user import UserRole
+
 from fastapi import HTTPException, Depends
 
+from app.authorization.admin_user_dep import IsAdminUsrDep
+from app.authorization.same_user_dep import IsSameUsrDep
 
-class SameUserOrAdmin:
-    async def __call__(self, user_id: str, caller_user_role: UserDep, caller_id: CallerIdDep):
-        if user_id != caller_id and caller_user_role != UserRole.ADMIN:
+
+class IsSameUserOrAdmin:
+    async def __call__(self, is_same_user: IsSameUsrDep, is_admin: IsAdminUsrDep) -> bool:
+        return is_same_user or is_admin
+
+
+is_same_user_or_admin = IsSameUserOrAdmin()
+IsSameUserOrAdmin = Annotated[bool, Depends(is_same_user_or_admin)]
+
+
+class VerifyIsSameUserOrAdmin:
+    async def __call__(self, is_my_user_or_admin: IsSameUserOrAdmin) -> None:
+        if not is_my_user_or_admin:
             raise HTTPException(status_code=403)
 
 
-verify_same_user_or_admin = SameUserOrAdmin()
-SameUserOrAdminDep = Annotated[None, Depends(verify_same_user_or_admin)]
+verify_is_same_user_or_admin = VerifyIsSameUserOrAdmin()
+VerifyIsSameUserOrAdminDep = Annotated[None, Depends(verify_is_same_user_or_admin)]
