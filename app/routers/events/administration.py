@@ -20,3 +20,17 @@ async def change_event_status(
     user_role: OrganizerOrAdminDep
 ):
     await service.update_status(event_id, status_modification, user_role)
+
+
+@events_admin_router.patch(
+    "/publish",
+    status_code=204,
+    response_model=None,
+    dependencies=[Depends(verify_is_organizer)]
+)
+async def publish_event(
+    service: EventsAdministrationServiceDep,
+    event_id: str,
+    user_role: OrganizerOrAdminDep
+):
+    await service.publish_event(event_id, user_role)

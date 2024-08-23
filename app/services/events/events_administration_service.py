@@ -34,3 +34,18 @@ class EventsAdministrationService(BaseService):
         print("actualizo ok: " + str(update_ok))
         if not update_ok:
             raise EventNotFound(event_id)
+
+    async def all_mandatory_config_ok(self) -> bool:
+        return True
+
+    async def publish_event(self, event_id: str, caller_role: Union[EventRole, UserRole]):
+        event = await self.events_repository.get(event_id)
+
+        print("event:"+str(event))
+        print("event_config:"+str(event.dates))
+
+        if self.all_mandatory_config_ok():
+            update_ok = await self.events_repository.update(event_id, EventStatus.STARTED)
+        print("actualizo ok: " + str(update_ok))
+        if not update_ok:
+            raise EventNotFound(event_id)
