@@ -11,7 +11,11 @@ from app.services.event_chairs.event_chairs_service_dep import EventChairService
 event_chairs_router = APIRouter(prefix="/{event_id}/chairs", tags=["Events: Chairs"])
 
 
-@event_chairs_router.get(path="", response_model=List[ChairResponseSchema], dependencies=[Depends(verify_is_organizer_or_admin)])
+@event_chairs_router.get(
+    path="",
+    response_model=List[ChairResponseSchema],
+    dependencies=[Depends(verify_is_organizer_or_admin)]
+)
 async def read_event_chairs(chair_service: EventChairServiceDep, event_id: str) -> List[ChairResponseSchema]:
     return await chair_service.get_all_chairs(event_id)
 
