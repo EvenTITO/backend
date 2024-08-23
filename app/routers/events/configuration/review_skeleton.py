@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from app.authorization.user_id_dep import verify_user_exists
 from app.schemas.events.review_skeleton.review_skeleton import ReviewSkeletonSchema
-from app.authorization.organizer_or_admin_dep import verify_is_organizer
+from app.authorization.organizer_or_admin_dep import verify_is_organizer_or_admin
 from app.services.events.events_configuration_service_dep import EventsConfigurationServiceDep
 
 review_skeleton_configuration_router = APIRouter(prefix="/review-skeleton")
@@ -11,7 +11,7 @@ review_skeleton_configuration_router = APIRouter(prefix="/review-skeleton")
     "",
     status_code=204,
     response_model=None,
-    dependencies=[Depends(verify_is_organizer)]
+    dependencies=[Depends(verify_is_organizer_or_admin)]
 )
 async def change_review_skeleton(
     review_skeleton: ReviewSkeletonSchema,

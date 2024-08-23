@@ -1,5 +1,3 @@
-from typing import Union
-
 from fastapi import HTTPException
 
 from app.database.models.event import EventStatus
@@ -7,7 +5,6 @@ from app.database.models.user import UserRole
 from app.exceptions.events_exceptions import EventNotFound
 from app.repository.events_repository import EventsRepository
 from app.schemas.events.event_status import EventStatusSchema
-from app.schemas.events.schemas import EventRole
 from app.services.services import BaseService
 
 
@@ -15,8 +12,7 @@ class EventsAdministrationService(BaseService):
     def __init__(self, events_repository: EventsRepository):
         self.events_repository = events_repository
 
-    async def update_status(self, event_id: str, new_status: EventStatusSchema,
-                            caller_role: Union[EventRole, UserRole]):
+    async def update_status(self, event_id: str, new_status: EventStatusSchema, caller_role: UserRole):
         event_status = await self.events_repository.get_status(event_id)
         admin_status = [
             EventStatus.WAITING_APPROVAL,
