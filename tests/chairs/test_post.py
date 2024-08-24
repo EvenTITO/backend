@@ -40,11 +40,24 @@ async def test_organizer_can_add_user_as_chair(client, create_organizer, create_
 
 
 @pytest.mark.skip(reason="TODO: agregar los test que validan agregar tracks de un evento a un chair")
-async def test_add_tracks_1():
-    pass
+async def test_add_tracks_1(
+        client,
+        create_event_creator,
+        create_event_from_event_creator,
+        create_event_chair
+):
+    add_tracks_request = DynamicTracksEventSchema(
+        tracks=["futbol", "tenis"],
+    )
+    response = await client.put(
+        f"/events/{create_event_from_event_creator}/chairs/{create_event_chair}/tracks",
+        json=jsonable_encoder(add_tracks_request),
+        headers=create_headers(create_event_creator["id"])
+    )
+    assert response.status_code == 400
 
 
-async def test_add_tracks_2(
+async def test_add_tracks_that_dont_exists_in_event_raises_error(
         client,
         create_event_creator,
         create_event_from_event_creator,

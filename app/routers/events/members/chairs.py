@@ -22,15 +22,6 @@ async def read_event_chairs(chair_service: EventChairServiceDep, event_id: str) 
 
 
 @event_chairs_router.get(
-    path="/{user_id}",
-    response_model=ChairResponseSchema,
-    dependencies=[Depends(verify_is_organizer_or_admin)]
-)
-async def get_chair(event_id: str, user_id: str, chair_service: EventChairServiceDep) -> ChairResponseSchema:
-    return await chair_service.get_chair(event_id, user_id)
-
-
-@event_chairs_router.get(
     path="/me",
     response_model=ChairResponseSchema,
     dependencies=[Depends(verify_is_organizer_or_chair)]
@@ -41,6 +32,15 @@ async def get_my_chair(
         chair_service: EventChairServiceDep
 ) -> ChairResponseSchema:
     return await chair_service.get_chair(event_id, caller_id)
+
+
+@event_chairs_router.get(
+    path="/{user_id}",
+    response_model=ChairResponseSchema,
+    dependencies=[Depends(verify_is_organizer_or_admin)]
+)
+async def get_chair(event_id: str, user_id: str, chair_service: EventChairServiceDep) -> ChairResponseSchema:
+    return await chair_service.get_chair(event_id, user_id)
 
 
 @event_chairs_router.delete(
