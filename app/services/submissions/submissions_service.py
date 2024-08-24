@@ -48,7 +48,7 @@ class SubmissionsService(BaseService):
     async def get_submission(self, submission_id: str) -> SubmissionDownloadSchema:
         return await self.__get_submission(submission_id)
 
-    async def get_my_latest_submission(self) -> SubmissionDownloadSchema:
+    async def get_latest_submission(self) -> SubmissionDownloadSchema:
         last_submission = await self.submission_repository.get_last_submission(self.event_id, self.work_id)
         return await self.__get_submission(str(last_submission.id))
 

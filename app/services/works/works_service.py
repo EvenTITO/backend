@@ -14,8 +14,11 @@ class WorksService(BaseService):
         self.user_id = user_id
         self.event_id = event_id
 
-    async def get_all_event_works(self, offset: int, limit: int) -> list[WorkWithState]:
-        works = await self.works_repository.get_all_works_for_event(self.event_id, offset, limit)
+    async def get_all_event_works(self, track: str, offset: int, limit: int) -> list[WorkWithState]:
+        if track:
+            works = await self.works_repository.get_all_event_works_for_track(self.event_id, track, offset, limit)
+        else:
+            works = await self.works_repository.get_all_works_for_event(self.event_id, offset, limit)
         return list(map(WorksService.__map_to_schema, works))
 
     async def get_my_works(self, offset: int, limit: int) -> list[WorkWithState]:

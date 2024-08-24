@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.event import EventModel, EventStatus
@@ -20,6 +20,14 @@ class EventsRepository(Repository):
     async def get_tracks(self, event_id: str):
         conditions = self._primary_key_conditions(event_id)
         return await self._get_with_values(conditions, EventModel.tracks)
+
+    async def update_tracks(self, event_id: str, tracks: list[str]):
+        conditions = self._primary_key_conditions(event_id)
+        update_query = (
+            update(EventModel).where(conditions).values(tracks=tracks)
+        )
+        await self.session.execute(update_query)
+        await self.session.commit()
 
     async def get_review_skeleton(self, event_id):
         conditions = self._primary_key_conditions(event_id)

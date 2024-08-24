@@ -18,13 +18,6 @@ class EventNotFound(HTTPException):
         super().__init__(status_code=self.status_code, detail=self.detail)
 
 
-class OrganizerFound(HTTPException):
-    def __init__(self, event_id, email):
-        self.status_code = 409
-        self.detail = f"Organizer with email: {email} in event: {event_id} already exists"
-        super().__init__(status_code=self.status_code, detail=self.detail)
-
-
 class InvalidQueryEventNotCreatedNotAdmin(HTTPException):
     def __init__(self, status: EventStatus | None, role: UserRole):
         self.status_code = 409
@@ -43,4 +36,11 @@ class InvalidCaller(HTTPException):
     def __init__(self):
         self.status_code = 400
         self.detail = "Invalid caller for operation"
+        super().__init__(status_code=self.status_code, detail=self.detail)
+
+
+class CannotUpdateTracksAfterEventStarts(HTTPException):
+    def __init__(self, event_id: str):
+        self.status_code = 409
+        self.detail = f"Cannot update tracks in event:{event_id} after its started."
         super().__init__(status_code=self.status_code, detail=self.detail)

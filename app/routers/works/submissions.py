@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query
 from fastapi import Depends
 
-from app.authorization.organizer_or_admin_dep import verify_is_organizer
+from app.authorization.organizer_or_admin_dep import verify_is_organizer_or_admin
 from app.authorization.organizer_or_author_dep import verify_is_organizer_or_author
 from app.authorization.user_id_dep import verify_user_exists
 from app.schemas.works.submission import SubmissionUploadSchema, SubmissionDownloadSchema, SubmissionResponseSchema
@@ -31,10 +31,10 @@ async def get_download_submission_file(
 @works_submissions_router.get(path="/latest", status_code=200, dependencies=[Depends(verify_is_organizer_or_author)])
 async def get_download_latest_submission_file(
         submission_service: SubmissionsServiceDep) -> SubmissionDownloadSchema:
-    return await submission_service.get_my_latest_submission()
+    return await submission_service.get_latest_submission()
 
 
-@submissions_router.get(path="", status_code=200, dependencies=[Depends(verify_is_organizer)])
+@submissions_router.get(path="", status_code=200, dependencies=[Depends(verify_is_organizer_or_admin)])
 async def get_all_submissions(
         submission_service: SubmissionsServiceDep,
         offset: int = 0,
