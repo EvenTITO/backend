@@ -1,12 +1,13 @@
-from app.database.models.chair import ChairModel
-from app.database.models.user import UserModel
-from app.exceptions.members.chair.chair_exceptions import UserNotIsChair
+from app.exceptions.members.chair.chair_exceptions import InvalidUpdateTrack, UserNotIsChair
 from app.repository.chairs_repository import ChairRepository
 from app.repository.users_repository import UsersRepository
-from app.schemas.members.chair_schema import ChairResponseSchema, ChairRequestSchema
+from app.schemas.events.schemas import DynamicTracksEventSchema
+from app.schemas.members.chair_schema import ChairResponseSchema
 from app.schemas.users.user import UserSchema
 from app.services.events.events_service import EventsService
 from app.services.services import BaseService
+from app.database.models.chair import ChairModel
+from app.database.models.user import UserModel
 
 
 class EventChairService(BaseService):
@@ -38,24 +39,25 @@ class EventChairService(BaseService):
     async def is_chair(self, event_id: str, user_id: str) -> None:
         return await self.chair_repository.is_member(event_id, user_id)
 
-    async def update_tracks(self, event_id: str, user_id: str, tracks_schema: ChairRequestSchema) -> None:
+    async def update_tracks(self, event_id: str, user_id: str, tracks_schema: DynamicTracksEventSchema) -> None:
         if not await self.chair_repository.is_member(event_id, user_id):
             raise UserNotIsChair(event_id, user_id)
         event_tracks = await self.event_service.get_event_tracks(event_id)
         valid_tracks = []
         for new_track in tracks_schema.tracks:
             if new_track not in event_tracks:
-                continue
+                raise InvalidUpdateTrack(event_id, new_track, tracks_schema.tracks)
             valid_tracks.append(new_track)
         await self.chair_repository.update_tracks(event_id, user_id, valid_tracks)
 
     @staticmethod
     def __map_to_schema(model: (UserModel, ChairModel)) -> ChairResponseSchema:
         user, chair = model
+        tracks = chair.tracks if chair.tracks else []
         return ChairResponseSchema(
             event_id=chair.event_id,
             user_id=chair.user_id,
-            tracks=chair.tracks,
+            tracks=tracks,
             user=UserSchema(
                 email=user.email,
                 name=user.name,

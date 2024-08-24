@@ -25,16 +25,19 @@ class StaticEventSchema(BaseModel):
     event_type: EventType = Field(examples=[EventType.CONFERENCE])
 
 
-class DynamicGeneralEventSchema(DatesCompleteSchema):
-    location: str = Field(
-        max_length=200,
-        examples=["FIUBA, Av. Paseo Colon 850"],
-        default=""
-    )
+class DynamicTracksEventSchema(BaseModel):
     tracks: list[str] = Field(
         max_length=1000,
         examples=[["track1", "track2", "track3"]],
         default_factory=list
+    )
+
+
+class DynamicGeneralEventSchema(DatesCompleteSchema, DynamicTracksEventSchema):
+    location: str = Field(
+        max_length=200,
+        examples=["FIUBA, Av. Paseo Colon 850"],
+        default=""
     )
     contact: str = Field(
         max_length=100,
@@ -50,11 +53,3 @@ class DynamicGeneralEventSchema(DatesCompleteSchema):
 
 class DynamicEventSchema(DynamicGeneralEventSchema, DatesCompleteSchema, PricingSchema):
     pass
-
-
-class DynamicTracksEventSchema(BaseModel):
-    tracks: list[str] = Field(
-        max_length=1000,
-        examples=[["track1", "track2", "track3"]],
-        default_factory=list
-    )

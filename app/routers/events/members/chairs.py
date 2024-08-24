@@ -5,7 +5,8 @@ from fastapi import APIRouter, Depends
 from app.authorization.caller_id_dep import CallerIdDep
 from app.authorization.organizer_or_admin_dep import verify_is_organizer_or_admin
 from app.authorization.organizer_or_chair_dep import verify_is_organizer_or_chair
-from app.schemas.members.chair_schema import ChairResponseSchema, ChairRequestSchema
+from app.schemas.events.schemas import DynamicTracksEventSchema
+from app.schemas.members.chair_schema import ChairResponseSchema
 from app.services.event_chairs.event_chairs_service_dep import EventChairServiceDep
 
 event_chairs_router = APIRouter(prefix="/{event_id}/chairs", tags=["Events: Chairs"])
@@ -44,7 +45,7 @@ async def get_my_chair(
 
 @event_chairs_router.delete(
     path="/{user_id}",
-    status_code=201,
+    status_code=204,
     response_model=None,
     dependencies=[Depends(verify_is_organizer_or_admin)]
 )
@@ -58,12 +59,12 @@ async def remove_chair(
 
 @event_chairs_router.put(
     path="/{user_id}/tracks",
-    status_code=201,
+    status_code=204,
     response_model=None,
     dependencies=[Depends(verify_is_organizer_or_admin)]
 )
 async def update(
-        tracks: ChairRequestSchema,
+        tracks: DynamicTracksEventSchema,
         event_id: str,
         user_id: str,
         chair_service: EventChairServiceDep
