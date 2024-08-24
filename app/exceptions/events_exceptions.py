@@ -21,7 +21,21 @@ class EventNotFound(HTTPException):
 class InvalidQueryEventNotCreatedNotAdmin(HTTPException):
     def __init__(self, status: EventStatus | None, role: UserRole):
         self.status_code = 409
-        self.detail = f"Invalid query for status: {status} while having the role: {role}."
+        self.detail = f"Invalid query for status: {status} while having the role: {role}"
+        super().__init__(status_code=self.status_code, detail=self.detail)
+
+
+class InvalidEventConfiguration(HTTPException):
+    def __init__(self):
+        self.status_code = 409
+        self.detail = "Invalid event configuration for published"
+        super().__init__(status_code=self.status_code, detail=self.detail)
+
+
+class InvalidCaller(HTTPException):
+    def __init__(self):
+        self.status_code = 400
+        self.detail = "Invalid caller for operation"
         super().__init__(status_code=self.status_code, detail=self.detail)
 
 

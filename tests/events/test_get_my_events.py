@@ -9,6 +9,7 @@ from app.schemas.events.event_status import EventStatusSchema
 from app.schemas.events.schemas import EventRole
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from ..commontest import create_headers
+from ..fixtures.data.helper import add_complete_dates
 
 
 async def test_get_my_events_no_events_empty_list(client, create_user):
@@ -32,6 +33,8 @@ async def test_get_my_events(client, mock_storage, create_event_started, create_
         json=jsonable_encoder(new_event),
         headers=create_headers(create_user['id'])
     )
+    await add_complete_dates(client, response.json(), create_user['id'])
+
     organizer_event_id = response.json()
     status_update = EventStatusSchema(
         status=EventStatus.STARTED
@@ -47,7 +50,10 @@ async def test_get_my_events(client, mock_storage, create_event_started, create_
         json=jsonable_encoder(new_event),
         headers=create_headers(create_user['id'])
     )
+
     organizer_inscripted_event_id = response.json()
+    await add_complete_dates(client, organizer_inscripted_event_id, admin_data.id)
+
     await client.patch(
         f"/events/{organizer_inscripted_event_id}/status",
         json=jsonable_encoder(status_update),
