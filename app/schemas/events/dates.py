@@ -4,7 +4,7 @@ from typing import Self
 from pydantic import (
     BaseModel,
     Field,
-    model_validator,
+    model_validator, ConfigDict,
 )
 
 
@@ -37,6 +37,7 @@ class DateSchema(BaseModel):
 
 
 class DatesCompleteSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     dates: list[DateSchema] = Field(
         default=[
             DateSchema(

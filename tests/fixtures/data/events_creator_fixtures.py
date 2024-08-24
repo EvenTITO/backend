@@ -6,6 +6,7 @@ from app.schemas.users.user import UserSchema
 from app.schemas.users.user_role import UserRoleSchema
 from app.schemas.events.create_event import CreateEventSchema
 from app.database.models.event import EventType
+from .helper import add_complete_dates
 
 from ...commontest import create_headers, get_user_method
 
@@ -52,4 +53,10 @@ async def create_event_from_event_creator(client, create_event_creator):
         json=jsonable_encoder(new_event),
         headers=create_headers(create_event_creator["id"])
     )
+    assert response.status_code == 201
+
+    event_id = response.json()
+
+    await add_complete_dates(client, event_id, create_event_creator["id"])
+
     return response.json()

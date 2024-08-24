@@ -70,16 +70,8 @@ async def test_get_all_events_admin_status_waiting_approval_is_zero(
 
 
 async def test_get_all_events_non_admin_can_query_started(
-        client, create_many_events, admin_data, create_user
+        client, create_many_events, create_event_started, admin_data, create_user
 ):
-    status_update = EventStatusSchema(
-        status=EventStatus.STARTED
-    )
-    response = await client.patch(
-        f"/events/{create_many_events[0]}/status",
-        json=jsonable_encoder(status_update),
-        headers=create_headers(admin_data.id)
-    )
 
     response = await client.get(
         "/events/",
@@ -145,19 +137,10 @@ async def test_get_all_events_public_is_status_created(client, create_event_star
 
 
 async def test_get_all_events_public_is_status_created2(
-        client, create_many_events, admin_data
+        client, create_many_events_started, admin_data
 ):
-    status_update = EventStatusSchema(
-        status=EventStatus.STARTED
-    )
-    n_events = len(create_many_events)
 
-    for event_id in create_many_events:
-        await client.patch(
-            f"/events/{event_id}/status",
-            json=jsonable_encoder(status_update),
-            headers=create_headers(admin_data.id)
-        )
+    n_events = len(create_many_events_started)
 
     response = await client.get(
         "/events/",

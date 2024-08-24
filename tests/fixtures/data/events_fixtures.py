@@ -4,6 +4,7 @@ from fastapi.encoders import jsonable_encoder
 from app.database.models.event import EventType, EventStatus
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.event_status import EventStatusSchema
+from .helper import add_complete_dates
 from ...commontest import create_headers, EVENTS
 
 
@@ -51,6 +52,9 @@ async def create_event_started(client, create_event, admin_data):
     status_update = EventStatusSchema(
         status=EventStatus.STARTED
     )
+
+    await add_complete_dates(client, create_event['id'], admin_data.id)
+
     await client.patch(
         f"/events/{create_event['id']}/status",
         json=jsonable_encoder(status_update),
@@ -65,6 +69,7 @@ async def create_many_events_started(client, admin_data):
     status_update = EventStatusSchema(
         status=EventStatus.STARTED
     )
+
     for event in EVENTS:
         response = await client.post(
             "/events",
@@ -72,6 +77,9 @@ async def create_many_events_started(client, admin_data):
             headers=create_headers(admin_data.id)
         )
         event_id = response.json()
+
+        await add_complete_dates(client, event_id, admin_data.id)
+
         await client.patch(
             f"/events/{event_id}/status",
             json=jsonable_encoder(status_update),

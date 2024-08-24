@@ -7,6 +7,8 @@ from app.schemas.events.dates import (
 )
 from ..commontest import create_headers
 
+# TODO: usar el helper para las fechas!
+
 
 async def test_put_dates_config(client, admin_data, create_event):
     dates = DatesCompleteSchema(
