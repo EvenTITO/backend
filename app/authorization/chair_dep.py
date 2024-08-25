@@ -11,8 +11,7 @@ class IsChair:
         return await chair_service.is_chair(event_id, caller_id)
 
 
-is_chair = IsChair()
-IsChairDep = Annotated[bool, Depends(is_chair)]
+IsChairDep = Annotated[bool, Depends(IsChair())]
 
 
 class VerifyIsChair:
@@ -21,8 +20,7 @@ class VerifyIsChair:
             raise HTTPException(status_code=403)
 
 
-verify_is_chair = VerifyIsChair()
-ChairDep = Annotated[None, Depends(verify_is_chair)]
+ChairDep = Annotated[None, Depends(VerifyIsChair())]
 
 
 class IsTrackChair:
@@ -31,7 +29,7 @@ class IsTrackChair:
             caller_id: CallerIdDep,
             event_id: str,
             chair_service: EventChairServiceDep,
-            track: str = Query(...)
+            track: str | None = Query(default=None)
     ) -> bool:
         if await chair_service.is_chair(event_id, caller_id):
             chair = await chair_service.get_chair(event_id, caller_id)
@@ -39,8 +37,7 @@ class IsTrackChair:
         return False
 
 
-is_track_chair = IsTrackChair()
-IsTrackChairDep = Annotated[bool, Depends(is_track_chair)]
+IsTrackChairDep = Annotated[bool, Depends(IsTrackChair())]
 
 
 class VerifyIsTrackChair:

@@ -11,8 +11,7 @@ class IsAdminUser:
         return role == UserRole.ADMIN
 
 
-is_admin_user = IsAdminUser()
-IsAdminUsrDep = Annotated[bool, Depends(is_admin_user)]
+IsAdminUsrDep = Annotated[bool, Depends(IsAdminUser())]
 
 
 class VerifyIsAdminUser:
@@ -21,5 +20,5 @@ class VerifyIsAdminUser:
             raise HTTPException(status_code=403)
 
 
-verify_user_is_admin = VerifyIsAdminUser()
-AdminUsrDep = Annotated[None, Depends(verify_user_is_admin)]
+verify_is_admin_user = VerifyIsAdminUser()
+AdminUsrDep = Annotated[None, Depends(verify_is_admin_user)]

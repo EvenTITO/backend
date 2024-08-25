@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Query
 from fastapi import Depends
 
-from app.authorization.organizer_or_admin_dep import verify_is_organizer_or_admin
-from app.authorization.organizer_or_author_dep import verify_is_organizer_or_author
+from app.authorization.admin_user_dep import IsAdminUsrDep
+from app.authorization.author_dep import IsAuthorDep
+from app.authorization.organizer_dep import IsOrganizerDep
 from app.authorization.user_id_dep import verify_user_exists
+from app.authorization.util_dep import or_
 from app.schemas.works.submission import SubmissionUploadSchema, SubmissionDownloadSchema, SubmissionResponseSchema
 from app.services.submissions.submissions_service_dep import SubmissionsServiceDep
 
@@ -20,7 +22,7 @@ async def submit(submission_service: SubmissionsServiceDep) -> SubmissionUploadS
 
 
 @works_submissions_router.get(path="/{submission_id}", status_code=200,
-                              dependencies=[Depends(verify_is_organizer_or_author)])
+                              dependencies=[or_(IsOrganizerDep, IsAuthorDep)])
 async def get_download_submission_file(
         submission_id: str,
         submission_service: SubmissionsServiceDep
@@ -28,13 +30,13 @@ async def get_download_submission_file(
     return await submission_service.get_submission(submission_id)
 
 
-@works_submissions_router.get(path="/latest", status_code=200, dependencies=[Depends(verify_is_organizer_or_author)])
+@works_submissions_router.get(path="/latest", status_code=200, dependencies=[or_(IsOrganizerDep, IsAuthorDep)])
 async def get_download_latest_submission_file(
         submission_service: SubmissionsServiceDep) -> SubmissionDownloadSchema:
     return await submission_service.get_latest_submission()
 
 
-@submissions_router.get(path="", status_code=200, dependencies=[Depends(verify_is_organizer_or_admin)])
+@submissions_router.get(path="", status_code=200, dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)])
 async def get_all_submissions(
         submission_service: SubmissionsServiceDep,
         offset: int = 0,

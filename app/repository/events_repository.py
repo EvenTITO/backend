@@ -1,6 +1,7 @@
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.database.models.chair import ChairModel
 from app.database.models.event import EventModel, EventStatus
 from app.database.models.inscription import InscriptionModel
 from app.database.models.organizer import OrganizerModel
@@ -20,6 +21,10 @@ class EventsRepository(Repository):
     async def get_tracks(self, event_id: str):
         conditions = self._primary_key_conditions(event_id)
         return await self._get_with_values(conditions, EventModel.tracks)
+
+    async def get_dates(self, event_id: str):
+        conditions = self._primary_key_conditions(event_id)
+        return await self._get_with_values(conditions, EventModel.dates)
 
     async def update_tracks(self, event_id: str, tracks: list[str]):
         conditions = self._primary_key_conditions(event_id)
@@ -51,21 +56,23 @@ class EventsRepository(Repository):
     async def get_all_events_for_user(self, user_id: str, offset: int, limit: int) -> list[PublicEventWithRolesSchema]:
         # TODO: refactor query and whole method.
         inscriptions_q = (select(EventModel)
-                          .join(InscriptionModel,
-                                InscriptionModel.event_id == EventModel.id)
+                          .join(InscriptionModel, InscriptionModel.event_id == EventModel.id)
                           .where(InscriptionModel.user_id == user_id))
 
         organizations_q = (select(EventModel)
-                           .join(OrganizerModel,
-                                 OrganizerModel.event_id == EventModel.id)
+                           .join(OrganizerModel, OrganizerModel.event_id == EventModel.id)
                            .where(OrganizerModel.user_id == user_id))
 
-        inscr = self.session.execute(inscriptions_q)
-        org = self.session.execute(organizations_q)
-        inscr_result = await inscr
-        org_result = await org
-        inscriptions = inscr_result.scalars().all()
-        organizations = org_result.scalars().all()
+        chairs_q = (select(EventModel)
+                    .join(ChairModel, ChairModel.event_id == EventModel.id)
+                    .where(ChairModel.user_id == user_id))
+
+        inscriptions_result = await self.session.execute(inscriptions_q)
+        organizers_result = await self.session.execute(organizations_q)
+        chairs_result = await self.session.execute(chairs_q)
+        inscriptions = inscriptions_result.scalars().all()
+        organizers = organizers_result.scalars().all()
+        chairs = chairs_result.scalars().all()
 
         def add_events(role, events, response):
             for event in events:
@@ -88,7 +95,8 @@ class EventsRepository(Repository):
         response = {}
         response = add_events(EventRole.ATTENDEE, inscriptions, response)
         response = add_events(EventRole.SPEAKER, inscriptions, response)
-        response = add_events(EventRole.ORGANIZER, organizations, response)
+        response = add_events(EventRole.ORGANIZER, organizers, response)
+        response = add_events(EventRole.CHAIR, chairs, response)
         return list(response.values())
 
     async def get_all_events(

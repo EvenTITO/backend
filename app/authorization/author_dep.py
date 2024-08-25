@@ -17,8 +17,7 @@ class IsAuthor:
         return await work_service.is_my_work(caller_id, event_id, work_id)
 
 
-is_author = IsAuthor()
-IsAuthorDep = Annotated[bool, Depends(is_author)]
+IsAuthorDep = Annotated[bool, Depends(IsAuthor())]
 
 
 class VerifyIsAuthor:

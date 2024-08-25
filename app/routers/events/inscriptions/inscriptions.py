@@ -2,8 +2,10 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Query
 
-from app.authorization.organizer_or_admin_dep import verify_is_organizer_or_admin
+from app.authorization.admin_user_dep import IsAdminUsrDep
+from app.authorization.organizer_dep import IsOrganizerDep
 from app.authorization.user_id_dep import verify_user_exists
+from app.authorization.util_dep import or_
 from app.schemas.inscriptions.inscription import InscriptionResponseSchema, InscriptionRequestSchema, \
     InscriptionPayResponseSchema
 from app.services.event_inscriptions.event_inscriptions_service_dep import EventInscriptionsServiceDep
@@ -31,7 +33,7 @@ async def create_inscription(
     path="",
     status_code=200,
     response_model=List[InscriptionResponseSchema],
-    dependencies=[Depends(verify_is_organizer_or_admin)]
+    dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
 async def read_event_inscriptions(
         inscriptions_service: EventInscriptionsServiceDep,

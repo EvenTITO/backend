@@ -7,6 +7,11 @@ async def test_put_user(client, create_user):
     update_create_user = create_user.copy()
     update_create_user["name"] = "new name"
     update_create_user["lastname"] = "new lastname"
+    update_create_user["identification_number"] = "1234"
+    update_create_user["phone"] = "5491165501111"
+    update_create_user["address"] = "Paseo Colon 850"
+    update_create_user["city"] = "Ciudad de Buenos Aires"
+    update_create_user["country"] = "Argentina"
     caller_id = update_create_user.pop('id')
     response = await client.put(
         f"/users/{caller_id}",
@@ -21,6 +26,10 @@ async def test_put_user(client, create_user):
     assert response.json()["name"] == update_create_user["name"]
     assert response.json()["email"] == update_create_user["email"]
     assert response.json()["lastname"] == update_create_user["lastname"]
+    assert response.json()["identification_number"] == update_create_user["identification_number"]
+    assert response.json()["address"] == update_create_user["address"]
+    assert response.json()["city"] == update_create_user["city"]
+    assert response.json()["country"] == update_create_user["country"]
 
 
 async def test_put_user_not_exists(client, create_user):

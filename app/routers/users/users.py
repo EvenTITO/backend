@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends
 
-from app.authorization.admin_user_dep import verify_user_is_admin
+from app.authorization.admin_user_dep import IsAdminUsrDep, verify_is_admin_user
 from app.authorization.caller_id_dep import verify_user_id
-from app.authorization.same_user_or_admin_dep import verify_is_same_user_or_admin
+from app.authorization.same_user_dep import IsSameUsrDep
+from app.authorization.util_dep import or_
 from app.routers.users.echo import echo_router
 from app.routers.users.roles import user_roles_router
 from app.schemas.users.user import UserModifySchema, UserSchema
@@ -22,7 +23,7 @@ users_router.include_router(user_roles_router)
     path="/{user_id}",
     response_model=UserReply,
     tags=["Users: General"],
-    dependencies=[Depends(verify_is_same_user_or_admin)]
+    dependencies=[or_(IsSameUsrDep, IsAdminUsrDep)]
 )
 async def read_user(user_id: str, users_service: UsersServiceDep):
     return await users_service.get(user_id)
@@ -44,7 +45,7 @@ async def create_user(user: UserSchema, users_service: UsersServiceDep):
     status_code=204,
     response_model=None,
     tags=["Users: General"],
-    dependencies=[Depends(verify_is_same_user_or_admin)]
+    dependencies=[or_(IsSameUsrDep, IsAdminUsrDep)]
 )
 async def update_user(user: UserModifySchema, users_service: UsersServiceDep):
     await users_service.update(user)
@@ -54,7 +55,7 @@ async def update_user(user: UserModifySchema, users_service: UsersServiceDep):
     path="",
     response_model=list[UserReply],
     tags=["Users: Administration"],
-    dependencies=[Depends(verify_user_is_admin)]
+    dependencies=[Depends(verify_is_admin_user)]
 )
 async def read_all_users(users_admin_service: UsersAdminServiceDep, limit: int = 100, offset: int = 0):
     return await users_admin_service.get_many(limit, offset)
