@@ -3,10 +3,23 @@ import datetime
 from fastapi.encoders import jsonable_encoder
 
 from app.schemas.events.dates import DatesCompleteSchema, DateSchema, MandatoryDates
+from app.schemas.events.schemas import DynamicTracksEventSchema
 from tests.commontest import create_headers
 
 
-async def add_complete_dates(client, event_id, creator_user_id):
+async def add_tracks(client, event_id, creator_user_id):
+    tracks_to_add = DynamicTracksEventSchema(
+        tracks=["First Track", "Second Track"]
+    )
+    response = await client.put(
+        f"/events/{event_id}/configuration/general/tracks",
+        json=jsonable_encoder(tracks_to_add),
+        headers=create_headers(creator_user_id)
+    )
+    assert response.status_code == 204
+
+
+async def add_dates(client, event_id, creator_user_id):
     dates = DatesCompleteSchema(
         dates=[
             DateSchema(
@@ -36,9 +49,14 @@ async def add_complete_dates(client, event_id, creator_user_id):
         ]
     )
 
-    response2 = await client.put(
+    response = await client.put(
         f"/events/{event_id}/configuration/dates",
         json=jsonable_encoder(dates),
         headers=create_headers(creator_user_id)
     )
-    assert response2.status_code == 204
+    assert response.status_code == 204
+
+
+async def complete_event_configuration(client, event_id, creator_user_id):
+    await add_dates(client, event_id, creator_user_id)
+    await add_tracks(client, event_id, creator_user_id)
