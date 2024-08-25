@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
-from app.authorization.organizer_or_admin_dep import verify_is_organizer_or_admin
+from app.authorization.admin_user_dep import IsAdminUsrDep
+from app.authorization.organizer_dep import IsOrganizerDep
+from app.authorization.util_dep import or_
 from app.schemas.storage.schemas import UploadURLSchema
-from app.services.storage.event_storage_service_dep import EventStorageServiceDep
 from app.services.storage.event_storage_service import EventsStaticFiles
+from app.services.storage.event_storage_service_dep import EventStorageServiceDep
 
 events_media_router = APIRouter(
     prefix="/{event_id}/upload_url",
@@ -11,7 +13,7 @@ events_media_router = APIRouter(
 )
 
 
-@events_media_router.get(path="/{media}", dependencies=[Depends(verify_is_organizer_or_admin)])
+@events_media_router.get(path="/{media}", dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)])
 async def get_upload_url(
         event_id: str,
         media: EventsStaticFiles,

@@ -13,6 +13,8 @@ async def test_get_work_retrieves_work_data(client, create_user, create_event):
         json=jsonable_encoder(USER_WORK),
         headers=create_headers(create_user["id"])
     )
+    assert response.status_code == 201
+
     work_id = response.json()
     work_response = await client.get(
         f"/events/{event_id}/works/{work_id}",

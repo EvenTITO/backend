@@ -3,8 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, Query
 
 from app.authorization.caller_id_dep import CallerIdDep
-from app.authorization.user_id_dep import UserDep
-from app.authorization.user_id_dep import verify_user_exists
+from app.authorization.user_id_dep import UserDep, verify_user_exists
 from app.database.models.event import EventStatus
 from app.routers.events.administration import events_admin_router
 from app.routers.events.configuration.configuration import events_configuration_router
@@ -48,7 +47,7 @@ async def read_my_events(
     return await events_service.get_my_events(caller_id, offset=offset, limit=limit)
 
 
-@events_router.get("/", response_model=List[PublicEventSchema], tags=["Events: General"])
+@events_router.get(path="/", response_model=List[PublicEventSchema], tags=["Events: General"])
 async def read_all_events(
         user_role: UserDep,
         events_service: EventsServiceDep,

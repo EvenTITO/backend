@@ -10,8 +10,7 @@ class IsSameUser:
         return user_id == caller_id
 
 
-is_same_user = IsSameUser()
-IsSameUsrDep = Annotated[bool, Depends(is_same_user)]
+IsSameUsrDep = Annotated[bool, Depends(IsSameUser())]
 
 
 class VerifyIsSameUser:

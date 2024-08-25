@@ -16,8 +16,7 @@ class IsOrganizer:
         return await organizers_service.is_organizer(event_id, caller_id)
 
 
-is_organizer = IsOrganizer()
-IsOrganizerDep = Annotated[bool, Depends(is_organizer)]
+IsOrganizerDep = Annotated[bool, Depends(IsOrganizer())]
 
 
 class VerifyIsOrganizer:

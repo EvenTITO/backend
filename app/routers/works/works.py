@@ -2,9 +2,11 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Query
 
-from app.authorization.organizer_or_author_dep import verify_is_organizer_or_author
-from app.authorization.organizer_or_chair_dep import verify_is_organizer_or_track_chair
+from app.authorization.author_dep import IsAuthorDep
+from app.authorization.chair_dep import IsTrackChairDep
+from app.authorization.organizer_dep import IsOrganizerDep
 from app.authorization.user_id_dep import verify_user_exists
+from app.authorization.util_dep import or_
 from app.schemas.works.work import WorkSchema, WorkWithState
 from app.services.works.works_service_dep import WorksServiceDep
 
@@ -15,15 +17,15 @@ works_router = APIRouter(prefix="/{event_id}/works", tags=["Events: Works"])
     path="",
     status_code=200,
     response_model=List[WorkWithState],
-    dependencies=[Depends(verify_is_organizer_or_track_chair)]
+    dependencies=[or_(IsOrganizerDep, IsTrackChairDep)]
 )
 async def get_works(
         work_service: WorksServiceDep,
         offset: int = 0,
         limit: int = Query(default=100, le=100),
-        track: str | None = Query(...)
+        track: str | None = Query(default=None)
 ) -> list[WorkWithState]:
-    return await work_service.get_all_event_works(track, offset, limit)
+    return await work_service.get_works(track, offset, limit)
 
 
 @works_router.get(
@@ -44,12 +46,10 @@ async def read_my_works(
     path="/{work_id}",
     status_code=200,
     response_model=WorkWithState,
-    dependencies=[Depends(verify_is_organizer_or_author)]
+    dependencies=[or_(IsOrganizerDep, IsAuthorDep, IsTrackChairDep)]
 )
-#  TODO si sos reviewer de este trabajo o chair del track de este trabajo tendrias que poder verlo,
-#  cambiar el verify_is_organizer_or_author_or_track_chair_or_work_reviewer o similar
+#  TODO si sos reviewer de este trabajo tendrias que poder verlo,
 async def get_work(work_id: str, work_service: WorksServiceDep) -> WorkWithState:
-    print("entro al metodo paso la dependency")
     return await work_service.get_work(work_id)
 
 

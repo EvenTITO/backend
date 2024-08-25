@@ -1,8 +1,10 @@
 from typing import List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
-from app.authorization.organizer_or_admin_dep import verify_is_organizer_or_admin
+from app.authorization.admin_user_dep import IsAdminUsrDep
+from app.authorization.organizer_dep import IsOrganizerDep
+from app.authorization.util_dep import or_
 from app.schemas.members.member_schema import MemberRequestSchema, MemberResponseSchema
 from app.schemas.members.member_schema import RolesRequestSchema
 from app.services.event_members.event_members_service_dep import EventMembersServiceDep
@@ -16,13 +18,13 @@ event_members_router = APIRouter(
 @event_members_router.get(
     path="",
     response_model=List[MemberResponseSchema],
-    dependencies=[Depends(verify_is_organizer_or_admin)]
+    dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
 async def read_event_members(members_service: EventMembersServiceDep, event_id: str):
     return await members_service.get_all_members(event_id)
 
 
-@event_members_router.post(path="", status_code=201, dependencies=[Depends(verify_is_organizer_or_admin)])
+@event_members_router.post(path="", status_code=201, dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)])
 async def invite_member(
         members_service: EventMembersServiceDep,
         member: MemberRequestSchema,
@@ -35,7 +37,7 @@ async def invite_member(
     path="/{user_id}",
     status_code=201,
     response_model=None,
-    dependencies=[Depends(verify_is_organizer_or_admin)]
+    dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
 async def remove_member(
         event_id: str,
@@ -49,7 +51,7 @@ async def remove_member(
     path="/{user_id}/roles",
     status_code=201,
     response_model=None,
-    dependencies=[Depends(verify_is_organizer_or_admin)]
+    dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
 async def update(
         roles: RolesRequestSchema,

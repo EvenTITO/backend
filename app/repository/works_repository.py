@@ -27,19 +27,13 @@ class WorksRepository(Repository):
         result = await self.session.execute(query)
         return result.scalars().all()
 
-    async def get_all_event_works_for_track(
-            self,
-            event_id: str,
-            track: str,
-            offset: int,
-            limit: int
-    ) -> list[WorkModel]:
-        query = (select(WorkModel)
-                 .where(and_(WorkModel.track == track, WorkModel.event_id == event_id))
-                 .offset(offset)
-                 .limit(limit))
-        result = await self.session.execute(query)
-        return result.scalars().all()
+    async def get_works_in_tracks(self, event_id: str, tracks: list[str], limit: int, offset: int):
+        conditions = [WorkModel.event_id == event_id, WorkModel.track.in_(tracks)]
+        await self._get_many_with_conditions(conditions, limit, offset)
+
+    async def get_works_by_track(self, event_id: str, track: str, limit: int, offset: int):
+        conditions = [WorkModel.event_id == event_id, WorkModel.track == track]
+        await self._get_many_with_conditions(conditions, limit, offset)
 
     async def create_work(self, work: WorkSchema, event_id: str, deadline_date: datetime, author_id: str) -> WorkModel:
         next_work_id = await self.__find_next_id(event_id)
@@ -51,10 +45,6 @@ class WorksRepository(Repository):
             author_id=author_id
         )
         return await self._create(work_model)
-
-    async def get_works_in_tracks(self, event_id: str, tracks: list[str], limit: int, offset: int):
-        conditions = [WorkModel.event_id == event_id, WorkModel.track.in_(tracks)]
-        await self._get_many_with_conditions(conditions, limit, offset)
 
     async def update_work(self, work_update: WorkSchema, event_id: str, work_id: int) -> bool:
         conditions = [WorkModel.event_id == event_id, WorkModel.id == work_id]
