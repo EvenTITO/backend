@@ -1,12 +1,9 @@
 from enum import Enum
 
 from sqlalchemy import Column, String
-from sqlalchemy.orm import relationship
 
 from app.database.models.base import Base
-from app.database.models.review import ReviewModel
 from app.database.models.utils import ModelTemplate
-from app.database.models.work import WorkModel
 
 
 class UserRole(str, Enum):
@@ -27,31 +24,3 @@ class UserModel(ModelTemplate, Base):
     address = Column(String, nullable=True)
     city = Column(String, nullable=True)
     country = Column(String, nullable=True)
-
-    events = relationship("EventModel", back_populates="creator")
-    inscriptions = relationship(
-        "InscriptionModel",
-        back_populates="user"
-    )
-    organizers = relationship(
-        "OrganizerModel",
-        back_populates="organizer"
-    )
-    chairs = relationship(
-        "ChairModel",
-        back_populates="chair"
-    )
-    reviewers = relationship(
-        "ReviewerModel",
-        back_populates="work"
-    )
-    works_as_author = relationship(
-        WorkModel,
-        foreign_keys=WorkModel.author_id,
-        back_populates="author"
-    )
-    reviews = relationship(
-        ReviewModel,
-        foreign_keys=ReviewModel.reviewer_id,
-        back_populates="reviewer"
-    )
