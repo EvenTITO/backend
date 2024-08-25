@@ -1,6 +1,7 @@
 import enum
 
 from sqlalchemy import (
+    UUID,
     Column,
     String,
     ForeignKey,
@@ -11,7 +12,7 @@ from sqlalchemy import (
 )
 
 from app.database.models.base import Base
-from app.database.models.utils import ModelTemplate
+from app.database.models.utils import ModelTemplate, UIDType
 
 
 class WorkStates(str, enum.Enum):
@@ -25,8 +26,8 @@ class WorkStates(str, enum.Enum):
 class WorkModel(ModelTemplate, Base):
     __tablename__ = "works"
 
-    event_id = Column(String, ForeignKey("events.id"), nullable=False)
-    author_id = Column(String, ForeignKey("users.id"), nullable=False)
+    event_id = Column(UUID(as_uuid=False), ForeignKey("events.id"), nullable=False)
+    author_id = Column(UIDType, ForeignKey("users.id"), nullable=False)
 
     title = Column(String, nullable=False)
     track = Column(String, nullable=False)

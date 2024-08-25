@@ -1,3 +1,4 @@
+import uuid
 from fastapi.encoders import jsonable_encoder
 
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
@@ -21,13 +22,13 @@ async def test_post_inscription(client, mock_storage, create_user, create_event_
 
 
 async def test_post_inscription_without_event_fails(client, create_user):
-    event_id = "event-does-not-exists"
+    event_id_not_exists = uuid.uuid4()
     new_inscription = InscriptionRequestSchema(
         roles=["ATTENDEE"],
         affiliation="Fiuba",
     )
     response = await client.post(
-        f"/events/{event_id}/inscriptions",
+        f"/events/{event_id_not_exists}/inscriptions",
         headers=create_headers(create_user["id"]),
         json=jsonable_encoder(new_inscription)
     )

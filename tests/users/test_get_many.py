@@ -25,7 +25,7 @@ USERS = [
 async def create_all_users(client):
     ids = []
     for user in USERS:
-        id = str(uuid4())
+        id = str(uuid4())[0:28]  # use UID, not UUID
         _ = await client.post(
             "/users",
             json=jsonable_encoder(user),

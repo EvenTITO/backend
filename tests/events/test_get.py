@@ -1,3 +1,4 @@
+import uuid
 from app.database.models.user import UserRole
 from app.exceptions.events_exceptions import EventNotFound, InvalidQueryEventNotCreatedNotAdmin
 import pytest
@@ -18,12 +19,12 @@ async def test_get_event(client, create_event, create_user):
 
 
 async def test_get_event_not_exists_fails(client, create_user):
-    id = "this-id-does-not-exist"
-    response = await client.get(f"/events/{id}/public",
+    this_id_does_not_exist = uuid.uuid4()
+    response = await client.get(f"/events/{str(this_id_does_not_exist)}/public",
                                 headers=create_headers(create_user['id']))
 
     assert response.status_code == 404
-    assert response.json()['detail'] == EventNotFound(id).detail
+    assert response.json()['detail'] == EventNotFound(str(this_id_does_not_exist)).detail
 
 
 async def test_get_all_events_not_admin_error(

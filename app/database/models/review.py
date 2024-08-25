@@ -4,10 +4,10 @@ from sqlalchemy import (
     Column,
     String,
     ForeignKey,
-    JSON
+    JSON,
+    UUID
 )
-
-from app.database.models.utils import DateTemplate
+from app.database.models.utils import DateTemplate, UIDType
 
 
 class ReviewStatus(str, enum.Enum):
@@ -20,10 +20,10 @@ class ReviewStatus(str, enum.Enum):
 class ReviewModel(DateTemplate):
     __tablename__ = "reviews"
 
-    submission_id = Column(String, ForeignKey("submissions.id"), primary_key=True)
-    reviewer_id = Column(String, ForeignKey("users.id"), primary_key=True)
-    event_id = Column(String, ForeignKey("events.id"), nullable=False)
-    work_id = Column(String, ForeignKey("works.id"), nullable=False)
+    submission_id = Column(UUID(as_uuid=False), ForeignKey("submissions.id"), primary_key=True)
+    reviewer_id = Column(UIDType, ForeignKey("users.id"), primary_key=True)
+    event_id = Column(UUID(as_uuid=False), ForeignKey("events.id"), nullable=False)
+    work_id = Column(UUID(as_uuid=False), ForeignKey("works.id"), nullable=False)
 
     review = Column(JSON)
     review_status = Column(String, nullable=False)

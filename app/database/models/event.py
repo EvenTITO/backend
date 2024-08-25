@@ -4,7 +4,7 @@ from sqlalchemy import Column, String, ForeignKey, JSON, ARRAY
 from sqlalchemy.orm import relationship
 
 from app.database.models.base import Base
-from app.database.models.utils import ModelTemplate
+from app.database.models.utils import ModelTemplate, UIDType
 
 
 class EventStatus(str, Enum):
@@ -26,7 +26,7 @@ class EventType(str, Enum):
 class EventModel(ModelTemplate, Base):
     __tablename__ = "events"
 
-    creator_id = Column(String, ForeignKey("users.id"), nullable=False)
+    creator_id = Column(UIDType, ForeignKey("users.id"), nullable=False)
 
     title = Column(String, nullable=False, unique=True)
     description = Column(String)
