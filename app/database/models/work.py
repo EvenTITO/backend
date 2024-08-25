@@ -51,3 +51,4 @@ class WorkModel(DateTemplate, Base):
     )
     event = relationship("EventModel", foreign_keys=[event_id], back_populates="works")
     submissions = relationship("SubmissionModel", back_populates="work")
+    reviewers = relationship("ReviewerModel", back_populates="work")
