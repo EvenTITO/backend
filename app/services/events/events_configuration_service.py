@@ -37,7 +37,7 @@ class EventsConfigurationService(BaseService):
         event = await self.events_repository.get(self.event_id)
         if event.status == EventStatus.STARTED and set(event.tracks) != set(tracks_schema.tracks):
             raise CannotUpdateTracksAfterEventStarts(self.event_id)
-        await self.events_repository.update_tracks(self.event_id, tracks_schema.tracks)
+        await self.events_repository.update(self.event_id, tracks_schema)
 
     async def get_review_skeleton(self) -> ReviewSkeletonSchema:
         review_skeleton = await self.events_repository.get_review_skeleton(self.event_id)

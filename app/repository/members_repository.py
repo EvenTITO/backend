@@ -23,7 +23,15 @@ class MemberRepository(Repository):
         return await self.exists((event_id, user_id))
 
     async def get_member(self, event_id: str, user_id: str):
-        return await self.get((event_id, user_id))
+        query = select(UserModel, self.model).where(
+            and_(
+                self.model.event_id == event_id,
+                self.model.user_id == UserModel.id,
+                UserModel.id == user_id
+            )
+        )
+        result = await self.session.execute(query)
+        return result.fetchone()
 
     async def remove_member(self, event_id, user_id):
         return await self.remove((event_id, user_id))

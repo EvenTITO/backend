@@ -6,7 +6,7 @@ from app.schemas.users.user import UserSchema
 from app.schemas.users.user_role import UserRoleSchema
 from app.schemas.events.create_event import CreateEventSchema
 from app.database.models.event import EventType
-from .helper import add_complete_dates
+from .helper import complete_event_configuration
 
 from ...commontest import create_headers, get_user_method
 
@@ -57,6 +57,6 @@ async def create_event_from_event_creator(client, create_event_creator):
 
     event_id = response.json()
 
-    await add_complete_dates(client, event_id, create_event_creator["id"])
+    await complete_event_configuration(client, event_id, create_event_creator["id"])
 
     return response.json()
