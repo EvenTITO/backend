@@ -36,9 +36,9 @@ class MemberRepository(Repository):
     async def remove_member(self, event_id, user_id):
         return await self.remove((event_id, user_id))
 
-    async def create_member(self, event_id: str, chair_id: str):
+    async def create_member(self, event_id: str, user_id: str):
         db_in = self.model(
-            user_id=chair_id,
+            user_id=user_id,
             event_id=event_id
         )
         await self._create(db_in)

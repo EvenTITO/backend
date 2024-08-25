@@ -6,5 +6,4 @@ from app.database.models.member import MemberModel
 
 class OrganizerModel(MemberModel, Base):
     __tablename__ = "organizers"
-    organizer = relationship("UserModel", back_populates="organizers")
     event = relationship("EventModel", back_populates="organizers")

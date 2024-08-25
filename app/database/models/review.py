@@ -4,14 +4,10 @@ from sqlalchemy import (
     Column,
     String,
     ForeignKey,
-    Integer,
-    JSON,
-    ForeignKeyConstraint
+    JSON
 )
-from sqlalchemy.orm import relationship
 
-from app.database.models.base import Base
-from app.database.models.submission import SubmissionModel
+from app.database.models.utils import DateTemplate
 
 
 class ReviewStatus(str, enum.Enum):
@@ -21,23 +17,13 @@ class ReviewStatus(str, enum.Enum):
     PENDING = "PENDING"
 
 
-class ReviewModel(Base):
+class ReviewModel(DateTemplate):
     __tablename__ = "reviews"
 
-    event_id = Column(String, primary_key=True)
-    work_id = Column(Integer, primary_key=True)
-    submission_id = Column(Integer, primary_key=True)
+    submission_id = Column(String, ForeignKey("submissions.id"), primary_key=True)
     reviewer_id = Column(String, ForeignKey("users.id"), primary_key=True)
+    event_id = Column(String, ForeignKey("events.id"), nullable=False)
+    work_id = Column(String, ForeignKey("works.id"), nullable=False)
 
     review = Column(JSON)
     review_status = Column(String, nullable=False)
-    __table_args__ = (
-        ForeignKeyConstraint(
-            [submission_id],
-            [SubmissionModel.id],
-            name="fk_submission_from_review"
-        ),
-    )
-
-    submission = relationship("SubmissionModel", back_populates="reviews")
-    reviewer = relationship("UserModel", back_populates="reviews")

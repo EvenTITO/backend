@@ -54,7 +54,7 @@ async def get_work(work_id: str, work_service: WorksServiceDep) -> WorkWithState
 
 
 @works_router.post(path="", status_code=201, dependencies=[Depends(verify_user_exists)])
-async def create_work(work: WorkSchema, work_service: WorksServiceDep) -> int:
+async def create_work(work: WorkSchema, work_service: WorksServiceDep) -> str:
     return await work_service.create_work(work)
 
 

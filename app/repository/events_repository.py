@@ -5,6 +5,7 @@ from app.database.models.chair import ChairModel
 from app.database.models.event import EventModel, EventStatus
 from app.database.models.inscription import InscriptionModel
 from app.database.models.organizer import OrganizerModel
+from app.database.models.reviewer import ReviewerModel
 from app.repository.crud_repository import Repository
 from app.schemas.events.public_event_with_roles import PublicEventWithRolesSchema
 from app.schemas.events.schemas import EventRole
@@ -59,12 +60,18 @@ class EventsRepository(Repository):
                     .join(ChairModel, ChairModel.event_id == EventModel.id)
                     .where(ChairModel.user_id == user_id))
 
+        reviewers_q = (select(EventModel)
+                       .join(ReviewerModel, ReviewerModel.event_id == EventModel.id)
+                       .where(ReviewerModel.user_id == user_id))
+
         inscriptions_result = await self.session.execute(inscriptions_q)
         organizers_result = await self.session.execute(organizations_q)
         chairs_result = await self.session.execute(chairs_q)
+        reviewers_result = await self.session.execute(reviewers_q)
         inscriptions = inscriptions_result.scalars().all()
         organizers = organizers_result.scalars().all()
         chairs = chairs_result.scalars().all()
+        reviewers = reviewers_result.scalars().all()
 
         def add_events(role, events, response):
             for event in events:
@@ -89,6 +96,7 @@ class EventsRepository(Repository):
         response = add_events(EventRole.SPEAKER, inscriptions, response)
         response = add_events(EventRole.ORGANIZER, organizers, response)
         response = add_events(EventRole.CHAIR, chairs, response)
+        response = add_events(EventRole.REVIEWER, reviewers, response)
         return list(response.values())
 
     async def get_all_events(

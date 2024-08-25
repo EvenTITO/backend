@@ -16,6 +16,7 @@ from app.database.models.review import ReviewModel
 from app.database.models.submission import SubmissionModel
 from app.database.models.user import UserModel
 from app.database.models.work import WorkModel
+from app.database.models.reviewer import ReviewerModel
 from app.database.models.base import Base
 from dotenv import load_dotenv
 import os

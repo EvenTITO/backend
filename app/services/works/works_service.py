@@ -25,7 +25,7 @@ class WorksService(BaseService):
         works = await self.works_repository.get_all_works_for_user(self.user_id, offset, limit)
         return list(map(WorksService.__map_to_schema, works))
 
-    async def create_work(self, work: WorkSchema) -> int:
+    async def create_work(self, work: WorkSchema) -> str:
         deadline_date = datetime(2024, 11, 5)
         # TODO: use event deadline date.
         # TODO: validate before deadline.
@@ -54,7 +54,7 @@ class WorksService(BaseService):
         repeated_title = await self.works_repository.work_with_title_exists(self.event_id, work_update.title)
         if repeated_title:
             raise TitleAlreadyExists(work_update.title, self.event_id)
-        await self.works_repository.update_work(work_update, self.event_id, int(work_id))
+        await self.works_repository.update_work(work_update, self.event_id, work_id)
 
     async def validate_update_work(self, work_id: str) -> None:
         my_work = await self.__get_my_work(work_id)
@@ -70,7 +70,7 @@ class WorksService(BaseService):
         return work
 
     async def __get_work(self, event_id: str, work_id: str) -> WorkModel:
-        work = await self.works_repository.get_work(event_id=event_id, work_id=int(work_id))
+        work = await self.works_repository.get_work(event_id=event_id, work_id=work_id)
         if work is None:
             raise WorkNotFound(event_id=event_id, work_id=work_id)
         return work

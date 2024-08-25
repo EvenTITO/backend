@@ -1,26 +1,17 @@
 from sqlalchemy import (
     Column,
     String,
-    Integer,
-    ForeignKeyConstraint, Index, )
-from sqlalchemy.orm import relationship
+    Index, ForeignKey, )
 
 from app.database.models.base import Base
-from app.database.models.utils import DateTemplate
-from app.database.models.work import WorkModel
+from app.database.models.utils import ModelTemplate
 
 
-class SubmissionModel(DateTemplate, Base):
+class SubmissionModel(ModelTemplate, Base):
     __tablename__ = "submissions"
 
-    # TODO revisar que se autogenere con 1 y luego 2 y asi sucesivamente
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    event_id = Column(String, nullable=False)
-    work_id = Column(Integer, nullable=False)
-
-    work = relationship("WorkModel", back_populates="submissions")
-    reviews = relationship("ReviewModel", back_populates="submission")
-    # TODO: revisar si en los requests que se hacen se esta trayendo todo por estas relationships o la carga es lazy
+    event_id = Column(String, ForeignKey("events.id"), nullable=False)
+    work_id = Column(String, ForeignKey("works.id"), nullable=False)
 
     # This is a Compose Foreign Key constraint: the submission references a
     # single work with id (event_id, work_id).
@@ -28,9 +19,4 @@ class SubmissionModel(DateTemplate, Base):
     __table_args__ = (
         Index('ix_submission_event_id', 'event_id'),
         Index('ix_submission_work_id', 'work_id'),
-        ForeignKeyConstraint(
-            [event_id, work_id],
-            [WorkModel.event_id, WorkModel.id],
-            name="fk_work_from_submission"
-        ),
     )

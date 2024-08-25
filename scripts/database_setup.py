@@ -21,6 +21,7 @@ from app.database.models.organizer import OrganizerModel
 from app.database.models.review import ReviewModel
 from app.database.models.submission import SubmissionModel
 from app.database.models.work import WorkModel
+from app.database.models.reviewer import ReviewerModel
 from app.database.models.base import Base
 from app.database.session_dep import get_db
 from app.database.database import engine

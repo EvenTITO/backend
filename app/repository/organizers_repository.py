@@ -14,6 +14,3 @@ class OrganizerRepository(MemberRepository):
             OrganizerModel.event_id == event_id,
             OrganizerModel.user_id == organizer_id
         ]
-
-    async def get_organizer(self, event_id, user_id):
-        return await self.get((event_id, user_id))

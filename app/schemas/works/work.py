@@ -1,5 +1,7 @@
 from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict
+
 from app.database.models.work import WorkStates
 from app.schemas.works.author import AuthorInformation
 
@@ -14,6 +16,6 @@ class WorkSchema(BaseModel):
 
 
 class WorkWithState(WorkSchema):
-    id: int
+    id: str
     state: WorkStates
     deadline_date: datetime
