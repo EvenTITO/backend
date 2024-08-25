@@ -64,8 +64,8 @@ class EventsRepository(Repository):
                            .where(OrganizerModel.user_id == user_id))
 
         chairs_q = (select(EventModel)
-                           .join(ChairModel, ChairModel.event_id == EventModel.id)
-                           .where(ChairModel.user_id == user_id))
+                    .join(ChairModel, ChairModel.event_id == EventModel.id)
+                    .where(ChairModel.user_id == user_id))
 
         inscriptions_result = await self.session.execute(inscriptions_q)
         organizers_result = await self.session.execute(organizations_q)
