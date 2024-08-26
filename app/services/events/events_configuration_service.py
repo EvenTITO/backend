@@ -1,3 +1,4 @@
+from uuid import UUID
 from app.database.models.event import EventStatus
 from app.exceptions.events_exceptions import CannotUpdateTracksAfterEventStarts
 from app.repository.events_repository import EventsRepository
@@ -11,7 +12,7 @@ from app.services.services import BaseService
 
 
 class EventsConfigurationService(BaseService):
-    def __init__(self, events_repository: EventsRepository, event_id: str):
+    def __init__(self, events_repository: EventsRepository, event_id: UUID):
         self.events_repository = events_repository
         self.event_id = event_id
 

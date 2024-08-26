@@ -15,7 +15,7 @@ async def create_organizer(client, create_event_creator, create_event_from_event
         lastname="Rodriguez",
         email="mrodriguez@email.com"
     )
-    organizer_id = "frlasdvpqqad08jd"
+    organizer_id = "frlasdvpqqad08jd123456789223"
     await client.post(
         "/users",
         json=jsonable_encoder(organizer),

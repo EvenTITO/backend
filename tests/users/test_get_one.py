@@ -12,7 +12,7 @@ async def test_get_user(client, create_user):
 
 
 async def test_get_no_user_cant_get_other(client, create_user):
-    new_user_id = 'user-not-exists'
+    new_user_id = 'usernotexists123456789012345'
 
     response = await client.get(f"/users/{create_user['id']}",
                                 headers=create_headers(new_user_id))
@@ -22,7 +22,7 @@ async def test_get_no_user_cant_get_other(client, create_user):
 
 
 async def test_get_user_from_other_user_forbidden(client, create_user):
-    other_user_id = "paoksncaokasdasdl"
+    other_user_id = "paoksncaokasdasdl12345678901"
     other_create_user = UserSchema(
         name="Lio",
         lastname="Messi",

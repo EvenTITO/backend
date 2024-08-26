@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID
 
 from sqlalchemy import func, and_, update, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,7 +12,7 @@ class SubmissionsRepository(Repository):
     def __init__(self, session: AsyncSession):
         super().__init__(session, SubmissionModel)
 
-    async def get_all_submissions_for_event(self, event_id: str, offset: int, limit: int) -> list[SubmissionModel]:
+    async def get_all_submissions_for_event(self, event_id: UUID, offset: int, limit: int) -> list[SubmissionModel]:
         query = select(SubmissionModel).where(SubmissionModel.event_id == event_id).offset(offset).limit(limit)
         result = await self.session.execute(query)
         return result.scalars().all()
@@ -24,11 +25,11 @@ class SubmissionsRepository(Repository):
                 func.max(self.model.id)
             ))
 
-    async def do_new_submit(self, event_id, work_id) -> int:
+    async def do_new_submit(self, event_id: UUID, work_id: UUID) -> UUID:
         new_submission = SubmissionModel(event_id=event_id, work_id=work_id)
         return (await self._create(new_submission)).id
 
-    async def update_submit(self, submission_id) -> SubmissionModel:
+    async def update_submit(self, submission_id: UUID) -> SubmissionModel:
         update_query = (
             update(self.model).where(self.model.id == submission_id).values(last_update=datetime.now())
         )

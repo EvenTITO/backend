@@ -1,7 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, Query
-
+from uuid import UUID
 from app.authorization.caller_id_dep import CallerIdDep
 from app.authorization.user_id_dep import UserDep, verify_user_exists
 from app.database.models.event import EventStatus
@@ -59,7 +59,7 @@ async def read_all_events(
     return await events_service.get_all_events(offset, limit, status, search, user_role)
 
 
-@events_router.post("", status_code=201, response_model=str, tags=["Events: General"])
+@events_router.post("", status_code=201, response_model=UUID, tags=["Events: General"])
 async def create_event(
         event: CreateEventSchema,
         user_role: UserDep,
@@ -70,5 +70,5 @@ async def create_event(
 
 
 @events_router.get("/{event_id}/public", response_model=PublicEventWithRolesSchema, tags=["Events: General"])
-async def read_event_general(events_service: EventsServiceDep, caller_id: CallerIdDep, event_id: str):
+async def read_event_general(events_service: EventsServiceDep, caller_id: CallerIdDep, event_id: UUID):
     return await events_service.get_public_event(caller_id, event_id)

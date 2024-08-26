@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends, HTTPException, Query
 
@@ -7,7 +8,7 @@ from app.services.event_chairs.event_chairs_service_dep import EventChairService
 
 
 class IsChair:
-    async def __call__(self, caller_id: CallerIdDep, event_id: str, chair_service: EventChairServiceDep) -> bool:
+    async def __call__(self, caller_id: CallerIdDep, event_id: UUID, chair_service: EventChairServiceDep) -> bool:
         return await chair_service.is_chair(event_id, caller_id)
 
 
@@ -27,7 +28,7 @@ class IsTrackChair:
     async def __call__(
             self,
             caller_id: CallerIdDep,
-            event_id: str,
+            event_id: UUID,
             chair_service: EventChairServiceDep,
             track: str | None = Query(default=None)
     ) -> bool:

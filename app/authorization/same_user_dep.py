@@ -3,10 +3,11 @@ from typing import Annotated
 from fastapi import HTTPException, Depends
 
 from app.authorization.caller_id_dep import CallerIdDep
+from app.schemas.users.utils import UID
 
 
 class IsSameUser:
-    async def __call__(self, user_id: str, caller_id: CallerIdDep) -> bool:
+    async def __call__(self, user_id: UID, caller_id: CallerIdDep) -> bool:
         return user_id == caller_id
 
 

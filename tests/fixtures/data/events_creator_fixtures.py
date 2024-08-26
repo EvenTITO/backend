@@ -21,7 +21,7 @@ async def create_event_creator(client, admin_data):
     user_id = await client.post(
         "/users",
         json=jsonable_encoder(event_creator),
-        headers=create_headers("lakjsdeuimx213klasmd3")
+        headers=create_headers("lakjsdeuimx213klasmd31234567")
     )
     user_id = user_id.json()
     new_role = UserRoleSchema(

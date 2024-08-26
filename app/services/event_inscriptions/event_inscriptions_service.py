@@ -1,3 +1,4 @@
+from uuid import UUID
 from app.database.models.event import EventStatus
 from app.database.models.inscription import InscriptionModel, InscriptionStatus
 from app.exceptions.inscriptions_exceptions import EventNotStarted, InscriptionAlreadyPaid, \
@@ -5,6 +6,7 @@ from app.exceptions.inscriptions_exceptions import EventNotStarted, InscriptionA
 from app.repository.inscriptions_repository import InscriptionsRepository
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema, InscriptionResponseSchema, \
     InscriptionPayResponseSchema
+from app.schemas.users.utils import UID
 from app.services.events.events_service import EventsService
 from app.services.services import BaseService
 from app.services.storage.event_inscription_storage_service import EventInscriptionStorageService
@@ -16,8 +18,8 @@ class EventInscriptionsService(BaseService):
             events_service: EventsService,
             storage_service: EventInscriptionStorageService,
             inscriptions_repository: InscriptionsRepository,
-            event_id: str,
-            user_id: str
+            event_id: UUID,
+            user_id: UID
     ):
         self.events_service = events_service
         self.storage_service = storage_service
@@ -53,7 +55,7 @@ class EventInscriptionsService(BaseService):
         )
         return list(map(EventInscriptionsService.map_to_schema, inscriptions))
 
-    async def pay(self, inscription_id: str) -> InscriptionPayResponseSchema:
+    async def pay(self, inscription_id: UUID) -> InscriptionPayResponseSchema:
         my_inscription = await self.inscriptions_repository.get_user_inscription_by_id(self.user_id, inscription_id)
         if my_inscription is None:
             raise InscriptionNotFound(self.event_id, inscription_id)

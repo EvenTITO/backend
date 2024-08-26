@@ -1,4 +1,5 @@
 from enum import Enum
+from uuid import UUID
 
 from app.schemas.media.image import ImgSchema
 from app.schemas.storage.schemas import UploadURLSchema
@@ -14,19 +15,19 @@ class EventsStaticFiles(str, Enum):
 
 class EventsStorageService(StorageService):
 
-    async def get_upload_url(self, event_id: str, file_to_get: EventsStaticFiles) -> UploadURLSchema:
+    async def get_upload_url(self, event_id: UUID, file_to_get: EventsStaticFiles) -> UploadURLSchema:
         return await self.storage_client.generate_signed_upload_url(
             bucket_name=self.storage_settings.EVENTS_BUCKET,
             blob_name=f"{event_id}/{file_to_get.value}"
         )
 
     @staticmethod
-    def get_public_event_url(event_id: str, file_to_get: EventsStaticFiles):
+    def get_public_event_url(event_id: UUID, file_to_get: EventsStaticFiles):
         storage_settings = StorageSettings()
         return storage_settings.PUBLIC_BASE_URL + storage_settings.EVENTS_BUCKET + f"/{event_id}/{file_to_get.value}"
 
     @staticmethod
-    def get_media(event_id: str):
+    def get_media(event_id: UUID):
         return [
             ImgSchema(
                 name=EventsStaticFiles.MAIN_IMAGE,

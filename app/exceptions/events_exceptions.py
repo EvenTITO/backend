@@ -1,3 +1,4 @@
+from uuid import UUID
 from fastapi import HTTPException
 
 from app.database.models.event import EventStatus
@@ -40,7 +41,7 @@ class InvalidCaller(HTTPException):
 
 
 class CannotUpdateTracksAfterEventStarts(HTTPException):
-    def __init__(self, event_id: str):
+    def __init__(self, event_id: UUID):
         self.status_code = 409
         self.detail = f"Cannot update tracks in event:{event_id} after its started."
         super().__init__(status_code=self.status_code, detail=self.detail)

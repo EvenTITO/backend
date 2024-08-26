@@ -61,7 +61,7 @@ async def test_post_event_invaluser_id(client):
 
     response = await client.post("/events",
                                  json=jsonable_encoder(event),
-                                 headers=create_headers('invalid-creator-id'))
+                                 headers=create_headers('invalidcreatorid123456789098'))
 
     assert response.status_code == 404
 

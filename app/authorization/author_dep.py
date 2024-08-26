@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends, HTTPException
 
@@ -10,8 +11,8 @@ class IsAuthor:
     async def __call__(
             self,
             caller_id: CallerIdDep,
-            event_id: str,
-            work_id: str,
+            event_id: UUID,
+            work_id: UUID,
             work_service: WorksServiceDep
     ) -> bool:
         return await work_service.is_my_work(caller_id, event_id, work_id)

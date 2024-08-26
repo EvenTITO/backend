@@ -3,6 +3,8 @@ from app.schemas.users.user import UserSchema
 from app.repository.crud_repository import Repository
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.schemas.users.utils import UID
+
 
 class UsersRepository(Repository):
     def __init__(self, session: AsyncSession):
@@ -24,6 +26,6 @@ class UsersRepository(Repository):
         db_user = UserModel(**user.model_dump(), id=id)
         return await self.create(db_user)
 
-    async def get_role(self, id) -> UserRole:
+    async def get_role(self, id: UID) -> UserRole:
         conditions = self._primary_key_conditions(id)
         return await self._get_with_values(conditions, UserModel.role)

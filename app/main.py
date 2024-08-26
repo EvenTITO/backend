@@ -4,14 +4,12 @@ from app.routers.users.users import users_router
 from app.routers.events.events import events_router
 
 
-# TODO: Change email.
 app = FastAPI(
     title="Backend API",
     description="Backend for EvenTITO",
     version="0.0.1",
     contact={
         "name": "EvenTITO",
-        "email": "eventito@gmail.com",
     },
     license_info={
         "name": "MIT",
