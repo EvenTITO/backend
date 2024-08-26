@@ -32,8 +32,7 @@ class ReviewerRepository(MemberRepository):
         result = await self.session.execute(query)
         return result.scalar()
 
-    async def get_all(self, event_id: UUID, work_id: UUID | None) -> list[ReviewerWithWorksResponseSchema]:
-        print(work_id)
+    async def get_all_reviewers(self, event_id: UUID, work_id: UUID | None) -> list[ReviewerWithWorksResponseSchema]:
         group_by_subquery = (
             select(
                 ReviewerModel.event_id,

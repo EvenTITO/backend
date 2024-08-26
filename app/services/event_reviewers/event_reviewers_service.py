@@ -34,7 +34,7 @@ class EventReviewerService(BaseService):
         return await self.reviewer_repository.is_reviewer_of_work_in_event(event_id, user_id, work_id)
 
     async def get_reviewers(self, event_id: UUID, work_id: UUID | None) -> list[ReviewerWithWorksResponseSchema]:
-        return await self.reviewer_repository.get_all(event_id, work_id)
+        return await self.reviewer_repository.get_all_reviewers(event_id, work_id)
 
     async def get_reviewer_by_user_id(self, event_id: UUID, user_id: UID) -> ReviewerWithWorksResponseSchema:
         if not await self.is_reviewer_in_event(event_id, user_id):

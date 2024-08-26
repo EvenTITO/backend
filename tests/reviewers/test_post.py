@@ -104,7 +104,7 @@ async def test_create_reviewers_by_work_id_invalid(
         review_deadline="2024-06-07"
     )
     new_reviewer_2 = ReviewerRequestSchema(
-        work_id="work_id_invalid",
+        work_id="1365bfdb-b718-411c-9132-ec2abad9fbdd",
         email=create_event_creator["email"],
         review_deadline="2024-06-07"
     )

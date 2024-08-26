@@ -200,7 +200,7 @@ async def test_get_reviewers_by_work_id_invalid_return_empty_list(
     assert response.status_code == 201
 
     get_response = await client.get(
-        f"/events/{create_event_from_event_creator}/reviewers?work_id=work_id_invalid",
+        f"/events/{create_event_from_event_creator}/reviewers?work_id=a17d7848-180c-4ab7-8eea-35c41bb78533",
         headers=create_headers(create_event_creator['id'])
     )
 
@@ -216,7 +216,7 @@ async def test_get_reviewers_by_work_id_without_reviewers(
         create_event_from_event_creator
 ):
     response = await client.get(
-        f"/events/{create_event_from_event_creator}/reviewers?work_id=1",
+        f"/events/{create_event_from_event_creator}/reviewers?work_id=a1111111-180c-4ab7-8eea-35c41bb78533",
         headers=create_headers(create_event_creator['id'])
     )
 
@@ -319,7 +319,7 @@ async def test_get_reviewer__by_user_id_ok(
     assert reviewer["user"]["email"] == create_user["email"]
 
 
-async def test_get_reviewer_by_user_id_invalid_userid(
+async def test_get_reviewer_by_user_id_invalid_userid_not_uid(
         client,
         create_user,
         create_event_creator,
@@ -358,6 +358,46 @@ async def test_get_reviewer_by_user_id_invalid_userid(
 
     get_response = await client.get(
         f"/events/{create_event_from_event_creator}/reviewers/user_id_invalid",
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert get_response.status_code == 422
+
+
+async def test_get_reviewer_by_user_id_invalid_userid(
+        client,
+        create_user,
+        create_event_creator,
+        create_event_from_event_creator
+):
+    create_work_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works",
+        json=jsonable_encoder(USER_WORK),
+        headers=create_headers(create_event_creator['id'])
+    )
+    assert create_work_response.status_code == 201
+
+    work_id = create_work_response.json()
+    new_reviewer_1 = ReviewerRequestSchema(
+        work_id=work_id,
+        email=create_user["email"],
+        review_deadline="2024-06-07"
+    )
+
+    request = ReviewerCreateRequestSchema(
+        reviewers=[new_reviewer_1]
+    )
+
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/reviewers",
+        json=jsonable_encoder(request),
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert response.status_code == 201
+
+    get_response = await client.get(
+        f"/events/{create_event_from_event_creator}/reviewers/{create_event_creator['id']}",
         headers=create_headers(create_event_creator['id'])
     )
 
@@ -500,4 +540,4 @@ async def test_get_reviewer_by_work_id_and_user_id_invalid_user_id(
         headers=create_headers(create_event_creator['id'])
     )
 
-    assert get_response.status_code == 404
+    assert get_response.status_code == 422

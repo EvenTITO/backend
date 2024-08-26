@@ -7,7 +7,7 @@ from app.schemas.users.utils import UID
 
 
 class ReviewerWithWorksResponseSchema(MemberResponseSchema):
-    work_ids: list[str] = Field(
+    work_ids: list[UUID] = Field(
         max_length=100,
         examples=[["work_id_01", "work_id_02", "work_id_03"]],
         default_factory=list
