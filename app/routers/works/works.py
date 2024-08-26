@@ -24,7 +24,7 @@ async def get_works(
         work_service: WorksServiceDep,
         offset: int = 0,
         limit: int = Query(default=100, le=100),
-        track: str | None = Query(default=None)
+        track: str = Query(default=None)
 ) -> list[WorkWithState]:
     return await work_service.get_works(track, offset, limit)
 

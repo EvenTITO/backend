@@ -1,4 +1,5 @@
 from uuid import UUID
+
 from app.database.models.event import EventStatus
 from app.database.models.user import UserRole
 from app.exceptions.events_exceptions import EventNotFound, InvalidEventSameTitle, InvalidQueryEventNotCreatedNotAdmin
@@ -17,7 +18,7 @@ class EventsService(BaseService):
         self.events_repository = events_repository
         self.organizers_service = organizers_service
 
-    async def create(self, event: CreateEventSchema, creator_id: str, user_role: UserRole):
+    async def create(self, event: CreateEventSchema, creator_id: UID, user_role: UserRole):
         event_same_title_exists = await self.events_repository.event_with_title_exists(event.title)
         if event_same_title_exists:
             raise InvalidEventSameTitle(event.title)

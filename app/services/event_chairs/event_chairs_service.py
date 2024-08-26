@@ -1,4 +1,7 @@
 from uuid import UUID
+
+from app.database.models.chair import ChairModel
+from app.database.models.user import UserModel
 from app.exceptions.members.chair.chair_exceptions import InvalidUpdateTrack, UserNotIsChair
 from app.repository.chairs_repository import ChairRepository
 from app.repository.users_repository import UsersRepository
@@ -8,8 +11,6 @@ from app.schemas.users.user import UserSchema
 from app.schemas.users.utils import UID
 from app.services.events.events_service import EventsService
 from app.services.services import BaseService
-from app.database.models.chair import ChairModel
-from app.database.models.user import UserModel
 
 
 class EventChairService(BaseService):
@@ -38,7 +39,7 @@ class EventChairService(BaseService):
             raise UserNotIsChair(event_id, user_id)
         await self.chair_repository.remove_member(event_id, user_id)
 
-    async def is_chair(self, event_id: UUID, user_id: UID) -> None:
+    async def is_chair(self, event_id: UUID, user_id: UID) -> bool:
         return await self.chair_repository.is_member(event_id, user_id)
 
     async def update_tracks(self, event_id: UUID, user_id: UID, tracks_schema: DynamicTracksEventSchema) -> None:
