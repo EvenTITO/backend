@@ -131,9 +131,14 @@ async def test_get_my_events_should_not_include_an_event_where_i_do_not_particip
     assert len(response.json()) == 0
 
 
-@pytest.mark.skip(reason="TODO: I dont know wheater we have the chairs implementation or not.")
-async def test_get_my_events_includes_events_where_i_am_chair():
-    assert False
+async def test_get_my_events_includes_events_where_i_am_chair(client, create_event_chair):
+    response = await client.get("/events/my-events",
+                                headers=create_headers(create_event_chair))
+    assert response.status_code == 200
+    events = response.json()
+    assert len(events) == 1
+    assert len(events[0]['roles']) == 1
+    assert EventRole.CHAIR in events[0]['roles']
 
 
 @pytest.mark.skip(reason="TODO: Write this code. Which date should we take? Or add a param for ordering?")
