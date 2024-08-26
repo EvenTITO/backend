@@ -1,10 +1,12 @@
 from typing import Annotated
+from uuid import UUID
 
 from annotated_types import Len
 from pydantic import BaseModel, ConfigDict
 
 from app.database.models.inscription import InscriptionRole, InscriptionStatus
 from app.schemas.storage.schemas import UploadURLSchema, DownloadURLSchema
+from app.schemas.users.utils import UID
 
 
 class InscriptionRequestSchema(BaseModel):
@@ -14,8 +16,8 @@ class InscriptionRequestSchema(BaseModel):
 
 class InscriptionResponseSchema(BaseModel):
     id: str
-    user_id: str
-    event_id: str
+    user_id: UID
+    event_id: UUID
     roles: list[InscriptionRole]
     status: InscriptionStatus
     affiliation: str | None

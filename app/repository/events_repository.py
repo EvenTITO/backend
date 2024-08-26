@@ -1,3 +1,4 @@
+from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,21 +10,22 @@ from app.database.models.reviewer import ReviewerModel
 from app.repository.crud_repository import Repository
 from app.schemas.events.public_event_with_roles import PublicEventWithRolesSchema
 from app.schemas.events.schemas import EventRole
+from app.schemas.users.utils import UID
 
 
 class EventsRepository(Repository):
     def __init__(self, session: AsyncSession):
         super().__init__(session, EventModel)
 
-    async def get_status(self, event_id: str):
+    async def get_status(self, event_id: UUID):
         conditions = self._primary_key_conditions(event_id)
         return await self._get_with_values(conditions, EventModel.status)
 
-    async def get_tracks(self, event_id: str):
+    async def get_tracks(self, event_id: UUID):
         conditions = self._primary_key_conditions(event_id)
         return await self._get_with_values(conditions, EventModel.tracks)
 
-    async def get_dates(self, event_id: str):
+    async def get_dates(self, event_id: UUID):
         conditions = self._primary_key_conditions(event_id)
         return await self._get_with_values(conditions, EventModel.dates)
 
@@ -46,7 +48,7 @@ class EventsRepository(Repository):
         )
         return await self._create(new_event)
 
-    async def get_all_events_for_user(self, user_id: str, offset: int, limit: int) -> list[PublicEventWithRolesSchema]:
+    async def get_all_events_for_user(self, user_id: UID, offset: int, limit: int) -> list[PublicEventWithRolesSchema]:
         # TODO: refactor query and whole method.
         inscriptions_q = (select(EventModel)
                           .join(InscriptionModel, InscriptionModel.event_id == EventModel.id)

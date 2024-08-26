@@ -5,18 +5,19 @@ from app.exceptions.users_exceptions import (
     EmailAlreadyExists,
     IdAlreadyExists,
 )
+from app.schemas.users.utils import UID
 from app.services.services import BaseService
 
 
 class UsersService(BaseService):
-    def __init__(self, users_repository: UsersRepository, user_id: str):
+    def __init__(self, users_repository: UsersRepository, user_id: UID):
         self.users_repository = users_repository
         self.user_id = user_id
 
-    async def exists(self, user_id: str) -> bool:
+    async def exists(self, user_id: UID) -> bool:
         return await self.users_repository.exists(user_id)
 
-    async def create(self, user: UserSchema) -> str:
+    async def create(self, user: UserSchema) -> UID:
         exists = await self.users_repository.exists(self.user_id)
         if exists:
             raise IdAlreadyExists(self.user_id)
@@ -39,5 +40,5 @@ class UsersService(BaseService):
     async def get_role(self) -> UserRole:
         return await self.users_repository.get_role(self.user_id)
 
-    async def get(self, user_id: str) -> UserReply:
+    async def get(self, user_id: UID) -> UserReply:
         return await self.users_repository.get(user_id)

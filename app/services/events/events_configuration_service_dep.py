@@ -1,3 +1,4 @@
+from uuid import UUID
 from fastapi import Depends
 from typing import Annotated
 
@@ -9,7 +10,7 @@ from app.services.events.events_configuration_service import EventsConfiguration
 class EventsConfigurationChecker:
     async def __call__(
         self,
-        event_id: str,
+        event_id: UUID,
         events_repository: EventsRepository = Depends(get_repository(EventsRepository)),
     ) -> EventsConfigurationService:
         return EventsConfigurationService(events_repository, event_id)

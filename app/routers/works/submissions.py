@@ -1,3 +1,4 @@
+from uuid import UUID
 from fastapi import APIRouter, Query
 from fastapi import Depends
 
@@ -24,7 +25,7 @@ async def submit(submission_service: SubmissionsServiceDep) -> SubmissionUploadS
 @works_submissions_router.get(path="/{submission_id}", status_code=200,
                               dependencies=[or_(IsOrganizerDep, IsAuthorDep)])
 async def get_download_submission_file(
-        submission_id: str,
+        submission_id: UUID,
         submission_service: SubmissionsServiceDep
 ) -> SubmissionDownloadSchema:
     return await submission_service.get_submission(submission_id)

@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends
 
@@ -13,7 +14,7 @@ from app.services.storage.event_inscription_storage_service_dep import EventInsc
 class EventInscriptionsServiceChecker:
     async def __call__(
             self,
-            event_id: str,
+            event_id: UUID,
             caller_id: CallerIdDep,
             events_service: EventsServiceDep,
             storage_service: EventInscriptionStorageServiceDep,

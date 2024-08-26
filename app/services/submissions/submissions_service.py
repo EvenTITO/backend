@@ -1,6 +1,8 @@
+from uuid import UUID
 from app.database.models.submission import SubmissionModel
 from app.database.models.work import WorkStates
 from app.repository.submissions_repository import SubmissionsRepository
+from app.schemas.users.utils import UID
 from app.schemas.works.submission import SubmissionUploadSchema, SubmissionDownloadSchema, SubmissionResponseSchema
 from app.services.services import BaseService
 from app.services.storage.work_storage_service import WorkStorageService
@@ -12,9 +14,9 @@ class SubmissionsService(BaseService):
                  submission_repository: SubmissionsRepository,
                  work_service: WorksService,
                  storage_service: WorkStorageService,
-                 user_id: str,
-                 event_id: str,
-                 work_id: str):
+                 user_id: UID,
+                 event_id: UUID,
+                 work_id: UUID):
         self.submission_repository = submission_repository
         self.work_service = work_service
         self.storage_service = storage_service
@@ -45,14 +47,14 @@ class SubmissionsService(BaseService):
             upload_url=upload_url
         )
 
-    async def get_submission(self, submission_id: str) -> SubmissionDownloadSchema:
+    async def get_submission(self, submission_id: UUID) -> SubmissionDownloadSchema:
         return await self.__get_submission(submission_id)
 
     async def get_latest_submission(self) -> SubmissionDownloadSchema:
         last_submission = await self.submission_repository.get_last_submission(self.event_id, self.work_id)
         return await self.__get_submission(str(last_submission.id))
 
-    async def __get_submission(self, submission_id: str) -> SubmissionDownloadSchema:
+    async def __get_submission(self, submission_id: UUID) -> SubmissionDownloadSchema:
         download_url = await self.storage_service.get_submission_read_url(self.event_id, self.work_id, submission_id)
         return SubmissionDownloadSchema(
             id=submission_id,

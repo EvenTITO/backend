@@ -5,7 +5,7 @@ from app.exceptions.users_exceptions import EmailAlreadyExists, IdAlreadyExists
 
 
 async def test_create_user(client):
-    user_id = "aasjdfvhasdvnlaksdj"
+    user_id = "aasjdfvhasdvnlaksdj123456789"
     create_user = UserSchema(
         name="Lio",
         lastname="Messi",
@@ -29,7 +29,7 @@ async def test_create_user(client):
 async def test_create_same_email_fails(client, create_user):
     new_user_same_email = create_user.copy()
     new_user_same_email.pop("id")
-    caller_id = "other-id"
+    caller_id = "otherid123456789909876543123"
     response = await client.post("/users",
                                  json=new_user_same_email,
                                  headers=create_headers(caller_id))
@@ -57,7 +57,7 @@ async def test_create_empty_user_fails(client):
         "lastname": "",
         "email": ""
     }
-    response = await client.post("/users", json=empty_user, headers=create_headers("a-valid-id"))
+    response = await client.post("/users", json=empty_user, headers=create_headers("avalidid12345678901234567890"))
     assert response.status_code == 422
 
 
@@ -68,7 +68,7 @@ async def test_create_invalid_email_fails(client):
         "email": "invalid_email.com",
     }
     response = await client.post("/users", json=user_invalid_email,
-                                 headers=create_headers("a-valid-id"))
+                                 headers=create_headers("avalidid12345678901234567890"))
 
     assert response.status_code == 422
 

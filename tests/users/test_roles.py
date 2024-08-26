@@ -119,7 +119,7 @@ async def test_not_admin_user_cant_add_admin(client, create_user):
         lastname="Messi",
         email="email@email.com"
     )
-    non_admin_id = "id-non-admin"
+    non_admin_id = "idnonadmin123456789012345678"
     response = await client.post("/users",
                                  json=jsonable_encoder(non_admin_user),
                                  headers=create_headers(non_admin_id))
@@ -140,7 +140,7 @@ async def test_not_admin_user_cant_add_creator(client, create_user):
         lastname="Messi",
         email="email@email.com"
     )
-    non_admin_id = "id-non-admin"
+    non_admin_id = "idnonadmin123456789012345678"
     response = await client.post("/users",
                                  json=jsonable_encoder(non_admin_user),
                                  headers=create_headers(non_admin_id))

@@ -1,4 +1,5 @@
 from typing import List
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
 
@@ -49,7 +50,7 @@ async def read_my_works(
     dependencies=[or_(IsOrganizerDep, IsAuthorDep, IsTrackChairDep)]
 )
 #  TODO si sos reviewer de este trabajo tendrias que poder verlo,
-async def get_work(work_id: str, work_service: WorksServiceDep) -> WorkWithState:
+async def get_work(work_id: UUID, work_service: WorksServiceDep) -> WorkWithState:
     return await work_service.get_work(work_id)
 
 
@@ -59,5 +60,5 @@ async def create_work(work: WorkSchema, work_service: WorksServiceDep) -> str:
 
 
 @works_router.put(path="/{work_id}", status_code=204, dependencies=[Depends(verify_user_exists)])
-async def update_work(work_id: str, work_update: WorkSchema, work_service: WorksServiceDep) -> None:
+async def update_work(work_id: UUID, work_update: WorkSchema, work_service: WorksServiceDep) -> None:
     await work_service.update_work(work_id, work_update)

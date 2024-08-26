@@ -1,3 +1,4 @@
+from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
 from app.schemas.storage.schemas import UploadURLSchema, DownloadURLSchema
@@ -6,8 +7,8 @@ from app.schemas.storage.schemas import UploadURLSchema, DownloadURLSchema
 class SubmissionResponseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: str
-    work_id: str
-    event_id: str
+    work_id: UUID
+    event_id: UUID
 
 
 class SubmissionDownloadSchema(SubmissionResponseSchema):

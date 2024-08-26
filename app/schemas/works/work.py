@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
@@ -16,6 +17,6 @@ class WorkSchema(BaseModel):
 
 
 class WorkWithState(WorkSchema):
-    id: str
+    id: UUID
     state: WorkStates
     deadline_date: datetime

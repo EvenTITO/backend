@@ -8,6 +8,7 @@ from app.routers.users.echo import echo_router
 from app.routers.users.roles import user_roles_router
 from app.schemas.users.user import UserModifySchema, UserSchema
 from app.schemas.users.user import UserReply
+from app.schemas.users.utils import UID
 from app.services.users.users_admin_service_dep import UsersAdminServiceDep
 from app.services.users.users_service_dep import UsersServiceDep
 
@@ -25,7 +26,7 @@ users_router.include_router(user_roles_router)
     tags=["Users: General"],
     dependencies=[or_(IsSameUsrDep, IsAdminUsrDep)]
 )
-async def read_user(user_id: str, users_service: UsersServiceDep):
+async def read_user(user_id: UID, users_service: UsersServiceDep):
     return await users_service.get(user_id)
 
 

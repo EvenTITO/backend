@@ -1,11 +1,20 @@
 from typing import Annotated
-from fastapi import Header, HTTPException, Depends
+from fastapi import HTTPException, Header, Depends
+from pydantic import BaseModel, ValidationError
+
+from app.schemas.users.utils import UID
 
 
-async def verify_user_id(X_User_Id: str = Header(...)) -> str:
-    if not X_User_Id:
-        raise HTTPException(status_code=400, detail="X-User-Id missing.")
+class UIDModel(BaseModel):
+    uid: UID
+
+
+async def verify_user_id(X_User_Id: Annotated[UID, Header()]) -> UID:
     return X_User_Id
+    try:
+        return UIDModel(uid=X_User_Id).uid  # force validation
+    except ValidationError:
+        raise HTTPException(status_code=400, detail="X-User-Id missing.")
 
 
-CallerIdDep = Annotated[str, Depends(verify_user_id)]
+CallerIdDep = Annotated[UID, Depends(verify_user_id)]

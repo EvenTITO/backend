@@ -34,7 +34,7 @@ async def test_put_user(client, create_user):
 
 async def test_put_user_not_exists(client, create_user):
     user_changes = create_user.copy()
-    different_id = "this-id-does-not-exist"
+    different_id = "thisiddoesnotexist1234567890"
     new_lastname = "Rocuzzo"
     user_changes.pop('id')
     user_changes["lastname"] = new_lastname
@@ -64,7 +64,7 @@ async def test_user_cant_change_other_user(client, create_user):
         lastname="Messi",
         email="other_user@email.com",
     )
-    other_user_id = "iasdiohvklaspiolsds"
+    other_user_id = "iasdiohvklaspiolsds123456789"
     response = await client.post(
         "/users",
         json=jsonable_encoder(other),

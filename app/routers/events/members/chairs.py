@@ -1,4 +1,5 @@
 from typing import List
+from uuid import UUID
 
 from fastapi import APIRouter
 
@@ -9,6 +10,7 @@ from app.authorization.organizer_dep import IsOrganizerDep
 from app.authorization.util_dep import or_
 from app.schemas.events.schemas import DynamicTracksEventSchema
 from app.schemas.members.chair_schema import ChairResponseSchema
+from app.schemas.users.utils import UID
 from app.services.event_chairs.event_chairs_service_dep import EventChairServiceDep
 
 event_chairs_router = APIRouter(prefix="/{event_id}/chairs", tags=["Events: Chairs"])
@@ -19,7 +21,7 @@ event_chairs_router = APIRouter(prefix="/{event_id}/chairs", tags=["Events: Chai
     response_model=List[ChairResponseSchema],
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
-async def read_event_chairs(chair_service: EventChairServiceDep, event_id: str) -> List[ChairResponseSchema]:
+async def read_event_chairs(chair_service: EventChairServiceDep, event_id: UUID) -> List[ChairResponseSchema]:
     return await chair_service.get_all_chairs(event_id)
 
 
@@ -29,7 +31,7 @@ async def read_event_chairs(chair_service: EventChairServiceDep, event_id: str) 
     dependencies=[or_(IsOrganizerDep, IsChairDep)]
 )
 async def get_my_chair(
-        event_id: str,
+        event_id: UUID,
         caller_id: CallerIdDep,
         chair_service: EventChairServiceDep
 ) -> ChairResponseSchema:
@@ -41,7 +43,7 @@ async def get_my_chair(
     response_model=ChairResponseSchema,
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
-async def get_chair(event_id: str, user_id: str, chair_service: EventChairServiceDep) -> ChairResponseSchema:
+async def get_chair(event_id: UUID, user_id: UID, chair_service: EventChairServiceDep) -> ChairResponseSchema:
     return await chair_service.get_chair(event_id, user_id)
 
 
@@ -52,8 +54,8 @@ async def get_chair(event_id: str, user_id: str, chair_service: EventChairServic
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
 async def remove_chair(
-        event_id: str,
-        user_id: str,
+        event_id: UUID,
+        user_id: UID,
         chair_service: EventChairServiceDep
 ) -> None:
     await chair_service.remove_chair(event_id, user_id)
@@ -67,8 +69,8 @@ async def remove_chair(
 )
 async def update(
         tracks: DynamicTracksEventSchema,
-        event_id: str,
-        user_id: str,
+        event_id: UUID,
+        user_id: UID,
         chair_service: EventChairServiceDep
 ) -> None:
     await chair_service.update_tracks(event_id, user_id, tracks)

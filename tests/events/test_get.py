@@ -27,6 +27,14 @@ async def test_get_event_not_exists_fails(client, create_user):
     assert response.json()['detail'] == EventNotFound(str(this_id_does_not_exist)).detail
 
 
+async def test_get_event_not_exists_fails_with_422_if_not_uuid(client, create_user):
+    this_id_does_not_exist = 'this-id-is-not-uuid'
+    response = await client.get(f"/events/{this_id_does_not_exist}/public",
+                                headers=create_headers(create_user['id']))
+
+    assert response.status_code == 422
+
+
 async def test_get_all_events_not_admin_error(
         client, create_many_events, create_user
 ):

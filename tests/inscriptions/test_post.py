@@ -37,7 +37,7 @@ async def test_post_inscription_without_event_fails(client, create_user):
 
 async def test_post_inscription_without_user_fails(client, create_event):
     event_id = create_event['id']
-    user_id_not_exists = 'id-user-does-not-exists'
+    user_id_not_exists = 'iduserdoesnotexists123456789'
     response = await client.post(
         f"/events/{event_id}/inscriptions",
         headers=create_headers(user_id_not_exists)
