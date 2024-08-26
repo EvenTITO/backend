@@ -21,7 +21,7 @@ class InscriptionModel(ModelTemplate, Base):
     __tablename__ = "inscriptions"
 
     user_id = Column(UIDType, ForeignKey("users.id"), nullable=False)
-    event_id = Column(UUID(as_uuid=False), ForeignKey("events.id"), nullable=False)
+    event_id = Column(UUID(as_uuid=True), ForeignKey("events.id"), nullable=False)
     status = Column(String, default=InscriptionStatus.PENDING_PAYMENT.value, nullable=False)
     roles = Column(ARRAY(String), default=[InscriptionRole.ATTENDEE.value], nullable=False)
     affiliation = Column(String, default=None, nullable=True)

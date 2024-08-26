@@ -26,7 +26,7 @@ class WorkStates(str, enum.Enum):
 class WorkModel(ModelTemplate, Base):
     __tablename__ = "works"
 
-    event_id = Column(UUID(as_uuid=False), ForeignKey("events.id"), nullable=False)
+    event_id = Column(UUID(as_uuid=True), ForeignKey("events.id"), nullable=False)
     author_id = Column(UIDType, ForeignKey("users.id"), nullable=False)
 
     title = Column(String, nullable=False)

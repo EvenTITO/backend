@@ -46,7 +46,7 @@ class EventMembersService(BaseService):
                 return True
         return False
 
-    async def invite_member(self, member: MemberRequestSchema, event_id: UUID) -> str:
+    async def invite_member(self, member: MemberRequestSchema, event_id: UUID) -> UID:
         user_id = await self.users_repository.get_user_id_by_email(member.email)
         if user_id is None:
             raise UserNotFound(member.email)

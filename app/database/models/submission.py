@@ -7,8 +7,8 @@ from app.database.models.utils import ModelTemplate
 class SubmissionModel(ModelTemplate, Base):
     __tablename__ = "submissions"
 
-    event_id = Column(UUID(as_uuid=False), ForeignKey("events.id"), nullable=False)
-    work_id = Column(UUID(as_uuid=False), ForeignKey("works.id"), nullable=False)
+    event_id = Column(UUID(as_uuid=True), ForeignKey("events.id"), nullable=False)
+    work_id = Column(UUID(as_uuid=True), ForeignKey("works.id"), nullable=False)
 
     # This is a Compose Foreign Key constraint: the submission references a
     # single work with id (event_id, work_id).

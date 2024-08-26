@@ -31,7 +31,7 @@ async def invite_member(
         members_service: EventMembersServiceDep,
         member: MemberRequestSchema,
         event_id: UUID
-) -> str:
+) -> UID:
     return await members_service.invite_member(member, event_id)
 
 

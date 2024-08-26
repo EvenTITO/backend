@@ -12,4 +12,4 @@ class MemberModel(DateTemplate):
 
     @declared_attr
     def event_id(self):
-        return Column(UUID(as_uuid=False), ForeignKey("events.id"), primary_key=True)
+        return Column(UUID(as_uuid=True), ForeignKey("events.id"), primary_key=True)

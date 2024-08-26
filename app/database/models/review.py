@@ -20,10 +20,10 @@ class ReviewStatus(str, enum.Enum):
 class ReviewModel(DateTemplate):
     __tablename__ = "reviews"
 
-    submission_id = Column(UUID(as_uuid=False), ForeignKey("submissions.id"), primary_key=True)
+    submission_id = Column(UUID(as_uuid=True), ForeignKey("submissions.id"), primary_key=True)
     reviewer_id = Column(UIDType, ForeignKey("users.id"), primary_key=True)
-    event_id = Column(UUID(as_uuid=False), ForeignKey("events.id"), nullable=False)
-    work_id = Column(UUID(as_uuid=False), ForeignKey("works.id"), nullable=False)
+    event_id = Column(UUID(as_uuid=True), ForeignKey("events.id"), nullable=False)
+    work_id = Column(UUID(as_uuid=True), ForeignKey("works.id"), nullable=False)
 
     review = Column(JSON)
     review_status = Column(String, nullable=False)

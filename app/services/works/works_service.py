@@ -27,7 +27,7 @@ class WorksService(BaseService):
         works = await self.works_repository.get_all_works_for_user(self.user_id, offset, limit)
         return list(map(WorksService.__map_to_schema, works))
 
-    async def create_work(self, work: WorkSchema) -> str:
+    async def create_work(self, work: WorkSchema) -> UUID:
         deadline_date = datetime(2024, 11, 5)
         # TODO: use event deadline date.
         # TODO: validate before deadline.
