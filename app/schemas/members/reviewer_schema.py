@@ -1,6 +1,9 @@
+from uuid import UUID
+
 from pydantic import Field, BaseModel, PrivateAttr
 
 from app.schemas.members.member_schema import MemberResponseSchema
+from app.schemas.users.utils import UID
 
 
 class ReviewerWithWorksResponseSchema(MemberResponseSchema):
@@ -13,13 +16,13 @@ class ReviewerWithWorksResponseSchema(MemberResponseSchema):
 
 class ReviewerResponseSchema(MemberResponseSchema):
     review_deadline: str = Field(examples=["2024-07-12"])
-    work_id: str = Field(examples=["work_id_01"])
+    work_id: UUID = Field(examples=["work_id_01"])
 
 
 class ReviewerRequestSchema(BaseModel):
-    work_id: str
+    work_id: UUID
     email: str
-    _user_id: str | None = PrivateAttr()
+    _user_id: UID | None = PrivateAttr()
     review_deadline: str = Field(examples=["2024-07-12"])
 
 

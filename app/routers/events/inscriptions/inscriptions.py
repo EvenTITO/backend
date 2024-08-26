@@ -1,4 +1,5 @@
 from typing import List
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
 
@@ -62,5 +63,8 @@ async def read_my_inscriptions(
     status_code=200,
     dependencies=[Depends(verify_user_exists)]
 )
-async def submit(inscription_id: str, inscription_service: EventInscriptionsServiceDep) -> InscriptionPayResponseSchema:
+async def submit(
+    inscription_id: UUID,
+    inscription_service: EventInscriptionsServiceDep
+) -> InscriptionPayResponseSchema:
     return await inscription_service.pay(inscription_id)

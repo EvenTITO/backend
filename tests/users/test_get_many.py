@@ -25,8 +25,9 @@ USERS = [
 async def create_all_users(client):
     ids = []
     for user in USERS:
-        id = str(uuid4())
-        _ = await client.post(
+        uid = str(uuid4())
+        id = 3 * uid[0:8] + 'asdf'  # just a random UID, not UUID because it fails validation.
+        await client.post(
             "/users",
             json=jsonable_encoder(user),
             headers=create_headers(id)

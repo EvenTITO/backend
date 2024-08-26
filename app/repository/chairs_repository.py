@@ -1,8 +1,10 @@
+from uuid import UUID
 from sqlalchemy import update, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.chair import ChairModel
 from app.repository.members_repository import MemberRepository
+from app.schemas.users.utils import UID
 
 
 class ChairRepository(MemberRepository):
@@ -16,7 +18,7 @@ class ChairRepository(MemberRepository):
             ChairModel.user_id == chair_id
         ]
 
-    async def update_tracks(self, event_id: str, user_id: str, tracks: list[str]):
+    async def update_tracks(self, event_id: UUID, user_id: UID, tracks: list[str]):
         update_query = (
             update(ChairModel).where(and_(
                 ChairModel.event_id == event_id,

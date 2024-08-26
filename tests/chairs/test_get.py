@@ -47,19 +47,53 @@ async def test_get_chairs_empty(client, create_event_creator, create_event_from_
     assert len(chair_list) == 0
 
 
-@pytest.mark.skip(reason="TODO: obtener el chair por user_id con sus tracks si ese chair soy yo mismo y soy organizer")
-async def test_get_chair_by_user_id_01():
-    pass
+async def test_get_chair_by_user_id_being_myself_the_chair_and_organizer(
+    client,
+    create_event_from_event_creator,
+    create_event_creator
+):
+    request = MemberRequestSchema(
+        email=create_event_creator["email"],
+        role=EventRole.CHAIR
+    )
+    # Add myself as chair
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/members",
+        json=jsonable_encoder(request),
+        headers=create_headers(create_event_creator["id"])
+    )
+    assert response.status_code == 201
+
+    response = await client.get(
+        f"/events/{create_event_from_event_creator}/chairs/{create_event_creator['id']}",
+        headers=create_headers(create_event_creator['id'])
+    )
+    assert response.status_code == 200
 
 
-@pytest.mark.skip(reason="TODO: obtener un chair por user_id con sus tracks si soy organizer")
-async def test_get_chair_by_user_id_02():
-    pass
+async def test_get_chair_by_user_id_being_an_organizer(
+    client,
+    create_event_creator,
+    create_event_from_event_creator,
+    create_event_chair
+):
+    response = await client.get(
+        f"/events/{create_event_from_event_creator}/chairs/{create_event_chair}",
+        headers=create_headers(create_event_creator["id"])
+    )
+    assert response.status_code == 200
 
 
-@pytest.mark.skip(reason="TODO: (FALLO) tratar de obtener un chair por user_id si no soy organizer")
-async def test_get_chair_by_user_id_03():
-    pass
+async def test_get_chair_by_user_id_called_by_not_organizer_fails(
+    client,
+    create_event_from_event_creator,
+    create_event_chair
+):
+    response = await client.get(
+        f"/events/{create_event_from_event_creator}/chairs/{create_event_chair}",
+        headers=create_headers(create_event_chair)
+    )
+    assert response.status_code == 403
 
 
 @pytest.mark.skip(reason="TODO: (FALLO) tratar de obtener un chair si no soy organizer pero ese user_id no es chair")
@@ -67,16 +101,52 @@ async def test_get_chair_by_user_id_04():
     pass
 
 
-@pytest.mark.skip(reason="TODO:(FALLO) tratar de obtener chair si soy organizer pero ese user_id no existe como user")
-async def test_get_chair_by_user_id_05():
-    pass
+async def test_get_chair_by_user_id_fails_if_the_user_does_not_exist(
+    client,
+    create_event_creator,
+    create_event_from_event_creator,
+):
+    invalid_user_id = 'qwertyuiopasdfghjklzxcvbnmdfghj'
+    response = await client.get(
+        f"/events/{create_event_from_event_creator}/chairs/{invalid_user_id}",
+        headers=create_headers(create_event_creator['id'])
+    )
+    assert response.status_code == 404
 
 
-@pytest.mark.skip(reason="TODO: obtener mis datos como chair si soy chair del evento")
-async def test_get_chair_me_01():
-    pass
+async def test_get_chair_by_user_id_fails_if_the_user_does_not_exist_as_chair(
+    client,
+    create_event_creator,
+    create_event_from_event_creator,
+    create_user,
+):
+    response = await client.get(
+        f"/events/{create_event_from_event_creator}/chairs/{create_user['id']}",
+        headers=create_headers(create_event_creator['id'])
+    )
+    assert response.status_code == 404
 
 
-@pytest.mark.skip(reason="TODO:(FALLO) obtener mis datos como chair si no soy chair del evento")
-async def test_get_chair_me_02():
-    pass
+async def test_get_chair_me_i_am_event_chair(
+    client,
+    create_event_from_event_creator,
+    create_event_chair
+):
+    response = await client.get(
+        f"/events/{create_event_from_event_creator}/chairs/me",
+        headers=create_headers(create_event_chair)
+    )
+    assert response.status_code == 200
+    assert len(response.json()['tracks']) == 0
+
+
+async def test_get_chair_me_i_am_not_event_chair_fails(
+    client,
+    create_event_from_event_creator,
+    create_user
+):
+    response = await client.get(
+        f"/events/{create_event_from_event_creator}/chairs/me",
+        headers=create_headers(create_user['id'])
+    )
+    assert response.status_code == 403

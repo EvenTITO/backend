@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends
 
@@ -15,8 +16,8 @@ class Submissions:
     async def __call__(
             self,
             user_id: CallerIdDep,
-            event_id: str,
-            work_id: str,
+            event_id: UUID,
+            work_id: UUID,
             storage_service: WorkStorageServiceDep,
             submission_repository: SubmissionsRepository = Depends(get_repository(SubmissionsRepository)),
             work_repository: WorksRepository = Depends(get_repository(WorksRepository))

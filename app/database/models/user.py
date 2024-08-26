@@ -3,7 +3,7 @@ from enum import Enum
 from sqlalchemy import Column, String
 
 from app.database.models.base import Base
-from app.database.models.utils import ModelTemplate
+from app.database.models.utils import DateTemplate, UIDType
 
 
 class UserRole(str, Enum):
@@ -12,8 +12,9 @@ class UserRole(str, Enum):
     DEFAULT = "DEFAULT"
 
 
-class UserModel(ModelTemplate, Base):
+class UserModel(DateTemplate, Base):
     __tablename__ = "users"
+    id = Column(UIDType, primary_key=True)
 
     email = Column(String, nullable=False, unique=True)
     name = Column(String, nullable=False)

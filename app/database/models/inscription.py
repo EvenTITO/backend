@@ -1,9 +1,9 @@
 from enum import Enum
 
-from sqlalchemy import Column, String, ForeignKey, ARRAY, Index
+from sqlalchemy import Column, String, ForeignKey, ARRAY, Index, UUID
 
 from app.database.models.base import Base
-from app.database.models.utils import ModelTemplate
+from app.database.models.utils import ModelTemplate, UIDType
 
 
 class InscriptionStatus(str, Enum):
@@ -20,8 +20,8 @@ class InscriptionRole(str, Enum):
 class InscriptionModel(ModelTemplate, Base):
     __tablename__ = "inscriptions"
 
-    user_id = Column(String, ForeignKey("users.id"), nullable=False)
-    event_id = Column(String, ForeignKey("events.id"), nullable=False)
+    user_id = Column(UIDType, ForeignKey("users.id"), nullable=False)
+    event_id = Column(UUID(as_uuid=True), ForeignKey("events.id"), nullable=False)
     status = Column(String, default=InscriptionStatus.PENDING_PAYMENT.value, nullable=False)
     roles = Column(ARRAY(String), default=[InscriptionRole.ATTENDEE.value], nullable=False)
     affiliation = Column(String, default=None, nullable=True)

@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter
 
 reviews_router = APIRouter(prefix="/events/{event_id}/works/{work_id}/reviews", tags=["Event: Works Reviews"])
@@ -31,7 +33,7 @@ async def update_work_review_status():
 
 
 @reviews_router.put("/{review_id}")
-async def update_review(review_id: int):
+async def update_review(review_id: UUID):
     """
     The reviewer uses this method to update his review.
     """

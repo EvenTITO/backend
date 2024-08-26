@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from uuid import UUID
 
 from app.authorization.util_dep import or_
 from app.services.events.events_administration_service_dep import EventsAdministrationServiceDep
@@ -18,7 +19,7 @@ events_admin_router = APIRouter(prefix="/{event_id}", tags=["Events: Administrat
 )
 async def change_event_status(
         service: EventsAdministrationServiceDep,
-        event_id: str,
+        event_id: UUID,
         status_modification: EventStatusSchema,
         user_role: UserDep
 ):

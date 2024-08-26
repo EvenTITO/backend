@@ -3,6 +3,7 @@ from typing import Self
 from pydantic import BaseModel, Field, EmailStr, model_validator, ConfigDict
 
 from app.schemas.users.user_role import UserRoleSchema
+from app.schemas.users.utils import UID
 
 
 class UserModifySchema(BaseModel):
@@ -29,4 +30,4 @@ class UserSchema(UserModifySchema):
 
 
 class UserReply(UserSchema, UserRoleSchema):
-    id: str
+    id: UID

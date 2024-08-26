@@ -1,4 +1,5 @@
 from typing import List
+from uuid import UUID
 
 from fastapi import APIRouter, Query
 
@@ -7,6 +8,7 @@ from app.authorization.organizer_dep import IsOrganizerDep
 from app.authorization.util_dep import or_
 from app.schemas.members.reviewer_schema import ReviewerWithWorksResponseSchema, ReviewerCreateRequestSchema, \
     ReviewerResponseSchema
+from app.schemas.users.utils import UID
 from app.services.event_reviewers.event_reviewers_service_dep import EventReviewerServiceDep
 
 event_reviewers_router = APIRouter(
@@ -26,7 +28,7 @@ event_works_reviewers_router = APIRouter(
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
 async def add_reviewers(
-        event_id: str,
+        event_id: UUID,
         reviewers: ReviewerCreateRequestSchema,
         reviewer_service: EventReviewerServiceDep
 ) -> None:
@@ -40,8 +42,8 @@ async def add_reviewers(
 )
 async def read_event_reviewers(
         reviewer_service: EventReviewerServiceDep,
-        event_id: str,
-        work_id: str = Query(default=None),
+        event_id: UUID,
+        work_id: UUID = Query(default=None),
 ) -> List[ReviewerWithWorksResponseSchema]:
     return await reviewer_service.get_reviewers(event_id, work_id)
 
@@ -53,8 +55,8 @@ async def read_event_reviewers(
 )
 async def read_event_reviewer_by_user(
         reviewer_service: EventReviewerServiceDep,
-        event_id: str,
-        user_id: str,
+        event_id: UUID,
+        user_id: UID,
 ) -> ReviewerWithWorksResponseSchema:
     return await reviewer_service.get_reviewer_by_user_id(event_id, user_id)
 
@@ -66,8 +68,8 @@ async def read_event_reviewer_by_user(
 )
 async def read_event_reviewer_by_user_and_work(
         reviewer_service: EventReviewerServiceDep,
-        event_id: str,
-        work_id: str,
-        user_id: str,
+        event_id: UUID,
+        work_id: UUID,
+        user_id: UID,
 ) -> ReviewerResponseSchema:
     return await reviewer_service.get_reviewer_by_user_id_and_work_id(event_id, user_id, work_id)

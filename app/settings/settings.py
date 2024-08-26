@@ -24,3 +24,7 @@ class NotificationsSettings(BaseSettings):
     FRONTEND_URL: str = ''
     ENABLE_SEND_EMAILS: bool = False
     SMTPS_PORT: int = 465
+
+
+class DatabaseSettings(BaseSettings):
+    DATABASE_URL: str

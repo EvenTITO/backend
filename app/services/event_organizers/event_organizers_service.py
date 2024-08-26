@@ -1,3 +1,4 @@
+from uuid import UUID
 from app.database.models.member import MemberModel
 from app.database.models.user import UserModel
 from app.exceptions.members.organizer.organizer_exceptions import UserNotIsOrganizer, AtLeastOneOrganizer
@@ -5,6 +6,7 @@ from app.repository.organizers_repository import OrganizerRepository
 from app.repository.users_repository import UsersRepository
 from app.schemas.members.member_schema import MemberResponseSchema
 from app.schemas.users.user import UserSchema
+from app.schemas.users.utils import UID
 from app.services.services import BaseService
 
 
@@ -13,14 +15,14 @@ class EventOrganizersService(BaseService):
         self.organizer_repository = organizer_repository
         self.users_repository = users_repository
 
-    async def get_all_organizers(self, event_id: str) -> list[MemberResponseSchema]:
+    async def get_all_organizers(self, event_id: UUID) -> list[MemberResponseSchema]:
         users_organizers = await self.organizer_repository.get_all(event_id)
         return list(map(EventOrganizersService.__map_to_schema, users_organizers))
 
-    async def is_organizer(self, event_id: str, user_id: str) -> bool:
+    async def is_organizer(self, event_id: UUID, user_id: UID) -> bool:
         return await self.organizer_repository.is_member(event_id, user_id)
 
-    async def remove_organizer(self, event_id: str, user_id: str) -> None:
+    async def remove_organizer(self, event_id: UUID, user_id: UID) -> None:
         if not await self.organizer_repository.is_member(event_id, user_id):
             raise UserNotIsOrganizer(event_id, user_id)
         users_organizers = await self.organizer_repository.get_all(event_id)
