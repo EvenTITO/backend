@@ -6,7 +6,7 @@ from app.schemas.storage.schemas import UploadURLSchema, DownloadURLSchema
 
 class SubmissionResponseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: str
+    id: UUID
     work_id: UUID
     event_id: UUID
 

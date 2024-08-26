@@ -15,7 +15,7 @@ class InscriptionRequestSchema(BaseModel):
 
 
 class InscriptionResponseSchema(BaseModel):
-    id: str
+    id: UUID
     user_id: UID
     event_id: UUID
     roles: list[InscriptionRole]
@@ -26,17 +26,17 @@ class InscriptionResponseSchema(BaseModel):
 
 class InscriptionPayResponseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: str
+    id: UUID
     upload_url: UploadURLSchema
 
 
 class InscriptionAffiliationUploadSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: str
+    id: UUID
     upload_url: UploadURLSchema
 
 
 class InscriptionAffiliationDownloadSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: str
+    id: UUID
     download_url: DownloadURLSchema

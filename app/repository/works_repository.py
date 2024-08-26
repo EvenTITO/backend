@@ -37,7 +37,7 @@ class WorksRepository(Repository):
         conditions = [WorkModel.event_id == event_id, WorkModel.track == track]
         await self._get_many_with_conditions(conditions, limit, offset)
 
-    async def create_work(self, work: WorkSchema, event_id: UUID, deadline_date: datetime, author_id: str) -> WorkModel:
+    async def create_work(self, work: WorkSchema, event_id: UUID, deadline_date: datetime, author_id: UID) -> WorkModel:
         work_model = WorkModel(
             **work.model_dump(),
             event_id=event_id,
