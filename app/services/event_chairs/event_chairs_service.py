@@ -36,7 +36,7 @@ class EventChairService(BaseService):
             raise UserNotIsChair(event_id, user_id)
         await self.chair_repository.remove_member(event_id, user_id)
 
-    async def is_chair(self, event_id: str, user_id: str) -> None:
+    async def is_chair(self, event_id: str, user_id: str) -> bool:
         return await self.chair_repository.is_member(event_id, user_id)
 
     async def update_tracks(self, event_id: str, user_id: str, tracks_schema: DynamicTracksEventSchema) -> None:

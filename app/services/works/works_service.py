@@ -75,6 +75,9 @@ class WorksService(BaseService):
             raise WorkNotFound(event_id=event_id, work_id=work_id)
         return work
 
+    async def exist_work(self, event_id: str, work_id: str) -> bool:
+        return await self.works_repository.exists_work(event_id, work_id)
+
     @staticmethod
     def __map_to_schema(model: WorkModel) -> WorkWithState:
         return WorkWithState(

@@ -51,3 +51,7 @@ class WorksRepository(Repository):
     async def work_with_title_exists(self, event_id: str, title: str):
         conditions = [WorkModel.event_id == event_id, WorkModel.title == title]
         return await self._exists_with_conditions(conditions)
+
+    async def exists_work(self, event_id: str, work_id: str) -> bool:
+        conditions = [WorkModel.event_id == event_id, WorkModel.id == work_id]
+        return await self._exists_with_conditions(conditions)
