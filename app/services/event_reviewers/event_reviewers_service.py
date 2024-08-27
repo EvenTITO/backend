@@ -6,7 +6,7 @@ from app.exceptions.users_exceptions import UserNotFound
 from app.exceptions.works.works_exceptions import WorkNotFound
 from app.repository.reviewers_repository import ReviewerRepository
 from app.repository.users_repository import UsersRepository
-from app.schemas.members.reviewer_schema import ReviewerResponseSchema
+from app.schemas.members.reviewer_schema import ReviewerResponseSchema, ReviewerAssignmentSchema
 from app.schemas.members.reviewer_schema import ReviewerWithWorksResponseSchema, ReviewerCreateRequestSchema
 from app.schemas.users.utils import UID
 from app.services.events.events_service import EventsService
@@ -62,3 +62,6 @@ class EventReviewerService(BaseService):
                 raise AlreadyReviewerExist(event_id, user_id, new_reviewer.work_id)
             new_reviewer._user_id = user_id
         await self.reviewer_repository.create_reviewers(event_id, create_schema.reviewers)
+
+    async def get_my_assignments(self, event_id: UUID, user_id: UID) -> list[ReviewerAssignmentSchema]:
+        return await self.reviewer_repository.get_assignments(event_id, user_id)

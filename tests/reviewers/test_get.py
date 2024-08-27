@@ -444,34 +444,66 @@ async def test_get_reviewer_by_user_id_not_reviewer_user_id(
     assert get_response.status_code == 404
 
 
-async def test_get_reviewer_by_work_id_and_user_id_ok(
+async def test_get_my_assignments_ok(
         client,
         create_user,
         create_event_creator,
         create_event_from_event_creator
 ):
-    create_work_response = await client.post(
+    create_work_1_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
         json=jsonable_encoder(USER_WORK),
         headers=create_headers(create_event_creator['id'])
     )
+    assert create_work_1_response.status_code == 201
 
-    assert create_work_response.status_code == 201
+    work_id_1 = create_work_1_response.json()
 
-    work_id = create_work_response.json()
+    work_2 = USER_WORK.model_copy()
+    work_2.title = 'new work title'
+
+    create_work_2_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works",
+        json=jsonable_encoder(work_2),
+        headers=create_headers(create_event_creator['id'])
+    )
+    assert create_work_2_response.status_code == 201
+    work_id_2 = create_work_2_response.json()
+
+    work_3 = USER_WORK.model_copy()
+    work_3.title = 'new work other title'
+
+    create_work_3_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works",
+        json=jsonable_encoder(work_3),
+        headers=create_headers(create_event_creator['id'])
+    )
+    assert create_work_3_response.status_code == 201
+    work_id_3 = create_work_3_response.json()
+
     new_reviewer_1 = ReviewerRequestSchema(
-        work_id=work_id,
+        work_id=work_id_1,
+        email=create_user["email"],
+        review_deadline="2024-07-07"
+    )
+    new_reviewer_2 = ReviewerRequestSchema(
+        work_id=work_id_2,
         email=create_user["email"],
         review_deadline="2024-06-07"
     )
-    new_reviewer_2 = ReviewerRequestSchema(
-        work_id=work_id,
+    new_reviewer_3 = ReviewerRequestSchema(
+        work_id=work_id_3,
+        email=create_user["email"],
+        review_deadline="2024-05-07"
+    )
+    new_reviewer_4 = ReviewerRequestSchema(
+        work_id=work_id_1,
         email=create_event_creator["email"],
         review_deadline="2024-06-07"
     )
 
     request = ReviewerCreateRequestSchema(
-        reviewers=[new_reviewer_1, new_reviewer_2]
+        reviewers=[new_reviewer_1, new_reviewer_2, new_reviewer_3, new_reviewer_4]
     )
 
     response = await client.post(
@@ -483,48 +515,57 @@ async def test_get_reviewer_by_work_id_and_user_id_ok(
     assert response.status_code == 201
 
     get_response = await client.get(
-        f"/events/{create_event_from_event_creator}/works/{work_id}/reviewers/{create_user['id']}",
+        f"/events/{create_event_from_event_creator}/reviewers/my-assignments",
+        headers=create_headers(create_user['id'])
+    )
+
+    assert get_response.status_code == 200
+
+    assignments_list = get_response.json()
+    assert len(assignments_list) == 3
+    assert work_id_1 == assignments_list[0]["work_id"]
+    assert work_id_2 == assignments_list[1]["work_id"]
+    assert work_id_3 == assignments_list[2]["work_id"]
+    assert "2024-07-07" == assignments_list[0]["review_deadline"]
+    assert "2024-06-07" == assignments_list[1]["review_deadline"]
+    assert "2024-05-07" == assignments_list[2]["review_deadline"]
+
+    get_response = await client.get(
+        f"/events/{create_event_from_event_creator}/reviewers/my-assignments",
         headers=create_headers(create_event_creator['id'])
     )
 
     assert get_response.status_code == 200
 
-    reviewer = get_response.json()
-    assert reviewer["work_id"] == work_id
-    assert reviewer["event_id"] == create_event_from_event_creator
-    assert reviewer["user_id"] == create_user['id']
-    assert reviewer["review_deadline"] == "2024-06-07"
-    assert reviewer["user"]["email"] == create_user["email"]
+    assignments_list = get_response.json()
+    assert len(assignments_list) == 1
+    assert work_id_1 == assignments_list[0]["work_id"]
+    assert "2024-06-07" == assignments_list[0]["review_deadline"]
 
 
-async def test_get_reviewer_by_work_id_and_user_id_invalid_user_id(
+async def test_get_my_assignments_without_permissions(
         client,
         create_user,
         create_event_creator,
         create_event_from_event_creator
 ):
-    create_work_response = await client.post(
+    create_work_1_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
         json=jsonable_encoder(USER_WORK),
         headers=create_headers(create_event_creator['id'])
     )
+    assert create_work_1_response.status_code == 201
 
-    assert create_work_response.status_code == 201
+    work_id_1 = create_work_1_response.json()
 
-    work_id = create_work_response.json()
-    new_reviewer_1 = ReviewerRequestSchema(
-        work_id=work_id,
-        email=create_user["email"],
-        review_deadline="2024-06-07"
-    )
-    new_reviewer_2 = ReviewerRequestSchema(
-        work_id=work_id,
+    new_reviewer = ReviewerRequestSchema(
+        work_id=work_id_1,
         email=create_event_creator["email"],
         review_deadline="2024-06-07"
     )
 
     request = ReviewerCreateRequestSchema(
-        reviewers=[new_reviewer_1, new_reviewer_2]
+        reviewers=[new_reviewer]
     )
 
     response = await client.post(
@@ -536,8 +577,8 @@ async def test_get_reviewer_by_work_id_and_user_id_invalid_user_id(
     assert response.status_code == 201
 
     get_response = await client.get(
-        f"/events/{create_event_from_event_creator}/works/{work_id}/reviewers/user_id_invalid",
-        headers=create_headers(create_event_creator['id'])
+        f"/events/{create_event_from_event_creator}/reviewers/my-assignments",
+        headers=create_headers(create_user['id'])
     )
 
-    assert get_response.status_code == 422
+    assert get_response.status_code == 403
