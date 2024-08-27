@@ -19,6 +19,11 @@ class ReviewerResponseSchema(MemberResponseSchema):
     work_id: UUID = Field(examples=["work_id_01"])
 
 
+class ReviewerAssignmentSchema(BaseModel):
+    review_deadline: str = Field(examples=["2024-07-12"])
+    work_id: UUID = Field(examples=["work_id_01"])
+
+
 class ReviewerRequestSchema(BaseModel):
     work_id: UUID
     email: str

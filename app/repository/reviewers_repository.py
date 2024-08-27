@@ -6,7 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.models.reviewer import ReviewerModel
 from app.database.models.user import UserModel
 from app.repository.members_repository import MemberRepository
-from app.schemas.members.reviewer_schema import ReviewerWithWorksResponseSchema, ReviewerResponseSchema
+from app.schemas.members.reviewer_schema import ReviewerWithWorksResponseSchema, ReviewerResponseSchema, \
+    ReviewerAssignmentSchema
 from app.schemas.users.utils import UID
 
 
@@ -120,3 +121,11 @@ class ReviewerRepository(MemberRepository):
             )
             self.session.add(new_reviewer_model)
         await self.session.commit()
+
+    async def get_assignments(self, event_id: UUID, user_id: UID):
+        query = (select(ReviewerModel.work_id, ReviewerModel.review_deadline)
+                 .where(and_(ReviewerModel.event_id == event_id, ReviewerModel.user_id == user_id)))
+
+        result = await self.session.execute(query)
+        res = result.fetchall()
+        return [ReviewerAssignmentSchema(work_id=row.work_id, review_deadline=row.review_deadline) for row in res]
