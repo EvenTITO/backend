@@ -38,15 +38,16 @@ BODY_TEMPLATE = get_body_template()
 class NotificationsService:
     def _send_email(self, message: EmailMessage):
         if not settings.ENABLE_SEND_EMAILS:
+            print("not setting send emails")
             return
-        message['From'] = settings.NOTIFICATIONS_EMAIL
+        message['From'] = settings.EMAIL
         try:
             with smtplib.SMTP_SSL(
                 "smtp.gmail.com",
                 settings.SMTPS_PORT,
                 context=SLL_DEFAULT_CONTEXT
             ) as server:
-                server.login(settings.NOTIFICATIONS_EMAIL, settings.NOTIFICATIONS_EMAIL_PASSWORD)
+                server.login(settings.EMAIL, settings.EMAIL_PASSWORD)
                 server.send_message(message)
             return True
         except Exception as e:

@@ -2,9 +2,27 @@ import datetime
 
 from fastapi.encoders import jsonable_encoder
 
+from app.schemas.events.configuration_general import ConfigurationGeneralEventSchema
 from app.schemas.events.dates import DatesCompleteSchema, DateSchema, MandatoryDates
 from app.schemas.events.schemas import DynamicTracksEventSchema
 from tests.commontest import create_headers
+
+
+async def add_notification_mails(client, event_id, creator_user_id):
+    event = ConfigurationGeneralEventSchema()
+    event.notification_mails = ["eventito_test@hotmail.com"]
+    event.contact = "Pepe"
+    event.organized_by = "Jose"
+    event.dates[0].date = "2024-09-02"
+    event.dates[0].time = "15:30:00"
+
+    response = await client.put(
+        f"/events/{event_id}/configuration/general",
+        json=jsonable_encoder(event),
+        headers=create_headers(creator_user_id)
+    )
+
+    assert response.status_code == 204
 
 
 async def add_tracks(client, event_id, creator_user_id):
