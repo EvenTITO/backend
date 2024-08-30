@@ -3,8 +3,8 @@ class NoStorageProvidedClient:
         self,
         bucket_name,
         blob_name,
-        expiration,
-        max_size_mb
+        expiration=3600,
+        max_size_mb=3
     ):
         raise Exception("No storage Client provided")
 
@@ -12,6 +12,6 @@ class NoStorageProvidedClient:
         self,
         bucket_name,
         blob_name,
-        expiration,
+        expiration=3600,
     ):
         raise Exception("No storage Client provided")

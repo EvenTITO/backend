@@ -2,9 +2,10 @@ from fastapi.encoders import jsonable_encoder
 
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from ..commontest import create_headers
+from ..fixtures.data.events_fixtures import create_many_events_started_with_emails
 
 
-async def test_get_inscription(client, mock_storage, create_inscription, admin_data):
+async def test_get_inscription(client, create_inscription, admin_data):
     event_id = create_inscription['event_id']
     response = await client.get(
         f"/events/{event_id}/inscriptions",
@@ -17,9 +18,7 @@ async def test_get_inscription(client, mock_storage, create_inscription, admin_d
     assert (inscriptions[0]['user_id'] == create_inscription['user_id'])
 
 
-async def test_user_inscribes_to_two_events(client, mock_storage, create_user, create_many_events_started_with_emails):
-    assert len(create_many_events_started_with_emails) > 1
-
+async def test_user_inscribes_to_two_events(client, create_user, create_many_events_started):
     new_inscription = InscriptionRequestSchema(
         roles=["ATTENDEE"],
         affiliation="Fiuba",

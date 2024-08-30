@@ -3,9 +3,10 @@ from fastapi.encoders import jsonable_encoder
 
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from ..commontest import create_headers
+from ..fixtures.data.events_fixtures import create_event_started_with_email
 
 
-async def test_post_inscription(client, mock_storage, create_user, create_event_started_with_email):
+async def test_post_inscription(client, create_user, create_event_started):
     new_inscription = InscriptionRequestSchema(
         roles=["ATTENDEE"],
         affiliation="Fiuba",

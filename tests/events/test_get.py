@@ -78,17 +78,17 @@ async def test_get_all_events_admin_status_waiting_approval_is_zero(
     assert len(response.json()) == 0
 
 
-# async def test_get_all_events_non_admin_can_query_started(
-#         client, create_many_events, create_event_started, admin_data, create_user
-# ):
-#
-#     response = await client.get(
-#         "/events/",
-#         headers=create_headers(create_user['id']),
-#         params={'status': EventStatus.STARTED.value}
-#     )
-#     assert response.status_code == 200
-#     assert len(response.json()) == 1
+async def test_get_all_events_non_admin_can_query_started(
+        client, create_many_events, create_event_started, admin_data, create_user
+):
+
+    response = await client.get(
+        "/events/",
+        headers=create_headers(create_user['id']),
+        params={'status': EventStatus.STARTED.value}
+    )
+    assert response.status_code == 200
+    assert len(response.json()) == 1
 
 
 async def test_get_all_events_non_admin_can_not_query_created(
@@ -135,29 +135,29 @@ async def test_get_all_events_query_by_title_contains(
     assert len(response.json()) == 2
 
 
-# async def test_get_all_events_public_is_status_created(client, create_event, admin_data):
-#     response = await client.get(
-#         "/events/",
-#         params={'status': EventStatus.STARTED.value},
-#         headers=create_headers(admin_data.id)
-#     )
-#     assert response.status_code == 200
-#     assert len(response.json()) == 1
+async def test_get_all_events_public_is_status_created(client, create_event, admin_data):
+    response = await client.get(
+        "/events/",
+        params={'status': EventStatus.STARTED.value},
+        headers=create_headers(admin_data.id)
+    )
+    assert response.status_code == 200
+    assert len(response.json()) == 1
 
 
-# async def test_get_all_events_public_is_status_created2(
-#         client, create_many_events_started_with_emails, admin_data
-# ):
-#
-#     n_events = len(create_many_events_started_with_emails)
-#
-#     response = await client.get(
-#         "/events/",
-#         params={'status': EventStatus.STARTED.value},
-#         headers=create_headers(admin_data.id)
-#     )
-#     assert response.status_code == 200
-#     assert len(response.json()) == n_events
+async def test_get_all_events_public_is_status_created2(
+        client, create_many_events_started_with_emails, admin_data
+):
+
+    n_events = len(create_many_events_started_with_emails)
+
+    response = await client.get(
+        "/events/",
+        params={'status': EventStatus.STARTED.value},
+        headers=create_headers(admin_data.id)
+    )
+    assert response.status_code == 200
+    assert len(response.json()) == n_events
 
 
 @pytest.mark.skip(reason="TODO: Write this code. Which date should we take? Or add a param for ordering?")

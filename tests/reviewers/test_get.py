@@ -1,5 +1,5 @@
 from fastapi.encoders import jsonable_encoder
-
+import datetime
 from app.schemas.members.reviewer_schema import ReviewerRequestSchema, ReviewerCreateRequestSchema
 from ..commontest import create_headers
 from ..works.test_create_work import USER_WORK
@@ -39,12 +39,12 @@ async def test_get_reviewers_ok(
     new_reviewer_1 = ReviewerRequestSchema(
         work_id=work_id,
         email=create_user["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
     new_reviewer_2 = ReviewerRequestSchema(
         work_id=work_id,
         email=create_event_creator["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
 
     request = ReviewerCreateRequestSchema(
@@ -120,12 +120,12 @@ async def test_get_reviewers_by_work_id_ok(
     new_reviewer_1 = ReviewerRequestSchema(
         work_id=work_id_1,
         email=create_user["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
     new_reviewer_2 = ReviewerRequestSchema(
         work_id=work_id_1,
         email=create_event_creator["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
 
     new_reviewer_3 = ReviewerRequestSchema(
@@ -179,12 +179,12 @@ async def test_get_reviewers_by_work_id_invalid_return_empty_list(
     new_reviewer_1 = ReviewerRequestSchema(
         work_id=work_id_1,
         email=create_user["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
     new_reviewer_2 = ReviewerRequestSchema(
         work_id=work_id_1,
         email=create_event_creator["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
 
     request = ReviewerCreateRequestSchema(
@@ -285,12 +285,12 @@ async def test_get_reviewer__by_user_id_ok(
     new_reviewer_1 = ReviewerRequestSchema(
         work_id=work_id,
         email=create_user["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
     new_reviewer_2 = ReviewerRequestSchema(
         work_id=work_id,
         email=create_event_creator["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
 
     request = ReviewerCreateRequestSchema(
@@ -336,12 +336,12 @@ async def test_get_reviewer_by_user_id_invalid_userid_not_uid(
     new_reviewer_1 = ReviewerRequestSchema(
         work_id=work_id,
         email=create_user["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
     new_reviewer_2 = ReviewerRequestSchema(
         work_id=work_id,
         email=create_event_creator["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
 
     request = ReviewerCreateRequestSchema(
@@ -381,7 +381,7 @@ async def test_get_reviewer_by_user_id_invalid_userid(
     new_reviewer_1 = ReviewerRequestSchema(
         work_id=work_id,
         email=create_user["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
 
     request = ReviewerCreateRequestSchema(
@@ -421,7 +421,7 @@ async def test_get_reviewer_by_user_id_not_reviewer_user_id(
     new_reviewer_1 = ReviewerRequestSchema(
         work_id=work_id,
         email=create_user["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
 
     request = ReviewerCreateRequestSchema(
@@ -484,22 +484,22 @@ async def test_get_my_assignments_ok(
     new_reviewer_1 = ReviewerRequestSchema(
         work_id=work_id_1,
         email=create_user["email"],
-        review_deadline="2024-07-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=20)
     )
     new_reviewer_2 = ReviewerRequestSchema(
         work_id=work_id_2,
         email=create_user["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
     new_reviewer_3 = ReviewerRequestSchema(
         work_id=work_id_3,
         email=create_user["email"],
-        review_deadline="2024-05-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=5)
     )
     new_reviewer_4 = ReviewerRequestSchema(
         work_id=work_id_1,
         email=create_event_creator["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
 
     request = ReviewerCreateRequestSchema(
@@ -526,9 +526,9 @@ async def test_get_my_assignments_ok(
     assert work_id_1 == assignments_list[0]["work_id"]
     assert work_id_2 == assignments_list[1]["work_id"]
     assert work_id_3 == assignments_list[2]["work_id"]
-    assert "2024-07-07" == assignments_list[0]["review_deadline"]
-    assert "2024-06-07" == assignments_list[1]["review_deadline"]
-    assert "2024-05-07" == assignments_list[2]["review_deadline"]
+    assert new_reviewer_1.review_deadline.isoformat() == assignments_list[0]["review_deadline"]
+    assert new_reviewer_2.review_deadline.isoformat() == assignments_list[1]["review_deadline"]
+    assert new_reviewer_3.review_deadline.isoformat() == assignments_list[2]["review_deadline"]
 
     get_response = await client.get(
         f"/events/{create_event_from_event_creator}/reviewers/my-assignments",
@@ -540,7 +540,7 @@ async def test_get_my_assignments_ok(
     assignments_list = get_response.json()
     assert len(assignments_list) == 1
     assert work_id_1 == assignments_list[0]["work_id"]
-    assert "2024-06-07" == assignments_list[0]["review_deadline"]
+    assert new_reviewer_4.review_deadline.isoformat() == assignments_list[0]["review_deadline"]
 
 
 async def test_get_my_assignments_without_permissions(
@@ -561,7 +561,7 @@ async def test_get_my_assignments_without_permissions(
     new_reviewer = ReviewerRequestSchema(
         work_id=work_id_1,
         email=create_event_creator["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
 
     request = ReviewerCreateRequestSchema(

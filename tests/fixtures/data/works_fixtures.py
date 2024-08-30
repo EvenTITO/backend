@@ -1,3 +1,5 @@
+from app.schemas.works.author import AuthorInformation
+from app.schemas.works.work import WorkSchema
 import pytest
 
 from fastapi.encoders import jsonable_encoder
@@ -16,3 +18,32 @@ async def create_many_works(client, create_user, create_event):
         work_id = response.json()
         work['id'] = work_id
     return WORKS
+
+
+@pytest.fixture(scope="function")
+async def create_work_from_user(client, create_user, create_event) -> str:
+    user_work = WorkSchema(
+        title=(
+            'Comparación del Rendimiento de Curve25519, '
+            'P-256 y Curvas de Edwards en Algoritmos '
+            'de Criptografía Cuántica'
+        ),
+        track='cibersecurity',
+        abstract='',
+        keywords=['ciber', 'security'],
+        authors=[
+            AuthorInformation(
+                full_name='Mateo Perez',
+                membership='fiuba',
+                mail='mail@mail.com'
+            )
+        ]
+    )
+    event_id = create_event['id']
+    response = await client.post(
+        f"/events/{event_id}/works",
+        json=jsonable_encoder(user_work),
+        headers=create_headers(create_user["id"])
+    )
+    assert response.status_code == 201
+    return response.json()

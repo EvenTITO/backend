@@ -9,7 +9,6 @@ from app.schemas.events.event_status import EventStatusSchema
 from app.schemas.events.schemas import EventRole
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from ..commontest import create_headers
-from ..fixtures.data.events_fixtures import create_event_started
 from ..fixtures.data.helper import complete_event_configuration
 
 
@@ -19,7 +18,7 @@ async def test_get_my_events_no_events_empty_list(client, create_user):
     assert len(response.json()) == 0
 
 
-async def test_get_my_events(client, mock_storage, create_event_started_with_email, create_user, admin_data):
+async def test_get_my_events(client, create_event_started, create_user, admin_data):
     new_event = CreateEventSchema(
         title="Some Event Title",
         start_date=datetime(2024, 9, 2),

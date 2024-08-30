@@ -1,6 +1,7 @@
 from uuid import UUID
 from app.database.models.submission import SubmissionModel
 from app.database.models.work import WorkStates
+from app.exceptions.submissions.submissions_exceptions import SubmissionNotFound
 from app.repository.submissions_repository import SubmissionsRepository
 from app.schemas.users.utils import UID
 from app.schemas.works.submission import SubmissionUploadSchema, SubmissionDownloadSchema, SubmissionResponseSchema
@@ -52,7 +53,9 @@ class SubmissionsService(BaseService):
 
     async def get_latest_submission(self) -> SubmissionDownloadSchema:
         last_submission = await self.submission_repository.get_last_submission(self.event_id, self.work_id)
-        return await self.__get_submission(str(last_submission.id))
+        if last_submission is None:
+            raise SubmissionNotFound(self.event_id, self.work_id)
+        return await self.__get_submission(last_submission.id)
 
     async def __get_submission(self, submission_id: UUID) -> SubmissionDownloadSchema:
         download_url = await self.storage_service.get_submission_read_url(self.event_id, self.work_id, submission_id)

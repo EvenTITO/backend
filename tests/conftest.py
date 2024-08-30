@@ -8,3 +8,4 @@ from .fixtures.data.inscriptions_fixtures import *  # noqa: F401, F403
 from .fixtures.data.organizers_fixtures import *  # noqa: F401, F403
 from .fixtures.data.works_fixtures import *  # noqa: F401, F403
 from .fixtures.data.events_members_fixtures import *  # noqa: F401, F403
+from .fixtures.data.submissions_fixtures import *  # noqa: F401, F403

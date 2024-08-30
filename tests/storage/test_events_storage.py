@@ -20,7 +20,6 @@ async def test_get_event_contains_event_public_url(
 
 
 async def test_get_event_upload_url_must_be_event_organizer(
-    mock_storage,
     client,
     create_organizer,
     create_event_from_event_creator,
@@ -36,7 +35,6 @@ async def test_get_event_upload_url_must_be_event_organizer(
 
 
 async def test_get_event_upload_url_not_organizer_fails(
-    mock_storage,
     client,
     create_user,
     create_event_from_event_creator,
@@ -50,7 +48,6 @@ async def test_get_event_upload_url_not_organizer_fails(
 
 
 async def test_get_event_upload_url_nonexistent_file_fails(
-    mock_storage,
     client,
     create_organizer,
     create_event_from_event_creator,
