@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import func, and_, update, select
+from sqlalchemy import desc, update, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.submission import SubmissionModel
@@ -19,11 +19,12 @@ class SubmissionsRepository(Repository):
 
     async def get_last_submission(self, event_id, work_id) -> SubmissionModel:
         return await self._get_with_conditions(
-            and_(
+            [
                 self.model.event_id == event_id,
                 self.model.work_id == work_id,
-                func.max(self.model.id)
-            ))
+            ],
+            order_by=desc(self.model.creation_date)
+        )
 
     async def do_new_submit(self, event_id: UUID, work_id: UUID) -> UUID:
         new_submission = SubmissionModel(event_id=event_id, work_id=work_id)

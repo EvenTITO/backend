@@ -30,11 +30,14 @@ class Repository:
         conditions = self._primary_key_conditions(id)
         return await self._get_with_conditions(conditions)
 
-    async def _get_with_conditions(self, conditions):
-        return await self._get_with_values(conditions, self.model)
+    async def _get_with_conditions(self, conditions: list, order_by=None):
+        return await self._get_with_values(conditions, self.model, order_by)
 
-    async def _get_with_values(self, conditions, values):
-        query = select(values).where(and_(*conditions)).limit(1)
+    async def _get_with_values(self, conditions: list, values, order_by=None):
+        query = select(values).where(and_(*conditions))
+        if order_by:
+            query = query.order_by(order_by)
+        query = query.limit(1)
         result = await self.session.execute(query)
         return result.scalars().first()
 

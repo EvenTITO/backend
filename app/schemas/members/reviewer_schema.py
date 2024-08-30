@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 
 from pydantic import Field, BaseModel, PrivateAttr
@@ -14,21 +15,18 @@ class ReviewerWithWorksResponseSchema(MemberResponseSchema):
     )
 
 
-class ReviewerResponseSchema(MemberResponseSchema):
-    review_deadline: str = Field(examples=["2024-07-12"])
-    work_id: UUID = Field(examples=["work_id_01"])
-
-
 class ReviewerAssignmentSchema(BaseModel):
-    review_deadline: str = Field(examples=["2024-07-12"])
+    review_deadline: datetime = Field(examples=[datetime.now()])
     work_id: UUID = Field(examples=["work_id_01"])
 
 
-class ReviewerRequestSchema(BaseModel):
-    work_id: UUID
+class ReviewerResponseSchema(MemberResponseSchema, ReviewerAssignmentSchema):
+    pass
+
+
+class ReviewerRequestSchema(ReviewerAssignmentSchema):
     email: str
     _user_id: UID | None = PrivateAttr()
-    review_deadline: str = Field(examples=["2024-07-12"])
 
 
 class ReviewerCreateRequestSchema(BaseModel):
