@@ -1,7 +1,7 @@
 from ..commontest import create_headers
 
 
-async def test_create_submission(client, create_user, create_event, create_work_from_user):
+async def test_create_submission(client, create_user, create_event, create_work_from_user, mock_storage):
     event_id = create_event['id']
     response = await client.put(
         f"/events/{event_id}/works/{create_work_from_user}/submissions/submit",

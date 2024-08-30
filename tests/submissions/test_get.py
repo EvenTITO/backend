@@ -4,6 +4,7 @@ from ..commontest import create_headers
 async def test_get_latest_submission(
         client,
         create_user,
+        mock_storage,
         create_event,
         create_work_from_user,
         create_submission_from_work
