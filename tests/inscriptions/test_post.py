@@ -5,7 +5,7 @@ from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from ..commontest import create_headers
 
 
-async def test_post_inscription(client, mock_storage, create_user, create_event_started):
+async def test_post_inscription(client,  create_user, create_event_started):
     new_inscription = InscriptionRequestSchema(
         roles=["ATTENDEE"],
         affiliation="Fiuba",
