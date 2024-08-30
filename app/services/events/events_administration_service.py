@@ -26,18 +26,15 @@ class EventsAdministrationService(BaseService):
                 (caller_role != UserRole.ADMIN) and
                 (event.status in admin_status or new_status.status in admin_status)
         ):
-            print("error 400 no soy admin")
             raise InvalidCaller()
 
         # Check change STARTED status(publish event)
         self.all_mandatory_config_ok(event)
 
         if new_status.status == EventStatus.STARTED and not self.all_mandatory_config_ok(event):
-            print("error 400 no soy admin2")
             raise InvalidEventConfiguration()
 
         update_ok = await self.events_repository.update(self.event_id, new_status)
-        print("actualizo ok: " + str(update_ok))
         if not update_ok:
             raise EventNotFound(self.event_id)
 

@@ -18,20 +18,6 @@ works_submissions_router = APIRouter(
 )
 
 
-@works_submissions_router.get(
-    path="",
-    status_code=200,
-    response_model=list[SubmissionResponseSchema],
-    dependencies=[or_(IsOrganizerDep, IsAdminUsrDep, IsAuthorDep, IsWorkReviewerDep)]
-)
-async def get_all_submissions(
-        submission_service: SubmissionsServiceDep,
-        offset: int = 0,
-        limit: int = Query(default=100, le=100)
-) -> list[SubmissionResponseSchema]:
-    return await submission_service.get_all_event_submissions(offset, limit)
-
-
 @works_submissions_router.put(
     path="/submit",
     status_code=201,
@@ -65,3 +51,17 @@ async def get_download_submission_file(
         submission_service: SubmissionsServiceDep
 ) -> SubmissionDownloadSchema:
     return await submission_service.get_submission(submission_id)
+
+
+@works_submissions_router.get(
+    path="",
+    status_code=200,
+    response_model=list[SubmissionResponseSchema],
+    dependencies=[or_(IsOrganizerDep, IsAdminUsrDep, IsAuthorDep, IsWorkReviewerDep)]
+)
+async def get_all_submissions(
+        submission_service: SubmissionsServiceDep,
+        offset: int = 0,
+        limit: int = Query(default=100, le=100)
+) -> list[SubmissionResponseSchema]:
+    return await submission_service.get_all_event_submissions(offset, limit)
