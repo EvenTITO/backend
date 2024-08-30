@@ -11,10 +11,9 @@ class IsReviewer:
     async def __call__(
             self,
             caller_id: CallerIdDep,
-            event_id: UUID,
             reviewer_service: EventReviewerServiceDep
     ) -> bool:
-        return await reviewer_service.is_reviewer_in_event(event_id, caller_id)
+        return await reviewer_service.is_reviewer_in_event(caller_id)
 
 
 IsReviewerDep = Annotated[bool, Depends(IsReviewer())]
@@ -28,3 +27,26 @@ class VerifyIsReviewer:
 
 verify_is_reviewer = VerifyIsReviewer()
 ReviewerDep = Annotated[None, Depends(verify_is_reviewer)]
+
+
+class IsWorkReviewer:
+    async def __call__(
+            self,
+            caller_id: CallerIdDep,
+            work_id: UUID,
+            reviewer_service: EventReviewerServiceDep,
+    ) -> bool:
+        return await reviewer_service.is_reviewer_of_work_in_event(caller_id, work_id)
+
+
+IsWorkReviewerDep = Annotated[bool, Depends(IsWorkReviewer())]
+
+
+class VerifyIsWorkReviewer:
+    async def __call__(self, is_event_work_reviewer: IsWorkReviewerDep) -> None:
+        if not is_event_work_reviewer:
+            raise HTTPException(status_code=403)
+
+
+verify_is_work_reviewer = VerifyIsWorkReviewer()
+WorkReviewerDep = Annotated[None, Depends(verify_is_work_reviewer)]

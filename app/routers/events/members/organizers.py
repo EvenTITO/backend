@@ -1,7 +1,6 @@
 from typing import List
 
 from fastapi import APIRouter
-from uuid import UUID
 
 from app.authorization.admin_user_dep import IsAdminUsrDep
 from app.authorization.organizer_dep import IsOrganizerDep
@@ -21,8 +20,8 @@ event_organizers_router = APIRouter(
     response_model=List[MemberResponseSchema],
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
-async def read_event_organizers(organizer_service: EventOrganizersServiceDep, event_id: UUID):
-    return await organizer_service.get_all_organizers(event_id)
+async def read_event_organizers(organizer_service: EventOrganizersServiceDep):
+    return await organizer_service.get_all_organizers()
 
 
 @event_organizers_router.delete(
@@ -32,8 +31,7 @@ async def read_event_organizers(organizer_service: EventOrganizersServiceDep, ev
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
 async def remove_organizer(
-        event_id: UUID,
         user_id: UID,
         organizer_service: EventOrganizersServiceDep
 ) -> None:
-    await organizer_service.remove_organizer(event_id, user_id)
+    await organizer_service.remove_organizer(user_id)

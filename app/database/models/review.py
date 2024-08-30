@@ -1,29 +1,20 @@
-import enum
-
 from sqlalchemy import (
     Column,
-    String,
     ForeignKey,
     JSON,
-    UUID
+    UUID, String
 )
-from app.database.models.utils import DateTemplate, UIDType
+
+from app.database.models.utils import UIDType, ModelTemplate
 
 
-class ReviewStatus(str, enum.Enum):
-    ACCEPTED = "ACCEPTED"
-    REJECTED = "REJECTED"
-    RE_SUBMIT = "RE_SUBMIT"
-    PENDING = "PENDING"
-
-
-class ReviewModel(DateTemplate):
+class ReviewModel(ModelTemplate):
     __tablename__ = "reviews"
 
-    submission_id = Column(UUID(as_uuid=True), ForeignKey("submissions.id"), primary_key=True)
-    reviewer_id = Column(UIDType, ForeignKey("users.id"), primary_key=True)
-    event_id = Column(UUID(as_uuid=True), ForeignKey("events.id"), nullable=False)
-    work_id = Column(UUID(as_uuid=True), ForeignKey("works.id"), nullable=False)
-
+    submission_id = Column(UUID(as_uuid=True), ForeignKey("submissions.id"))
+    reviewer_id = Column(UIDType, ForeignKey("users.id"))
+    event_id = Column(UUID(as_uuid=True), ForeignKey("events.id"))
+    work_id = Column(UUID(as_uuid=True), ForeignKey("works.id"))
+    status = Column(String)
     review = Column(JSON)
-    review_status = Column(String, nullable=False)
+    shared = bool

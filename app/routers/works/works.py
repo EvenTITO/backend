@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Query
 from app.authorization.author_dep import IsAuthorDep
 from app.authorization.chair_dep import IsTrackChairDep
 from app.authorization.organizer_dep import IsOrganizerDep
+from app.authorization.reviewer_dep import IsWorkReviewerDep
 from app.authorization.user_id_dep import verify_user_exists
 from app.authorization.util_dep import or_
 from app.schemas.works.work import WorkSchema, WorkWithState
@@ -47,9 +48,8 @@ async def read_my_works(
     path="/{work_id}",
     status_code=200,
     response_model=WorkWithState,
-    dependencies=[or_(IsOrganizerDep, IsAuthorDep, IsTrackChairDep)]
+    dependencies=[or_(IsOrganizerDep, IsAuthorDep, IsWorkReviewerDep)]
 )
-#  TODO si sos reviewer de este trabajo tendrias que poder verlo,
 async def get_work(work_id: UUID, work_service: WorksServiceDep) -> WorkWithState:
     return await work_service.get_work(work_id)
 

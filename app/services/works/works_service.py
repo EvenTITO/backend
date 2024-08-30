@@ -43,8 +43,8 @@ class WorksService(BaseService):
         )
         return work.id
 
-    async def is_my_work(self, caller_id: UID, event_id: UUID, work_id: UUID) -> bool:
-        work = await self.__get_work(event_id, work_id)
+    async def is_my_work(self, caller_id: UID, work_id: UUID) -> bool:
+        work = await self.__get_work(self.event_id, work_id)
         return work.author_id == caller_id
 
     async def get_work(self, work_id: UUID) -> WorkWithState:
@@ -77,8 +77,8 @@ class WorksService(BaseService):
             raise WorkNotFound(event_id=event_id, work_id=work_id)
         return work
 
-    async def exist_work(self, event_id: UUID, work_id: UUID) -> bool:
-        return await self.works_repository.exists_work(event_id, work_id)
+    async def exist_work(self, work_id: UUID) -> bool:
+        return await self.works_repository.exists_work(self.event_id, work_id)
 
     @staticmethod
     def __map_to_schema(model: WorkModel) -> WorkWithState:

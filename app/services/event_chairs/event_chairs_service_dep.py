@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends
 
@@ -12,11 +13,12 @@ from app.services.events.events_service_dep import EventsServiceDep
 class EventsChairChecker:
     async def __call__(
             self,
+            event_id: UUID,
             events_service: EventsServiceDep,
             users_repository: UsersRepository = Depends(get_repository(UsersRepository)),
             chair_repository: ChairRepository = Depends(get_repository(ChairRepository)),
     ) -> EventChairService:
-        return EventChairService(events_service, chair_repository, users_repository)
+        return EventChairService(event_id, events_service, chair_repository, users_repository)
 
 
 event_chair_checker = EventsChairChecker()

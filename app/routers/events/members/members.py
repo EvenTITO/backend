@@ -1,7 +1,7 @@
 from typing import List
+from uuid import UUID
 
 from fastapi import APIRouter
-from uuid import UUID
 
 from app.authorization.admin_user_dep import IsAdminUsrDep
 from app.authorization.organizer_dep import IsOrganizerDep
@@ -22,17 +22,16 @@ event_members_router = APIRouter(
     response_model=List[MemberResponseSchema],
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
-async def read_event_members(members_service: EventMembersServiceDep, event_id: UUID):
-    return await members_service.get_all_members(event_id)
+async def read_event_members(members_service: EventMembersServiceDep):
+    return await members_service.get_all_members()
 
 
 @event_members_router.post(path="", status_code=201, dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)])
 async def invite_member(
         members_service: EventMembersServiceDep,
         member: MemberRequestSchema,
-        event_id: UUID
 ) -> UID:
-    return await members_service.invite_member(member, event_id)
+    return await members_service.invite_member(member)
 
 
 @event_members_router.delete(

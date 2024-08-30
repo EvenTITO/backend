@@ -12,9 +12,9 @@ from app.services.services import BaseService
 
 
 class EventsConfigurationService(BaseService):
-    def __init__(self, events_repository: EventsRepository, event_id: UUID):
-        self.events_repository = events_repository
+    def __init__(self, event_id: UUID, events_repository: EventsRepository):
         self.event_id = event_id
+        self.events_repository = events_repository
 
     async def get_configuration(self) -> EventConfigurationSchema:
         return await self.events_repository.get(self.event_id)

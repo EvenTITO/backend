@@ -1,7 +1,8 @@
 from typing import List
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
-from uuid import UUID
+
 from app.authorization.caller_id_dep import CallerIdDep
 from app.authorization.user_id_dep import UserDep, verify_user_exists
 from app.database.models.event import EventStatus
@@ -13,7 +14,7 @@ from app.routers.events.members.chairs import event_chairs_router
 from app.routers.events.members.members import event_members_router
 from app.routers.events.members.organizers import event_organizers_router
 from app.routers.events.members.reviewers import event_reviewers_router
-from app.routers.works.submissions import works_submissions_router, submissions_router
+from app.routers.works.submissions import works_submissions_router
 from app.routers.works.works import works_router
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.public_event import PublicEventSchema
@@ -31,7 +32,6 @@ events_router.include_router(event_reviewers_router)
 events_router.include_router(works_router)
 events_router.include_router(inscriptions_events_router)
 events_router.include_router(works_submissions_router)
-events_router.include_router(submissions_router)
 
 
 @events_router.get(

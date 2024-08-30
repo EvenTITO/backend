@@ -5,10 +5,11 @@ from uuid import UUID
 
 from app.database.models.member import MemberModel
 from app.database.models.user import UserModel
-from app.exceptions.members.organizer.organizer_exceptions import AlreadyOrganizerExist
+from app.exceptions.members.member_exceptions import AlreadyMemberExist
 from app.exceptions.users_exceptions import UserNotFound
 from app.repository.chairs_repository import ChairRepository
 from app.repository.organizers_repository import OrganizerRepository
+from app.repository.reviewers_repository import ReviewerRepository
 from app.repository.users_repository import UsersRepository
 from app.schemas.events.schemas import EventRole
 from app.schemas.members.member_schema import MemberRequestSchema, MemberResponseSchema, MemberResponseWithRolesSchema
@@ -21,17 +22,24 @@ from app.services.services import BaseService
 class EventMembersService(BaseService):
     def __init__(
             self,
+            event_id: UUID,
             organizer_repository: OrganizerRepository,
             chair_repository: ChairRepository,
+            reviewer_repository: ReviewerRepository,
             users_repository: UsersRepository,
     ):
+        self.event_id = event_id
         self.users_repository = users_repository
-        self.repositories = {EventRole.ORGANIZER: organizer_repository, EventRole.CHAIR: chair_repository}
+        self.repositories = {
+            EventRole.ORGANIZER: organizer_repository,
+            EventRole.REVIEWER: reviewer_repository,
+            EventRole.CHAIR: chair_repository
+        }
 
-    async def get_all_members(self, event_id: UUID) -> set[MemberResponseSchema]:
+    async def get_all_members(self) -> set[MemberResponseSchema]:
         result = []
         for role, repository in self.repositories.items():
-            members = await repository.get_all(event_id)
+            members = await repository.get_all(self.event_id)
             result += list(map(lambda x: EventMembersService.__map_to_schema(x, role), members))
         members_response = {
             MemberResponseWithRolesSchema(
@@ -40,37 +48,37 @@ class EventMembersService(BaseService):
         }
         return members_response
 
-    async def is_member(self, event_id: UUID, user_id: UID) -> bool:
+    async def is_member(self, user_id: UID) -> bool:
         for role, repository in self.repositories.items():
-            if await repository.is_member(event_id, user_id):
+            if await repository.is_member(self.event_id, user_id):
                 return True
         return False
 
-    async def invite_member(self, member: MemberRequestSchema, event_id: UUID) -> UID:
+    async def invite_member(self, member: MemberRequestSchema) -> UID:
         user_id = await self.users_repository.get_user_id_by_email(member.email)
         if user_id is None:
             raise UserNotFound(member.email)
         member_repository = self.repositories[member.role]
-        if await member_repository.is_member(event_id, user_id):
-            raise AlreadyOrganizerExist(event_id, user_id)
-        await member_repository.create_member(event_id, user_id)
+        if await member_repository.is_member(self.event_id, user_id):
+            raise AlreadyMemberExist(self.event_id, user_id, member.role)
+        await member_repository.create_member(self.event_id, user_id)
         return user_id
 
-    async def remove_member(self, event_id: UUID, user_id: UID) -> None:
+    async def remove_member(self, user_id: UID) -> None:
         for role, repository in self.repositories.items():
-            if await repository.is_member(event_id, user_id):
+            if await repository.is_member(self.event_id, user_id):
                 if role == EventRole.ORGANIZER:
-                    users_organizers = await repository.get_all(event_id)
+                    users_organizers = await repository.get_all(self.event_id)
                     if len(users_organizers) <= 1:
                         continue
-                await repository.remove_member(event_id, user_id)
+                await repository.remove_member(self.event_id, user_id)
 
-    async def update_rol_member(self, event_id: UUID, user_id: UID, role_schema: RolesRequestSchema):
+    async def update_rol_member(self, user_id: UID, role_schema: RolesRequestSchema):
         for role, repository in self.repositories.items():
-            if (role not in role_schema.roles) and (await repository.is_member(event_id, user_id)):
-                await repository.remove_member(event_id, user_id)
-            if (role in role_schema.roles) and (not await repository.is_member(event_id, user_id)):
-                await repository.create_member(event_id, user_id)
+            if (role not in role_schema.roles) and (await repository.is_member(self.event_id, user_id)):
+                await repository.remove_member(self.event_id, user_id)
+            if (role in role_schema.roles) and (not await repository.is_member(self.event_id, user_id)):
+                await repository.create_member(self.event_id, user_id)
 
     @staticmethod
     def __map_to_schema(model: (UserModel, MemberModel), role: EventRole) -> MemberResponseWithRolesSchema:

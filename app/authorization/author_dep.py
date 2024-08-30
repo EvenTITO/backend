@@ -15,7 +15,7 @@ class IsAuthor:
             work_id: UUID,
             work_service: WorksServiceDep
     ) -> bool:
-        return await work_service.is_my_work(caller_id, event_id, work_id)
+        return await work_service.is_my_work(caller_id, work_id)
 
 
 IsAuthorDep = Annotated[bool, Depends(IsAuthor())]

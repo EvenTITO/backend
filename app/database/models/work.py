@@ -16,7 +16,7 @@ from app.database.models.utils import ModelTemplate, UIDType
 
 
 class WorkStates(str, enum.Enum):
-    ACCEPTED = "ACCEPTED"
+    APPROVED = "APPROVED"
     REJECTED = "REJECTED"
     RE_SUBMIT = "RE_SUBMIT"
     IN_REVISION = "IN_REVISION"

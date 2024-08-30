@@ -5,9 +5,9 @@ from typing import Union
 from pydantic import BaseModel, Field
 
 
-class ReviewScheletonQuestions(BaseModel):
+class ReviewSkeletonQuestions(BaseModel):
     questions: list[Union[MultipleChoiceQuestion, SimpleQuestion]] = Field(default_factory=list)
 
 
 class ReviewSkeletonSchema(BaseModel):
-    review_skeleton: ReviewScheletonQuestions = Field(default=ReviewScheletonQuestions())
+    review_skeleton: ReviewSkeletonQuestions = Field(default=ReviewSkeletonQuestions())

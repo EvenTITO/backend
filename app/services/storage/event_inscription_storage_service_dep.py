@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends
 
@@ -6,8 +7,8 @@ from app.services.storage.event_inscription_storage_service import EventInscript
 
 
 class EventInscriptionStorage:
-    async def __call__(self) -> EventInscriptionStorageService:
-        return EventInscriptionStorageService()
+    async def __call__(self, event_id: UUID) -> EventInscriptionStorageService:
+        return EventInscriptionStorageService(event_id)
 
 
 event_inscription_storage_service = EventInscriptionStorage()

@@ -62,7 +62,7 @@ class EventsService(BaseService):
         # ver event.repository.get_all_events_for_user
         if caller_id is None:
             return event
-        if await self.organizers_service.is_organizer(event_id, caller_id):
+        if await self.organizers_service.is_organizer(caller_id):
             event.roles.append(EventRole.ORGANIZER)
         return event
 

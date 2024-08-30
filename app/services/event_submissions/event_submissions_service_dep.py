@@ -8,7 +8,7 @@ from app.repository.repository import get_repository
 from app.repository.submissions_repository import SubmissionsRepository
 from app.repository.works_repository import WorksRepository
 from app.services.storage.work_storage_service_dep import WorkStorageServiceDep
-from app.services.submissions.submissions_service import SubmissionsService
+from app.services.event_submissions.event_submissions_service import SubmissionsService
 from app.services.works.works_service import WorksService
 
 
