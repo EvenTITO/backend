@@ -18,7 +18,7 @@ async def test_get_my_events_no_events_empty_list(client, create_user):
     assert len(response.json()) == 0
 
 
-async def test_get_my_events(client,  create_event_started, create_user, admin_data):
+async def test_get_my_events(client, mock_storage, create_event_started, create_user, admin_data):
     new_event = CreateEventSchema(
         title="Some Event Title",
         start_date=datetime(2024, 9, 2),

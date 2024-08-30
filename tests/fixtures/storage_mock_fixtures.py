@@ -2,7 +2,7 @@ import pytest
 from app.schemas.storage.schemas import DownloadURLSchema, UploadURLSchema
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 async def mock_storage(mocker):
     base_path = 'app.services.storage.storage_clients'
     gcp_path = base_path + '.gcp_storage_client.GCPStorageClient'
