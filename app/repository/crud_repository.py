@@ -35,7 +35,7 @@ class Repository:
 
     async def _get_with_values(self, conditions: list, values, order_by=None):
         query = select(values).where(and_(*conditions))
-        if order_by:
+        if order_by is None:
             query = query.order_by(order_by)
         query = query.limit(1)
         result = await self.session.execute(query)
