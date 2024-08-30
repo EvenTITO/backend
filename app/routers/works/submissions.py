@@ -22,6 +22,12 @@ async def submit(submission_service: SubmissionsServiceDep) -> SubmissionUploadS
     return await submission_service.do_submit()
 
 
+@works_submissions_router.get(path="/latest", status_code=200, dependencies=[or_(IsOrganizerDep, IsAuthorDep)])
+async def get_download_latest_submission_file(
+        submission_service: SubmissionsServiceDep) -> SubmissionDownloadSchema:
+    return await submission_service.get_latest_submission()
+
+
 @works_submissions_router.get(path="/{submission_id}", status_code=200,
                               dependencies=[or_(IsOrganizerDep, IsAuthorDep)])
 async def get_download_submission_file(
@@ -29,12 +35,6 @@ async def get_download_submission_file(
         submission_service: SubmissionsServiceDep
 ) -> SubmissionDownloadSchema:
     return await submission_service.get_submission(submission_id)
-
-
-@works_submissions_router.get(path="/latest", status_code=200, dependencies=[or_(IsOrganizerDep, IsAuthorDep)])
-async def get_download_latest_submission_file(
-        submission_service: SubmissionsServiceDep) -> SubmissionDownloadSchema:
-    return await submission_service.get_latest_submission()
 
 
 @submissions_router.get(path="", status_code=200, dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)])

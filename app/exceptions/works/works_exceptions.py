@@ -11,7 +11,7 @@ class TitleAlreadyExists(HTTPException):
 class WorkNotFound(HTTPException):
     def __init__(self, event_id, work_id):
         self.status_code = 404
-        self.detail = f"Work {work_id} in event ${event_id} nor found"
+        self.detail = f"Work {work_id} in event ${event_id} not found"
         super().__init__(status_code=self.status_code, detail=self.detail)
 
 
