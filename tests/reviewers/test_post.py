@@ -1,5 +1,5 @@
 from fastapi.encoders import jsonable_encoder
-
+import datetime
 from app.schemas.members.reviewer_schema import ReviewerRequestSchema, ReviewerCreateRequestSchema
 from ..commontest import create_headers
 from ..works.test_create_work import USER_WORK
@@ -22,12 +22,12 @@ async def test_create_reviewers_ok(
     new_reviewer_1 = ReviewerRequestSchema(
         work_id=work_id,
         email=create_user["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
     new_reviewer_2 = ReviewerRequestSchema(
         work_id=work_id,
         email=create_event_creator["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
 
     request = ReviewerCreateRequestSchema(
@@ -60,7 +60,7 @@ async def test_create_reviewers_already_exist_reviewer(
     new_reviewer_1 = ReviewerRequestSchema(
         work_id=work_id_1,
         email=create_user["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
 
     request = ReviewerCreateRequestSchema(
@@ -101,12 +101,12 @@ async def test_create_reviewers_by_work_id_invalid(
     new_reviewer_1 = ReviewerRequestSchema(
         work_id=work_id_1,
         email=create_user["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
     new_reviewer_2 = ReviewerRequestSchema(
         work_id="1365bfdb-b718-411c-9132-ec2abad9fbdd",
         email=create_event_creator["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
 
     request = ReviewerCreateRequestSchema(
@@ -139,12 +139,12 @@ async def test_create_reviewers_without_permissions(
     new_reviewer_1 = ReviewerRequestSchema(
         work_id=work_id,
         email=create_user["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
     new_reviewer_2 = ReviewerRequestSchema(
         work_id=work_id,
         email=create_event_creator["email"],
-        review_deadline="2024-06-07"
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
     )
 
     request = ReviewerCreateRequestSchema(
