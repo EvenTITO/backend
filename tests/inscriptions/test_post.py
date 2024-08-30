@@ -5,14 +5,14 @@ from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from ..commontest import create_headers
 
 
-async def test_post_inscription(client, mock_storage, create_user, create_event_started):
+async def test_post_inscription(client, mock_storage, create_user, create_event_started_with_email):
     new_inscription = InscriptionRequestSchema(
         roles=["ATTENDEE"],
         affiliation="Fiuba",
     )
 
     response = await client.post(
-        f"/events/{create_event_started}/inscriptions",
+        f"/events/{create_event_started_with_email}/inscriptions",
         headers=create_headers(create_user["id"]),
         json=jsonable_encoder(new_inscription)
     )
