@@ -2,8 +2,9 @@ from fastapi import APIRouter, Query
 
 from app.authorization.admin_user_dep import IsAdminUsrDep
 from app.authorization.organizer_dep import IsOrganizerDep
+from app.authorization.reviewer_dep import IsWorkReviewerDep
 from app.authorization.util_dep import or_
-from app.schemas.works.review import ReviewResponseSchema
+from app.schemas.works.review import ReviewResponseSchema, ReviewUploadSchema, ReviewCreateRequestSchema
 from app.services.event_reviews.event_reviews_service_dep import EventReviewsServiceDep
 
 reviews_router = APIRouter(prefix="/events/{event_id}/works/{work_id}/reviews", tags=["Event: Works Reviews"])
@@ -23,18 +24,20 @@ async def get_all_reviews(
     return await reviews_service.get_all_reviews(offset, limit)
 
 
+@reviews_router.post(
+    path="",
+    status_code=201,
+    response_model=ReviewUploadSchema,
+    dependencies=[or_(IsOrganizerDep, IsAdminUsrDep, IsWorkReviewerDep)]
+)
+async def add_review(
+        review_schema: ReviewCreateRequestSchema,
+        reviews_service: EventReviewsServiceDep
+) -> ReviewUploadSchema:
+    return await reviews_service.add_review(review_schema)
+
+
 """
-
-
-
-
-@reviews_router.post("")
-async def add_a_review():
-    
-    #The reviewer uses this method to submit a review.
-    
-    pass
-
 
 @reviews_router.patch("/status")
 async def update_work_review_status():

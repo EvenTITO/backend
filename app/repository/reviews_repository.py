@@ -4,7 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.review import ReviewModel
 from app.repository.crud_repository import Repository
-from app.schemas.works.review import ReviewResponseSchema
+from app.schemas.users.utils import UID
+from app.schemas.works.review import ReviewResponseSchema, ReviewCreateRequestSchema
 
 
 class ReviewsRepository(Repository):
@@ -35,22 +36,21 @@ class ReviewsRepository(Repository):
             ) for row in res
         ]
 
-    """
-async def create_review(
+    async def create_review(
             self,
             event_id: UUID,
             work_id: UUID,
+            reviewer_id: UID,
             submission_id: UUID,
-            user_id: UID,
-            # TODO review: ???
-    ) -> UUID:
+            review_schema: ReviewCreateRequestSchema
+    ) -> ReviewResponseSchema:
         new_review = ReviewModel(
-            event_id=,
-            work_id=,
-            submission_id=
-            user_id =
+            event_id=event_id,
+            work_id=work_id,
+            reviewer_id=reviewer_id,
+            submission_id=submission_id,
+            status=review_schema.status,
+            review=review_schema.review
         )
-        return (await self._create(new_review)).id
-
-
-"""
+        saved_review = (await self._create(new_review))
+        return ReviewResponseSchema(**saved_review.model_dump())

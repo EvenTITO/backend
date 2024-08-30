@@ -34,7 +34,7 @@ async def get_all_submissions(
 
 @works_submissions_router.put(
     path="/submit",
-    status_code=200,
+    status_code=201,
     response_model=SubmissionUploadSchema,
     dependencies=[Depends(verify_user_exists)]
 )
