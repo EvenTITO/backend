@@ -1,5 +1,5 @@
 from functools import reduce
-from itertools import groupby, chain
+from itertools import groupby
 from operator import attrgetter
 from uuid import UUID
 
