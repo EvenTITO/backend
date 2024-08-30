@@ -1,0 +1,83 @@
+import datetime
+
+from fastapi.encoders import jsonable_encoder
+
+from app.schemas.events.schemas import EventRole
+from app.schemas.members.member_schema import MemberRequestSchema
+from app.schemas.members.reviewer_schema import ReviewerRequestSchema, ReviewerCreateRequestSchema
+from ..commontest import create_headers
+from ..works.test_create_work import USER_WORK
+
+
+async def test_get_members_ok(
+        client,
+        create_user,
+        create_event_creator,
+        create_event_from_event_creator
+):
+    create_work_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works",
+        json=jsonable_encoder(USER_WORK),
+        headers=create_headers(create_event_creator['id'])
+    )
+    assert create_work_response.status_code == 201
+
+    work_id = create_work_response.json()
+
+    # agregar reviewers
+    new_reviewer_1 = ReviewerRequestSchema(
+        work_id=work_id,
+        email=create_user["email"],
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
+    )
+    new_reviewer_2 = ReviewerRequestSchema(
+        work_id=work_id,
+        email=create_event_creator["email"],
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
+    )
+
+    request = ReviewerCreateRequestSchema(
+        reviewers=[new_reviewer_1, new_reviewer_2]
+    )
+
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/reviewers",
+        json=jsonable_encoder(request),
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert response.status_code == 201
+
+    # agregar chair
+    create_member_request = MemberRequestSchema(
+        email=create_user["email"],
+        role=EventRole.CHAIR
+    )
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/members",
+        json=jsonable_encoder(create_member_request),
+        headers=create_headers(create_event_creator["id"])
+    )
+
+    assert response.status_code == 201
+
+    get_response = await client.get(
+        f"/events/{create_event_from_event_creator}/members",
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert get_response.status_code == 200
+
+    member_list = get_response.json()
+    assert len(member_list[0]["roles"]) == 2
+    assert len(member_list[1]["roles"]) == 2
+    assert member_list[0]["event_id"] == create_event_from_event_creator
+    assert member_list[1]["event_id"] == create_event_from_event_creator
+    assert member_list[0]["user_id"] == create_user['id']
+    assert member_list[1]["user_id"] == create_event_creator['id']
+    assert set(member_list[0]["roles"]) == {"REVIEWER", "CHAIR"}
+    assert set(member_list[1]["roles"]) == {"REVIEWER", "ORGANIZER"}
+    assert member_list[0]["user"]["email"] == create_user["email"]
+    assert member_list[1]["user"]["email"] == create_event_creator["email"]
+
+# TODO terminar los test

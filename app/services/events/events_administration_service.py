@@ -39,7 +39,6 @@ class EventsAdministrationService(BaseService):
             raise EventNotFound(self.event_id)
 
     def all_mandatory_config_ok(self, event) -> bool:
-        print(event)
         event_dates = DatesCompleteSchema.model_validate(event)
         for date in event_dates.dates:
             if date.date is None and date.time is None:

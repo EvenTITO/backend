@@ -53,7 +53,6 @@ async def create_event_from_event_creator(client, create_event_creator):
         json=jsonable_encoder(new_event),
         headers=create_headers(create_event_creator["id"])
     )
-    print(response.json())
     assert response.status_code == 201
 
     event_id = response.json()

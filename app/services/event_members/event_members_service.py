@@ -1,6 +1,6 @@
 from functools import reduce
-from itertools import groupby
-from operator import itemgetter
+from itertools import groupby, chain
+from operator import attrgetter
 from uuid import UUID
 
 from app.database.models.member import MemberModel
@@ -12,7 +12,7 @@ from app.repository.organizers_repository import OrganizerRepository
 from app.repository.reviewers_repository import ReviewerRepository
 from app.repository.users_repository import UsersRepository
 from app.schemas.events.schemas import EventRole
-from app.schemas.members.member_schema import MemberRequestSchema, MemberResponseSchema, MemberResponseWithRolesSchema
+from app.schemas.members.member_schema import MemberRequestSchema, MemberResponseWithRolesSchema
 from app.schemas.members.member_schema import RolesRequestSchema
 from app.schemas.users.user import UserSchema
 from app.schemas.users.utils import UID
@@ -36,16 +36,24 @@ class EventMembersService(BaseService):
             EventRole.CHAIR: chair_repository
         }
 
-    async def get_all_members(self) -> set[MemberResponseSchema]:
+    async def get_all_members(self) -> list[MemberResponseWithRolesSchema]:
         result = []
         for role, repository in self.repositories.items():
             members = await repository.get_all(self.event_id)
             result += list(map(lambda x: EventMembersService.__map_to_schema(x, role), members))
-        members_response = {
-            MemberResponseWithRolesSchema(
-                **v[0].model_dump(mode='json'), roles=list(reduce(lambda x, y: x.roles + y.roles, v)))
-            for k, v in groupby(result, key=itemgetter('user_id'))
-        }
+
+        result.sort(key=attrgetter('user_id'))
+
+        members_response = []
+        for k, v in groupby(result, key=attrgetter('user_id')):
+            group = list(v)
+            member = MemberResponseWithRolesSchema(
+                **({
+                    **(group[0].model_dump(mode='json')),
+                    "roles": list(reduce(lambda x, y: x.roles + y.roles, group))
+                })
+            )
+            members_response.append(member)
         return members_response
 
     async def is_member(self, user_id: UID) -> bool:

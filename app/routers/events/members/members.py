@@ -6,7 +6,7 @@ from fastapi import APIRouter
 from app.authorization.admin_user_dep import IsAdminUsrDep
 from app.authorization.organizer_dep import IsOrganizerDep
 from app.authorization.util_dep import or_
-from app.schemas.members.member_schema import MemberRequestSchema, MemberResponseSchema
+from app.schemas.members.member_schema import MemberRequestSchema, MemberResponseWithRolesSchema
 from app.schemas.members.member_schema import RolesRequestSchema
 from app.schemas.users.utils import UID
 from app.services.event_members.event_members_service_dep import EventMembersServiceDep
@@ -19,10 +19,11 @@ event_members_router = APIRouter(
 
 @event_members_router.get(
     path="",
-    response_model=List[MemberResponseSchema],
+    status_code=200,
+    response_model=List[MemberResponseWithRolesSchema],
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
-async def read_event_members(members_service: EventMembersServiceDep):
+async def read_event_members(members_service: EventMembersServiceDep) -> list[MemberResponseWithRolesSchema]:
     return await members_service.get_all_members()
 
 
