@@ -6,6 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from app.database.models.event import EventStatus
 from app.schemas.events.event_status import EventStatusSchema
 from ..commontest import create_headers, EVENTS
+from app.schemas.events.schemas import EventRole
 
 
 async def test_get_event(client, create_event, create_user):
@@ -163,3 +164,42 @@ async def test_get_all_events_public_is_status_created2(
 @pytest.mark.skip(reason="TODO: Write this code. Which date should we take? Or add a param for ordering?")
 async def test_get_all_events_should_be_ordered_by_something():
     assert False
+
+
+async def test_get_event_with_organizer_role(
+    client, create_event_from_event_creator, create_event_creator
+):
+    response = await client.get(
+        f"/events/{create_event_from_event_creator}/public",
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert response.status_code == 200
+    assert EventRole.ORGANIZER in response.json()["roles"]
+    assert len(response.json()["roles"]) == 1
+
+
+async def test_get_event_with_chair_role(
+    client, create_event_chair, create_event_from_event_creator
+):
+    response = await client.get(
+        f"/events/{create_event_from_event_creator}/public",
+        headers=create_headers(create_event_chair)
+    )
+
+    assert response.status_code == 200
+    assert EventRole.CHAIR in response.json()["roles"]
+    assert len(response.json()["roles"]) == 1
+
+
+async def test_get_event_with_attendee_role(
+    client, create_inscription
+):
+    response = await client.get(
+        f"/events/{create_inscription['event_id']}/public",
+        headers=create_headers(create_inscription['user_id'])
+    )
+
+    assert response.status_code == 200
+    assert EventRole.ATTENDEE in response.json()["roles"]
+    assert len(response.json()["roles"]) == 1
