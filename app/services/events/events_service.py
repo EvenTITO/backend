@@ -58,13 +58,14 @@ class EventsService(BaseService):
         if event is None:
             raise EventNotFound(event_id)
         event = PublicEventWithRolesSchema.model_validate(event)
-        # TODO aca falta poner todos los roles en el evento, esto solo agrega si sos organizer
-        # ver event.repository.get_all_events_for_user
         if caller_id is None:
             return event
-        if await self.organizers_service.is_organizer(event_id, caller_id):
-            event.roles.append(EventRole.ORGANIZER)
+        event_roles = await self.events_repository.get_roles(event_id, caller_id)
+        event.roles = event_roles
         return event
+        # if event_roles is None:
+        #     event.roles.append(EventRole.ORGANIZER)
+        # return event
 
     async def get_event_status(self, event_id: UUID):
         event_status = await self.events_repository.get_status(event_id)
