@@ -96,8 +96,8 @@ class EventsRepository(Repository):
         query = (
             select(
                 EventModel,
-                select(InscriptionModel.roles).where((InscriptionModel.event_id == EventModel.id)
-                                                     & (InscriptionModel.user_id == user_id)).label('inscription_roles'),
+                select(InscriptionModel.roles).where((InscriptionModel.event_id == EventModel.id) & (
+                    InscriptionModel.user_id == user_id)).label('inscription_roles'),
                 select(1).where((OrganizerModel.event_id == EventModel.id) & (
                     OrganizerModel.user_id == user_id)).exists().label('is_organizer'),
                 select(1).where((ChairModel.event_id == EventModel.id) & (

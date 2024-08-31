@@ -7,7 +7,6 @@ from app.repository.events_repository import EventsRepository
 from app.schemas.events.configuration import EventConfigurationSchema
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.public_event_with_roles import PublicEventWithRolesSchema
-from app.schemas.events.schemas import EventRole
 from app.schemas.users.utils import UID
 from app.services.event_organizers.event_organizers_service import EventOrganizersService
 from app.services.services import BaseService
@@ -63,9 +62,6 @@ class EventsService(BaseService):
         event_roles = await self.events_repository.get_roles(event_id, caller_id)
         event.roles = event_roles
         return event
-        # if event_roles is None:
-        #     event.roles.append(EventRole.ORGANIZER)
-        # return event
 
     async def get_event_status(self, event_id: UUID):
         event_status = await self.events_repository.get_status(event_id)
