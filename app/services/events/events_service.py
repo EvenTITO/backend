@@ -33,9 +33,9 @@ class EventsService(BaseService):
             status=status
         )
         event_created = await self.events_repository.create(creator_id, event)
-        return event_created.id
 
-        # TODO: add notifications in events_service if if event_created.status == EventStatus.WAITING_APPROVAL.
+        # TODO: add notifications in events_service if event_created.status == EventStatus.WAITING_APPROVAL
+        return event_created.id
 
     async def get_my_events(self, caller_id: UID, offset: int, limit: int) -> list[PublicEventWithRolesSchema]:
         return await self.events_repository.get_all_events_for_user(caller_id, offset=offset, limit=limit)

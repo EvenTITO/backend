@@ -72,7 +72,7 @@ class NotificationsService:
         message.set_payload(body)
         return message
 
-    def _add_body_2(self, message: EmailMessage, body):
+    def _add_body_extra(self, message: EmailMessage, body):
         body_filled = BODY_TEMPLATE.replace('{{ body }}', body)
         message.set_content('This is a HTML email. If you see this text, your client does not support HTML.')
         message.add_alternative(body_filled, subtype='html')

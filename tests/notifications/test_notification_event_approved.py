@@ -13,7 +13,7 @@ settings = NotificationsSettings()
 async def test_send_notification_when_admin_approve_event(create_event_with_email):
 
     notification_service = EventsNotificationsService()
-    email_sent = await notification_service.notify_event_approved(create_event_with_email)
+    email_sent = await notification_service.notify_event_created(create_event_with_email)
     print(email_sent)
     assert email_sent
 
@@ -23,6 +23,6 @@ async def test_send_notification_when_admin_approve_event_with_invalid_email():
     notification_service = EventsNotificationsService()
     email_test = "Format email error string"
     with pytest.raises(Exception) as ex:
-        await notification_service.notify_event_approved(["string"])
+        await notification_service.notify_event_created(["string"])
     assert str(ex.value) == email_test
     print(email_test)

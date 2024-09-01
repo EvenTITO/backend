@@ -31,21 +31,25 @@ class EventsAdministrationService(BaseService):
             raise InvalidCaller()
 
         # Check change STARTED status(publish event)
-        if new_status.status == EventStatus.STARTED and not self.all_mandatory_config_ok(event):
+        if new_status.status == EventStatus.STARTED and not self.__all_mandatory_config_ok(event):
             raise InvalidEventConfiguration()
 
         update_ok = await self.events_repository.update(event_id, new_status)
         if not update_ok:
             raise EventNotFound(event_id)
 
-        await self.notify_change(event)
+        await self.__notify_change(new_status, event)
 
-    def all_mandatory_config_ok(self, event) -> bool:
+    def __all_mandatory_config_ok(self, event) -> bool:
         event_dates = DatesCompleteSchema.model_validate(event)
         for date in event_dates.dates:
             if date.date is None and date.time is None:
                 return False
         return True
 
-    async def notify_change(self, event):
-        await self.notification_service.notify_event_approved(event)
+    async def __notify_change(self, new_status, event):
+        # print("[TEST] new_status: "+str(new_status))
+        if new_status.status.value == EventStatus.CREATED.value:
+            await self.notification_service.notify_event_created(event)
+        elif new_status.status.value == EventStatus.STARTED.value:
+            await self.notification_service.notify_event_started(event)
