@@ -245,7 +245,8 @@ async def test_update_review_ok(
         assert create_review["status"] == ReviewDecision.NOT_APPROVED
 
         new_answer = ReviewAnswer(answers=[
-            SimpleAnswer(question="Comentarios", answer="Bien las correcciones. Aprobado", type_question='simple_question')
+            SimpleAnswer(question="Comentarios", answer="Bien las correcciones. Aprobado",
+                         type_question='simple_question')
         ])
         new_review = ReviewCreateRequestSchema(
             status=ReviewDecision.APPROVED,

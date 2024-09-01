@@ -1,6 +1,5 @@
 import datetime
 
-import pytest
 from fastapi.encoders import jsonable_encoder
 
 from app.database.models.work import WorkStates
@@ -345,7 +344,6 @@ async def test_get_all_works_chair_non_authorized(
     )
 
     assert work_response_2.status_code == 201
-    work_id_2 = work_response_2.json()
 
     all_works_response = await client.get(
         f"/events/{create_event_from_event_creator}/works",
