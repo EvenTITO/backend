@@ -1,4 +1,4 @@
-from app.schemas.events.review_skeleton.review_skeleton import ReviewScheletonQuestions, ReviewSkeletonSchema
+from app.schemas.events.review_skeleton.review_skeleton import ReviewSkeletonQuestions, ReviewSkeletonSchema
 from app.schemas.events.review_skeleton.simple_question import SimpleQuestion
 from app.schemas.events.review_skeleton.multiples_choice_question import (
     MultipleChoiceQuestion
@@ -10,7 +10,7 @@ from ..commontest import create_headers
 async def test_put_review_skeleton(client, admin_data, create_event):
     first_question = 'This is a simple question that has a str answer'
     review_skeleton = ReviewSkeletonSchema(
-        review_skeleton=ReviewScheletonQuestions(
+        review_skeleton=ReviewSkeletonQuestions(
             questions=[
                 SimpleQuestion(
                     type_question='simple_question',

@@ -1,4 +1,5 @@
 from uuid import UUID
+
 from app.database.models.member import MemberModel
 from app.database.models.user import UserModel
 from app.exceptions.members.organizer.organizer_exceptions import UserNotIsOrganizer, AtLeastOneOrganizer
@@ -11,24 +12,25 @@ from app.services.services import BaseService
 
 
 class EventOrganizersService(BaseService):
-    def __init__(self, organizer_repository: OrganizerRepository, users_repository: UsersRepository):
+    def __init__(self, event_id: UUID, organizer_repository: OrganizerRepository, users_repository: UsersRepository):
+        self.event_id = event_id
         self.organizer_repository = organizer_repository
         self.users_repository = users_repository
 
-    async def get_all_organizers(self, event_id: UUID) -> list[MemberResponseSchema]:
-        users_organizers = await self.organizer_repository.get_all(event_id)
+    async def get_all_organizers(self) -> list[MemberResponseSchema]:
+        users_organizers = await self.organizer_repository.get_all(self.event_id)
         return list(map(EventOrganizersService.__map_to_schema, users_organizers))
 
-    async def is_organizer(self, event_id: UUID, user_id: UID) -> bool:
-        return await self.organizer_repository.is_member(event_id, user_id)
+    async def is_organizer(self, user_id: UID) -> bool:
+        return await self.organizer_repository.is_member(self.event_id, user_id)
 
-    async def remove_organizer(self, event_id: UUID, user_id: UID) -> None:
-        if not await self.organizer_repository.is_member(event_id, user_id):
-            raise UserNotIsOrganizer(event_id, user_id)
-        users_organizers = await self.organizer_repository.get_all(event_id)
+    async def remove_organizer(self, user_id: UID) -> None:
+        if not await self.organizer_repository.is_member(self.event_id, user_id):
+            raise UserNotIsOrganizer(self.event_id, user_id)
+        users_organizers = await self.organizer_repository.get_all(self.event_id)
         if len(users_organizers) <= 1:
-            raise AtLeastOneOrganizer(event_id, user_id)
-        await self.organizer_repository.remove_member(event_id, user_id)
+            raise AtLeastOneOrganizer(self.event_id, user_id)
+        await self.organizer_repository.remove_member(self.event_id, user_id)
 
     @staticmethod
     def __map_to_schema(model: (UserModel, MemberModel)) -> MemberResponseSchema:

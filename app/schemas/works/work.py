@@ -16,7 +16,10 @@ class WorkSchema(BaseModel):
     authors: list[AuthorInformation]
 
 
-class WorkWithState(WorkSchema):
-    id: UUID
+class WorkStateSchema(BaseModel):
     state: WorkStates
+
+
+class WorkWithState(WorkSchema, WorkStateSchema):
+    id: UUID
     deadline_date: datetime

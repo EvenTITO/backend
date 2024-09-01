@@ -1,4 +1,5 @@
 from fastapi.encoders import jsonable_encoder
+
 from app.exceptions.members.chair.chair_exceptions import UserNotIsChair
 from app.schemas.events.schemas import DynamicTracksEventSchema, EventRole
 from app.schemas.members.member_schema import MemberRequestSchema
@@ -45,7 +46,7 @@ async def test_add_tracks_that_exist_in_the_event_success(
         create_event_chair
 ):
     add_tracks_request = DynamicTracksEventSchema(
-        tracks=["First Track"],
+        tracks=["math"],
     )
     response = await client.put(
         f"/events/{create_event_from_event_creator}/chairs/{create_event_chair}/tracks",
@@ -97,7 +98,7 @@ async def test_change_tracks_to_new_tracks_the_tracks_are_fully_updated(
         create_event_chair
 ):
     add_tracks_request = DynamicTracksEventSchema(
-        tracks=["First Track"],
+        tracks=["math"],
     )
     response = await client.put(
         f"/events/{create_event_from_event_creator}/chairs/{create_event_chair}/tracks",
@@ -105,7 +106,7 @@ async def test_change_tracks_to_new_tracks_the_tracks_are_fully_updated(
         headers=create_headers(create_event_creator["id"])
     )
     assert response.status_code == 204
-    add_tracks_request.tracks = ["Second Track"]
+    add_tracks_request.tracks = ["chemistry"]
     response = await client.put(
         f"/events/{create_event_from_event_creator}/chairs/{create_event_chair}/tracks",
         json=jsonable_encoder(add_tracks_request),
@@ -118,7 +119,7 @@ async def test_change_tracks_to_new_tracks_the_tracks_are_fully_updated(
     )
     assert response.status_code == 200
     assert len(response.json()["tracks"]) == 1
-    assert response.json()["tracks"][0] == "Second Track"
+    assert response.json()["tracks"][0] == "chemistry"
 
 
 async def test_remove_all_chair_tracks_by_setting_the_list_to_empty(
@@ -128,7 +129,7 @@ async def test_remove_all_chair_tracks_by_setting_the_list_to_empty(
         create_event_chair
 ):
     add_tracks_request = DynamicTracksEventSchema(
-        tracks=["First Track"],
+        tracks=["math"],
     )
     response = await client.put(
         f"/events/{create_event_from_event_creator}/chairs/{create_event_chair}/tracks",

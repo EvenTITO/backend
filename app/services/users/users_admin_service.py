@@ -29,5 +29,5 @@ class UsersAdminService(BaseService):
         ):
             raise CantRemoveLastAdmin()
 
-    async def get_many(self, limit: int, offset: int) -> list[UserReply]:
-        return await self.users_repository.get_many(limit, offset)
+    async def get_many(self, offset: int, limit: int) -> list[UserReply]:
+        return await self.users_repository.get_many(offset, limit)

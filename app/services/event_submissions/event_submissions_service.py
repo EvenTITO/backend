@@ -1,4 +1,5 @@
 from uuid import UUID
+
 from app.database.models.submission import SubmissionModel
 from app.database.models.work import WorkStates
 from app.exceptions.submissions.submissions_exceptions import SubmissionNotFound
@@ -11,13 +12,15 @@ from app.services.works.works_service import WorksService
 
 
 class SubmissionsService(BaseService):
-    def __init__(self,
-                 submission_repository: SubmissionsRepository,
-                 work_service: WorksService,
-                 storage_service: WorkStorageService,
-                 user_id: UID,
-                 event_id: UUID,
-                 work_id: UUID):
+    def __init__(
+            self,
+            submission_repository: SubmissionsRepository,
+            work_service: WorksService,
+            storage_service: WorkStorageService,
+            user_id: UID,
+            event_id: UUID,
+            work_id: UUID
+    ):
         self.submission_repository = submission_repository
         self.work_service = work_service
         self.storage_service = storage_service
@@ -40,7 +43,7 @@ class SubmissionsService(BaseService):
                 submission_id = await self.submission_repository.do_new_submit(self.event_id, self.work_id)
             else:
                 submission_id = await self.submission_repository.update_submit(last_submission.id)
-        upload_url = await self.storage_service.get_submission_upload_url(self.event_id, self.work_id, submission_id)
+        upload_url = await self.storage_service.get_submission_upload_url(submission_id)
         return SubmissionUploadSchema(
             id=submission_id,
             event_id=self.event_id,
@@ -58,7 +61,7 @@ class SubmissionsService(BaseService):
         return await self.__get_submission(last_submission.id)
 
     async def __get_submission(self, submission_id: UUID) -> SubmissionDownloadSchema:
-        download_url = await self.storage_service.get_submission_read_url(self.event_id, self.work_id, submission_id)
+        download_url = await self.storage_service.get_submission_read_url(submission_id)
         return SubmissionDownloadSchema(
             id=submission_id,
             event_id=self.event_id,

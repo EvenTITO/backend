@@ -1,5 +1,4 @@
 from typing import List
-from uuid import UUID
 
 from fastapi import APIRouter
 
@@ -21,8 +20,8 @@ event_chairs_router = APIRouter(prefix="/{event_id}/chairs", tags=["Events: Chai
     response_model=List[ChairResponseSchema],
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
-async def read_event_chairs(chair_service: EventChairServiceDep, event_id: UUID) -> List[ChairResponseSchema]:
-    return await chair_service.get_all_chairs(event_id)
+async def read_event_chairs(chair_service: EventChairServiceDep) -> List[ChairResponseSchema]:
+    return await chair_service.get_all_chairs()
 
 
 @event_chairs_router.get(
@@ -30,12 +29,8 @@ async def read_event_chairs(chair_service: EventChairServiceDep, event_id: UUID)
     response_model=ChairResponseSchema,
     dependencies=[or_(IsOrganizerDep, IsChairDep)]
 )
-async def get_my_chair(
-        event_id: UUID,
-        caller_id: CallerIdDep,
-        chair_service: EventChairServiceDep
-) -> ChairResponseSchema:
-    return await chair_service.get_chair(event_id, caller_id)
+async def get_my_chair(caller_id: CallerIdDep, chair_service: EventChairServiceDep) -> ChairResponseSchema:
+    return await chair_service.get_chair(caller_id)
 
 
 @event_chairs_router.get(
@@ -43,8 +38,8 @@ async def get_my_chair(
     response_model=ChairResponseSchema,
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
-async def get_chair(event_id: UUID, user_id: UID, chair_service: EventChairServiceDep) -> ChairResponseSchema:
-    return await chair_service.get_chair(event_id, user_id)
+async def get_chair(user_id: UID, chair_service: EventChairServiceDep) -> ChairResponseSchema:
+    return await chair_service.get_chair(user_id)
 
 
 @event_chairs_router.delete(
@@ -53,12 +48,8 @@ async def get_chair(event_id: UUID, user_id: UID, chair_service: EventChairServi
     response_model=None,
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
-async def remove_chair(
-        event_id: UUID,
-        user_id: UID,
-        chair_service: EventChairServiceDep
-) -> None:
-    await chair_service.remove_chair(event_id, user_id)
+async def remove_chair(user_id: UID, chair_service: EventChairServiceDep) -> None:
+    await chair_service.remove_chair(user_id)
 
 
 @event_chairs_router.put(
@@ -67,10 +58,5 @@ async def remove_chair(
     response_model=None,
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
-async def update(
-        tracks: DynamicTracksEventSchema,
-        event_id: UUID,
-        user_id: UID,
-        chair_service: EventChairServiceDep
-) -> None:
-    await chair_service.update_tracks(event_id, user_id, tracks)
+async def update(user_id: UID, tracks: DynamicTracksEventSchema, chair_service: EventChairServiceDep) -> None:
+    await chair_service.update_tracks(user_id, tracks)

@@ -15,10 +15,14 @@ class EventsStaticFiles(str, Enum):
 
 class EventsStorageService(StorageService):
 
-    async def get_upload_url(self, event_id: UUID, file_to_get: EventsStaticFiles) -> UploadURLSchema:
+    def __init__(self, event_id: UUID):
+        super().__init__()
+        self.event_id = event_id
+
+    async def get_upload_url(self, file_to_get: EventsStaticFiles) -> UploadURLSchema:
         return await self.storage_client.generate_signed_upload_url(
             bucket_name=self.storage_settings.EVENTS_BUCKET,
-            blob_name=f"{event_id}/{file_to_get.value}"
+            blob_name=f"{self.event_id}/{file_to_get.value}"
         )
 
     @staticmethod

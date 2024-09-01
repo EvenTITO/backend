@@ -1,6 +1,6 @@
-import pytest
 from fastapi.encoders import jsonable_encoder
 
+from app.schemas.events.schemas import DynamicTracksEventSchema
 from ..commontest import create_headers
 
 
@@ -112,16 +112,44 @@ async def test_put_many_changes(
     assert response.json()['contact'] == update_create_event["contact"]
 
 
-@pytest.mark.skip(reason="TODO: validar agregar tracks nuevos despues de startup servicio PUT /general")
-async def test_add_tracks_1():
-    pass
+async def test_update_tracks_ok(client, admin_data, create_event):
+    new_tracks = ['futbol', 'tenis', 'golf']
+    tracks_to_add = DynamicTracksEventSchema(
+        tracks=new_tracks
+    )
+    response = await client.put(
+        f"/events/{create_event['id']}/configuration/general/tracks",
+        json=jsonable_encoder(tracks_to_add),
+        headers=create_headers(admin_data.id)
+    )
+
+    assert response.status_code == 204
+
+    response = await client.get(
+        f"/events/{create_event['id']}/configuration",
+        headers=create_headers(admin_data.id)
+    )
+
+    assert response.status_code == 200
+    assert response.json()['tracks'][0] == new_tracks[0]
+    assert response.json()['tracks'][1] == new_tracks[1]
+    assert response.json()['tracks'][2] == new_tracks[2]
+
+    # the title and description do not change.
+    assert response.json()['title'] == create_event["title"]
+    assert response.json()['description'] == create_event["description"]
+    assert response.json()['location'] == create_event["location"]
+    assert response.json()['contact'] == create_event["contact"]
 
 
-@pytest.mark.skip(reason="TODO: validar agregar tracks nuevos despues de startup servicio PUT /general/tracks")
-async def test_add_tracks_2():
-    pass
+async def test_update_tracks_fails_if_event_started(client, admin_data, create_event_started):
+    tracks_to_add = DynamicTracksEventSchema(
+        tracks=['futbol', 'tenis', 'golf']
+    )
+    response = await client.put(
+        f"/events/{create_event_started}/configuration/general/tracks",
+        json=jsonable_encoder(tracks_to_add),
+        headers=create_headers(admin_data.id)
+    )
 
-
-@pytest.mark.skip(reason="TODO: validar agregar tracks nuevos antes de startup servicio PUT /general/tracks")
-async def test_add_tracks_3():
-    pass
+    assert response.status_code == 409

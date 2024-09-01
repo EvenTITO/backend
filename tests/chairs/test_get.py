@@ -1,8 +1,7 @@
-from app.schemas.members.member_schema import MemberRequestSchema
-import pytest
 from fastapi.encoders import jsonable_encoder
 
 from app.schemas.events.schemas import EventRole
+from app.schemas.members.member_schema import MemberRequestSchema
 from ..commontest import create_headers
 
 
@@ -48,9 +47,9 @@ async def test_get_chairs_empty(client, create_event_creator, create_event_from_
 
 
 async def test_get_chair_by_user_id_being_myself_the_chair_and_organizer(
-    client,
-    create_event_from_event_creator,
-    create_event_creator
+        client,
+        create_event_from_event_creator,
+        create_event_creator
 ):
     request = MemberRequestSchema(
         email=create_event_creator["email"],
@@ -72,10 +71,10 @@ async def test_get_chair_by_user_id_being_myself_the_chair_and_organizer(
 
 
 async def test_get_chair_by_user_id_being_an_organizer(
-    client,
-    create_event_creator,
-    create_event_from_event_creator,
-    create_event_chair
+        client,
+        create_event_creator,
+        create_event_from_event_creator,
+        create_event_chair
 ):
     response = await client.get(
         f"/events/{create_event_from_event_creator}/chairs/{create_event_chair}",
@@ -85,9 +84,9 @@ async def test_get_chair_by_user_id_being_an_organizer(
 
 
 async def test_get_chair_by_user_id_called_by_not_organizer_fails(
-    client,
-    create_event_from_event_creator,
-    create_event_chair
+        client,
+        create_event_from_event_creator,
+        create_event_chair
 ):
     response = await client.get(
         f"/events/{create_event_from_event_creator}/chairs/{create_event_chair}",
@@ -96,15 +95,10 @@ async def test_get_chair_by_user_id_called_by_not_organizer_fails(
     assert response.status_code == 403
 
 
-@pytest.mark.skip(reason="TODO: (FALLO) tratar de obtener un chair si no soy organizer pero ese user_id no es chair")
-async def test_get_chair_by_user_id_04():
-    pass
-
-
 async def test_get_chair_by_user_id_fails_if_the_user_does_not_exist(
-    client,
-    create_event_creator,
-    create_event_from_event_creator,
+        client,
+        create_event_creator,
+        create_event_from_event_creator,
 ):
     invalid_user_id = 'qwertyuiopasdfghjklzxcvbnmdfghj'
     response = await client.get(
@@ -115,10 +109,10 @@ async def test_get_chair_by_user_id_fails_if_the_user_does_not_exist(
 
 
 async def test_get_chair_by_user_id_fails_if_the_user_does_not_exist_as_chair(
-    client,
-    create_event_creator,
-    create_event_from_event_creator,
-    create_user,
+        client,
+        create_event_creator,
+        create_event_from_event_creator,
+        create_user,
 ):
     response = await client.get(
         f"/events/{create_event_from_event_creator}/chairs/{create_user['id']}",
@@ -128,9 +122,9 @@ async def test_get_chair_by_user_id_fails_if_the_user_does_not_exist_as_chair(
 
 
 async def test_get_chair_me_i_am_event_chair(
-    client,
-    create_event_from_event_creator,
-    create_event_chair
+        client,
+        create_event_from_event_creator,
+        create_event_chair
 ):
     response = await client.get(
         f"/events/{create_event_from_event_creator}/chairs/me",
@@ -141,9 +135,9 @@ async def test_get_chair_me_i_am_event_chair(
 
 
 async def test_get_chair_me_i_am_not_event_chair_fails(
-    client,
-    create_event_from_event_creator,
-    create_user
+        client,
+        create_event_from_event_creator,
+        create_user
 ):
     response = await client.get(
         f"/events/{create_event_from_event_creator}/chairs/me",

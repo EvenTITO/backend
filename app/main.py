@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers.users.users import users_router
-from app.routers.events.events import events_router
 
+from app.routers.events.events import events_router
+from app.routers.users.users import users_router
 
 app = FastAPI(
     title="Backend API",
@@ -26,7 +26,6 @@ origins = [
     "http://localhost:5173",
 ]
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -34,7 +33,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 app.include_router(users_router)
 app.include_router(events_router)
