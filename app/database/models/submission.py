@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Index, ForeignKey, UUID
+from sqlalchemy import Column, Index, ForeignKey, UUID, String
 
 from app.database.models.base import Base
 from app.database.models.utils import ModelTemplate
+from app.database.models.work import WorkStates
 
 
 class SubmissionModel(ModelTemplate, Base):
@@ -9,6 +10,7 @@ class SubmissionModel(ModelTemplate, Base):
 
     event_id = Column(UUID(as_uuid=True), ForeignKey("events.id"), nullable=False)
     work_id = Column(UUID(as_uuid=True), ForeignKey("works.id"), nullable=False)
+    state = Column(String, nullable=False, default=WorkStates.SUBMITTED)
 
     # This is a Compose Foreign Key constraint: the submission references a
     # single work with id (event_id, work_id).

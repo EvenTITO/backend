@@ -48,24 +48,27 @@ class SubmissionsService(BaseService):
             id=submission_id,
             event_id=self.event_id,
             work_id=self.work_id,
+            state=WorkStates.SUBMITTED,
             upload_url=upload_url
         )
 
     async def get_submission(self, submission_id: UUID) -> SubmissionDownloadSchema:
-        return await self.__get_submission(submission_id)
+        submission = await self.submission_repository.get(submission_id)
+        return await self.__get_submission(submission)
 
     async def get_latest_submission(self) -> SubmissionDownloadSchema:
         last_submission = await self.submission_repository.get_last_submission(self.event_id, self.work_id)
-        if last_submission is None:
-            raise SubmissionNotFound(self.event_id, self.work_id)
-        return await self.__get_submission(last_submission.id)
+        return await self.__get_submission(last_submission)
 
-    async def __get_submission(self, submission_id: UUID) -> SubmissionDownloadSchema:
-        download_url = await self.storage_service.get_submission_read_url(submission_id)
+    async def __get_submission(self, submission: SubmissionModel) -> SubmissionDownloadSchema:
+        if submission is None:
+            raise SubmissionNotFound(self.event_id, self.work_id)
+        download_url = await self.storage_service.get_submission_read_url(submission.id)
         return SubmissionDownloadSchema(
-            id=submission_id,
-            event_id=self.event_id,
-            work_id=self.work_id,
+            id=submission.id,
+            event_id=submission.event_id,
+            work_id=submission.work_id,
+            state=submission.state,
             download_url=download_url
         )
 
@@ -75,4 +78,5 @@ class SubmissionsService(BaseService):
             id=model.id,
             work_id=model.work_id,
             event_id=model.event_id,
+            state=model.state
         )
