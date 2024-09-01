@@ -5,6 +5,7 @@ pytest-cov
 httpx
 sqlalchemy
 asyncpg
+apscheduler
 python-dotenv
 pydantic
 google-cloud-storage

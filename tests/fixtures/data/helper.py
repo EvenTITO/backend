@@ -9,7 +9,7 @@ from tests.commontest import create_headers
 
 async def add_tracks(client, event_id, creator_user_id):
     tracks_to_add = DynamicTracksEventSchema(
-        tracks=["First Track", "Second Track"]
+        tracks=['math', 'chemistry', 'physics']
     )
     response = await client.put(
         f"/events/{event_id}/configuration/general/tracks",

@@ -21,8 +21,8 @@ class ReviewsRepository(Repository):
     ) -> list[ReviewResponseSchema]:
         res = await self._get_many_with_conditions(
             [ReviewModel.event_id == event_id, ReviewModel.work_id == work_id],
-            limit,
-            offset
+            offset,
+            limit
         )
         return [
             ReviewResponseSchema(
@@ -45,12 +45,23 @@ class ReviewsRepository(Repository):
             review_schema: ReviewCreateRequestSchema
     ) -> ReviewResponseSchema:
         new_review = ReviewModel(
+            **review_schema.model_dump(),
             event_id=event_id,
             work_id=work_id,
             reviewer_id=reviewer_id,
-            submission_id=submission_id,
-            status=review_schema.status,
-            review=review_schema.review
+            submission_id=submission_id
         )
         saved_review = (await self._create(new_review))
-        return ReviewResponseSchema(**saved_review.model_dump())
+        return ReviewResponseSchema(
+            id=saved_review.id,
+            event_id=saved_review.event_id,
+            work_id=saved_review.work_id,
+            submission_id=saved_review.submission_id,
+            reviewer_id=saved_review.reviewer_id,
+            review=saved_review.review,
+            status=saved_review.status,
+        )
+
+    async def update_review(self, review_id: UUID, review_update: ReviewCreateRequestSchema) -> bool:
+        conditions = [ReviewModel.id == review_id]
+        return await self._update_with_conditions(conditions, review_update)

@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from app.database.models.work import WorkStates
-from app.exceptions.reviews_exceptions import IsNotWorkRevisionPeriod, CannotUpdateReviewIfNotExistSubmission
+from app.exceptions.reviews_exceptions import IsNotWorkRevisionPeriod
 from app.repository.reviews_repository import ReviewsRepository
 from app.schemas.users.utils import UID
 from app.schemas.works.review import ReviewUploadSchema, ReviewCreateRequestSchema, ReviewResponseSchema
@@ -39,8 +39,6 @@ class EventReviewsService(BaseService):
             raise IsNotWorkRevisionPeriod(self.event_id, self.work_id)
 
         last_submission = await self.submission_service.get_latest_submission()
-        if last_submission is None:
-            raise CannotUpdateReviewIfNotExistSubmission(self.event_id, self.work_id)
 
         saved_review = await self.reviews_repository.create_review(
             self.event_id,
@@ -51,3 +49,10 @@ class EventReviewsService(BaseService):
         )
         upload_url = await self.storage_service.get_review_upload_url(saved_review.id)
         return ReviewUploadSchema(**saved_review.model_dump(), upload_url=upload_url)
+
+    async def update_review(self, review_id: UUID, review_schema: ReviewCreateRequestSchema) -> None:
+        my_work = await self.work_service.get_work(self.work_id)
+        if my_work.state != WorkStates.IN_REVISION:
+            raise IsNotWorkRevisionPeriod(self.event_id, self.work_id)
+
+        await self.reviews_repository.update_review(review_id, review_schema)

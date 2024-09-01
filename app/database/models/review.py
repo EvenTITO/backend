@@ -5,10 +5,11 @@ from sqlalchemy import (
     UUID, String, Boolean
 )
 
+from app.database.models.base import Base
 from app.database.models.utils import UIDType, ModelTemplate
 
 
-class ReviewModel(ModelTemplate):
+class ReviewModel(ModelTemplate, Base):
     __tablename__ = "reviews"
 
     submission_id = Column(UUID(as_uuid=True), ForeignKey("submissions.id"))

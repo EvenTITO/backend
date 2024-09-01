@@ -46,7 +46,6 @@ async def create_event_from_event_creator(client, create_event_creator):
         description="This is a nice event",
         event_type=EventType.CONFERENCE,
         location='Paseo Colon 850',
-        tracks=['math', 'chemistry', 'phisics'],
     )
     response = await client.post(
         "/events",

@@ -1,14 +1,16 @@
 from datetime import datetime
+from typing import Annotated
 from uuid import UUID
 
-from sqlalchemy import and_
+from fastapi import Depends
+from sqlalchemy import and_, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 
-from app.database.models.work import WorkModel
+from app.database.models.work import WorkModel, WorkStates
 from app.repository.crud_repository import Repository
+from app.repository.repository import get_repository
 from app.schemas.users.utils import UID
-from app.schemas.works.work import WorkSchema
+from app.schemas.works.work import WorkSchema, WorkStateSchema
 
 
 class WorksRepository(Repository):
@@ -20,22 +22,20 @@ class WorksRepository(Repository):
         return await self._get_with_conditions(conditions)
 
     async def get_all_works_for_event(self, event_id: UUID, offset: int, limit: int) -> list[WorkModel]:
-        query = select(WorkModel).where(and_(WorkModel.event_id == event_id)).offset(offset).limit(limit)
-        result = await self.session.execute(query)
-        return result.scalars().all()
+        conditions = [WorkModel.event_id == event_id]
+        return await self._get_many_with_conditions(conditions, offset, limit)
 
     async def get_all_works_for_user(self, user_id: UID, offset: int, limit: int) -> list[WorkModel]:
-        query = select(WorkModel).where(and_(WorkModel.author_id == user_id)).offset(offset).limit(limit)
-        result = await self.session.execute(query)
-        return result.scalars().all()
+        conditions = [WorkModel.author_id == user_id]
+        return await self._get_many_with_conditions(conditions, offset, limit)
 
-    async def get_works_in_tracks(self, event_id: UUID, tracks: list[str], limit: int, offset: int):
+    async def get_works_in_tracks(self, event_id: UUID, tracks: list[str], offset: int, limit: int) -> list[WorkModel]:
         conditions = [WorkModel.event_id == event_id, WorkModel.track.in_(tracks)]
-        await self._get_many_with_conditions(conditions, limit, offset)
+        return await self._get_many_with_conditions(conditions, offset, limit)
 
-    async def get_works_by_track(self, event_id: UUID, track: str, limit: int, offset: int):
+    async def get_works_by_track(self, event_id: UUID, track: str, offset: int, limit: int) -> list[WorkModel]:
         conditions = [WorkModel.event_id == event_id, WorkModel.track == track]
-        await self._get_many_with_conditions(conditions, limit, offset)
+        return await self._get_many_with_conditions(conditions, offset, limit)
 
     async def create_work(self, work: WorkSchema, event_id: UUID, deadline_date: datetime, author_id: UID) -> WorkModel:
         work_model = WorkModel(
@@ -57,3 +57,20 @@ class WorksRepository(Repository):
     async def exists_work(self, event_id: UUID, work_id: UUID) -> bool:
         conditions = [WorkModel.event_id == event_id, WorkModel.id == work_id]
         return await self._exists_with_conditions(conditions)
+
+    async def update_work_status(self, event_id: UUID, work_id: UUID, status: WorkStateSchema):
+        conditions = [WorkModel.event_id == event_id, WorkModel.id == work_id]
+        return await self._update_with_conditions(conditions, status)
+
+    async def update_works_status(self):
+        print(f"[{datetime.now().date()} - {datetime.now().time()}] Actualizando estado de los trabajos")
+        conditions = [
+            WorkModel.deadline_date < datetime.now(),
+            WorkModel.state in (WorkStates.SUBMITTED, WorkStates.RE_SUBMIT)
+        ]
+        query = update(WorkModel).where(and_(*conditions)).values(state=WorkStates.IN_REVISION)
+        await self.session.execute(query)
+        await self.session.commit()
+
+
+WorkRepositoryDep = Annotated[WorksRepository, Depends(get_repository(WorksRepository))]

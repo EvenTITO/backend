@@ -1,6 +1,7 @@
 from uuid import UUID
+
 from app.database.models.event import EventStatus
-from app.exceptions.events_exceptions import CannotUpdateTracksAfterEventStarts
+from app.exceptions.events_exceptions import CannotUpdateTracksAfterEventStarts, EventNotFound
 from app.repository.events_repository import EventsRepository
 from app.schemas.events.configuration import EventConfigurationSchema
 from app.schemas.events.configuration_general import ConfigurationGeneralEventSchema
@@ -42,6 +43,20 @@ class EventsConfigurationService(BaseService):
 
     async def get_review_skeleton(self) -> ReviewSkeletonSchema:
         review_skeleton = await self.events_repository.get_review_skeleton(self.event_id)
-        return ReviewSkeletonSchema(
-            review_skeleton=review_skeleton
-        )
+        return ReviewSkeletonSchema(review_skeleton=review_skeleton)
+
+    async def get_dates(self) -> DatesCompleteSchema:
+        dates = await self.events_repository.get_dates(self.event_id)
+        return DatesCompleteSchema(dates=dates)
+
+    async def get_event_tracks(self):
+        tracks = await self.events_repository.get_tracks(self.event_id)
+        if tracks is None:
+            raise EventNotFound(self.event_id)
+        return tracks
+
+    async def get_event_status(self):
+        event_status = await self.events_repository.get_status(self.event_id)
+        if event_status is None:
+            raise EventNotFound(self.event_id)
+        return event_status

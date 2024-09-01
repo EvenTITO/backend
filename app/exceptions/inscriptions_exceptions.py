@@ -32,5 +32,5 @@ class EventNotStarted(HTTPException):
 class InscriptionNotFound(HTTPException):
     def __init__(self, event_id, inscription_id):
         self.status_code = 404
-        self.detail = f"Inscription {inscription_id} in event ${event_id} not found"
+        self.detail = f"Inscription {inscription_id} in event {event_id} not found"
         super().__init__(status_code=self.status_code, detail=self.detail)

@@ -9,7 +9,7 @@ from app.schemas.events.schemas import DynamicTracksEventSchema
 from app.schemas.members.chair_schema import ChairResponseSchema
 from app.schemas.users.user import UserSchema
 from app.schemas.users.utils import UID
-from app.services.events.events_service import EventsService
+from app.services.events.events_configuration_service import EventsConfigurationService
 from app.services.services import BaseService
 
 
@@ -17,12 +17,12 @@ class EventChairService(BaseService):
     def __init__(
             self,
             event_id: UUID,
-            event_service: EventsService,
+            events_configuration_service: EventsConfigurationService,
             chair_repository: ChairRepository,
             users_repository: UsersRepository
     ):
         self.event_id = event_id
-        self.event_service = event_service
+        self.events_configuration_service = events_configuration_service
         self.chair_repository = chair_repository
         self.users_repository = users_repository
 
@@ -47,7 +47,7 @@ class EventChairService(BaseService):
     async def update_tracks(self, user_id: UID, tracks_schema: DynamicTracksEventSchema) -> None:
         if not await self.chair_repository.is_member(self.event_id, user_id):
             raise UserNotIsChair(self.event_id, user_id)
-        event_tracks = await self.event_service.get_event_tracks(self.event_id)
+        event_tracks = await self.events_configuration_service.get_event_tracks()
         valid_tracks = []
         for new_track in tracks_schema.tracks:
             if new_track not in event_tracks:

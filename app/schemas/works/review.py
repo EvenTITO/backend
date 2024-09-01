@@ -20,6 +20,7 @@ class ReviewAnswer(BaseModel):
 
 
 class ReviewCreateRequestSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     status: ReviewDecision = Field(examples=["APPROVED"])
     review: ReviewAnswer
 

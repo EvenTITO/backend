@@ -14,6 +14,7 @@ from app.routers.events.members.chairs import event_chairs_router
 from app.routers.events.members.members import event_members_router
 from app.routers.events.members.organizers import event_organizers_router
 from app.routers.events.members.reviewers import event_reviewers_router
+from app.routers.works.reviews import event_reviews_router
 from app.routers.works.submissions import works_submissions_router
 from app.routers.works.works import works_router
 from app.schemas.events.create_event import CreateEventSchema
@@ -29,6 +30,7 @@ events_router.include_router(event_members_router)
 events_router.include_router(event_organizers_router)
 events_router.include_router(event_chairs_router)
 events_router.include_router(event_reviewers_router)
+events_router.include_router(event_reviews_router)
 events_router.include_router(works_router)
 events_router.include_router(inscriptions_events_router)
 events_router.include_router(works_submissions_router)

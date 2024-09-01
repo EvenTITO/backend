@@ -53,12 +53,12 @@ class Repository:
             return False
         return True
 
-    async def _get_many_with_conditions(self, conditions, limit: int, offset: int):
+    async def _get_many_with_conditions(self, conditions, offset: int, limit: int):
         query = select(self.model).where(and_(*conditions)).offset(offset).limit(limit)
         result = await self.session.execute(query)
         return result.scalars().all()
 
-    async def get_many(self, limit: int, offset: int):
+    async def get_many(self, offset: int, limit: int):
         query = select(self.model).offset(offset).limit(limit)
         result = await self.session.execute(query)
         return result.scalars().all()
