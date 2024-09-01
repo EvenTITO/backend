@@ -7,7 +7,6 @@ from app.repository.events_repository import EventsRepository
 from app.schemas.events.configuration import EventConfigurationSchema
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.public_event_with_roles import PublicEventWithRolesSchema
-from app.schemas.events.schemas import EventRole
 from app.schemas.users.utils import UID
 from app.services.event_organizers.event_organizers_service import EventOrganizersService
 from app.services.services import BaseService
@@ -58,12 +57,10 @@ class EventsService(BaseService):
         if event is None:
             raise EventNotFound(event_id)
         event = PublicEventWithRolesSchema.model_validate(event)
-        # TODO aca falta poner todos los roles en el evento, esto solo agrega si sos organizer
-        # ver event.repository.get_all_events_for_user
         if caller_id is None:
             return event
-        if await self.organizers_service.is_organizer(event_id, caller_id):
-            event.roles.append(EventRole.ORGANIZER)
+        event_roles = await self.events_repository.get_roles(event_id, caller_id)
+        event.roles = event_roles
         return event
 
     async def get_event_status(self, event_id: UUID):
