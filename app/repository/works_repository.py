@@ -3,10 +3,9 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import Depends
-from sqlalchemy import and_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.models.work import WorkModel, WorkStates
+from app.database.models.work import WorkModel
 from app.repository.crud_repository import Repository
 from app.repository.repository import get_repository
 from app.schemas.users.utils import UID
