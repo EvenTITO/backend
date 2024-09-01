@@ -1,13 +1,13 @@
-import datetime
+import datetime as datetime_library
+from datetime import datetime
 
 from fastapi.encoders import jsonable_encoder
+from freezegun import freeze_time
 
-from app.database.models.work import WorkStates
 from app.schemas.events.review_skeleton.simple_question import SimpleAnswer
 from app.schemas.members.reviewer_schema import ReviewerRequestSchema, ReviewerCreateRequestSchema
 from app.schemas.users.user import UserSchema
 from app.schemas.works.review import ReviewAnswer, ReviewCreateRequestSchema, ReviewDecision
-from app.schemas.works.work import WorkStateSchema
 from ..commontest import create_headers
 from ..works.test_create_work import USER_WORK
 
@@ -34,14 +34,6 @@ async def test_get_reviews_ok(
     submission_id = submission_response.json()['id']
     assert submission_response.status_code == 201
 
-    update_status_work_response = await client.patch(
-        f"/events/{create_event_from_event_creator}/works/{work_id}/status",
-        json=jsonable_encoder(WorkStateSchema(state=WorkStates.IN_REVISION)),
-        headers=create_headers(create_event_creator['id'])
-    )
-
-    assert update_status_work_response.status_code == 204
-
     other_user_id = "paoksncaokasdasdl12345678901"
     other_create_user = UserSchema(
         name="Angel",
@@ -58,13 +50,13 @@ async def test_get_reviews_ok(
     new_reviewer_1 = ReviewerRequestSchema(
         work_id=work_id,
         email=create_user['email'],
-        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
+        review_deadline=datetime_library.date.today() + datetime_library.timedelta(days=10)
     )
 
     new_reviewer_2 = ReviewerRequestSchema(
         work_id=work_id,
         email=other_create_user.email,
-        review_deadline=datetime.date.today() + datetime.timedelta(days=7)
+        review_deadline=datetime_library.date.today() + datetime_library.timedelta(days=7)
     )
 
     request = ReviewerCreateRequestSchema(
@@ -87,34 +79,35 @@ async def test_get_reviews_ok(
         review=answer_1
     )
 
-    create_review_1_response = await client.post(
-        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
-        json=jsonable_encoder(review_1),
-        headers=create_headers(create_user['id'])
-    )
+    with freeze_time(datetime.now() + datetime_library.timedelta(days=31)):
+        create_review_1_response = await client.post(
+            f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+            json=jsonable_encoder(review_1),
+            headers=create_headers(create_user['id'])
+        )
 
-    assert create_review_1_response.status_code == 201
+        assert create_review_1_response.status_code == 201, create_review_1_response.json()
 
-    answer_2 = ReviewAnswer(
-        answers=[SimpleAnswer(
-            question="Comentarios",
-            answer="Mejorar desarrollo, es demasiado técnico y difícil de leer. Revisar ortografía.",
-            type_question='simple_question'
-        )]
-    )
+        answer_2 = ReviewAnswer(
+            answers=[SimpleAnswer(
+                question="Comentarios",
+                answer="Mejorar desarrollo, es demasiado técnico y difícil de leer. Revisar ortografía.",
+                type_question='simple_question'
+            )]
+        )
 
-    review_2 = ReviewCreateRequestSchema(
-        status=ReviewDecision.NOT_APPROVED,
-        review=answer_2
-    )
+        review_2 = ReviewCreateRequestSchema(
+            status=ReviewDecision.NOT_APPROVED,
+            review=answer_2
+        )
 
-    create_review_2_response = await client.post(
-        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
-        json=jsonable_encoder(review_2),
-        headers=create_headers(other_user_id)
-    )
+        create_review_2_response = await client.post(
+            f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+            json=jsonable_encoder(review_2),
+            headers=create_headers(other_user_id)
+        )
 
-    assert create_review_2_response.status_code == 201
+        assert create_review_2_response.status_code == 201
 
     get_response = await client.get(
         f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",

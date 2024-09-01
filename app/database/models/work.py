@@ -19,7 +19,6 @@ class WorkStates(str, enum.Enum):
     APPROVED = "APPROVED"
     REJECTED = "REJECTED"
     RE_SUBMIT = "RE_SUBMIT"
-    IN_REVISION = "IN_REVISION"
     SUBMITTED = "SUBMITTED"
 
 

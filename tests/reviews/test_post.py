@@ -1,12 +1,12 @@
-import datetime
+import datetime as datetime_library
+from datetime import datetime
 
 from fastapi.encoders import jsonable_encoder
+from freezegun import freeze_time
 
-from app.database.models.work import WorkStates
 from app.schemas.events.review_skeleton.simple_question import SimpleAnswer
 from app.schemas.members.reviewer_schema import ReviewerRequestSchema, ReviewerCreateRequestSchema
 from app.schemas.works.review import ReviewCreateRequestSchema, ReviewDecision, ReviewAnswer
-from app.schemas.works.work import WorkStateSchema
 from ..commontest import create_headers
 from ..works.test_create_work import USER_WORK
 
@@ -28,7 +28,7 @@ async def test_create_review_error_work_is_not_in_revision_yet(
     new_reviewer_1 = ReviewerRequestSchema(
         work_id=work_id,
         email=create_user['email'],
-        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
+        review_deadline=datetime_library.date.today() + datetime_library.timedelta(days=10)
     )
 
     request = ReviewerCreateRequestSchema(
@@ -74,18 +74,10 @@ async def test_create_review_error_work_has_no_submissions(
 
     work_id = create_work_response.json()
 
-    update_status_work_response = await client.patch(
-        f"/events/{create_event_from_event_creator}/works/{work_id}/status",
-        json=jsonable_encoder(WorkStateSchema(state=WorkStates.IN_REVISION)),
-        headers=create_headers(create_event_creator['id'])
-    )
-
-    assert update_status_work_response.status_code == 204
-
     new_reviewer = ReviewerRequestSchema(
         work_id=work_id,
         email=create_user['email'],
-        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
+        review_deadline=datetime_library.date.today() + datetime_library.timedelta(days=10)
     )
 
     request = ReviewerCreateRequestSchema(
@@ -107,12 +99,12 @@ async def test_create_review_error_work_has_no_submissions(
         status=ReviewDecision.APPROVED,
         review=answer
     )
-
-    create_review_response = await client.post(
-        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
-        json=jsonable_encoder(review),
-        headers=create_headers(create_user['id'])
-    )
+    with freeze_time(datetime.now() + datetime_library.timedelta(days=31)):
+        create_review_response = await client.post(
+            f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+            json=jsonable_encoder(review),
+            headers=create_headers(create_user['id'])
+        )
 
     assert create_review_response.status_code == 404
 
@@ -138,18 +130,10 @@ async def test_create_review_ok(
     )
     assert submission_response.status_code == 201
 
-    update_status_work_response = await client.patch(
-        f"/events/{create_event_from_event_creator}/works/{work_id}/status",
-        json=jsonable_encoder(WorkStateSchema(state=WorkStates.IN_REVISION)),
-        headers=create_headers(create_event_creator['id'])
-    )
-
-    assert update_status_work_response.status_code == 204
-
     new_reviewer = ReviewerRequestSchema(
         work_id=work_id,
         email=create_user['email'],
-        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
+        review_deadline=datetime_library.date.today() + datetime_library.timedelta(days=10)
     )
 
     request = ReviewerCreateRequestSchema(
@@ -171,12 +155,12 @@ async def test_create_review_ok(
         status=ReviewDecision.APPROVED,
         review=answer
     )
-
-    create_review_response = await client.post(
-        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
-        json=jsonable_encoder(review),
-        headers=create_headers(create_user['id'])
-    )
+    with freeze_time(datetime.now() + datetime_library.timedelta(days=31)):
+        create_review_response = await client.post(
+            f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+            json=jsonable_encoder(review),
+            headers=create_headers(create_user['id'])
+        )
 
     assert create_review_response.status_code == 201
     assert create_review_response.json()["upload_url"]["upload_url"] == "mocked-url-upload"
@@ -211,18 +195,10 @@ async def test_update_review_ok(
     )
     assert submission_response.status_code == 201
 
-    update_status_work_response = await client.patch(
-        f"/events/{create_event_from_event_creator}/works/{work_id}/status",
-        json=jsonable_encoder(WorkStateSchema(state=WorkStates.IN_REVISION)),
-        headers=create_headers(create_event_creator['id'])
-    )
-
-    assert update_status_work_response.status_code == 204
-
     new_reviewer = ReviewerRequestSchema(
         work_id=work_id,
         email=create_user['email'],
-        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
+        review_deadline=datetime_library.date.today() + datetime_library.timedelta(days=10)
     )
 
     request = ReviewerCreateRequestSchema(
@@ -248,37 +224,37 @@ async def test_update_review_ok(
         status=ReviewDecision.NOT_APPROVED,
         review=answer
     )
+    with freeze_time(datetime.now() + datetime_library.timedelta(days=31)):
+        create_review_response = await client.post(
+            f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+            json=jsonable_encoder(review),
+            headers=create_headers(create_user['id'])
+        )
 
-    create_review_response = await client.post(
-        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
-        json=jsonable_encoder(review),
-        headers=create_headers(create_user['id'])
-    )
+        assert create_review_response.status_code == 201
+        create_review = create_review_response.json()
+        assert create_review["upload_url"]["upload_url"] == "mocked-url-upload"
+        assert create_review["event_id"] == create_event_from_event_creator
+        assert create_review["work_id"] == work_id
+        assert create_review["reviewer_id"] == create_user['id']
+        assert len(create_review["review"]["answers"]) == 1
+        assert create_review["review"]["answers"][0]["question"] == "Comentarios"
+        assert (create_review["review"]["answers"][0]["answer"] ==
+                "Mejorar desarrollo, es demasiado técnico y difícil de leer. Revisar ortografía.")
+        assert create_review["review"]["answers"][0]["type_question"] == "simple_question"
+        assert create_review["status"] == ReviewDecision.NOT_APPROVED
 
-    assert create_review_response.status_code == 201
-    create_review = create_review_response.json()
-    assert create_review["upload_url"]["upload_url"] == "mocked-url-upload"
-    assert create_review["event_id"] == create_event_from_event_creator
-    assert create_review["work_id"] == work_id
-    assert create_review["reviewer_id"] == create_user['id']
-    assert len(create_review["review"]["answers"]) == 1
-    assert create_review["review"]["answers"][0]["question"] == "Comentarios"
-    assert (create_review["review"]["answers"][0]["answer"] ==
-            "Mejorar desarrollo, es demasiado técnico y difícil de leer. Revisar ortografía.")
-    assert create_review["review"]["answers"][0]["type_question"] == "simple_question"
-    assert create_review["status"] == ReviewDecision.NOT_APPROVED
-
-    new_answer = ReviewAnswer(answers=[
-        SimpleAnswer(question="Comentarios", answer="Bien las correcciones. Aprobado", type_question='simple_question')
-    ])
-    new_review = ReviewCreateRequestSchema(
-        status=ReviewDecision.APPROVED,
-        review=new_answer
-    )
-    update_review_response = await client.put(
-        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews/{create_review['id']}",
-        json=jsonable_encoder(new_review),
-        headers=create_headers(create_user['id'])
-    )
+        new_answer = ReviewAnswer(answers=[
+            SimpleAnswer(question="Comentarios", answer="Bien las correcciones. Aprobado", type_question='simple_question')
+        ])
+        new_review = ReviewCreateRequestSchema(
+            status=ReviewDecision.APPROVED,
+            review=new_answer
+        )
+        update_review_response = await client.put(
+            f"/events/{create_event_from_event_creator}/works/{work_id}/reviews/{create_review['id']}",
+            json=jsonable_encoder(new_review),
+            headers=create_headers(create_user['id'])
+        )
 
     assert update_review_response.status_code == 201

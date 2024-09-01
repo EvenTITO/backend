@@ -38,10 +38,7 @@ class WorksService(BaseService):
         return list(map(WorksService.__map_to_schema, works))
 
     async def create_work(self, work: WorkSchema) -> UUID:
-        dates_schema = await self.event_configuration_service.get_dates()
-        submission_deadline = next((x for x in dates_schema.dates if x.name == MandatoryDates.SUBMISSION_DEADLINE_DATE),
-                                   None)
-
+        submission_deadline = await self._get_submission_deadline()
         if submission_deadline.date < datetime.now().date():
             raise CannotCreateWorkAfterDeadlineDate(submission_deadline)
 
@@ -101,6 +98,10 @@ class WorksService(BaseService):
 
     async def exist_work(self, work_id: UUID) -> bool:
         return await self.works_repository.exists_work(self.event_id, work_id)
+
+    async def _get_submission_deadline(self):
+        dates_schema = await self.event_configuration_service.get_dates()
+        return next((x for x in dates_schema.dates if x.name == MandatoryDates.SUBMISSION_DEADLINE_DATE), None)
 
     @staticmethod
     def __map_to_schema(model: WorkModel) -> WorkWithState:

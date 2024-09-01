@@ -62,15 +62,5 @@ class WorksRepository(Repository):
         conditions = [WorkModel.event_id == event_id, WorkModel.id == work_id]
         return await self._update_with_conditions(conditions, status)
 
-    async def update_works_status(self):
-        print(f"[{datetime.now().date()} - {datetime.now().time()}] Actualizando estado de los trabajos")
-        conditions = [
-            WorkModel.deadline_date < datetime.now(),
-            WorkModel.state in (WorkStates.SUBMITTED, WorkStates.RE_SUBMIT)
-        ]
-        query = update(WorkModel).where(and_(*conditions)).values(state=WorkStates.IN_REVISION)
-        await self.session.execute(query)
-        await self.session.commit()
-
 
 WorkRepositoryDep = Annotated[WorksRepository, Depends(get_repository(WorksRepository))]
