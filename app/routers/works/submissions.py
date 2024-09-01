@@ -4,10 +4,9 @@ from fastapi import APIRouter, Query
 from fastapi import Depends
 
 from app.authorization.admin_user_dep import IsAdminUsrDep
-from app.authorization.author_dep import IsAuthorDep
+from app.authorization.author_dep import IsAuthorDep, verify_is_author
 from app.authorization.organizer_dep import IsOrganizerDep
 from app.authorization.reviewer_dep import IsWorkReviewerDep
-from app.authorization.user_id_dep import verify_user_exists
 from app.authorization.util_dep import or_
 from app.schemas.works.submission import SubmissionUploadSchema, SubmissionDownloadSchema, SubmissionResponseSchema
 from app.services.event_submissions.event_submissions_service_dep import SubmissionsServiceDep
@@ -22,12 +21,14 @@ works_submissions_router = APIRouter(
     path="/submit",
     status_code=201,
     response_model=SubmissionUploadSchema,
-    dependencies=[Depends(verify_user_exists)]
+    dependencies=[Depends(verify_is_author)]
 )
 async def submit(submission_service: SubmissionsServiceDep) -> SubmissionUploadSchema:
     return await submission_service.do_submit()
 
 
+# Si sos chair del track asignado al trabajo del cual queres ver la submission no vas a poder a no ser que te auto
+# como reviewer del trabajo
 @works_submissions_router.get(
     path="/latest",
     status_code=200,

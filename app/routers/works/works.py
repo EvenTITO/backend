@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 
 from app.authorization.admin_user_dep import IsAdminUsrDep
-from app.authorization.author_dep import IsAuthorDep
+from app.authorization.author_dep import IsAuthorDep, verify_is_author
 from app.authorization.chair_dep import IsTrackChairDep
 from app.authorization.organizer_dep import IsOrganizerDep
 from app.authorization.reviewer_dep import IsWorkReviewerDep
@@ -60,7 +60,7 @@ async def create_work(work: WorkSchema, work_service: WorksServiceDep) -> UUID:
     return await work_service.create_work(work)
 
 
-@works_router.put(path="/{work_id}", status_code=204, dependencies=[Depends(verify_user_exists)])
+@works_router.put(path="/{work_id}", status_code=204, dependencies=[Depends(verify_is_author)])
 async def update_work(work_id: UUID, work_update: WorkSchema, work_service: WorksServiceDep) -> None:
     await work_service.update_work(work_id, work_update)
 

@@ -1,13 +1,10 @@
 from datetime import datetime
-from typing import Annotated
 from uuid import UUID
 
-from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.work import WorkModel
 from app.repository.crud_repository import Repository
-from app.repository.repository import get_repository
 from app.schemas.users.utils import UID
 from app.schemas.works.work import WorkSchema, WorkStateSchema
 
@@ -60,6 +57,3 @@ class WorksRepository(Repository):
     async def update_work_status(self, event_id: UUID, work_id: UUID, status: WorkStateSchema):
         conditions = [WorkModel.event_id == event_id, WorkModel.id == work_id]
         return await self._update_with_conditions(conditions, status)
-
-
-WorkRepositoryDep = Annotated[WorksRepository, Depends(get_repository(WorksRepository))]
