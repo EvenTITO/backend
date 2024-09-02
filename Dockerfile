@@ -8,7 +8,6 @@ COPY ./requirements.txt /code/requirements.txt
 
 RUN pip install --no-cache-dir --upgrade -r  /code/requirements.txt && \
     rm -rf /root/.cache /var/lib/apt/lists/* /tmp/*
-RUN pip install pydantic[email]
 
 RUN apt-get remove -y git && apt-get autoremove -y
 
