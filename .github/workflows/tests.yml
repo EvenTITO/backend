@@ -39,8 +39,8 @@ jobs:
     # Notifications
       NOTIFICATIONS_EMAIL: ''
       NOTIFICATIONS_EMAIL_PASSWORD: ''
-      FRONTEND_URL: https://eventito-frontend.vercel.app/
-      ENABLE_SEND_EMAILS: False
+      NOTIFICATIONS_FRONTEND_URL: https://eventito-frontend.vercel.app/
+      NOTIFICATIONS_ENABLE_SEND_EMAILS: False
 
     steps:
     - uses: actions/checkout@v4

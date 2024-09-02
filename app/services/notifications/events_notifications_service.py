@@ -15,15 +15,15 @@ class EventsNotificationsService(NotificationsService):
     def __init__(self, event_repository: EventsRepository, users_repository: UsersRepository):
         self.event_repository = event_repository
         self.users_repository = users_repository
-        self.admins_emails = []
+        self.recipients_emails = []
 
-    def __admins_message(self):
+    def __recipients_message(self):
         # Check valid format email & set emails receivers
-        for email in self.admins_emails:
+        for email in self.recipients_emails:
             if not self.__is_valid_email(email):
                 raise Exception(f"Format email error {email}")
         message = EmailMessage()
-        message['To'] = ",".join(self.admins_emails)
+        message['To'] = ",".join(self.recipients_emails)
         print(message['To'])
         return message
 
@@ -48,7 +48,7 @@ class EventsNotificationsService(NotificationsService):
     # Search organizer emails and extra notification emails(in event)
     async def __search_emails_to_send(self, event):
 
-        creator_id = await self.event_repository.get_created_id_event(event.id)
+        creator_id = await self.event_repository.get_created_id(event.id)
         organizer_user = await self.users_repository.get(creator_id)
 
         emails_to_send = []
@@ -59,9 +59,12 @@ class EventsNotificationsService(NotificationsService):
         return emails_to_send
 
     async def notify_event_created(self, event):
-        self.admins_emails = await self.__search_emails_to_send(event)
+        self.recipients_emails = await self.__search_emails_to_send(event)
+        if len(self.recipients_emails) == 0:
+            print("Non-existent email recipients")
+            return
 
-        message = self.__admins_message()
+        message = self.__recipients_message()
 
         body = CREATE_EVENT_NOTIFICATION_HTML
         subject = 'Su solicitud de creación de evento fue aprobada'
@@ -75,9 +78,9 @@ class EventsNotificationsService(NotificationsService):
         return self._send_email(message)
 
     async def notify_event_started(self, event):
-        self.admins_emails = self.__search_emails_to_send(event)
+        self.recipients_emails = self.__search_emails_to_send(event)
 
-        message = self.__admins_message()
+        message = self.__recipients_message()
 
         body = START_EVENT_NOTIFICATION_HTML
         body = self.__common_body(body, event)

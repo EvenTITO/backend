@@ -48,7 +48,6 @@ class EventsAdministrationService(BaseService):
         return True
 
     async def __notify_change(self, new_status, event):
-        # print("[TEST] new_status: "+str(new_status))
         if new_status.status.value == EventStatus.CREATED.value:
             await self.notification_service.notify_event_created(event)
         elif new_status.status.value == EventStatus.STARTED.value:
