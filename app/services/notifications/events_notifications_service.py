@@ -9,6 +9,7 @@ import re
 email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 CREATE_EVENT_NOTIFICATION_HTML = load_html('create-event-notification.html')
 START_EVENT_NOTIFICATION_HTML = load_html('start-event-notification.html')
+WAITING_APPROVAL_EVENT_NOTIFICATION_HTML = load_html('waiting-event-notification.html')
 
 
 class EventsNotificationsService(NotificationsService):
@@ -31,11 +32,21 @@ class EventsNotificationsService(NotificationsService):
         return re.match(email_regex, email) is not None
 
     def __common_body(self, body, event):
+        start_date = "Sin definir"
+        start_time = "Sin definir"
+        organized_by = "Sin definir"
+        if event.dates[0]['date'] is not None:
+            start_date = event.dates[0]['date']
+        if event.dates[0]['date'] is not None:
+            start_time = event.dates[0]['time']
+        if event.organized_by is not None:
+            organized_by = event.organized_by
+
         body = body.replace("[contact]", event.contact)
         body = body.replace("[title]", event.title)
-        body = body.replace("[START_DATE]", event.dates[0]['date'])
-        body = body.replace("[START_TIME]", event.dates[0]['time'])
-        body = body.replace("[organized_by]", event.organized_by)
+        body = body.replace("[START_DATE]", start_date)
+        body = body.replace("[START_TIME]", start_time)
+        body = body.replace("[organized_by]", organized_by)
 
         return body
 
@@ -47,7 +58,6 @@ class EventsNotificationsService(NotificationsService):
 
     # Search organizer emails and extra notification emails(in event)
     async def __search_emails_to_send(self, event):
-
         creator_id = await self.event_repository.get_created_id(event.id)
         organizer_user = await self.users_repository.get(creator_id)
 
@@ -78,14 +88,36 @@ class EventsNotificationsService(NotificationsService):
         return self._send_email(message)
 
     async def notify_event_started(self, event):
-        self.recipients_emails = self.__search_emails_to_send(event)
+        self.recipients_emails = await self.__search_emails_to_send(event)
+        if len(self.recipients_emails) == 0:
+            print("Non-existent email recipients")
+            return
 
         message = self.__recipients_message()
 
         body = START_EVENT_NOTIFICATION_HTML
         body = self.__common_body(body, event)
 
-        dyn_subject = f"El evento ${event.title} se ha publicado"
+        dyn_subject = f"El evento {event.title} se ha publicado"
+        self._add_subject(message, dyn_subject)
+        self._add_body(message, body)
+        self._add_body_extra(message, body)
+
+        return self._send_email(message)
+
+    async def notify_event_waiting_approval(self, event):
+        self.recipients_emails = await self.__search_emails_to_send(event)
+        print(self.recipients_emails)
+        if len(self.recipients_emails) == 0:
+            print("Non-existent email recipients")
+            return
+
+        message = self.__recipients_message()
+
+        body = WAITING_APPROVAL_EVENT_NOTIFICATION_HTML
+        body = self.__common_body(body, event)
+
+        dyn_subject = f"El evento {event.title} se ha enviado para su aprobación"
         self._add_subject(message, dyn_subject)
         self._add_body(message, body)
         self._add_body_extra(message, body)

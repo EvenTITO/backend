@@ -168,3 +168,9 @@ pgdata
 #Intellij
 .idea
 .DS_Store
+
+#pyvenv
+pyvenv.cfg
+
+#bin
+/bin
