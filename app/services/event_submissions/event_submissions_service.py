@@ -1,4 +1,5 @@
 from uuid import UUID
+
 from app.database.models.submission import SubmissionModel
 from app.database.models.work import WorkStates
 from app.exceptions.submissions.submissions_exceptions import SubmissionNotFound
@@ -11,13 +12,15 @@ from app.services.works.works_service import WorksService
 
 
 class SubmissionsService(BaseService):
-    def __init__(self,
-                 submission_repository: SubmissionsRepository,
-                 work_service: WorksService,
-                 storage_service: WorkStorageService,
-                 user_id: UID,
-                 event_id: UUID,
-                 work_id: UUID):
+    def __init__(
+            self,
+            submission_repository: SubmissionsRepository,
+            work_service: WorksService,
+            storage_service: WorkStorageService,
+            user_id: UID,
+            event_id: UUID,
+            work_id: UUID
+    ):
         self.submission_repository = submission_repository
         self.work_service = work_service
         self.storage_service = storage_service
@@ -40,29 +43,32 @@ class SubmissionsService(BaseService):
                 submission_id = await self.submission_repository.do_new_submit(self.event_id, self.work_id)
             else:
                 submission_id = await self.submission_repository.update_submit(last_submission.id)
-        upload_url = await self.storage_service.get_submission_upload_url(self.event_id, self.work_id, submission_id)
+        upload_url = await self.storage_service.get_submission_upload_url(submission_id)
         return SubmissionUploadSchema(
             id=submission_id,
             event_id=self.event_id,
             work_id=self.work_id,
+            state=WorkStates.SUBMITTED,
             upload_url=upload_url
         )
 
     async def get_submission(self, submission_id: UUID) -> SubmissionDownloadSchema:
-        return await self.__get_submission(submission_id)
+        submission = await self.submission_repository.get(submission_id)
+        return await self.__get_submission(submission)
 
     async def get_latest_submission(self) -> SubmissionDownloadSchema:
         last_submission = await self.submission_repository.get_last_submission(self.event_id, self.work_id)
-        if last_submission is None:
-            raise SubmissionNotFound(self.event_id, self.work_id)
-        return await self.__get_submission(last_submission.id)
+        return await self.__get_submission(last_submission)
 
-    async def __get_submission(self, submission_id: UUID) -> SubmissionDownloadSchema:
-        download_url = await self.storage_service.get_submission_read_url(self.event_id, self.work_id, submission_id)
+    async def __get_submission(self, submission: SubmissionModel) -> SubmissionDownloadSchema:
+        if submission is None:
+            raise SubmissionNotFound(self.event_id, self.work_id)
+        download_url = await self.storage_service.get_submission_read_url(submission.id)
         return SubmissionDownloadSchema(
-            id=submission_id,
-            event_id=self.event_id,
-            work_id=self.work_id,
+            id=submission.id,
+            event_id=submission.event_id,
+            work_id=submission.work_id,
+            state=submission.state,
             download_url=download_url
         )
 
@@ -72,4 +78,5 @@ class SubmissionsService(BaseService):
             id=model.id,
             work_id=model.work_id,
             event_id=model.event_id,
+            state=model.state
         )

@@ -22,7 +22,8 @@ class MemberRepository(Repository):
         return result.fetchall()
 
     async def is_member(self, event_id: UUID, user_id: UID):
-        return await self.exists((event_id, user_id))
+        conditions = [self.model.event_id == event_id, self.model.user_id == user_id]
+        return await self._exists_with_conditions(conditions)
 
     async def get_member(self, event_id: UUID, user_id: UID):
         query = select(UserModel, self.model).where(

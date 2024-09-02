@@ -3,12 +3,14 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
 
-from app.authorization.author_dep import IsAuthorDep
+from app.authorization.admin_user_dep import IsAdminUsrDep
+from app.authorization.author_dep import IsAuthorDep, verify_is_author
 from app.authorization.chair_dep import IsTrackChairDep
 from app.authorization.organizer_dep import IsOrganizerDep
+from app.authorization.reviewer_dep import IsWorkReviewerDep
 from app.authorization.user_id_dep import verify_user_exists
 from app.authorization.util_dep import or_
-from app.schemas.works.work import WorkSchema, WorkWithState
+from app.schemas.works.work import WorkSchema, WorkWithState, WorkStateSchema
 from app.services.works.works_service_dep import WorksServiceDep
 
 works_router = APIRouter(prefix="/{event_id}/works", tags=["Events: Works"])
@@ -47,9 +49,8 @@ async def read_my_works(
     path="/{work_id}",
     status_code=200,
     response_model=WorkWithState,
-    dependencies=[or_(IsOrganizerDep, IsAuthorDep, IsTrackChairDep)]
+    dependencies=[or_(IsOrganizerDep, IsAuthorDep, IsWorkReviewerDep)]
 )
-#  TODO si sos reviewer de este trabajo tendrias que poder verlo,
 async def get_work(work_id: UUID, work_service: WorksServiceDep) -> WorkWithState:
     return await work_service.get_work(work_id)
 
@@ -59,6 +60,15 @@ async def create_work(work: WorkSchema, work_service: WorksServiceDep) -> UUID:
     return await work_service.create_work(work)
 
 
-@works_router.put(path="/{work_id}", status_code=204, dependencies=[Depends(verify_user_exists)])
+@works_router.put(path="/{work_id}", status_code=204, dependencies=[Depends(verify_is_author)])
 async def update_work(work_id: UUID, work_update: WorkSchema, work_service: WorksServiceDep) -> None:
     await work_service.update_work(work_id, work_update)
+
+
+@works_router.patch(
+    path="/{work_id}/status",
+    status_code=204,
+    dependencies=[or_(IsAdminUsrDep, IsOrganizerDep)]
+)
+async def update_work_status(work_id: UUID, status: WorkStateSchema, work_service: WorksServiceDep) -> None:
+    await work_service.update_work_status(work_id, status)

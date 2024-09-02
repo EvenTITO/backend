@@ -7,4 +7,4 @@ async def test_create_submission(client, create_user, create_event, create_work_
         f"/events/{event_id}/works/{create_work_from_user}/submissions/submit",
         headers=create_headers(create_user["id"])
     )
-    assert response.status_code == 200, f'error: {response.json()}'
+    assert response.status_code == 201, f'error: {response.json()}'

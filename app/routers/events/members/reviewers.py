@@ -25,11 +25,10 @@ event_reviewers_router = APIRouter(
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
 async def add_reviewers(
-        event_id: UUID,
         reviewers: ReviewerCreateRequestSchema,
         reviewer_service: EventReviewerServiceDep
 ) -> None:
-    return await reviewer_service.add_reviewers(event_id, reviewers)
+    return await reviewer_service.add_reviewers(reviewers)
 
 
 @event_reviewers_router.get(
@@ -39,10 +38,9 @@ async def add_reviewers(
 )
 async def read_event_reviewers(
         reviewer_service: EventReviewerServiceDep,
-        event_id: UUID,
         work_id: UUID = Query(default=None),
 ) -> List[ReviewerWithWorksResponseSchema]:
-    return await reviewer_service.get_reviewers(event_id, work_id)
+    return await reviewer_service.get_reviewers(work_id)
 
 
 @event_reviewers_router.get(
@@ -51,11 +49,10 @@ async def read_event_reviewers(
     dependencies=[or_(IsOrganizerDep, IsReviewerDep, IsAdminUsrDep)]
 )
 async def get_my_assignments(
-        reviewer_service: EventReviewerServiceDep,
-        event_id: UUID,
         user_id: CallerIdDep,
+        reviewer_service: EventReviewerServiceDep,
 ) -> list[ReviewerAssignmentSchema]:
-    return await reviewer_service.get_my_assignments(event_id, user_id)
+    return await reviewer_service.get_my_assignments(user_id)
 
 
 @event_reviewers_router.get(
@@ -64,8 +61,7 @@ async def get_my_assignments(
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
 async def read_event_reviewer_by_user(
-        reviewer_service: EventReviewerServiceDep,
-        event_id: UUID,
         user_id: UID,
+        reviewer_service: EventReviewerServiceDep,
 ) -> ReviewerWithWorksResponseSchema:
-    return await reviewer_service.get_reviewer_by_user_id(event_id, user_id)
+    return await reviewer_service.get_reviewer_by_user_id(user_id)

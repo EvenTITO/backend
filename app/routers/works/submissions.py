@@ -1,35 +1,52 @@
 from uuid import UUID
+
 from fastapi import APIRouter, Query
 from fastapi import Depends
 
 from app.authorization.admin_user_dep import IsAdminUsrDep
-from app.authorization.author_dep import IsAuthorDep
+from app.authorization.author_dep import IsAuthorDep, verify_is_author
 from app.authorization.organizer_dep import IsOrganizerDep
-from app.authorization.user_id_dep import verify_user_exists
+from app.authorization.reviewer_dep import IsWorkReviewerDep
 from app.authorization.util_dep import or_
 from app.schemas.works.submission import SubmissionUploadSchema, SubmissionDownloadSchema, SubmissionResponseSchema
-from app.services.submissions.submissions_service_dep import SubmissionsServiceDep
+from app.services.event_submissions.event_submissions_service_dep import SubmissionsServiceDep
 
 works_submissions_router = APIRouter(
     prefix="/{event_id}/works/{work_id}/submissions",
     tags=["Event: Works Submissions"]
 )
-submissions_router = APIRouter(prefix="/{event_id}/submissions", tags=["Event: Submissions"])
 
 
-@works_submissions_router.put(path="/submit", status_code=200, dependencies=[Depends(verify_user_exists)])
+@works_submissions_router.put(
+    path="/submit",
+    status_code=201,
+    response_model=SubmissionUploadSchema,
+    dependencies=[Depends(verify_is_author)]
+)
 async def submit(submission_service: SubmissionsServiceDep) -> SubmissionUploadSchema:
     return await submission_service.do_submit()
 
 
-@works_submissions_router.get(path="/latest", status_code=200, dependencies=[or_(IsOrganizerDep, IsAuthorDep)])
+# Si sos chair del track asignado al trabajo del cual queres ver la submission no vas a poder a no ser que te auto
+# como reviewer del trabajo
+@works_submissions_router.get(
+    path="/latest",
+    status_code=200,
+    response_model=SubmissionDownloadSchema,
+    dependencies=[or_(IsOrganizerDep, IsAdminUsrDep, IsAuthorDep, IsWorkReviewerDep)]
+)
 async def get_download_latest_submission_file(
-        submission_service: SubmissionsServiceDep) -> SubmissionDownloadSchema:
+        submission_service: SubmissionsServiceDep
+) -> SubmissionDownloadSchema:
     return await submission_service.get_latest_submission()
 
 
-@works_submissions_router.get(path="/{submission_id}", status_code=200,
-                              dependencies=[or_(IsOrganizerDep, IsAuthorDep)])
+@works_submissions_router.get(
+    path="/{submission_id}",
+    status_code=200,
+    response_model=SubmissionDownloadSchema,
+    dependencies=[or_(IsOrganizerDep, IsAdminUsrDep, IsAuthorDep, IsWorkReviewerDep)]
+)
 async def get_download_submission_file(
         submission_id: UUID,
         submission_service: SubmissionsServiceDep
@@ -37,7 +54,12 @@ async def get_download_submission_file(
     return await submission_service.get_submission(submission_id)
 
 
-@submissions_router.get(path="", status_code=200, dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)])
+@works_submissions_router.get(
+    path="",
+    status_code=200,
+    response_model=list[SubmissionResponseSchema],
+    dependencies=[or_(IsOrganizerDep, IsAdminUsrDep, IsAuthorDep, IsWorkReviewerDep)]
+)
 async def get_all_submissions(
         submission_service: SubmissionsServiceDep,
         offset: int = 0,

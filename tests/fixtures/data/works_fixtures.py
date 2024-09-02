@@ -28,7 +28,7 @@ async def create_work_from_user(client, create_user, create_event) -> str:
             'P-256 y Curvas de Edwards en Algoritmos '
             'de Criptografía Cuántica'
         ),
-        track='cibersecurity',
+        track='chemistry',
         abstract='',
         keywords=['ciber', 'security'],
         authors=[

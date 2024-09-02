@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends
 
@@ -13,12 +14,13 @@ from app.services.works.works_service_dep import WorksServiceDep
 class EventsReviewerChecker:
     async def __call__(
             self,
+            event_id: UUID,
             events_service: EventsServiceDep,
             work_service: WorksServiceDep,
             users_repository: UsersRepository = Depends(get_repository(UsersRepository)),
             reviewer_repository: ReviewerRepository = Depends(get_repository(ReviewerRepository)),
     ) -> EventReviewerService:
-        return EventReviewerService(events_service, work_service, reviewer_repository, users_repository)
+        return EventReviewerService(event_id, events_service, work_service, reviewer_repository, users_repository)
 
 
 event_reviewer_checker = EventsReviewerChecker()

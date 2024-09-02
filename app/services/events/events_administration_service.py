@@ -1,4 +1,5 @@
 from uuid import UUID
+
 from app.database.models.event import EventStatus
 from app.database.models.user import UserRole
 from app.exceptions.events_exceptions import EventNotFound, InvalidEventConfiguration, InvalidCaller
@@ -11,13 +12,15 @@ from app.services.services import BaseService
 
 class EventsAdministrationService(BaseService):
     def __init__(self,
+                 event_id: UUID,
                  events_repository: EventsRepository,
                  notification_service: EventsNotificationsService):
+        self.event_id = event_id
         self.events_repository = events_repository
         self.notification_service = notification_service
 
-    async def update_status(self, event_id: UUID, new_status: EventStatusSchema, caller_role: UserRole):
-        event = await self.events_repository.get(event_id)
+    async def update_status(self, new_status: EventStatusSchema, caller_role: UserRole):
+        event = await self.events_repository.get(self.event_id)
 
         admin_status = [
             EventStatus.WAITING_APPROVAL,
@@ -34,9 +37,9 @@ class EventsAdministrationService(BaseService):
         if new_status.status == EventStatus.STARTED and not self.__all_mandatory_config_ok(event):
             raise InvalidEventConfiguration()
 
-        update_ok = await self.events_repository.update(event_id, new_status)
+        update_ok = await self.events_repository.update(self.event_id, new_status)
         if not update_ok:
-            raise EventNotFound(event_id)
+            raise EventNotFound(self.event_id)
 
         await self.__notify_change(new_status, event)
 

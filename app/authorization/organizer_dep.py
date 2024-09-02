@@ -1,5 +1,4 @@
 from typing import Annotated
-from uuid import UUID
 
 from fastapi import Depends, HTTPException
 
@@ -11,10 +10,9 @@ class IsOrganizer:
     async def __call__(
             self,
             caller_id: CallerIdDep,
-            event_id: UUID,
             organizers_service: EventOrganizersServiceDep
     ) -> bool:
-        return await organizers_service.is_organizer(event_id, caller_id)
+        return await organizers_service.is_organizer(caller_id)
 
 
 IsOrganizerDep = Annotated[bool, Depends(IsOrganizer())]

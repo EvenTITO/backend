@@ -5,8 +5,10 @@ pytest-cov
 httpx
 sqlalchemy
 asyncpg
+apscheduler
 python-dotenv
 pydantic
+freezegun
 google-cloud-storage
 pydantic-settings
 pytest-mock==3.14.0

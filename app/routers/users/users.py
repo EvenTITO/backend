@@ -59,4 +59,4 @@ async def update_user(user: UserModifySchema, users_service: UsersServiceDep):
     dependencies=[Depends(verify_is_admin_user)]
 )
 async def read_all_users(users_admin_service: UsersAdminServiceDep, limit: int = 100, offset: int = 0):
-    return await users_admin_service.get_many(limit, offset)
+    return await users_admin_service.get_many(offset, limit)

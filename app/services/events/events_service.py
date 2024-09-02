@@ -62,15 +62,3 @@ class EventsService(BaseService):
         event_roles = await self.events_repository.get_roles(event_id, caller_id)
         event.roles = event_roles
         return event
-
-    async def get_event_status(self, event_id: UUID):
-        event_status = await self.events_repository.get_status(event_id)
-        if event_status is None:
-            raise EventNotFound(event_id)
-        return event_status
-
-    async def get_event_tracks(self, event_id: UUID):
-        tracks = await self.events_repository.get_tracks(event_id)
-        if tracks is None:
-            raise EventNotFound(event_id)
-        return tracks

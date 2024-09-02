@@ -3,18 +3,28 @@ from uuid import UUID
 
 from app.database.models.work import WorkModel, WorkStates
 from app.exceptions.works.works_exceptions import TitleAlreadyExists, StatusNotAllowWorkUpdate, \
-    CannotUpdateWorkAfterDeadlineDate, WorkNotFound, NotIsMyWork
+    CannotUpdateWorkAfterDeadlineDate, WorkNotFound, NotIsMyWork, CannotCreateWorkAfterDeadlineDate, \
+    TrackNotExistInEvent
 from app.repository.works_repository import WorksRepository
+from app.schemas.events.dates import MandatoryDates
 from app.schemas.users.utils import UID
-from app.schemas.works.work import WorkWithState, WorkSchema
+from app.schemas.works.work import WorkWithState, WorkSchema, WorkStateSchema
+from app.services.events.events_configuration_service import EventsConfigurationService
 from app.services.services import BaseService
 
 
 class WorksService(BaseService):
-    def __init__(self, works_repository: WorksRepository, user_id: UID, event_id: UUID):
-        self.works_repository = works_repository
+    def __init__(
+            self,
+            user_id: UID,
+            event_id: UUID,
+            event_configuration_service: EventsConfigurationService,
+            works_repository: WorksRepository
+    ):
         self.user_id = user_id
         self.event_id = event_id
+        self.event_configuration_service = event_configuration_service
+        self.works_repository = works_repository
 
     async def get_works(self, track: str, offset: int, limit: int) -> list[WorkWithState]:
         if track:
@@ -28,23 +38,28 @@ class WorksService(BaseService):
         return list(map(WorksService.__map_to_schema, works))
 
     async def create_work(self, work: WorkSchema) -> UUID:
-        deadline_date = datetime(2024, 11, 5)
-        # TODO: use event deadline date.
-        # TODO: validate before deadline.
-        # TODO: validate track.
+        submission_deadline = await self._get_submission_deadline()
+        if submission_deadline.date < datetime.now().date():
+            raise CannotCreateWorkAfterDeadlineDate(submission_deadline)
+
         repeated_title = await self.works_repository.work_with_title_exists(self.event_id, work.title)
         if repeated_title:
             raise TitleAlreadyExists(work.title, self.event_id)
+
+        event_tracks = await self.event_configuration_service.get_event_tracks()
+        if work.track not in event_tracks:
+            raise TrackNotExistInEvent(self.event_id, work.track)
+
         work = await self.works_repository.create_work(
             work,
             self.event_id,
-            deadline_date,
+            datetime.combine(submission_deadline.date, submission_deadline.time),
             self.user_id
         )
         return work.id
 
-    async def is_my_work(self, caller_id: UID, event_id: UUID, work_id: UUID) -> bool:
-        work = await self.__get_work(event_id, work_id)
+    async def is_my_work(self, caller_id: UID, work_id: UUID) -> bool:
+        work = await self.__get_work(self.event_id, work_id)
         return work.author_id == caller_id
 
     async def get_work(self, work_id: UUID) -> WorkWithState:
@@ -57,6 +72,11 @@ class WorksService(BaseService):
         if repeated_title:
             raise TitleAlreadyExists(work_update.title, self.event_id)
         await self.works_repository.update_work(work_update, self.event_id, work_id)
+
+    async def update_work_status(self, work_id: UUID, status: WorkStateSchema) -> None:
+        if not await self.exist_work(work_id):
+            raise WorkNotFound(event_id=self.event_id, work_id=work_id)
+        await self.works_repository.update_work_status(self.event_id, work_id, status)
 
     async def validate_update_work(self, work_id: UUID) -> None:
         my_work = await self.__get_my_work(work_id)
@@ -72,13 +92,16 @@ class WorksService(BaseService):
         return work
 
     async def __get_work(self, event_id: UUID, work_id: UUID) -> WorkModel:
-        work = await self.works_repository.get_work(event_id=event_id, work_id=work_id)
-        if work is None:
-            raise WorkNotFound(event_id=event_id, work_id=work_id)
-        return work
+        if not await self.exist_work(work_id):
+            raise WorkNotFound(event_id=self.event_id, work_id=work_id)
+        return await self.works_repository.get_work(event_id=event_id, work_id=work_id)
 
-    async def exist_work(self, event_id: UUID, work_id: UUID) -> bool:
-        return await self.works_repository.exists_work(event_id, work_id)
+    async def exist_work(self, work_id: UUID) -> bool:
+        return await self.works_repository.exists_work(self.event_id, work_id)
+
+    async def _get_submission_deadline(self):
+        dates_schema = await self.event_configuration_service.get_dates()
+        return next((x for x in dates_schema.dates if x.name == MandatoryDates.SUBMISSION_DEADLINE_DATE), None)
 
     @staticmethod
     def __map_to_schema(model: WorkModel) -> WorkWithState:

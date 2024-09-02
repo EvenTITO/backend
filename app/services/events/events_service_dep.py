@@ -1,5 +1,6 @@
-from fastapi import Depends
 from typing import Annotated
+
+from fastapi import Depends
 
 from app.repository.events_repository import EventsRepository
 from app.repository.repository import get_repository
@@ -9,9 +10,9 @@ from app.services.events.events_service import EventsService
 
 class EventsChecker:
     async def __call__(
-        self,
-        organizers_service: EventOrganizersServiceDep,
-        events_repository: EventsRepository = Depends(get_repository(EventsRepository)),
+            self,
+            organizers_service: EventOrganizersServiceDep,
+            events_repository: EventsRepository = Depends(get_repository(EventsRepository)),
     ) -> EventsService:
         return EventsService(events_repository, organizers_service)
 

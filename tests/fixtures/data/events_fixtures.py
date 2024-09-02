@@ -1,6 +1,6 @@
 import pytest
-
 from fastapi.encoders import jsonable_encoder
+
 from app.database.models.event import EventType, EventStatus
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.event_status import EventStatusSchema
@@ -25,6 +25,8 @@ async def create_event(client, admin_data):
         headers=create_headers(admin_data.id)
     )
     event_id = event_id.json()
+
+    await complete_event_configuration(client, event_id, admin_data.id)
 
     event_dict = {
         **new_event.model_dump(),
@@ -104,6 +106,7 @@ async def create_many_events(client, admin_data):
             headers=create_headers(admin_data.id)
         )
         ids_events.append(response.json())
+        await complete_event_configuration(client, response.json(), admin_data.id)
 
     return ids_events
 

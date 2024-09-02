@@ -1,5 +1,7 @@
-from fastapi import Depends
 from typing import Annotated
+from uuid import UUID
+
+from fastapi import Depends
 
 from app.repository.events_repository import EventsRepository
 from app.repository.repository import get_repository
@@ -7,14 +9,15 @@ from app.services.events.events_administration_service import EventsAdministrati
 from app.services.notifications.notifications_service_dep import EventsNotificationServiceDep
 
 
-class EventsAdministartionServiceChecker:
+class EventsAdministrationServiceChecker:
     async def __call__(
         self,
-            events_notifications_service: EventsNotificationServiceDep,
-            events_repository: EventsRepository = Depends(get_repository(EventsRepository))
+        event_id: UUID,
+        events_notifications_service: EventsNotificationServiceDep,
+        events_repository: EventsRepository = Depends(get_repository(EventsRepository))
     ) -> EventsAdministrationService:
-        return EventsAdministrationService(events_repository, events_notifications_service)
+        return EventsAdministrationService(event_id, events_repository, events_notifications_service)
 
 
-events_administrations_checker = EventsAdministartionServiceChecker()
+events_administrations_checker = EventsAdministrationServiceChecker()
 EventsAdministrationServiceDep = Annotated[EventsAdministrationService, Depends(events_administrations_checker)]
