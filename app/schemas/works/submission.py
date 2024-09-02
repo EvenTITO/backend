@@ -1,6 +1,8 @@
 from uuid import UUID
+
 from pydantic import BaseModel, ConfigDict
 
+from app.database.models.work import WorkStates
 from app.schemas.storage.schemas import UploadURLSchema, DownloadURLSchema
 
 
@@ -9,6 +11,7 @@ class SubmissionResponseSchema(BaseModel):
     id: UUID
     work_id: UUID
     event_id: UUID
+    state: WorkStates
 
 
 class SubmissionDownloadSchema(SubmissionResponseSchema):

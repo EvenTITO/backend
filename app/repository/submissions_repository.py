@@ -13,7 +13,7 @@ class SubmissionsRepository(Repository):
         super().__init__(session, SubmissionModel)
 
     async def get_all_submissions_for_event(self, event_id: UUID, offset: int, limit: int) -> list[SubmissionModel]:
-        query = select(SubmissionModel).where(SubmissionModel.event_id == event_id).offset(offset).limit(limit)
+        query = select(SubmissionModel).where(SubmissionModel.event_id is event_id).offset(offset).limit(limit)
         result = await self.session.execute(query)
         return result.scalars().all()
 
@@ -30,7 +30,7 @@ class SubmissionsRepository(Repository):
         new_submission = SubmissionModel(event_id=event_id, work_id=work_id)
         return (await self._create(new_submission)).id
 
-    async def update_submit(self, submission_id: UUID) -> SubmissionModel:
+    async def update_submit(self, submission_id: UUID) -> UUID:
         update_query = (
             update(self.model).where(self.model.id == submission_id).values(last_update=datetime.now())
         )

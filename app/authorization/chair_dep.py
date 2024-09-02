@@ -1,9 +1,11 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends, HTTPException, Query
 
 from app.authorization.caller_id_dep import CallerIdDep
 from app.services.event_chairs.event_chairs_service_dep import EventChairServiceDep
+from app.services.works.works_service_dep import WorksServiceDep
 
 
 class IsChair:
@@ -47,3 +49,31 @@ class VerifyIsTrackChair:
 
 verify_is_track_chair = VerifyIsTrackChair()
 TrackChairDep = Annotated[None, Depends(verify_is_track_chair)]
+
+
+class IsWorkChair:
+    async def __call__(
+            self,
+            caller_id: CallerIdDep,
+            work_id: UUID,
+            chair_service: EventChairServiceDep,
+            work_service: WorksServiceDep
+    ) -> bool:
+        if await chair_service.is_chair(caller_id):
+            chair = await chair_service.get_chair(caller_id)
+            work = await work_service.get_work(work_id)
+            return work.track in chair.tracks
+        return False
+
+
+IsWorkChairDep = Annotated[bool, Depends(IsWorkChair())]
+
+
+class VerifyIsWorkChair:
+    async def __call__(self, is_event_work_chair: IsWorkChairDep) -> None:
+        if not is_event_work_chair:
+            raise HTTPException(status_code=403)
+
+
+verify_is_work_chair = VerifyIsWorkChair()
+WorkChairDep = Annotated[None, Depends(verify_is_work_chair)]

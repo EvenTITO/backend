@@ -4,9 +4,12 @@ from datetime import datetime
 from fastapi.encoders import jsonable_encoder
 from freezegun import freeze_time
 
+from app.database.models.work import WorkStates
 from app.schemas.events.review_skeleton.simple_question import SimpleAnswer
+from app.schemas.events.schemas import DynamicTracksEventSchema
 from app.schemas.members.reviewer_schema import ReviewerRequestSchema, ReviewerCreateRequestSchema
-from app.schemas.works.review import ReviewCreateRequestSchema, ReviewDecision, ReviewAnswer
+from app.schemas.users.user import UserSchema
+from app.schemas.works.review import ReviewCreateRequestSchema, ReviewDecision, ReviewAnswer, ReviewPublishSchema
 from ..commontest import create_headers
 from ..works.test_create_work import USER_WORK
 
@@ -259,3 +262,739 @@ async def test_update_review_ok(
         )
 
     assert update_review_response.status_code == 201
+
+
+async def test_publish_reviews_ok(
+        client,
+        create_user,
+        create_event_creator,
+        create_event_from_event_creator
+):
+    user_author_id = "paoksncaokasdasdl12345678901"
+    user_author = UserSchema(
+        name="Angel",
+        lastname="Di Maria",
+        email="a.dimaria@email.com"
+    )
+
+    await client.post(
+        "/users",
+        json=jsonable_encoder(user_author),
+        headers=create_headers(user_author_id)
+    )
+    create_work_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works",
+        json=jsonable_encoder(USER_WORK),
+        headers=create_headers(user_author_id)
+    )
+    assert create_work_response.status_code == 201
+
+    work_id = create_work_response.json()
+
+    submission_response = await client.put(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/submissions/submit",
+        headers=create_headers(user_author_id)
+    )
+
+    assert submission_response.status_code == 201
+
+    new_reviewer_1 = ReviewerRequestSchema(
+        work_id=work_id,
+        email=create_user['email'],
+        review_deadline=datetime_library.date.today() + datetime_library.timedelta(days=10)
+    )
+
+    new_reviewer_2 = ReviewerRequestSchema(
+        work_id=work_id,
+        email=create_event_creator['email'],
+        review_deadline=datetime_library.date.today() + datetime_library.timedelta(days=7)
+    )
+
+    request = ReviewerCreateRequestSchema(
+        reviewers=[new_reviewer_1, new_reviewer_2]
+    )
+
+    reviewer_response = await client.post(
+        f"/events/{create_event_from_event_creator}/reviewers",
+        json=jsonable_encoder(request),
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert reviewer_response.status_code == 201
+
+    answer_1 = ReviewAnswer(
+        answers=[SimpleAnswer(question="Comentarios", answer="Muy buen trabajo.", type_question='simple_question')]
+    )
+    review_1 = ReviewCreateRequestSchema(
+        status=ReviewDecision.APPROVED,
+        review=answer_1
+    )
+
+    with freeze_time(datetime.now() + datetime_library.timedelta(days=31)):
+        create_review_1_response = await client.post(
+            f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+            json=jsonable_encoder(review_1),
+            headers=create_headers(create_user['id'])
+        )
+
+        assert create_review_1_response.status_code == 201, create_review_1_response.json()
+
+        answer_2 = ReviewAnswer(
+            answers=[SimpleAnswer(
+                question="Comentarios",
+                answer="Mejorar desarrollo, es demasiado técnico y difícil de leer. Revisar ortografía.",
+                type_question='simple_question'
+            )]
+        )
+
+        review_2 = ReviewCreateRequestSchema(
+            status=ReviewDecision.NOT_APPROVED,
+            review=answer_2
+        )
+
+        create_review_2_response = await client.post(
+            f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+            json=jsonable_encoder(review_2),
+            headers=create_headers(create_event_creator['id'])
+        )
+
+        assert create_review_2_response.status_code == 201
+
+    get_response = await client.get(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert get_response.status_code == 200
+    reviews = get_response.json()
+    assert len(reviews) == 2
+
+    work_response = await client.get(
+        f"/events/{create_event_from_event_creator}/works/{work_id}",
+        headers=create_headers(create_user["id"])
+    )
+
+    work_get = work_response.json()
+    assert work_response.status_code == 200
+    assert work_get["title"] == USER_WORK.title
+    assert work_get["id"] == work_id
+    assert work_get["state"] == WorkStates.SUBMITTED
+
+    submission_response = await client.get(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/submissions/latest",
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert submission_response.status_code == 200, f'response error: {submission_response.json()}'
+    assert submission_response.json()['state'] == WorkStates.SUBMITTED
+
+    publish_request = ReviewPublishSchema(
+        reviews_to_publish=[create_review_2_response.json()['id']],
+        new_work_status=WorkStates.RE_SUBMIT,
+        resend_deadline=datetime.now() + datetime_library.timedelta(days=15)
+    )
+
+    publish_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews/publish",
+        json=jsonable_encoder(publish_request),
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert publish_response.status_code == 201
+
+    work_response = await client.get(
+        f"/events/{create_event_from_event_creator}/works/{work_id}",
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    work_get = work_response.json()
+    assert work_response.status_code == 200
+    assert work_get["title"] == USER_WORK.title
+    assert work_get["id"] == work_id
+    assert work_get["state"] == WorkStates.RE_SUBMIT
+
+    response = await client.get(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/submissions/latest",
+        headers=create_headers(create_event_creator['id'])
+    )
+    assert response.status_code == 200, f'response error: {response.json()}'
+    assert response.json()['state'] == WorkStates.RE_SUBMIT
+
+
+async def test_publish_reviews_ok_work_track_chair(
+        client,
+        create_user,
+        create_event_creator,
+        create_event_from_event_creator,
+        create_event_chair
+):
+    user_author_id = "paoksncaokasdasdl12345678901"
+    user_author = UserSchema(
+        name="Angel",
+        lastname="Di Maria",
+        email="a.dimaria@email.com"
+    )
+
+    await client.post(
+        "/users",
+        json=jsonable_encoder(user_author),
+        headers=create_headers(user_author_id)
+    )
+    create_work_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works",
+        json=jsonable_encoder(USER_WORK),
+        headers=create_headers(user_author_id)
+    )
+    assert create_work_response.status_code == 201
+
+    work_id = create_work_response.json()
+
+    submission_response = await client.put(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/submissions/submit",
+        headers=create_headers(user_author_id)
+    )
+
+    assert submission_response.status_code == 201
+
+    new_reviewer = ReviewerRequestSchema(
+        work_id=work_id,
+        email=create_event_creator['email'],
+        review_deadline=datetime_library.date.today() + datetime_library.timedelta(days=7)
+    )
+
+    request = ReviewerCreateRequestSchema(
+        reviewers=[new_reviewer]
+    )
+
+    reviewer_response = await client.post(
+        f"/events/{create_event_from_event_creator}/reviewers",
+        json=jsonable_encoder(request),
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert reviewer_response.status_code == 201
+
+    with freeze_time(datetime.now() + datetime_library.timedelta(days=31)):
+        answer = ReviewAnswer(
+            answers=[SimpleAnswer(
+                question="Comentarios",
+                answer="Mejorar desarrollo, es demasiado técnico y difícil de leer. Revisar ortografía.",
+                type_question='simple_question'
+            )]
+        )
+
+        review = ReviewCreateRequestSchema(
+            status=ReviewDecision.NOT_APPROVED,
+            review=answer
+        )
+
+        create_review_response = await client.post(
+            f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+            json=jsonable_encoder(review),
+            headers=create_headers(create_event_creator['id'])
+        )
+
+        assert create_review_response.status_code == 201
+
+    get_response = await client.get(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert get_response.status_code == 200
+    reviews = get_response.json()
+    assert len(reviews) == 1
+
+    add_tracks_request = DynamicTracksEventSchema(
+        tracks=["chemistry"],
+    )
+    response = await client.put(
+        f"/events/{create_event_from_event_creator}/chairs/{create_event_chair}/tracks",
+        json=jsonable_encoder(add_tracks_request),
+        headers=create_headers(create_event_creator["id"])
+    )
+    assert response.status_code == 204
+
+    publish_request = ReviewPublishSchema(
+        reviews_to_publish=[create_review_response.json()['id']],
+        new_work_status=WorkStates.RE_SUBMIT,
+        resend_deadline=datetime.now() + datetime_library.timedelta(days=15)
+    )
+
+    publish_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews/publish",
+        json=jsonable_encoder(publish_request),
+        headers=create_headers(create_event_chair)
+    )
+
+    assert publish_response.status_code == 201
+
+
+async def test_publish_reviews_is_chair_but_not_in_work_track(
+        client,
+        create_user,
+        create_event_creator,
+        create_event_from_event_creator,
+        create_event_chair
+):
+    user_author_id = "paoksncaokasdasdl12345678901"
+    user_author = UserSchema(
+        name="Angel",
+        lastname="Di Maria",
+        email="a.dimaria@email.com"
+    )
+
+    await client.post(
+        "/users",
+        json=jsonable_encoder(user_author),
+        headers=create_headers(user_author_id)
+    )
+    create_work_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works",
+        json=jsonable_encoder(USER_WORK),
+        headers=create_headers(user_author_id)
+    )
+    assert create_work_response.status_code == 201
+
+    work_id = create_work_response.json()
+
+    submission_response = await client.put(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/submissions/submit",
+        headers=create_headers(user_author_id)
+    )
+
+    assert submission_response.status_code == 201
+
+    new_reviewer = ReviewerRequestSchema(
+        work_id=work_id,
+        email=create_event_creator['email'],
+        review_deadline=datetime_library.date.today() + datetime_library.timedelta(days=7)
+    )
+
+    request = ReviewerCreateRequestSchema(
+        reviewers=[new_reviewer]
+    )
+
+    reviewer_response = await client.post(
+        f"/events/{create_event_from_event_creator}/reviewers",
+        json=jsonable_encoder(request),
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert reviewer_response.status_code == 201
+
+    with freeze_time(datetime.now() + datetime_library.timedelta(days=31)):
+        answer = ReviewAnswer(
+            answers=[SimpleAnswer(
+                question="Comentarios",
+                answer="Mejorar desarrollo, es demasiado técnico y difícil de leer. Revisar ortografía.",
+                type_question='simple_question'
+            )]
+        )
+
+        review = ReviewCreateRequestSchema(
+            status=ReviewDecision.NOT_APPROVED,
+            review=answer
+        )
+
+        create_review_response = await client.post(
+            f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+            json=jsonable_encoder(review),
+            headers=create_headers(create_event_creator['id'])
+        )
+
+        assert create_review_response.status_code == 201
+
+    get_response = await client.get(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert get_response.status_code == 200
+    reviews = get_response.json()
+    assert len(reviews) == 1
+
+    add_tracks_request = DynamicTracksEventSchema(
+        tracks=["math"],
+    )
+    response = await client.put(
+        f"/events/{create_event_from_event_creator}/chairs/{create_event_chair}/tracks",
+        json=jsonable_encoder(add_tracks_request),
+        headers=create_headers(create_event_creator["id"])
+    )
+    assert response.status_code == 204
+
+    publish_request = ReviewPublishSchema(
+        reviews_to_publish=[create_review_response.json()['id']],
+        new_work_status=WorkStates.RE_SUBMIT,
+        resend_deadline=datetime.now() + datetime_library.timedelta(days=15)
+    )
+
+    publish_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews/publish",
+        json=jsonable_encoder(publish_request),
+        headers=create_headers(create_event_chair)
+    )
+
+    assert publish_response.status_code == 403
+
+
+async def test_publish_reviews_not_is_organizer_or_work_track(
+        client,
+        create_user,
+        create_event_creator,
+        create_event_from_event_creator,
+        create_event_chair
+):
+    user_author_id = "paoksncaokasdasdl12345678901"
+    user_author = UserSchema(
+        name="Angel",
+        lastname="Di Maria",
+        email="a.dimaria@email.com"
+    )
+
+    await client.post(
+        "/users",
+        json=jsonable_encoder(user_author),
+        headers=create_headers(user_author_id)
+    )
+    create_work_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works",
+        json=jsonable_encoder(USER_WORK),
+        headers=create_headers(user_author_id)
+    )
+    assert create_work_response.status_code == 201
+
+    work_id = create_work_response.json()
+
+    submission_response = await client.put(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/submissions/submit",
+        headers=create_headers(user_author_id)
+    )
+
+    assert submission_response.status_code == 201
+
+    new_reviewer = ReviewerRequestSchema(
+        work_id=work_id,
+        email=create_event_creator['email'],
+        review_deadline=datetime_library.date.today() + datetime_library.timedelta(days=7)
+    )
+
+    request = ReviewerCreateRequestSchema(
+        reviewers=[new_reviewer]
+    )
+
+    reviewer_response = await client.post(
+        f"/events/{create_event_from_event_creator}/reviewers",
+        json=jsonable_encoder(request),
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert reviewer_response.status_code == 201
+
+    with freeze_time(datetime.now() + datetime_library.timedelta(days=31)):
+        answer = ReviewAnswer(
+            answers=[SimpleAnswer(
+                question="Comentarios",
+                answer="Mejorar desarrollo, es demasiado técnico y difícil de leer. Revisar ortografía.",
+                type_question='simple_question'
+            )]
+        )
+
+        review = ReviewCreateRequestSchema(
+            status=ReviewDecision.NOT_APPROVED,
+            review=answer
+        )
+
+        create_review_response = await client.post(
+            f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+            json=jsonable_encoder(review),
+            headers=create_headers(create_event_creator['id'])
+        )
+
+        assert create_review_response.status_code == 201
+
+    get_response = await client.get(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert get_response.status_code == 200
+    reviews = get_response.json()
+    assert len(reviews) == 1
+
+    add_tracks_request = DynamicTracksEventSchema(
+        tracks=["chemistry"],
+    )
+    response = await client.put(
+        f"/events/{create_event_from_event_creator}/chairs/{create_event_chair}/tracks",
+        json=jsonable_encoder(add_tracks_request),
+        headers=create_headers(create_event_creator["id"])
+    )
+    assert response.status_code == 204
+
+    publish_request = ReviewPublishSchema(
+        reviews_to_publish=[create_review_response.json()['id']],
+        new_work_status=WorkStates.RE_SUBMIT,
+        resend_deadline=datetime.now() + datetime_library.timedelta(days=15)
+    )
+
+    publish_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews/publish",
+        json=jsonable_encoder(publish_request),
+        headers=create_headers(user_author_id)
+    )
+
+    assert publish_response.status_code == 403
+
+
+async def test_publish_reviews_empty_list(
+        client,
+        create_user,
+        create_event_creator,
+        create_event_from_event_creator
+):
+    user_author_id = "paoksncaokasdasdl12345678901"
+    user_author = UserSchema(
+        name="Angel",
+        lastname="Di Maria",
+        email="a.dimaria@email.com"
+    )
+
+    await client.post(
+        "/users",
+        json=jsonable_encoder(user_author),
+        headers=create_headers(user_author_id)
+    )
+    create_work_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works",
+        json=jsonable_encoder(USER_WORK),
+        headers=create_headers(user_author_id)
+    )
+    assert create_work_response.status_code == 201
+
+    work_id = create_work_response.json()
+
+    submission_response = await client.put(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/submissions/submit",
+        headers=create_headers(user_author_id)
+    )
+
+    assert submission_response.status_code == 201
+
+    new_reviewer_1 = ReviewerRequestSchema(
+        work_id=work_id,
+        email=create_user['email'],
+        review_deadline=datetime_library.date.today() + datetime_library.timedelta(days=10)
+    )
+
+    new_reviewer_2 = ReviewerRequestSchema(
+        work_id=work_id,
+        email=create_event_creator['email'],
+        review_deadline=datetime_library.date.today() + datetime_library.timedelta(days=7)
+    )
+
+    request = ReviewerCreateRequestSchema(
+        reviewers=[new_reviewer_1, new_reviewer_2]
+    )
+
+    reviewer_response = await client.post(
+        f"/events/{create_event_from_event_creator}/reviewers",
+        json=jsonable_encoder(request),
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert reviewer_response.status_code == 201
+
+    answer_1 = ReviewAnswer(
+        answers=[SimpleAnswer(question="Comentarios", answer="Muy buen trabajo.", type_question='simple_question')]
+    )
+    review_1 = ReviewCreateRequestSchema(
+        status=ReviewDecision.APPROVED,
+        review=answer_1
+    )
+
+    answer_2 = ReviewAnswer(
+        answers=[SimpleAnswer(
+            question="Comentarios",
+            answer="Mejorar desarrollo, es demasiado técnico y difícil de leer. Revisar ortografía.",
+            type_question='simple_question'
+        )]
+    )
+
+    review_2 = ReviewCreateRequestSchema(
+        status=ReviewDecision.NOT_APPROVED,
+        review=answer_2
+    )
+
+    with freeze_time(datetime.now() + datetime_library.timedelta(days=31)):
+        create_review_1_response = await client.post(
+            f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+            json=jsonable_encoder(review_1),
+            headers=create_headers(create_user['id'])
+        )
+
+        assert create_review_1_response.status_code == 201, create_review_1_response.json()
+
+        create_review_2_response = await client.post(
+            f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+            json=jsonable_encoder(review_2),
+            headers=create_headers(create_event_creator['id'])
+        )
+
+        assert create_review_2_response.status_code == 201
+
+    get_response = await client.get(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert get_response.status_code == 200
+    reviews = get_response.json()
+    assert len(reviews) == 2
+
+    publish_request = ReviewPublishSchema(
+        reviews_to_publish=[],
+        new_work_status=WorkStates.RE_SUBMIT,
+        resend_deadline=datetime.now() + datetime_library.timedelta(days=15)
+    )
+
+    publish_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews/publish",
+        json=jsonable_encoder(publish_request),
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert publish_response.status_code == 409
+
+
+async def test_publish_reviews_from_other_work_id(
+        client,
+        create_user,
+        create_event_creator,
+        create_event_from_event_creator
+):
+    user_author_id = "paoksncaokasdasdl12345678901"
+    user_author = UserSchema(
+        name="Angel",
+        lastname="Di Maria",
+        email="a.dimaria@email.com"
+    )
+
+    await client.post(
+        "/users",
+        json=jsonable_encoder(user_author),
+        headers=create_headers(user_author_id)
+    )
+    create_work_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works",
+        json=jsonable_encoder(USER_WORK),
+        headers=create_headers(user_author_id)
+    )
+    assert create_work_response.status_code == 201
+
+    work_id = create_work_response.json()
+
+    new_work = USER_WORK.model_copy()
+    new_work.title = 'new work title'
+
+    create_other_work_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works",
+        json=jsonable_encoder(new_work),
+        headers=create_headers(user_author_id)
+    )
+    assert create_other_work_response.status_code == 201
+
+    other_work_id = create_other_work_response.json()
+
+    submission_response = await client.put(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/submissions/submit",
+        headers=create_headers(user_author_id)
+    )
+
+    assert submission_response.status_code == 201
+
+    new_reviewer_1 = ReviewerRequestSchema(
+        work_id=work_id,
+        email=create_user['email'],
+        review_deadline=datetime_library.date.today() + datetime_library.timedelta(days=10)
+    )
+
+    new_reviewer_2 = ReviewerRequestSchema(
+        work_id=work_id,
+        email=create_event_creator['email'],
+        review_deadline=datetime_library.date.today() + datetime_library.timedelta(days=7)
+    )
+
+    request = ReviewerCreateRequestSchema(
+        reviewers=[new_reviewer_1, new_reviewer_2]
+    )
+
+    reviewer_response = await client.post(
+        f"/events/{create_event_from_event_creator}/reviewers",
+        json=jsonable_encoder(request),
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert reviewer_response.status_code == 201
+
+    answer_1 = ReviewAnswer(
+        answers=[SimpleAnswer(question="Comentarios", answer="Muy buen trabajo.", type_question='simple_question')]
+    )
+    review_1 = ReviewCreateRequestSchema(
+        status=ReviewDecision.APPROVED,
+        review=answer_1
+    )
+
+    answer_2 = ReviewAnswer(
+        answers=[SimpleAnswer(
+            question="Comentarios",
+            answer="Mejorar desarrollo, es demasiado técnico y difícil de leer. Revisar ortografía.",
+            type_question='simple_question'
+        )]
+    )
+
+    review_2 = ReviewCreateRequestSchema(
+        status=ReviewDecision.NOT_APPROVED,
+        review=answer_2
+    )
+
+    with freeze_time(datetime.now() + datetime_library.timedelta(days=31)):
+        create_review_1_response = await client.post(
+            f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+            json=jsonable_encoder(review_1),
+            headers=create_headers(create_user['id'])
+        )
+
+        assert create_review_1_response.status_code == 201, create_review_1_response.json()
+
+        create_review_2_response = await client.post(
+            f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+            json=jsonable_encoder(review_2),
+            headers=create_headers(create_event_creator['id'])
+        )
+
+        assert create_review_2_response.status_code == 201
+
+    get_response = await client.get(
+        f"/events/{create_event_from_event_creator}/works/{work_id}/reviews",
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert get_response.status_code == 200
+    reviews = get_response.json()
+    assert len(reviews) == 2
+
+    publish_request = ReviewPublishSchema(
+        reviews_to_publish=[create_review_2_response.json()['id']],
+        new_work_status=WorkStates.RE_SUBMIT,
+        resend_deadline=datetime.now() + datetime_library.timedelta(days=15)
+    )
+
+    publish_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works/{other_work_id}/reviews/publish",
+        json=jsonable_encoder(publish_request),
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert publish_response.status_code == 409

@@ -1,9 +1,11 @@
+from datetime import datetime
 from enum import Enum
-from typing import Union
+from typing import Union, Self
 from uuid import UUID
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, model_validator
 
+from app.database.models.work import WorkStates
 from app.schemas.events.review_skeleton.multiples_choice_question import MultipleChoiceAnswer
 from app.schemas.events.review_skeleton.simple_question import SimpleAnswer
 from app.schemas.storage.schemas import DownloadURLSchema, UploadURLSchema
@@ -41,3 +43,16 @@ class ReviewDownloadSchema(ReviewResponseSchema):
 class ReviewUploadSchema(ReviewResponseSchema):
     model_config = ConfigDict(from_attributes=True)
     upload_url: UploadURLSchema
+
+
+class ReviewPublishSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    reviews_to_publish: list[UUID] = Field(examples=[['review_id_1', 'review_id_2', 'review_id_n']])
+    new_work_status: WorkStates = Field(examples=[WorkStates.APPROVED])
+    resend_deadline: datetime | None = Field(examples=[datetime.now()], default=None)
+
+    @model_validator(mode='after')
+    def check_answers(self) -> Self:
+        if self.new_work_status.RE_SUBMIT and self.resend_deadline is None:
+            raise ValueError("resend_deadline cannot be None if new work status is RE_SUBMIT")
+        return self

@@ -1,10 +1,11 @@
 from datetime import datetime
 from uuid import UUID
 
-from app.exceptions.reviews_exceptions import IsNotWorkRevisionPeriod
+from app.exceptions.reviews_exceptions import IsNotWorkRevisionPeriod, CannotPublishReviews
 from app.repository.reviews_repository import ReviewsRepository
 from app.schemas.users.utils import UID
-from app.schemas.works.review import ReviewUploadSchema, ReviewCreateRequestSchema, ReviewResponseSchema
+from app.schemas.works.review import ReviewUploadSchema, ReviewCreateRequestSchema, ReviewResponseSchema, \
+    ReviewPublishSchema
 from app.services.event_submissions.event_submissions_service import SubmissionsService
 from app.services.services import BaseService
 from app.services.storage.work_storage_service import WorkStorageService
@@ -33,6 +34,9 @@ class EventReviewsService(BaseService):
     async def get_all_reviews(self, offset: int, limit: int) -> list[ReviewResponseSchema]:
         return await self.reviews_repository.get_all_work_reviews_for_event(self.event_id, self.work_id, offset, limit)
 
+    async def get_my_work_reviews(self, offset: int, limit: int) -> list[ReviewResponseSchema]:
+        return await self.reviews_repository.get_shared_work_reviews(self.event_id, self.work_id, offset, limit)
+
     async def add_review(self, review_schema: ReviewCreateRequestSchema) -> ReviewUploadSchema:
         my_work = await self.work_service.get_work(self.work_id)
         if my_work.deadline_date > datetime.now():
@@ -56,3 +60,8 @@ class EventReviewsService(BaseService):
             raise IsNotWorkRevisionPeriod(self.event_id, self.work_id)
 
         await self.reviews_repository.update_review(review_id, review_schema)
+
+    async def publish_reviews(self, reviews_to_publish: ReviewPublishSchema) -> None:
+        published = await self.reviews_repository.publish_reviews(self.event_id, self.work_id, reviews_to_publish)
+        if not published:
+            raise CannotPublishReviews(self.event_id, self.work_id)
