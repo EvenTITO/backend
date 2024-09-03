@@ -5,7 +5,7 @@ from app.database.models.event import EventType, EventStatus
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.event_status import EventStatusSchema
 from .helper import complete_event_configuration, add_notification_mails
-from ...commontest import create_headers, EVENTS
+from ...commontest import create_headers, EVENTS, ONE_EVENT
 
 
 @pytest.fixture(scope="function")
@@ -32,6 +32,7 @@ async def create_event(client, admin_data):
         **new_event.model_dump(),
         'id': event_id
     }
+
     return event_dict
 
 
@@ -51,11 +52,10 @@ async def create_event2(client, admin_data):
         json=jsonable_encoder(new_event),
         headers=create_headers(admin_data.id)
     )
+    event_id = event_id.json()
 
     await complete_event_configuration(client, event_id, admin_data.id)
     await add_notification_mails(client, event_id, admin_data.id)
-
-    event_id = event_id.json()
 
     event_dict = {
         **new_event.model_dump(),
@@ -140,15 +140,18 @@ async def create_event_started_with_email(client, create_event2, admin_data):
     )
     return create_event2['id']
 
+# @pytest.fixture(scope="function")
+# async def create_one_event_started(client, admin_data):
+
 
 @pytest.fixture(scope="function")
-async def create_many_events_started(client, admin_data):
+async def create_one_event_started(client, admin_data):
     ids_events = []
     status_update = EventStatusSchema(
         status=EventStatus.STARTED
     )
 
-    for event in EVENTS:
+    for event in ONE_EVENT:
         response = await client.post(
             "/events",
             json=jsonable_encoder(event),

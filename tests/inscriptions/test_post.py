@@ -13,7 +13,7 @@ async def test_post_inscription(client, create_user, create_event_started):
     )
 
     response = await client.post(
-        f"/events/{create_event_started_with_email}/inscriptions",
+        f"/events/{create_event_started}/inscriptions",
         headers=create_headers(create_user["id"]),
         json=jsonable_encoder(new_inscription)
     )

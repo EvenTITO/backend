@@ -18,7 +18,7 @@ async def test_get_inscription(client, create_inscription, admin_data):
     assert (inscriptions[0]['user_id'] == create_inscription['user_id'])
 
 
-async def test_user_inscribes_to_two_events(client, create_user, create_many_events_started):
+async def test_user_inscribes_to_two_events(client, create_user, create_many_events_started_with_emails):
     new_inscription = InscriptionRequestSchema(
         roles=["ATTENDEE"],
         affiliation="Fiuba",

@@ -21,7 +21,7 @@ class EventsAdministrationService(BaseService):
 
     async def update_status(self, new_status: EventStatusSchema, caller_role: UserRole):
         event = await self.events_repository.get(self.event_id)
-
+        # print("T0")
         admin_status = [
             EventStatus.WAITING_APPROVAL,
             EventStatus.NOT_APPROVED,
@@ -31,14 +31,17 @@ class EventsAdministrationService(BaseService):
                 (caller_role != UserRole.ADMIN) and
                 (event.status in admin_status or new_status.status in admin_status)
         ):
+            # print("T1")
             raise InvalidCaller()
 
         # Check change STARTED status(publish event)
         if new_status.status == EventStatus.STARTED and not self.__all_mandatory_config_ok(event):
+            # print("test!")
             raise InvalidEventConfiguration()
 
         update_ok = await self.events_repository.update(self.event_id, new_status)
         if not update_ok:
+            # print("T2")
             raise EventNotFound(self.event_id)
 
         await self.__notify_change(new_status, event)

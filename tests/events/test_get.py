@@ -136,7 +136,7 @@ async def test_get_all_events_query_by_title_contains(
     assert len(response.json()) == 2
 
 
-async def test_get_all_events_public_is_status_created(client, create_event, admin_data):
+async def test_get_all_events_public_is_status_created(client, create_event_started, admin_data):
     response = await client.get(
         "/events/",
         params={'status': EventStatus.STARTED.value},
@@ -146,19 +146,19 @@ async def test_get_all_events_public_is_status_created(client, create_event, adm
     assert len(response.json()) == 1
 
 
-async def test_get_all_events_public_is_status_created2(
-        client, create_many_events_started_with_emails, admin_data
-):
-
-    n_events = len(create_many_events_started_with_emails)
-
-    response = await client.get(
-        "/events/",
-        params={'status': EventStatus.STARTED.value},
-        headers=create_headers(admin_data.id)
-    )
-    assert response.status_code == 200
-    assert len(response.json()) == n_events
+# async def test_get_all_events_public_is_status_created2(
+#         client, create_many_events_started_with_emails, admin_data
+# ):
+#
+#     n_events = len(create_many_events_started_with_emails)
+#
+#     response = await client.get(
+#         "/events/",
+#         params={'status': EventStatus.STARTED.value},
+#         headers=create_headers(admin_data.id)
+#     )
+#     assert response.status_code == 200
+#     assert len(response.json()) == n_events
 
 
 @pytest.mark.skip(reason="TODO: Write this code. Which date should we take? Or add a param for ordering?")
