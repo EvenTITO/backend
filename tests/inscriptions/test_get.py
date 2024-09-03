@@ -16,8 +16,6 @@ async def test_get_inscription(client, create_inscription, admin_data):
     assert len(inscriptions) == 1
     assert (inscriptions[0]['user_id'] == create_inscription['user_id'])
 
-# TODO: revisar!
-
 
 async def test_user_inscribes_to_two_events(client, create_user, create_many_events_started):
     new_inscription = InscriptionRequestSchema(
