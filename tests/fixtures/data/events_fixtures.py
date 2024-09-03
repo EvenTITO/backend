@@ -140,9 +140,6 @@ async def create_event_started_with_email(client, create_event2, admin_data):
     )
     return create_event2['id']
 
-# @pytest.fixture(scope="function")
-# async def create_one_event_started(client, admin_data):
-
 
 @pytest.fixture(scope="function")
 async def create_one_event_started(client, admin_data):
