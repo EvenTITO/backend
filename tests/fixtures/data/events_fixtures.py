@@ -169,7 +169,7 @@ async def create_one_event_started(client, admin_data):
 
 
 @pytest.fixture(scope="function")
-async def create_many_events_started_with_emails(client, admin_data):
+async def create_many_events_started(client, admin_data):
     ids_events = []
     status_update = EventStatusSchema(
         status=EventStatus.STARTED
@@ -184,7 +184,6 @@ async def create_many_events_started_with_emails(client, admin_data):
         event_id = response.json()
 
         await complete_event_configuration(client, event_id, admin_data.id)
-        await add_notification_mails(client, event_id, admin_data.id)
 
         await client.patch(
             f"/events/{event_id}/status",
