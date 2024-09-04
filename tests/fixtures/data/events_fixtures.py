@@ -4,6 +4,7 @@ from fastapi.encoders import jsonable_encoder
 from app.database.models.event import EventType, EventStatus
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.event_status import EventStatusSchema
+from app.schemas.events.public_event import PublicEventSchema
 from .helper import complete_event_configuration, add_notification_mails
 from ...commontest import create_headers, EVENTS, ONE_EVENT
 
@@ -33,34 +34,6 @@ async def create_event(client, admin_data):
         'id': event_id
     }
 
-    return event_dict
-
-
-@pytest.fixture(scope="function")
-async def create_event2(client, admin_data):
-    new_event = CreateEventSchema(
-        title="Event Title",
-        start_date="2024-09-02",
-        end_date="2024-09-04",
-        description="This is a nice event",
-        event_type=EventType.CONFERENCE,
-        location='Paseo Colon 850',
-        tracks=['math', 'chemistry', 'phisics']
-    )
-    event_id = await client.post(
-        "/events",
-        json=jsonable_encoder(new_event),
-        headers=create_headers(admin_data.id)
-    )
-    event_id = event_id.json()
-
-    await complete_event_configuration(client, event_id, admin_data.id)
-    await add_notification_mails(client, event_id, admin_data.id)
-
-    event_dict = {
-        **new_event.model_dump(),
-        'id': event_id
-    }
     return event_dict
 
 
@@ -128,17 +101,17 @@ async def create_event_started(client, create_event, admin_data):
 
 
 @pytest.fixture(scope="function")
-async def create_event_started_with_email(client, create_event2, admin_data):
+async def create_event_started_with_email(client, create_event, admin_data):
     status_update = EventStatusSchema(
         status=EventStatus.STARTED
     )
 
     await client.patch(
-        f"/events/{create_event2['id']}/status",
+        f"/events/{create_event['id']}/status",
         json=jsonable_encoder(status_update),
         headers=create_headers(admin_data.id)
     )
-    return create_event2['id']
+    return create_event['id']
 
 
 @pytest.fixture(scope="function")

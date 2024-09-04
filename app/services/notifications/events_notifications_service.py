@@ -64,8 +64,9 @@ class EventsNotificationsService(NotificationsService):
         emails_to_send = []
         if event.notification_mails is not None:
             emails_to_send = emails_to_send + event.notification_mails
-        if organizer_user.email is not None:
-            emails_to_send.append(organizer_user.email)
+        if organizer_user is not None:
+            if organizer_user.email is not None:
+                emails_to_send.append(organizer_user.email)
         return emails_to_send
 
     async def notify_event_created(self, event):

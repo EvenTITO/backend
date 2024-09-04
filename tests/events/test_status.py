@@ -72,19 +72,19 @@ async def test_organizer_can_change_status_to_started_after_created(
 
 
 async def test_event_created_admin_can_change_status(
-        client, create_event2, admin_data
+        client, create_event, admin_data
 ):
     status_update = EventStatusSchema(
         status=EventStatus.CREATED
     )
     response = await client.patch(
-        f"/events/{create_event2['id']}/status",
+        f"/events/{create_event['id']}/status",
         json=jsonable_encoder(status_update),
         headers=create_headers(admin_data.id)
     )
     assert response.status_code == 204
     response = await client.get(
-        f"/events/{create_event2['id']}/public",
+        f"/events/{create_event['id']}/public",
         headers=create_headers(admin_data.id)
     )
     assert response.json()['status'] == status_update.status
