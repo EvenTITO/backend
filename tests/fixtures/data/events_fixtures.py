@@ -4,7 +4,6 @@ from fastapi.encoders import jsonable_encoder
 from app.database.models.event import EventType, EventStatus
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.event_status import EventStatusSchema
-from app.schemas.events.public_event import PublicEventSchema
 from .helper import complete_event_configuration, add_notification_mails
 from ...commontest import create_headers, EVENTS, ONE_EVENT
 
