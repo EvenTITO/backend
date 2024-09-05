@@ -47,10 +47,11 @@ class EventMembersService(BaseService):
         members_response = []
         for k, v in groupby(result, key=attrgetter('user_id')):
             group = list(v)
+            roles = list(reduce(lambda x, y: x + y, map(lambda x: x.roles, group)))
             member = MemberResponseWithRolesSchema(
                 **({
                     **(group[0].model_dump(mode='json')),
-                    "roles": list(reduce(lambda x, y: x.roles + y.roles, group))
+                    "roles": roles
                 })
             )
             members_response.append(member)
