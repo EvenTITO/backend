@@ -58,7 +58,7 @@ class EventsNotificationsService(NotificationsService):
 
     # Search organizer emails and extra notification emails(in event)
     async def __search_emails_to_send(self, event):
-        creator_id = await self.event_repository.get_created_id(event.id)
+        creator_id = await self.event_repository.get_creator_id(event.id)
         organizer_user = await self.users_repository.get(creator_id)
 
         emails_to_send = []

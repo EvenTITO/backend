@@ -17,7 +17,7 @@ class EventsRepository(Repository):
     def __init__(self, session: AsyncSession):
         super().__init__(session, EventModel)
 
-    async def get_created_id(self, event_id: UUID):
+    async def get_creator_id(self, event_id: UUID):
         conditions = self._primary_key_conditions(event_id)
         return await self._get_with_values(conditions, EventModel.creator_id)
 
