@@ -12,5 +12,6 @@ RUN pip install --no-cache-dir --upgrade -r  /code/requirements.txt && \
 RUN apt-get remove -y git && apt-get autoremove -y
 
 COPY ./app /code/app
+COPY ./assets /code/assets
 
 CMD uvicorn app.main:app --host=0.0.0.0 --port=${PORT}
