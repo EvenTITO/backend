@@ -2,8 +2,27 @@ import pytest
 
 from app.database.database import SessionLocal, engine
 from app.database.models.user import UserRole
+from app.repository.events_repository import EventsRepository
 from app.repository.users_repository import UsersRepository
 from app.schemas.users.user import UserReply
+
+
+@pytest.fixture(scope="session")
+async def get_UsersRepository():
+    session = SessionLocal(
+        bind=engine,
+    )
+    users_repo = UsersRepository(session)
+    return users_repo
+
+
+@pytest.fixture(scope="session")
+async def get_EventsRepository():
+    session = SessionLocal(
+        bind=engine,
+    )
+    events_repo = EventsRepository(session)
+    return events_repo
 
 
 @pytest.fixture(scope="session")

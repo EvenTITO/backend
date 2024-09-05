@@ -21,6 +21,40 @@ def create_headers(user_id):
     }
 
 
+ONE_EVENT = [
+    CreateEventSchema(
+        title="Conferencia de química",
+        dates=[
+            DateSchema(
+                name=MandatoryDates.START_DATE,
+                label='Fecha de Comienzo',
+                description='Fecha de comienzo del evento.',
+                date=datetime.date.today()+datetime.timedelta(days=30),
+                is_mandatory=True
+            ),
+            DateSchema(
+                name=MandatoryDates.END_DATE,
+                label='Fecha de Finalización',
+                description='Fecha de comienzo del evento.',
+                is_mandatory=True,
+                date=datetime.date.today()+datetime.timedelta(days=32)
+            ),
+            DateSchema(
+                name=MandatoryDates.SUBMISSION_DEADLINE_DATE,
+                label='Fecha de envío de trabajos',
+                description='Fecha límite de envío de trabajos.',
+                is_mandatory=True
+            )
+        ],
+        description="""
+        Conferencia donde se tratará el tema de hidrocarburos
+        """,
+        event_type=EventType.CONFERENCE,
+        location='Paseo Colon 850',
+        tracks=['math', 'chemistry', 'phisics'],
+    )
+]
+
 EVENTS = [
     CreateEventSchema(
         title="Conferencia de química",

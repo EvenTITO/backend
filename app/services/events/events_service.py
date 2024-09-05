@@ -9,13 +9,20 @@ from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.public_event_with_roles import PublicEventWithRolesSchema
 from app.schemas.users.utils import UID
 from app.services.event_organizers.event_organizers_service import EventOrganizersService
+from app.services.notifications.events_notifications_service import EventsNotificationsService
 from app.services.services import BaseService
 
 
 class EventsService(BaseService):
-    def __init__(self, events_repository: EventsRepository, organizers_service: EventOrganizersService):
+    def __init__(
+            self,
+            events_repository: EventsRepository,
+            organizers_service: EventOrganizersService,
+            event_notification_service: EventsNotificationsService,
+    ):
         self.events_repository = events_repository
         self.organizers_service = organizers_service
+        self.event_notification_service = event_notification_service
 
     async def create(self, event: CreateEventSchema, creator_id: UID, user_role: UserRole):
         event_same_title_exists = await self.events_repository.event_with_title_exists(event.title)
@@ -32,9 +39,12 @@ class EventsService(BaseService):
             status=status
         )
         event_created = await self.events_repository.create(creator_id, event)
-        return event_created.id
 
-        # TODO: add notifications in events_service if if event_created.status == EventStatus.WAITING_APPROVAL.
+        # Notify waiting approval event to creator event
+        if status.value == EventStatus.WAITING_APPROVAL.value:
+            await self.event_notification_service.notify_event_waiting_approval(event_created)
+
+        return event_created.id
 
     async def get_my_events(self, caller_id: UID, offset: int, limit: int) -> list[PublicEventWithRolesSchema]:
         return await self.events_repository.get_all_events_for_user(caller_id, offset=offset, limit=limit)
