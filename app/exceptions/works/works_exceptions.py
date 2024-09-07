@@ -43,6 +43,13 @@ class CannotCreateWorkAfterDeadlineDate(HTTPException):
         super().__init__(status_code=self.status_code, detail=self.detail)
 
 
+class CannotCreateWorkIfNotSpeakerInscription(HTTPException):
+    def __init__(self, event_id):
+        self.status_code = 409
+        self.detail = f"You cannot upload a work if you are not inscripted as a speaker in event {event_id}"
+        super().__init__(status_code=self.status_code, detail=self.detail)
+
+
 class TrackNotExistInEvent(HTTPException):
     def __init__(self, event_id, track):
         self.status_code = 409

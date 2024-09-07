@@ -2,7 +2,7 @@ from typing import Annotated
 from uuid import UUID
 
 from annotated_types import Len
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.database.models.inscription import InscriptionRole, InscriptionStatus
 from app.schemas.storage.schemas import UploadURLSchema, DownloadURLSchema
@@ -11,7 +11,7 @@ from app.schemas.users.utils import UID
 
 class InscriptionRequestSchema(BaseModel):
     roles: Annotated[list[InscriptionRole], Len(min_length=1)]
-    affiliation: str | None
+    affiliation: str | None = Field(default=None)
 
 
 class InscriptionResponseSchema(BaseModel):
@@ -20,8 +20,8 @@ class InscriptionResponseSchema(BaseModel):
     event_id: UUID
     roles: list[InscriptionRole]
     status: InscriptionStatus
-    affiliation: str | None
-    affiliation_upload_url: UploadURLSchema | None
+    affiliation: str | None = Field(default=None)
+    affiliation_upload_url: UploadURLSchema | None = Field(default=None)
 
 
 class InscriptionPayResponseSchema(BaseModel):

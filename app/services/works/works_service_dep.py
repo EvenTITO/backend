@@ -7,6 +7,7 @@ from app.authorization.caller_id_dep import CallerIdDep
 from app.authorization.user_id_dep import UserDep
 from app.repository.repository import get_repository
 from app.repository.works_repository import WorksRepository
+from app.services.event_inscriptions.event_inscriptions_service_dep import EventInscriptionsServiceDep
 from app.services.events.events_configuration_service_dep import EventsConfigurationServiceDep
 from app.services.works.works_service import WorksService
 
@@ -17,10 +18,11 @@ class Works:
             _: UserDep,
             caller_id: CallerIdDep,
             event_id: UUID,
-            events_configuration_service: EventsConfigurationServiceDep,
+            configuration_service: EventsConfigurationServiceDep,
+            inscription_service: EventInscriptionsServiceDep,
             works_repository: WorksRepository = Depends(get_repository(WorksRepository)),
     ) -> WorksService:
-        return WorksService(caller_id, event_id, events_configuration_service, works_repository)
+        return WorksService(caller_id, event_id, configuration_service, inscription_service, works_repository)
 
 
 auth_works_service = Works()

@@ -1,12 +1,24 @@
 from fastapi.encoders import jsonable_encoder
-from ..commontest import create_headers
+
+from app.database.models.inscription import InscriptionRole
+from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from .test_create_work import USER_WORK
+from ..commontest import create_headers
 
 
-async def test_get_work_author_can_update_his_work(client, create_user, create_event):
-    event_id = create_event['id']
+async def test_get_work_author_can_update_his_work(client, create_user, create_event_started):
+    new_inscription = InscriptionRequestSchema(
+        roles=[InscriptionRole.SPEAKER]
+    )
+
     response = await client.post(
-        f"/events/{event_id}/works",
+        f"/events/{create_event_started}/inscriptions",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201
+    response = await client.post(
+        f"/events/{create_event_started}/works",
         json=jsonable_encoder(USER_WORK),
         headers=create_headers(create_user["id"])
     )
@@ -15,7 +27,7 @@ async def test_get_work_author_can_update_his_work(client, create_user, create_e
     update_work.title = 'new work title'
 
     response = await client.put(
-        f"/events/{event_id}/works/{work_id}",
+        f"/events/{create_event_started}/works/{work_id}",
         json=jsonable_encoder(update_work),
         headers=create_headers(create_user["id"])
     )
@@ -23,7 +35,7 @@ async def test_get_work_author_can_update_his_work(client, create_user, create_e
     assert response.status_code == 204
 
     work_response = await client.get(
-        f"/events/{event_id}/works/{work_id}",
+        f"/events/{create_event_started}/works/{work_id}",
         headers=create_headers(create_user["id"])
     )
     work_get = work_response.json()
