@@ -4,8 +4,10 @@ from datetime import datetime
 from fastapi.encoders import jsonable_encoder
 from freezegun import freeze_time
 
+from app.database.models.inscription import InscriptionRole
 from app.database.models.work import WorkStates
 from app.schemas.events.review_skeleton.simple_question import SimpleAnswer
+from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from app.schemas.members.reviewer_schema import ReviewerRequestSchema, ReviewerCreateRequestSchema
 from app.schemas.users.user import UserSchema
 from app.schemas.works.review import ReviewAnswer, ReviewCreateRequestSchema, ReviewDecision, ReviewPublishSchema
@@ -17,7 +19,8 @@ async def test_get_reviews_ok(
         client,
         create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     create_work_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
@@ -145,7 +148,8 @@ async def test_get_my_work_reviews_ok(
         client,
         create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     user_author_id = "paoksncaokasdasdl12345678901"
     user_author = UserSchema(
@@ -159,6 +163,18 @@ async def test_get_my_work_reviews_ok(
         json=jsonable_encoder(user_author),
         headers=create_headers(user_author_id)
     )
+
+    new_inscription = InscriptionRequestSchema(
+        roles=[InscriptionRole.SPEAKER]
+    )
+
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/inscriptions",
+        headers=create_headers(user_author_id),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201, response.json()
+
     create_work_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
         json=jsonable_encoder(USER_WORK),
@@ -286,7 +302,8 @@ async def test_get_my_work_reviews_nothing_shared(
         client,
         create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     user_author_id = "paoksncaokasdasdl12345678901"
     user_author = UserSchema(
@@ -300,6 +317,18 @@ async def test_get_my_work_reviews_nothing_shared(
         json=jsonable_encoder(user_author),
         headers=create_headers(user_author_id)
     )
+
+    new_inscription = InscriptionRequestSchema(
+        roles=[InscriptionRole.SPEAKER]
+    )
+
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/inscriptions",
+        headers=create_headers(user_author_id),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201, response.json()
+
     create_work_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
         json=jsonable_encoder(USER_WORK),
@@ -400,8 +429,8 @@ async def test_get_my_work_reviews_nothing_shared(
 async def test_get_my_work_reviews_non_author(
         client,
         create_user,
-        create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     user_author_id = "paoksncaokasdasdl12345678901"
     user_author = UserSchema(
@@ -415,6 +444,18 @@ async def test_get_my_work_reviews_non_author(
         json=jsonable_encoder(user_author),
         headers=create_headers(user_author_id)
     )
+
+    new_inscription = InscriptionRequestSchema(
+        roles=[InscriptionRole.SPEAKER]
+    )
+
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/inscriptions",
+        headers=create_headers(user_author_id),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201, response.json()
+
     create_work_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
         json=jsonable_encoder(USER_WORK),

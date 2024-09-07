@@ -1,5 +1,7 @@
-from fastapi.encoders import jsonable_encoder
 import datetime
+
+from fastapi.encoders import jsonable_encoder
+
 from app.schemas.members.reviewer_schema import ReviewerRequestSchema, ReviewerCreateRequestSchema
 from ..commontest import create_headers
 from ..works.test_create_work import USER_WORK
@@ -7,9 +9,9 @@ from ..works.test_create_work import USER_WORK
 
 async def test_get_reviewers_without_reviewers(
         client,
-        create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     response = await client.get(
         f"/events/{create_event_from_event_creator}/reviewers",
@@ -26,7 +28,8 @@ async def test_get_reviewers_ok(
         client,
         create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     create_work_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
@@ -81,7 +84,6 @@ async def test_get_reviewers_ok(
 async def test_get_reviewers_without_permissions(
         client,
         create_user,
-        create_event_creator,
         create_event_from_event_creator
 ):
     response = await client.get(
@@ -96,7 +98,8 @@ async def test_get_reviewers_by_work_id_ok(
         client,
         create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     create_work_1_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
@@ -166,8 +169,10 @@ async def test_get_reviewers_by_work_id_invalid_return_empty_list(
         client,
         create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
+
     create_work_1_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
         json=jsonable_encoder(USER_WORK),
@@ -211,7 +216,6 @@ async def test_get_reviewers_by_work_id_invalid_return_empty_list(
 
 async def test_get_reviewers_by_work_id_without_reviewers(
         client,
-        create_user,
         create_event_creator,
         create_event_from_event_creator
 ):
@@ -229,7 +233,6 @@ async def test_get_reviewers_by_work_id_without_reviewers(
 async def test_get_reviewers_by_work_id_without_permissions(
         client,
         create_user,
-        create_event_creator,
         create_event_from_event_creator
 ):
     response = await client.get(
@@ -243,7 +246,6 @@ async def test_get_reviewers_by_work_id_without_permissions(
 async def test_get_reviewer__by_user_id_without_permissions(
         client,
         create_user,
-        create_event_creator,
         create_event_from_event_creator
 ):
     response = await client.get(
@@ -272,7 +274,8 @@ async def test_get_reviewer__by_user_id_ok(
         client,
         create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     create_work_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
@@ -323,7 +326,8 @@ async def test_get_reviewer_by_user_id_invalid_userid_not_uid(
         client,
         create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     create_work_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
@@ -368,7 +372,8 @@ async def test_get_reviewer_by_user_id_invalid_userid(
         client,
         create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     create_work_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
@@ -408,7 +413,8 @@ async def test_get_reviewer_by_user_id_not_reviewer_user_id(
         client,
         create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     create_work_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
@@ -448,7 +454,8 @@ async def test_get_my_assignments_ok(
         client,
         create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     create_work_1_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
@@ -547,7 +554,8 @@ async def test_get_my_assignments_without_permissions(
         client,
         create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     create_work_1_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
