@@ -56,6 +56,6 @@ async def test_send_notification_when_admin_approve_event_with_invalid_email(cre
     email_test = f"Format email error {email}"
     with pytest.raises(Exception) as ex:
         await notification_service.notify_event_created(event)
-        await session.close()
 
+    await session.close()
     assert str(ex.value) == email_test

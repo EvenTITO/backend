@@ -25,15 +25,19 @@ class EventsNotificationsService(NotificationsService):
         self.background_tasks = background_tasks
 
     def __recipients_message(self):
-        # Check valid format email & set emails receivers
-        for email in self.recipients_emails:
-            print(email)
-            if not self.__is_valid_email(email):
-                raise Exception(f"Format email error {email}")
         message = EmailMessage()
         message['To'] = ",".join(self.recipients_emails)
         print(message['To'])
         return message
+
+    def __validate_emails(self, emails):
+        # Check emails size
+        if len(emails) == 0:
+            raise Exception(f"Emails to send is empty")
+        # Check valid format email & set emails receivers
+        for email in emails:
+            if not self.__is_valid_email(email):
+                raise Exception(f"Format email error {email}")
 
     def __is_valid_email(self, email):
         return re.match(email_regex, email) is not None
@@ -76,11 +80,13 @@ class EventsNotificationsService(NotificationsService):
                 emails_to_send.append(organizer_user.email)
         return emails_to_send
 
+    def __print_email(self, emails, message):
+        print(f"Sending emails to {emails}")
+        print("email message:")
+        print(f"{message}")
+
     def __notify_event_started(self, event, emails_to_send):
         self.recipients_emails = emails_to_send
-        if len(self.recipients_emails) == 0:
-            print("Non-existent email recipients")
-            return
 
         message = self.__recipients_message()
 
@@ -92,10 +98,10 @@ class EventsNotificationsService(NotificationsService):
         self._add_body(message, body)
         self._add_body_extra(message, body)
 
+        self.__print_email(emails_to_send, message)
         return self._send_email(message)
 
     def __notify_event_created(self, event, emails_to_send):
-        print(emails_to_send)
         self.recipients_emails = emails_to_send
         if len(self.recipients_emails) == 0:
             print("Non-existent email recipients")
@@ -112,6 +118,7 @@ class EventsNotificationsService(NotificationsService):
         self._add_body(message, body)
         self._add_body_extra(message, body)
 
+        self.__print_email(emails_to_send, message)
         return self._send_email(message)
 
     def __notify_event_waiting_approval(self, event, emails_to_send):
@@ -120,7 +127,7 @@ class EventsNotificationsService(NotificationsService):
         if len(self.recipients_emails) == 0:
             print("Non-existent email recipients")
             return
-
+        print("1")
         message = self.__recipients_message()
 
         body = WAITING_APPROVAL_EVENT_NOTIFICATION_HTML
@@ -131,23 +138,31 @@ class EventsNotificationsService(NotificationsService):
         self._add_body(message, body)
         self._add_body_extra(message, body)
 
-        # return self._send_email(message)
+        self.__print_email(emails_to_send, message)
+
+        return self._send_email(message)
+
         # message = self.__recipients_message()
-        print("[TEST] 1")
-        return self.send_email2(message)
+        # print("[TEST] 1")
+        # return self.send_email2(message)
 
     async def notify_event_waiting_approval(self, event):
         emails_to_send = await self.__search_emails_to_send(event)
+        self.__validate_emails(emails_to_send)
+
         self.background_tasks.add_task(self.__notify_event_waiting_approval, event, emails_to_send)
         return True
 
     async def notify_event_created(self, event):
         emails_to_send = await self.__search_emails_to_send(event)
-        print(emails_to_send)
+        self.__validate_emails(emails_to_send)
+
         self.background_tasks.add_task(self.__notify_event_created, event, emails_to_send)
         return True
 
     async def notify_event_started(self, event):
         emails_to_send = await self.__search_emails_to_send(event)
+        self.__validate_emails(emails_to_send)
+
         self.background_tasks.add_task(self.__notify_event_started, event, emails_to_send)
         return True

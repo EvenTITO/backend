@@ -99,18 +99,11 @@ class NotificationsService:
             print("not setting send emails")
             return
         message['From'] = settings.EMAIL
-
-        with open('./assets/logo.svg', "rb") as svg_file:
-            svg = MIMEImage(svg_file.read(), _subtype="svg+xml")
-            svg.add_header("Content-ID", "<logo_svg>")
-            # message = MIMEMultipart("related")
-            message.attach(svg)
-
         try:
             with smtplib.SMTP_SSL(
-                    "smtp.gmail.com",
-                    settings.SMTPS_PORT,
-                    context=SLL_DEFAULT_CONTEXT
+                "smtp.gmail.com",
+                settings.SMTPS_PORT,
+                context=SLL_DEFAULT_CONTEXT
             ) as server:
                 server.login(settings.EMAIL, settings.EMAIL_PASSWORD)
                 server.send_message(message)
@@ -121,7 +114,6 @@ class NotificationsService:
             return False
 
     def _add_subject(self, message: EmailMessage, subject: str):
-
         message['Subject'] = f'[EvenTITO] {subject}'
         return message
 
@@ -134,8 +126,6 @@ class NotificationsService:
             f"<a href='{settings.FRONTEND_URL}'>EvenTITO</a>"
         )
         body = f"{body}\n\n{end_text}"
-
-        message.attach(MIMEMultipart(body, "html"))
 
         message.set_payload(body)
         return message
