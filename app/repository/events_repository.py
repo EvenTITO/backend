@@ -9,7 +9,7 @@ from app.database.models.organizer import OrganizerModel
 from app.database.models.reviewer import ReviewerModel
 from app.repository.crud_repository import Repository
 from app.schemas.events.public_event_with_roles import PublicEventWithRolesSchema
-from app.schemas.events.schemas import EventRole
+from app.schemas.events.roles import EventRole
 from app.schemas.users.utils import UID
 
 

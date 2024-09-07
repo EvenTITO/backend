@@ -5,7 +5,7 @@ from fastapi.encoders import jsonable_encoder
 from app.database.models.event import EventStatus
 from app.database.models.inscription import InscriptionRole
 from app.schemas.events.event_status import EventStatusSchema
-from app.schemas.events.schemas import EventRole
+from app.schemas.events.roles import EventRole
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from app.schemas.members.member_schema import MemberRequestSchema
 from app.schemas.members.reviewer_schema import ReviewerRequestSchema, ReviewerCreateRequestSchema

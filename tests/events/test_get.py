@@ -6,7 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from app.database.models.event import EventStatus
 from app.schemas.events.event_status import EventStatusSchema
 from ..commontest import create_headers, EVENTS
-from app.schemas.events.schemas import EventRole
+from app.schemas.events.roles import EventRole
 
 
 async def test_get_event(client, create_event, create_user):

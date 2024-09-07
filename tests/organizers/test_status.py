@@ -1,6 +1,6 @@
 from fastapi.encoders import jsonable_encoder
 
-from app.schemas.events.schemas import EventRole
+from app.schemas.events.roles import EventRole
 from app.schemas.members.member_schema import MemberRequestSchema
 from ..commontest import create_headers
 

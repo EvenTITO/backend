@@ -6,7 +6,8 @@ from app.database.models.event import EventStatus
 from app.database.models.inscription import InscriptionRole
 from app.database.models.work import WorkStates
 from app.schemas.events.event_status import EventStatusSchema
-from app.schemas.events.schemas import EventRole, DynamicTracksEventSchema
+from app.schemas.events.roles import EventRole
+from app.schemas.events.schemas import DynamicTracksEventSchema
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from app.schemas.members.member_schema import MemberRequestSchema
 from app.schemas.users.user import UserSchema

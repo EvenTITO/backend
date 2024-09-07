@@ -6,7 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from app.database.models.event import EventType, EventStatus
 from app.schemas.events.create_event import CreateEventSchema
 from app.schemas.events.event_status import EventStatusSchema
-from app.schemas.events.schemas import EventRole
+from app.schemas.events.roles import EventRole
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from ..commontest import create_headers
 from ..fixtures.data.helper import complete_event_configuration
