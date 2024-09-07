@@ -4,6 +4,8 @@ from app.repository.events_repository import EventsRepository
 from app.repository.users_repository import UsersRepository
 from app.services.notifications.notifications_service import NotificationsService, load_html
 
+from fastapi import BackgroundTasks
+
 import re
 
 email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
@@ -13,14 +15,19 @@ WAITING_APPROVAL_EVENT_NOTIFICATION_HTML = load_html('waiting-event-notification
 
 
 class EventsNotificationsService(NotificationsService):
-    def __init__(self, event_repository: EventsRepository, users_repository: UsersRepository):
+    def __init__(self,
+                 event_repository: EventsRepository,
+                 users_repository: UsersRepository,
+                 background_tasks: BackgroundTasks):
         self.event_repository = event_repository
         self.users_repository = users_repository
         self.recipients_emails = []
+        self.background_tasks = background_tasks
 
     def __recipients_message(self):
         # Check valid format email & set emails receivers
         for email in self.recipients_emails:
+            print(email)
             if not self.__is_valid_email(email):
                 raise Exception(f"Format email error {email}")
         message = EmailMessage()
@@ -69,8 +76,27 @@ class EventsNotificationsService(NotificationsService):
                 emails_to_send.append(organizer_user.email)
         return emails_to_send
 
-    async def notify_event_created(self, event):
-        self.recipients_emails = await self.__search_emails_to_send(event)
+    def __notify_event_started(self, event, emails_to_send):
+        self.recipients_emails = emails_to_send
+        if len(self.recipients_emails) == 0:
+            print("Non-existent email recipients")
+            return
+
+        message = self.__recipients_message()
+
+        body = START_EVENT_NOTIFICATION_HTML
+        body = self.__common_body(body, event)
+
+        dyn_subject = f"El evento {event.title} se ha publicado"
+        self._add_subject(message, dyn_subject)
+        self._add_body(message, body)
+        self._add_body_extra(message, body)
+
+        return self._send_email(message)
+
+    def __notify_event_created(self, event, emails_to_send):
+        print(emails_to_send)
+        self.recipients_emails = emails_to_send
         if len(self.recipients_emails) == 0:
             print("Non-existent email recipients")
             return
@@ -88,26 +114,8 @@ class EventsNotificationsService(NotificationsService):
 
         return self._send_email(message)
 
-    async def notify_event_started(self, event):
-        self.recipients_emails = await self.__search_emails_to_send(event)
-        if len(self.recipients_emails) == 0:
-            print("Non-existent email recipients")
-            return
-
-        message = self.__recipients_message()
-
-        body = START_EVENT_NOTIFICATION_HTML
-        body = self.__common_body(body, event)
-
-        dyn_subject = f"El evento {event.title} se ha publicado"
-        self._add_subject(message, dyn_subject)
-        self._add_body(message, body)
-        self._add_body_extra(message, body)
-
-        return self._send_email(message)
-
-    async def notify_event_waiting_approval(self, event):
-        self.recipients_emails = await self.__search_emails_to_send(event)
+    def __notify_event_waiting_approval(self, event, emails_to_send):
+        self.recipients_emails = emails_to_send
         print(self.recipients_emails)
         if len(self.recipients_emails) == 0:
             print("Non-existent email recipients")
@@ -123,4 +131,23 @@ class EventsNotificationsService(NotificationsService):
         self._add_body(message, body)
         self._add_body_extra(message, body)
 
-        return self._send_email(message)
+        # return self._send_email(message)
+        # message = self.__recipients_message()
+        print("[TEST] 1")
+        return self.send_email2(message)
+
+    async def notify_event_waiting_approval(self, event):
+        emails_to_send = await self.__search_emails_to_send(event)
+        self.background_tasks.add_task(self.__notify_event_waiting_approval, event, emails_to_send)
+        return True
+
+    async def notify_event_created(self, event):
+        emails_to_send = await self.__search_emails_to_send(event)
+        print(emails_to_send)
+        self.background_tasks.add_task(self.__notify_event_created, event, emails_to_send)
+        return True
+
+    async def notify_event_started(self, event):
+        emails_to_send = await self.__search_emails_to_send(event)
+        self.background_tasks.add_task(self.__notify_event_started, event, emails_to_send)
+        return True
