@@ -81,3 +81,19 @@ async def test_get_members_ok(
     assert member_list[1]["user"]["email"] == create_event_creator["email"]
 
 # TODO terminar los test
+
+
+async def test_get_only_one_member_organizer(
+        client,
+        create_user,
+        create_event_creator,
+        create_event_from_event_creator
+):
+    response = await client.get(
+        f"/events/{create_event_from_event_creator}/members",
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert response.status_code == 200
+    members_list = response.json()
+    assert len(members_list) == 1
