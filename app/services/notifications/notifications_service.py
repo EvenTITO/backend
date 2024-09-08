@@ -1,9 +1,6 @@
 import smtplib
 import ssl
 from email.message import EmailMessage
-from email.mime.image import MIMEImage
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 
 from app.settings.settings import NotificationsSettings
 
@@ -39,61 +36,6 @@ BODY_TEMPLATE = get_body_template()
 
 
 class NotificationsService:
-
-    def send_email2(self, message: EmailMessage):
-
-        # Configurar el servidor SMTP
-        smtp_server = "smtp.tudominio.com"
-        smtp_port = 587
-        username = "tuemail@tudominio.com"
-        password = "tupassword"
-
-        # Configurar el correo
-        from_email = "tuemail@tudominio.com"
-        to_email = "destinatario@ejemplo.com"
-        subject = "Correo con SVG"
-        body_html = """
-        <html>
-          <body>
-            <h1>¡Hola!</h1>
-            <p>Aquí tienes un SVG incrustado en el correo:</p>
-            <img src="cid:logo_svg" alt="Logo">
-          </body>
-        </html>
-        """
-
-        # Crear el contenedor de mensaje
-        msg = MIMEMultipart("related")
-        msg["Subject"] = subject
-        # msg["From"] = from_email
-        # msg["To"] = to_email
-
-        # Adjuntar el cuerpo del mensaje
-        msg.attach(MIMEText(body_html, "html"))
-
-        # Cargar el archivo SVG y adjuntarlo como imagen
-        with open("./assets/logo.svg", "rb") as svg_file:
-            svg = MIMEImage(svg_file.read(), _subtype="svg+xml")
-            svg.add_header("Content-ID", "<logo_svg>")
-            msg.attach(svg)
-
-        # Conectar al servidor SMTP y enviar el correo
-        try:
-            with smtplib.SMTP_SSL(
-                    "smtp.gmail.com",
-                    settings.SMTPS_PORT,
-                    context=SLL_DEFAULT_CONTEXT
-            ) as server:
-                server.login(settings.EMAIL, settings.EMAIL_PASSWORD)
-                server.send_message(message)
-            print("Correo enviado!")
-            return True
-        except Exception as e:
-            print(f'There was an error: {str(e)} '
-                  f'sending an email: {message.as_string()}.')
-            print("Correo ERROR!")
-            return False
-
     def _send_email(self, message: EmailMessage):
         if not settings.ENABLE_SEND_EMAILS:
             print("not setting send emails")
