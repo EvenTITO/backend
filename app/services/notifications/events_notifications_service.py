@@ -33,7 +33,7 @@ class EventsNotificationsService(NotificationsService):
     def __validate_emails(self, emails):
         # Check emails size
         if len(emails) == 0:
-            raise Exception(f"Emails to send is empty")
+            raise Exception("Emails to send is empty")
         # Check valid format email & set emails receivers
         for email in emails:
             if not self.__is_valid_email(email):
@@ -127,7 +127,6 @@ class EventsNotificationsService(NotificationsService):
         if len(self.recipients_emails) == 0:
             print("Non-existent email recipients")
             return
-        print("1")
         message = self.__recipients_message()
 
         body = WAITING_APPROVAL_EVENT_NOTIFICATION_HTML
