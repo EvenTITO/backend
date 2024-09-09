@@ -152,8 +152,6 @@ class EventsNotificationsService(NotificationsService):
         return True
 
     async def notify_inscription(self, event_id, user_id):
-        print(event_id)
-        print(user_id)
         event = await self.event_repository.get(event_id)
         emails_to_send = await self.__search_emails_to_send(event)
         user = await self.users_repository.get(user_id)

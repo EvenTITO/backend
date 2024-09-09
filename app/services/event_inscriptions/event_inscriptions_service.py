@@ -4,7 +4,6 @@ from app.database.models.event import EventStatus
 from app.database.models.inscription import InscriptionModel, InscriptionStatus
 from app.exceptions.inscriptions_exceptions import EventNotStarted, InscriptionAlreadyPaid, \
     InscriptionNotFound
-from app.repository.events_repository import EventsRepository
 from app.repository.inscriptions_repository import InscriptionsRepository
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema, InscriptionResponseSchema, \
     InscriptionPayResponseSchema
