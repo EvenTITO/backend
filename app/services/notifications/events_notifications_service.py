@@ -12,6 +12,7 @@ email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 CREATE_EVENT_NOTIFICATION_HTML = load_html('create-event-notification.html')
 START_EVENT_NOTIFICATION_HTML = load_html('start-event-notification.html')
 WAITING_APPROVAL_EVENT_NOTIFICATION_HTML = load_html('waiting-event-notification.html')
+INSCRIPTION_EVENT_NOTIFICATION_HTML = load_html('inscription-event-notification.html')
 
 
 class EventsNotificationsService(NotificationsService):
@@ -85,35 +86,17 @@ class EventsNotificationsService(NotificationsService):
         print("email message:")
         print(f"{message}")
 
-    def __notify_event_started(self, event, emails_to_send):
+    def __config_common(self,
+                        event,
+                        emails_to_send,
+                        body_common, subject):
+
         self.recipients_emails = emails_to_send
 
         message = self.__recipients_message()
 
-        body = START_EVENT_NOTIFICATION_HTML
-        body = self.__common_body(body, event)
+        body = self.__common_body(body_common, event)
 
-        dyn_subject = f"El evento {event.title} se ha publicado"
-        self._add_subject(message, dyn_subject)
-        self._add_body(message, body)
-        self._add_body_extra(message, body)
-
-        self.__print_email(emails_to_send, message)
-        return self._send_email(message)
-
-    def __notify_event_created(self, event, emails_to_send):
-        self.recipients_emails = emails_to_send
-        if len(self.recipients_emails) == 0:
-            print("Non-existent email recipients")
-            return
-
-        message = self.__recipients_message()
-
-        body = CREATE_EVENT_NOTIFICATION_HTML
-        subject = 'Su solicitud de creación de evento fue aprobada'
-
-        # TODO: refactor to template method
-        body = self.__common_body(body, event)
         self._add_subject(message, subject)
         self._add_body(message, body)
         self._add_body_extra(message, body)
@@ -121,29 +104,31 @@ class EventsNotificationsService(NotificationsService):
         self.__print_email(emails_to_send, message)
         return self._send_email(message)
 
+    def __notify_event_started(self, event, emails_to_send):
+        subject = f"El evento {event.title} se ha publicado"
+        self.__config_common(event, emails_to_send,
+                             START_EVENT_NOTIFICATION_HTML,
+                             subject)
+
+    def __notify_event_created(self, event, emails_to_send):
+        subject = "Su solicitud de creación de evento fue aprobada"
+        self.__config_common(event, emails_to_send,
+                             CREATE_EVENT_NOTIFICATION_HTML,
+                             subject)
+
     def __notify_event_waiting_approval(self, event, emails_to_send):
-        self.recipients_emails = emails_to_send
-        print(self.recipients_emails)
-        if len(self.recipients_emails) == 0:
-            print("Non-existent email recipients")
-            return
-        message = self.__recipients_message()
+        subject = f"El evento {event.title} se ha enviado para su aprobación"
+        self.__config_common(event, emails_to_send,
+                             WAITING_APPROVAL_EVENT_NOTIFICATION_HTML,
+                             subject)
 
-        body = WAITING_APPROVAL_EVENT_NOTIFICATION_HTML
-        body = self.__common_body(body, event)
+    def __notify_inscription(self, event, user, emails_to_send):
+        user_fullname = user.name + " " + user.lastname
+        subject = f"El usuario {user_fullname} se ha inscripto al evento {event.title}"
 
-        dyn_subject = f"El evento {event.title} se ha enviado para su aprobación"
-        self._add_subject(message, dyn_subject)
-        self._add_body(message, body)
-        self._add_body_extra(message, body)
-
-        self.__print_email(emails_to_send, message)
-
-        return self._send_email(message)
-
-        # message = self.__recipients_message()
-        # print("[TEST] 1")
-        # return self.send_email2(message)
+        self.__config_common(event, emails_to_send,
+                             INSCRIPTION_EVENT_NOTIFICATION_HTML,
+                             subject)
 
     async def notify_event_waiting_approval(self, event):
         emails_to_send = await self.__search_emails_to_send(event)
@@ -164,4 +149,18 @@ class EventsNotificationsService(NotificationsService):
         self.__validate_emails(emails_to_send)
 
         self.background_tasks.add_task(self.__notify_event_started, event, emails_to_send)
+        return True
+
+    async def notify_inscription(self, event_id, user_id):
+        print(event_id)
+        print(user_id)
+        event = await self.event_repository.get(event_id)
+        emails_to_send = await self.__search_emails_to_send(event)
+        user = await self.users_repository.get(user_id)
+        email_user = user.email
+        emails_to_send.append(email_user)
+
+        self.__validate_emails(emails_to_send)
+
+        self.background_tasks.add_task(self.__notify_inscription, event, user, emails_to_send)
         return True
