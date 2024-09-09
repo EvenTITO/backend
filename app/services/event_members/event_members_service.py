@@ -11,7 +11,7 @@ from app.repository.chairs_repository import ChairRepository
 from app.repository.organizers_repository import OrganizerRepository
 from app.repository.reviewers_repository import ReviewerRepository
 from app.repository.users_repository import UsersRepository
-from app.schemas.events.schemas import EventRole
+from app.schemas.events.roles import EventRole
 from app.schemas.members.member_schema import MemberRequestSchema, MemberResponseWithRolesSchema
 from app.schemas.members.member_schema import RolesRequestSchema
 from app.schemas.users.user import UserSchema

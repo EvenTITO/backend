@@ -1,7 +1,7 @@
 from uuid import UUID
 from pydantic import BaseModel
 
-from app.schemas.events.schemas import EventRole
+from app.schemas.events.roles import EventRole
 from app.schemas.users.user import UserSchema
 from app.schemas.users.utils import UID
 
