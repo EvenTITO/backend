@@ -96,14 +96,14 @@ async def test_get_members_ok(
     assert get_response.status_code == 200
 
     member_list = get_response.json()
-    assert len(member_list[0]["roles"]) == 2
-    assert len(member_list[1]["roles"]) == 2
+    assert len(member_list[0]["roles"]) == 1  # Only chair, reviewer is not a member.
+    assert len(member_list[1]["roles"]) == 1  # Only organizer, reviewer is not a member.
     assert member_list[0]["event_id"] == create_event_from_event_creator
     assert member_list[1]["event_id"] == create_event_from_event_creator
     assert member_list[0]["user_id"] == create_user['id']
     assert member_list[1]["user_id"] == create_event_creator['id']
-    assert set(member_list[0]["roles"]) == {"REVIEWER", "CHAIR"}
-    assert set(member_list[1]["roles"]) == {"REVIEWER", "ORGANIZER"}
+    assert set(member_list[0]["roles"]) == {"CHAIR"}
+    assert set(member_list[1]["roles"]) == {"ORGANIZER"}
     assert member_list[0]["user"]["email"] == create_user["email"]
     assert member_list[1]["user"]["email"] == create_event_creator["email"]
 
