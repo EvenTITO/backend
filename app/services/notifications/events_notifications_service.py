@@ -2,6 +2,7 @@ from email.message import EmailMessage
 
 from app.repository.events_repository import EventsRepository
 from app.repository.users_repository import UsersRepository
+from app.schemas.members.reviewer_schema import ReviewerCreateRequestSchema
 from app.services.notifications.notifications_service import NotificationsService, load_html
 
 from fastapi import BackgroundTasks
@@ -133,7 +134,7 @@ class EventsNotificationsService(NotificationsService):
     async def notify_event_waiting_approval(self, event):
         emails_to_send = await self.__search_emails_to_send(event)
         self.__validate_emails(emails_to_send)
-
+        print(f"emails_to_send: {emails_to_send}")
         self.background_tasks.add_task(self.__notify_event_waiting_approval, event, emails_to_send)
         return True
 
@@ -159,6 +160,19 @@ class EventsNotificationsService(NotificationsService):
         emails_to_send.append(email_user)
 
         self.__validate_emails(emails_to_send)
-
+        print(f"emails_to_send:{emails_to_send}")
         self.background_tasks.add_task(self.__notify_inscription, event, user, emails_to_send)
+        return True
+
+    async def notify_new_reviewers(self, event_id, reviewers: ReviewerCreateRequestSchema):
+        event = await self.event_repository.get(event_id)
+        emails_to_send = await self.__search_emails_to_send(event)
+        for reviewer in reviewers.reviewers:
+            if reviewer.email is not None:
+                emails_to_send.append(reviewer.email)
+        print(f"emails_to_send: {emails_to_send}")
+        self.__validate_emails(emails_to_send)
+
+        # self.background_tasks.add_task(self.__notify_inscription, event, user, emails_to_send)
+
         return True
