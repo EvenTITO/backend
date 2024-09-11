@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from email.message import EmailMessage
 
+from app.database.models.work import WorkStates
 from app.repository.events_repository import EventsRepository
 from app.repository.users_repository import UsersRepository
 from app.schemas.members.reviewer_schema import ReviewerCreateRequestSchema
@@ -17,6 +18,7 @@ START_EVENT_NOTIFICATION_HTML = load_html('start-event-notification.html')
 WAITING_APPROVAL_EVENT_NOTIFICATION_HTML = load_html('waiting-event-notification.html')
 INSCRIPTION_EVENT_NOTIFICATION_HTML = load_html('inscription-event-notification.html')
 REVIEWER_EVENT_NOTIFICATION_HTML = load_html('reviewer-event-notification.html')
+CHANGE_WORK_STATUS_NOTIFICATION_HTML = load_html('change-work-status-notification.html')
 
 
 class EventsNotificationsService(NotificationsService):
@@ -148,6 +150,15 @@ class EventsNotificationsService(NotificationsService):
                                             subject,
                                             params)
 
+    def __notify_change_work_status(self, event, emails_to_send, params):
+        subject = f"Su trabajo a cambiado de estado"
+        self.__config_common_and_send_email(
+            event,
+            emails_to_send,
+            CHANGE_WORK_STATUS_NOTIFICATION_HTML,
+            subject,
+            params)
+
     async def notify_event_waiting_approval(self, event):
         emails_to_send = await self.__search_emails_to_send(event)
         self.__validate_emails(emails_to_send)
@@ -177,8 +188,8 @@ class EventsNotificationsService(NotificationsService):
         emails_to_send.append(email_user)
 
         self.__validate_emails(emails_to_send)
-        print(f"emails_to_send:{emails_to_send}")
         self.background_tasks.add_task(self.__notify_inscription, event, user, emails_to_send)
+
         return True
 
     async def notify_new_reviewers(self, event_id, reviewers: ReviewerCreateRequestSchema):
@@ -200,4 +211,32 @@ class EventsNotificationsService(NotificationsService):
                     emails_to_send,
                     params)
 
+        return True
+
+    async def notify_change_work_status(self, event_id, user_id, obj, status):
+        event = await self.event_repository.get(event_id)
+        emails_to_send = await self.__search_emails_to_send(event)
+
+        print(f"user_id: {user_id}")
+        # TODO: sending email?
+        # user = await self.users_repository.get(user_id)
+        for author in obj['work'].authors:
+            notify_update = author['notify_updates']
+            if notify_update:
+                author_email = author['mail']
+                emails_to_send.append(author_email)
+                print(f"email2: {author_email}")
+
+        status_msg = ""
+        if status == WorkStates.APPROVED:
+            status_msg = "APROBADO"
+        else:
+            status_msg = "RECHAZADO"
+        params = [str(obj['id']), status_msg]
+        self.background_tasks.add_task(
+            self.__notify_change_work_status,
+            event,
+            emails_to_send,
+            params
+        )
         return True
