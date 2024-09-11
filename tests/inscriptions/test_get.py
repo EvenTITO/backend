@@ -1,10 +1,11 @@
 from fastapi.encoders import jsonable_encoder
 
+from app.database.models.inscription import InscriptionStatus
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from ..commontest import create_headers
 
 
-async def test_get_inscription(client, create_inscription, admin_data):
+async def test_get_inscriptions(client, create_inscription, admin_data):
     event_id = create_inscription['event_id']
     response = await client.get(
         f"/events/{event_id}/inscriptions",
@@ -46,3 +47,34 @@ async def test_user_inscribes_to_two_events(client, create_user, create_many_eve
     assert len(inscriptions_response) == 2
     for inscription in inscriptions_response:
         assert inscription['id'] in inscripted_events
+
+
+async def test_get_inscription(client, create_user, create_event_started, create_speaker_inscription):
+    inscription_id = create_speaker_inscription['id']
+    response = await client.get(
+        f"/events/{create_event_started}/inscriptions/{inscription_id}",
+        headers=create_headers(create_user['id'])
+    )
+
+    assert response.status_code == 200
+    inscription = response.json()
+    assert inscription['id'] == inscription_id
+    assert inscription['user_id'] == create_user["id"]
+    assert inscription['event_id'] == create_event_started
+    assert inscription['status'] == InscriptionStatus.PENDING_PAYMENT
+    assert inscription['roles'][0] == "SPEAKER"
+    assert inscription['affiliation'] == "Fiuba"
+    assert inscription['upload_url'] is None
+
+
+async def test_get_affiliation(client, create_user, create_event_started, create_speaker_inscription):
+    inscription_id = create_speaker_inscription['id']
+    response = await client.get(
+        f"/events/{create_event_started}/inscriptions/{inscription_id}/affiliation",
+        headers=create_headers(create_user['id'])
+    )
+
+    assert response.status_code == 200
+    inscription = response.json()
+    assert inscription['id'] == inscription_id
+    assert inscription['download_url']['download_url'] == 'mocked-url-download'
