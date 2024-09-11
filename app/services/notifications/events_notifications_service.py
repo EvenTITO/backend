@@ -151,7 +151,7 @@ class EventsNotificationsService(NotificationsService):
                                             params)
 
     def __notify_change_work_status(self, event, emails_to_send, params):
-        subject = f"Su trabajo a cambiado de estado"
+        subject = "Su trabajo a cambiado de estado"
         self.__config_common_and_send_email(
             event,
             emails_to_send,
