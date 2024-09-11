@@ -65,6 +65,5 @@ class EventReviewerService(BaseService):
         # Sending notification email
         await self.event_notification_service.notify_new_reviewers(self.event_id, create_schema)
 
-
-async def get_my_assignments(self, user_id: UID) -> list[ReviewerAssignmentSchema]:
-    return await self.reviewer_repository.get_assignments(self.event_id, user_id)
+    async def get_my_assignments(self, user_id: UID) -> list[ReviewerAssignmentSchema]:
+        return await self.reviewer_repository.get_assignments(self.event_id, user_id)
