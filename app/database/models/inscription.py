@@ -7,9 +7,9 @@ from app.database.models.utils import ModelTemplate, UIDType
 
 
 class InscriptionStatus(str, Enum):
-    PENDING_PAYMENT = "PENDING_PAYMENT"
-    PAYMENT_MADE = "PAYMENT_MADE"
-    CONFIRMED_PAYMENT = "CONFIRMED_PAYMENT"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
+    PENDING_APPROVAL = "PENDING_APPROVAL"
 
 
 class InscriptionRole(str, Enum):
@@ -22,7 +22,7 @@ class InscriptionModel(ModelTemplate, Base):
 
     user_id = Column(UIDType, ForeignKey("users.id"), nullable=False)
     event_id = Column(UUID(as_uuid=True), ForeignKey("events.id"), nullable=False)
-    status = Column(String, default=InscriptionStatus.PENDING_PAYMENT.value, nullable=False)
+    status = Column(String, default=InscriptionStatus.PENDING_APPROVAL.value, nullable=False)
     roles = Column(ARRAY(String), default=[InscriptionRole.ATTENDEE.value], nullable=False)
     affiliation = Column(String, default=None, nullable=True)
 

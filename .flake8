@@ -1,3 +1,7 @@
 [flake8]
-exclude = migrations/*
+exclude =
+    migrations/*
+    env
+    .env
+    ./venv/*
 max-line-length = 120

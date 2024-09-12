@@ -10,6 +10,7 @@ from app.authorization.user_id_dep import verify_user_exists
 from app.authorization.util_dep import or_
 from app.schemas.inscriptions.inscription import InscriptionResponseSchema, InscriptionRequestSchema, \
     InscriptionUploadSchema, InscriptionDownloadSchema
+from app.schemas.payments.payment import PaymentRequestSchema, PaymentUploadSchema
 from app.services.event_inscriptions.event_inscriptions_service_dep import EventInscriptionsServiceDep
 
 inscriptions_events_router = APIRouter(
@@ -86,19 +87,6 @@ async def read_affiliation(
 
 
 @inscriptions_events_router.put(
-    path="/{inscription_id}/pay",
-    status_code=200,
-    response_model=InscriptionUploadSchema,
-    dependencies=[Depends(verify_is_registered)]
-)
-async def submit(
-        inscription_id: UUID,
-        inscription_service: EventInscriptionsServiceDep
-) -> InscriptionUploadSchema:
-    return await inscription_service.pay(inscription_id)
-
-
-@inscriptions_events_router.put(
     path="/{inscription_id}",
     status_code=201,
     response_model=InscriptionUploadSchema,
@@ -110,3 +98,17 @@ async def update_inscription(
         inscriptions_service: EventInscriptionsServiceDep
 ) -> InscriptionUploadSchema:
     return await inscriptions_service.update_inscription(inscription_id, inscription)
+
+
+@inscriptions_events_router.put(
+    path="/{inscription_id}/pay",
+    status_code=201,
+    response_model=PaymentUploadSchema,
+    dependencies=[Depends(verify_is_registered)]
+)
+async def pay_inscription(
+        inscription_id: UUID,
+        payment_request: PaymentRequestSchema,
+        inscription_service: EventInscriptionsServiceDep
+) -> PaymentUploadSchema:
+    return await inscription_service.pay(inscription_id, payment_request)

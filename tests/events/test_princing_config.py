@@ -1,6 +1,6 @@
 from fastapi.encoders import jsonable_encoder
 from app.schemas.events.pricing import (
-    FeeSchema,
+    FareSchema,
     PricingSchema
 )
 from app.schemas.events.roles import EventRole
@@ -8,7 +8,7 @@ from ..commontest import create_headers
 
 
 async def test_put_pricing_config_ok(client, admin_data, create_event):
-    students_fee = FeeSchema(
+    students_fee = FareSchema(
         name="Students Only Fee",
         description="Only Students with certificate",
         value="50",
@@ -35,7 +35,7 @@ async def test_put_pricing_config_ok(client, admin_data, create_event):
 
 
 async def test_put_pricing_with_related_data_ok(client, admin_data, create_event):
-    students_fee_attendee = FeeSchema(
+    students_fee_attendee = FareSchema(
         name="Attendee students Only Fee",
         description="Only Students with certificate",
         value="50",
@@ -45,7 +45,7 @@ async def test_put_pricing_with_related_data_ok(client, admin_data, create_event
         roles=[EventRole.ATTENDEE]
     )
 
-    students_fee_speaker = FeeSchema(
+    students_fee_speaker = FareSchema(
         name="Speakers students Only Fee",
         description="Only Students with certificate",
         value="60",
