@@ -4,11 +4,12 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 
 from app.authorization.admin_user_dep import IsAdminUsrDep
+from app.authorization.inscripted_dep import verify_is_registered, IsRegisteredDep
 from app.authorization.organizer_dep import IsOrganizerDep
 from app.authorization.user_id_dep import verify_user_exists
 from app.authorization.util_dep import or_
 from app.schemas.inscriptions.inscription import InscriptionResponseSchema, InscriptionRequestSchema, \
-    InscriptionPayResponseSchema
+    InscriptionUploadSchema, InscriptionDownloadSchema
 from app.services.event_inscriptions.event_inscriptions_service_dep import EventInscriptionsServiceDep
 
 inscriptions_events_router = APIRouter(
@@ -58,13 +59,54 @@ async def read_my_inscriptions(
     return await inscriptions_service.get_my_event_inscriptions(offset, limit)
 
 
+@inscriptions_events_router.get(
+    path="/{inscription_id}",
+    status_code=200,
+    response_model=InscriptionResponseSchema,
+    dependencies=[or_(IsOrganizerDep, IsRegisteredDep)]
+)
+async def read_inscription(
+        inscription_id: UUID,
+        inscriptions_service: EventInscriptionsServiceDep,
+) -> InscriptionResponseSchema:
+    return await inscriptions_service.get_inscription(inscription_id)
+
+
+@inscriptions_events_router.get(
+    path="/{inscription_id}/affiliation",
+    status_code=200,
+    response_model=InscriptionDownloadSchema,
+    dependencies=[or_(IsOrganizerDep, IsRegisteredDep)]
+)
+async def read_affiliation(
+        inscription_id: UUID,
+        inscriptions_service: EventInscriptionsServiceDep,
+) -> InscriptionDownloadSchema:
+    return await inscriptions_service.get_affiliation(inscription_id)
+
+
 @inscriptions_events_router.put(
     path="/{inscription_id}/pay",
     status_code=200,
-    dependencies=[Depends(verify_user_exists)]
+    response_model=InscriptionUploadSchema,
+    dependencies=[Depends(verify_is_registered)]
 )
 async def submit(
-    inscription_id: UUID,
-    inscription_service: EventInscriptionsServiceDep
-) -> InscriptionPayResponseSchema:
+        inscription_id: UUID,
+        inscription_service: EventInscriptionsServiceDep
+) -> InscriptionUploadSchema:
     return await inscription_service.pay(inscription_id)
+
+
+@inscriptions_events_router.put(
+    path="/{inscription_id}",
+    status_code=201,
+    response_model=InscriptionUploadSchema,
+    dependencies=[Depends(verify_is_registered)]
+)
+async def update_inscription(
+        inscription_id: UUID,
+        inscription: InscriptionRequestSchema,
+        inscriptions_service: EventInscriptionsServiceDep
+) -> InscriptionUploadSchema:
+    return await inscriptions_service.update_inscription(inscription_id, inscription)

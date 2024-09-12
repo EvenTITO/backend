@@ -1,4 +1,5 @@
 from uuid import UUID
+
 from sqlalchemy import select, and_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,7 +13,7 @@ class InscriptionsRepository(Repository):
     def __init__(self, session: AsyncSession):
         super().__init__(session, InscriptionModel)
 
-    async def inscription_exists(self, event_id: UUID, user_id: UID):
+    async def inscription_exists(self, event_id: UUID, user_id: UID) -> bool:
         conditions = [InscriptionModel.event_id == event_id, InscriptionModel.user_id == user_id]
         return await self._exists_with_conditions(conditions)
 
@@ -49,9 +50,14 @@ class InscriptionsRepository(Repository):
         result = await self.session.execute(query)
         return result.scalars().all()
 
-    async def get_user_inscription_by_id(self, user_id: UID, inscription_id: UUID) -> InscriptionModel:
+    async def get_user_inscription_by_id(self, user_id: UID, event_id: UUID, inscription_id: UUID) -> InscriptionModel:
         query = select(InscriptionModel).where(
-            and_(InscriptionModel.id == inscription_id, InscriptionModel.user_id == user_id))
+            and_(
+                InscriptionModel.id == inscription_id,
+                InscriptionModel.user_id == user_id,
+                InscriptionModel.event_id == event_id
+            )
+        )
         result = await self.session.execute(query)
         return result.scalars().first()
 
@@ -62,3 +68,12 @@ class InscriptionsRepository(Repository):
         )
         await self.session.execute(update_query)
         await self.session.commit()
+
+    async def update_inscription(
+            self,
+            inscription_update: InscriptionRequestSchema,
+            event_id: UUID,
+            inscription_id: UUID
+    ) -> bool:
+        conditions = [InscriptionModel.event_id == event_id, InscriptionModel.id == inscription_id]
+        return await self._update_with_conditions(conditions, inscription_update)

@@ -30,12 +30,12 @@ async def create_speaker_inscription(client, create_user, create_event_started):
         affiliation="Fiuba",
     )
 
-    await client.post(
+    response = await client.post(
         f"/events/{create_event_started}/inscriptions",
         json=jsonable_encoder(new_inscription),
         headers=create_headers(create_user["id"])
     )
-    return {'event_id': create_event_started, 'user_id': create_user["id"]}
+    return {'id': response.json()['id'], 'event_id': create_event_started, 'user_id': create_user["id"]}
 
 
 @pytest.fixture(scope="function")
