@@ -37,15 +37,6 @@ class EventsNotificationsService(NotificationsService):
         print(message['To'])
         return message
 
-    def __validate_emails(self, emails):
-        # Check emails size
-        if len(emails) == 0:
-            raise Exception("Emails to send is empty")
-        # Check valid format email & set emails receivers
-        for email in emails:
-            if not self.__is_valid_email(email):
-                raise Exception(f"Format email error {email}")
-
     def __is_valid_email(self, email):
         return re.match(email_regex, email) is not None
 
@@ -161,21 +152,18 @@ class EventsNotificationsService(NotificationsService):
 
     async def notify_event_waiting_approval(self, event):
         emails_to_send = await self.__search_emails_to_send(event)
-        self.__validate_emails(emails_to_send)
         print(f"emails_to_send: {emails_to_send}")
         self.background_tasks.add_task(self.__notify_event_waiting_approval, event, emails_to_send)
         return True
 
     async def notify_event_created(self, event):
         emails_to_send = await self.__search_emails_to_send(event)
-        self.__validate_emails(emails_to_send)
 
         self.background_tasks.add_task(self.__notify_event_created, event, emails_to_send)
         return True
 
     async def notify_event_started(self, event):
         emails_to_send = await self.__search_emails_to_send(event)
-        self.__validate_emails(emails_to_send)
 
         self.background_tasks.add_task(self.__notify_event_started, event, emails_to_send)
         return True
@@ -187,7 +175,6 @@ class EventsNotificationsService(NotificationsService):
         email_user = user.email
         emails_to_send.append(email_user)
 
-        self.__validate_emails(emails_to_send)
         self.background_tasks.add_task(self.__notify_inscription, event, user, emails_to_send)
 
         return True
@@ -199,7 +186,6 @@ class EventsNotificationsService(NotificationsService):
             if reviewer.email is not None:
                 emails_to_send.append(reviewer.email)
                 user_reviewer = await self.users_repository.get_user_by_email(reviewer.email)
-                self.__validate_emails(emails_to_send)
 
                 fullname = f"{user_reviewer.name} {user_reviewer.lastname}"
                 params = [fullname, str(reviewer.work_id), str(reviewer.review_deadline)]
