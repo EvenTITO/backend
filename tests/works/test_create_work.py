@@ -1,6 +1,8 @@
 # flake8: noqa
 from fastapi.encoders import jsonable_encoder
 
+from app.database.models.inscription import InscriptionRole
+from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from app.schemas.works.author import AuthorInformation
 from app.schemas.works.work import WorkSchema
 from ..commontest import create_headers
@@ -24,30 +26,60 @@ USER_WORK = WorkSchema(
 )
 
 
-async def test_create_work(client, create_user, create_event):
-    event_id = create_event['id']
+async def test_create_work(client, create_user, create_event_started):
+    new_inscription = InscriptionRequestSchema(
+        roles=[InscriptionRole.SPEAKER]
+    )
+
     response = await client.post(
-        f"/events/{event_id}/works",
+        f"/events/{create_event_started}/inscriptions",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201
+
+    response = await client.post(
+        f"/events/{create_event_started}/works",
         json=jsonable_encoder(USER_WORK),
         headers=create_headers(create_user["id"])
     )
     assert response.status_code == 201
 
 
-async def test_create_two_works_same_title_same_event_fails(client, create_user, create_event):
-    """
-    When many works are created in the same event, they all should have a different incremental id.
-    """
+async def test_create_work_without_inscription(client, create_user, create_event):
     event_id = create_event['id']
-
     response = await client.post(
         f"/events/{event_id}/works",
         json=jsonable_encoder(USER_WORK),
         headers=create_headers(create_user["id"])
     )
+    assert response.status_code == 409, "The second response should fail given that the title is repeated"
+
+
+async def test_create_two_works_same_title_same_event_fails(client, create_user, create_event_started):
+    """
+    When many works are created in the same event, they all should have a different incremental id.
+    """
+
+    new_inscription = InscriptionRequestSchema(
+        roles=[InscriptionRole.SPEAKER]
+    )
+
+    response = await client.post(
+        f"/events/{create_event_started}/inscriptions",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201
+
+    response = await client.post(
+        f"/events/{create_event_started}/works",
+        json=jsonable_encoder(USER_WORK),
+        headers=create_headers(create_user["id"])
+    )
 
     second_response = await client.post(
-        f"/events/{event_id}/works",
+        f"/events/{create_event_started}/works",
         json=jsonable_encoder(USER_WORK),
         headers=create_headers(create_user["id"])
     )

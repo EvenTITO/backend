@@ -1,5 +1,3 @@
-from enum import Enum
-
 from pydantic import (
     BaseModel,
     Field,
@@ -8,14 +6,6 @@ from pydantic import (
 from app.schemas.events.dates import DatesCompleteSchema
 from app.schemas.events.pricing import PricingSchema
 from ...database.models.event import EventType
-
-
-class EventRole(str, Enum):
-    ORGANIZER = "ORGANIZER"
-    CHAIR = "CHAIR"
-    REVIEWER = "REVIEWER"
-    SPEAKER = "SPEAKER"
-    ATTENDEE = "ATTENDEE"
 
 
 class StaticEventSchema(BaseModel):

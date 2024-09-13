@@ -2,18 +2,33 @@ import datetime
 
 from fastapi.encoders import jsonable_encoder
 
+from app.database.models.event import EventStatus
+from app.database.models.inscription import InscriptionRole
 from app.database.models.work import WorkStates
-from app.schemas.events.schemas import EventRole, DynamicTracksEventSchema
+from app.schemas.events.event_status import EventStatusSchema
+from app.schemas.events.roles import EventRole
+from app.schemas.events.schemas import DynamicTracksEventSchema
+from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from app.schemas.members.member_schema import MemberRequestSchema
 from app.schemas.users.user import UserSchema
 from .test_create_work import USER_WORK
 from ..commontest import create_headers
 
 
-async def test_get_work_retrieves_work_data(client, create_user, create_event):
-    event_id = create_event['id']
+async def test_get_work_retrieves_work_data(client, create_user, create_event_started):
+    new_inscription = InscriptionRequestSchema(
+        roles=[InscriptionRole.SPEAKER]
+    )
+
     response = await client.post(
-        f"/events/{event_id}/works",
+        f"/events/{create_event_started}/inscriptions",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201
+
+    response = await client.post(
+        f"/events/{create_event_started}/works",
         json=jsonable_encoder(USER_WORK),
         headers=create_headers(create_user["id"])
     )
@@ -21,7 +36,7 @@ async def test_get_work_retrieves_work_data(client, create_user, create_event):
 
     work_id = response.json()
     work_response = await client.get(
-        f"/events/{event_id}/works/{work_id}",
+        f"/events/{create_event_started}/works/{work_id}",
         headers=create_headers(create_user["id"])
     )
     work_get = work_response.json()
@@ -37,7 +52,29 @@ async def test_get_work_retrieves_work_data(client, create_user, create_event):
     assert work_get["track"] == USER_WORK.track
 
 
-async def test_get_works_organizer(client, create_user, create_event_creator, create_event_from_event_creator):
+async def test_get_works_organizer(admin_data, client, create_user, create_event_creator,
+                                   create_event_from_event_creator):
+    status_update = EventStatusSchema(
+        status=EventStatus.STARTED
+    )
+
+    await client.patch(
+        f"/events/{create_event_from_event_creator}/status",
+        json=jsonable_encoder(status_update),
+        headers=create_headers(admin_data.id)
+
+    )
+    new_inscription = InscriptionRequestSchema(
+        roles=[InscriptionRole.SPEAKER]
+    )
+
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/inscriptions",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201, response.json()
+
     response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
         json=jsonable_encoder(USER_WORK),
@@ -71,11 +108,33 @@ async def test_get_works_organizer(client, create_user, create_event_creator, cr
 
 
 async def test_get_works_organizer_with_track(
+        admin_data,
         client,
         create_user,
         create_event_creator,
         create_event_from_event_creator
 ):
+    status_update = EventStatusSchema(
+        status=EventStatus.STARTED
+    )
+
+    await client.patch(
+        f"/events/{create_event_from_event_creator}/status",
+        json=jsonable_encoder(status_update),
+        headers=create_headers(admin_data.id)
+
+    )
+    new_inscription = InscriptionRequestSchema(
+        roles=[InscriptionRole.SPEAKER]
+    )
+
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/inscriptions",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201, response.json()
+
     work_response_1 = await client.post(
         f"/events/{create_event_from_event_creator}/works",
         json=jsonable_encoder(USER_WORK),
@@ -129,7 +188,8 @@ async def test_get_works_organizer_with_track(
     assert work["authors"][0]["mail"] == USER_WORK.authors[0].mail
 
 
-async def test_get_works_chair_with_track(client, create_user, create_event_creator, create_event_from_event_creator):
+async def test_get_works_chair_with_track(admin_data, client, create_user, create_event_creator,
+                                          create_event_from_event_creator):
     other_user_id = "paoksncaokasdasdl12345678901"
     other_create_user = UserSchema(
         name="Angel",
@@ -165,12 +225,33 @@ async def test_get_works_chair_with_track(client, create_user, create_event_crea
     )
     assert response.status_code == 204
 
+    status_update = EventStatusSchema(
+        status=EventStatus.STARTED
+    )
+
+    await client.patch(
+        f"/events/{create_event_from_event_creator}/status",
+        json=jsonable_encoder(status_update),
+        headers=create_headers(admin_data.id)
+
+    )
+    new_inscription = InscriptionRequestSchema(
+        roles=[InscriptionRole.SPEAKER]
+    )
+
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/inscriptions",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201, response.json()
+
     work_response_1 = await client.post(
         f"/events/{create_event_from_event_creator}/works",
         json=jsonable_encoder(USER_WORK),
         headers=create_headers(create_user["id"])
     )
-    assert work_response_1.status_code == 201
+    assert work_response_1.status_code == 201, work_response_1.json()
 
     work_2 = USER_WORK.model_copy()
     work_2.title = 'nuevo titulo'
@@ -219,6 +300,7 @@ async def test_get_works_chair_with_track(client, create_user, create_event_crea
 
 
 async def test_get_works_chair_with_not_mine_track(
+        admin_data,
         client,
         create_user,
         create_event_creator,
@@ -259,12 +341,33 @@ async def test_get_works_chair_with_not_mine_track(
     )
     assert response.status_code == 204
 
+    status_update = EventStatusSchema(
+        status=EventStatus.STARTED
+    )
+
+    await client.patch(
+        f"/events/{create_event_from_event_creator}/status",
+        json=jsonable_encoder(status_update),
+        headers=create_headers(admin_data.id)
+
+    )
+    new_inscription = InscriptionRequestSchema(
+        roles=[InscriptionRole.SPEAKER]
+    )
+
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/inscriptions",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201, response.json()
+
     work_response_1 = await client.post(
         f"/events/{create_event_from_event_creator}/works",
         json=jsonable_encoder(USER_WORK),
         headers=create_headers(create_user["id"])
     )
-    assert work_response_1.status_code == 201
+    assert work_response_1.status_code == 201, work_response_1.json()
 
     work_2 = USER_WORK.model_copy()
     work_2.title = 'nuevo titulo'
@@ -296,6 +399,7 @@ async def test_get_works_chair_with_not_mine_track(
 
 
 async def test_get_all_works_chair_non_authorized(
+        admin_data,
         client,
         create_user,
         create_event_creator,
@@ -325,6 +429,27 @@ async def test_get_all_works_chair_non_authorized(
         headers=create_headers(create_event_creator["id"])
     )
     assert new_chair_response.status_code == 201
+
+    status_update = EventStatusSchema(
+        status=EventStatus.STARTED
+    )
+
+    await client.patch(
+        f"/events/{create_event_from_event_creator}/status",
+        json=jsonable_encoder(status_update),
+        headers=create_headers(admin_data.id)
+
+    )
+    new_inscription = InscriptionRequestSchema(
+        roles=[InscriptionRole.SPEAKER]
+    )
+
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/inscriptions",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201, response.json()
 
     work_response_1 = await client.post(
         f"/events/{create_event_from_event_creator}/works",

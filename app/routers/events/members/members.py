@@ -28,11 +28,11 @@ async def read_event_members(members_service: EventMembersServiceDep) -> list[Me
 
 
 @event_members_router.post(path="", status_code=201, dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)])
-async def invite_member(
+async def add_member(
         members_service: EventMembersServiceDep,
         member: MemberRequestSchema,
 ) -> UID:
-    return await members_service.invite_member(member)
+    return await members_service.add_member(member)
 
 
 @event_members_router.delete(

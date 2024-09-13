@@ -1,17 +1,16 @@
+import pytest
+from fastapi.encoders import jsonable_encoder
+
 from app.schemas.works.author import AuthorInformation
 from app.schemas.works.work import WorkSchema
-import pytest
-
-from fastapi.encoders import jsonable_encoder
 from ...commontest import create_headers, WORKS
 
 
 @pytest.fixture(scope="function")
-async def create_many_works(client, create_user, create_event):
-    event_id = create_event['id']
+async def create_many_works(client, create_user, create_event_started, create_speaker_inscription):
     for work in WORKS:
         response = await client.post(
-            f"/events/{event_id}/works",
+            f"/events/{create_event_started}/works",
             json=jsonable_encoder(work),
             headers=create_headers(create_user["id"])
         )
@@ -21,7 +20,7 @@ async def create_many_works(client, create_user, create_event):
 
 
 @pytest.fixture(scope="function")
-async def create_work_from_user(client, create_user, create_event) -> str:
+async def create_work_from_user(client, create_user, create_event_started, create_speaker_inscription) -> str:
     user_work = WorkSchema(
         title=(
             'Comparación del Rendimiento de Curve25519, '
@@ -39,9 +38,8 @@ async def create_work_from_user(client, create_user, create_event) -> str:
             )
         ]
     )
-    event_id = create_event['id']
     response = await client.post(
-        f"/events/{event_id}/works",
+        f"/events/{create_event_started}/works",
         json=jsonable_encoder(user_work),
         headers=create_headers(create_user["id"])
     )

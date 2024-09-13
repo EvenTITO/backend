@@ -1,14 +1,16 @@
 from datetime import datetime
 from uuid import UUID
 
+from app.database.models.inscription import InscriptionRole
 from app.database.models.work import WorkModel, WorkStates
 from app.exceptions.works.works_exceptions import TitleAlreadyExists, StatusNotAllowWorkUpdate, \
     CannotUpdateWorkAfterDeadlineDate, WorkNotFound, NotIsMyWork, CannotCreateWorkAfterDeadlineDate, \
-    TrackNotExistInEvent
+    TrackNotExistInEvent, CannotCreateWorkIfNotSpeakerInscription
 from app.repository.works_repository import WorksRepository
 from app.schemas.events.dates import MandatoryDates
 from app.schemas.users.utils import UID
 from app.schemas.works.work import WorkWithState, WorkSchema, WorkStateSchema
+from app.services.event_inscriptions.event_inscriptions_service import EventInscriptionsService
 from app.services.events.events_configuration_service import EventsConfigurationService
 from app.services.notifications.events_notifications_service import EventsNotificationsService
 from app.services.services import BaseService
@@ -20,12 +22,14 @@ class WorksService(BaseService):
             user_id: UID,
             event_id: UUID,
             event_configuration_service: EventsConfigurationService,
-            works_repository: WorksRepository,
             event_notification_service: EventsNotificationsService,
+            inscription_service: EventInscriptionsService,
+            works_repository: WorksRepository
     ):
         self.user_id = user_id
         self.event_id = event_id
         self.event_configuration_service = event_configuration_service
+        self.inscription_service = inscription_service
         self.works_repository = works_repository
         self.event_notification_service = event_notification_service
 
@@ -52,6 +56,11 @@ class WorksService(BaseService):
         event_tracks = await self.event_configuration_service.get_event_tracks()
         if work.track not in event_tracks:
             raise TrackNotExistInEvent(self.event_id, work.track)
+
+        my_inscriptions = await self.inscription_service.get_my_event_inscriptions(0, 100)
+        has_inscription = True in (InscriptionRole.SPEAKER in inscription.roles for inscription in my_inscriptions)
+        if not has_inscription:
+            raise CannotCreateWorkIfNotSpeakerInscription(self.event_id)
 
         work = await self.works_repository.create_work(
             work,

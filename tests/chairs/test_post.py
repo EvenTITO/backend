@@ -1,7 +1,8 @@
 from fastapi.encoders import jsonable_encoder
 
 from app.exceptions.members.chair.chair_exceptions import UserNotIsChair
-from app.schemas.events.schemas import DynamicTracksEventSchema, EventRole
+from app.schemas.events.roles import EventRole
+from app.schemas.events.schemas import DynamicTracksEventSchema
 from app.schemas.members.member_schema import MemberRequestSchema
 from ..commontest import create_headers
 

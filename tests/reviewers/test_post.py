@@ -9,7 +9,8 @@ async def test_create_reviewers_ok(
         client,
         create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     create_work_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
@@ -47,7 +48,8 @@ async def test_create_reviewers_already_exist_reviewer(
         client,
         create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     create_work_1_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
@@ -88,7 +90,8 @@ async def test_create_reviewers_by_work_id_invalid(
         client,
         create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     create_work_1_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",
@@ -126,7 +129,8 @@ async def test_create_reviewers_without_permissions(
         client,
         create_user,
         create_event_creator,
-        create_event_from_event_creator
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
 ):
     create_work_response = await client.post(
         f"/events/{create_event_from_event_creator}/works",

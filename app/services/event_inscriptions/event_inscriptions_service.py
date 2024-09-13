@@ -6,7 +6,7 @@ from app.exceptions.inscriptions_exceptions import EventNotStarted, InscriptionA
     InscriptionNotFound
 from app.repository.inscriptions_repository import InscriptionsRepository
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema, InscriptionResponseSchema, \
-    InscriptionPayResponseSchema
+    InscriptionUploadSchema, InscriptionDownloadSchema
 from app.schemas.users.utils import UID
 from app.services.events.events_configuration_service import EventsConfigurationService
 from app.services.notifications.events_notifications_service import EventsNotificationsService
@@ -39,16 +39,50 @@ class EventInscriptionsService(BaseService):
         response = EventInscriptionsService.map_to_schema(saved_inscription)
         if saved_inscription.affiliation is not None:
             upload_url = await self.storage_service.get_affiliation_upload_url(self.user_id, saved_inscription.id)
-            response.affiliation_upload_url = upload_url
-
+            response.upload_url = upload_url
         # Ending we send a notification email
         # TODO: enviar email al inscriptor ?
         await self.event_notification_service.notify_inscription(self.event_id, self.user_id)
         return response
 
+    async def update_inscription(
+            self,
+            inscription_id: UUID,
+            inscription_update: InscriptionRequestSchema
+    ) -> InscriptionUploadSchema:
+        my_inscription = await self.inscriptions_repository.get_user_inscription_by_id(
+            self.user_id,
+            self.event_id,
+            inscription_id
+        )
+        if my_inscription is None:
+            raise InscriptionNotFound(self.event_id, inscription_id)
+        await self.inscriptions_repository.update_inscription(inscription_update, self.event_id, inscription_id)
+        response = InscriptionUploadSchema(id=inscription_id)
+        if inscription_update.affiliation is not None:
+            upload_url = await self.storage_service.get_affiliation_upload_url(self.user_id, inscription_id)
+            response.upload_url = upload_url
+        return response
+
     async def get_event_inscriptions(self, offset: int, limit: int) -> list[InscriptionResponseSchema]:
         inscriptions = await self.inscriptions_repository.get_event_inscriptions(self.event_id, offset, limit)
         return list(map(EventInscriptionsService.map_to_schema, inscriptions))
+
+    async def get_inscription(self, inscription_id: UUID) -> InscriptionResponseSchema:
+        inscription = await self.inscriptions_repository.get(inscription_id)
+        if inscription is None:
+            raise InscriptionNotFound(self.event_id, inscription_id)
+        return EventInscriptionsService.map_to_schema(inscription)
+
+    async def get_affiliation(self, inscription_id: UUID) -> InscriptionDownloadSchema:
+        inscription = await self.inscriptions_repository.get(inscription_id)
+        if inscription is None:
+            raise InscriptionNotFound(self.event_id, inscription_id)
+        response = InscriptionDownloadSchema(id=inscription.id)
+        if inscription.affiliation:
+            download_url = await self.storage_service.get_affiliation_read_url(self.user_id, inscription.id)
+            response.download_url = download_url
+        return response
 
     async def get_my_event_inscriptions(self, offset: int, limit: int) -> list[InscriptionResponseSchema]:
         inscriptions = await self.inscriptions_repository.get_event_user_inscriptions(
@@ -59,15 +93,27 @@ class EventInscriptionsService(BaseService):
         )
         return list(map(EventInscriptionsService.map_to_schema, inscriptions))
 
-    async def pay(self, inscription_id: UUID) -> InscriptionPayResponseSchema:
-        my_inscription = await self.inscriptions_repository.get_user_inscription_by_id(self.user_id, inscription_id)
+    async def pay(self, inscription_id: UUID) -> InscriptionUploadSchema:
+        my_inscription = await self.inscriptions_repository.get_user_inscription_by_id(
+            self.user_id,
+            self.event_id,
+            inscription_id
+        )
         if my_inscription is None:
             raise InscriptionNotFound(self.event_id, inscription_id)
         if my_inscription.status != InscriptionStatus.PENDING_PAYMENT:
             raise InscriptionAlreadyPaid(inscription_id, self.user_id, self.event_id)
         await self.inscriptions_repository.pay(inscription_id)
         upload_url = await self.storage_service.get_payment_upload_url(self.user_id, inscription_id)
-        return InscriptionPayResponseSchema(id=inscription_id, upload_url=upload_url)
+        return InscriptionUploadSchema(id=inscription_id, upload_url=upload_url)
+
+    async def is_my_inscription(self, inscription_id: UUID) -> bool:
+        my_inscription = await self.inscriptions_repository.get_user_inscription_by_id(
+            self.user_id,
+            self.event_id,
+            inscription_id
+        )
+        return my_inscription is not None
 
     @staticmethod
     def map_to_schema(model: InscriptionModel) -> InscriptionResponseSchema:
@@ -78,5 +124,5 @@ class EventInscriptionsService(BaseService):
             status=model.status,
             roles=model.roles,
             affiliation=model.affiliation,
-            affiliation_upload_url=None
+            upload_url=None
         )

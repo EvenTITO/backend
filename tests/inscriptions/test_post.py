@@ -1,6 +1,8 @@
 import uuid
+
 from fastapi.encoders import jsonable_encoder
 
+from app.database.models.inscription import InscriptionStatus
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from ..commontest import create_headers
 
@@ -59,3 +61,36 @@ async def test_post_inscription_in_event_not_started(client, create_user, create
     assert response.status_code == 409
     assert response.json()["detail"] == "The event " + event_id + (" has not started."
                                                                    " The current event status is CREATED")
+
+
+async def test_update_inscription(client, create_user, create_event_started, create_speaker_inscription):
+    update_inscription = InscriptionRequestSchema(
+        roles=["ATTENDEE"],
+        affiliation="UTN",
+    )
+
+    inscription_id = create_speaker_inscription['id']
+
+    response = await client.put(
+        f"/events/{create_event_started}/inscriptions/{inscription_id}",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(update_inscription)
+    )
+    assert response.status_code == 201
+    assert response.json()['id'] == inscription_id
+    assert response.json()['upload_url']['upload_url'] == 'mocked-url-upload'
+
+    my_inscriptions_response = await client.get(
+        f"/events/{create_event_started}/inscriptions/my-inscriptions",
+        headers=create_headers(create_user["id"])
+    )
+    assert my_inscriptions_response.status_code == 200
+    my_inscriptions = my_inscriptions_response.json()
+    assert len(my_inscriptions) == 1
+    assert my_inscriptions[0]['id'] == inscription_id
+    assert my_inscriptions[0]['user_id'] == create_user["id"]
+    assert my_inscriptions[0]['event_id'] == create_event_started
+    assert my_inscriptions[0]['status'] == InscriptionStatus.PENDING_PAYMENT
+    assert len(my_inscriptions[0]['roles']) == 1
+    assert my_inscriptions[0]['roles'][0] == "ATTENDEE"
+    assert my_inscriptions[0]['affiliation'] == "UTN"

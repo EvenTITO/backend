@@ -5,13 +5,12 @@ from uuid import UUID
 
 from app.database.models.member import MemberModel
 from app.database.models.user import UserModel
-from app.exceptions.members.member_exceptions import AlreadyMemberExist
+from app.exceptions.members.member_exceptions import AlreadyMemberExist, MemberRoleNotSupported
 from app.exceptions.users_exceptions import UserNotFound
 from app.repository.chairs_repository import ChairRepository
 from app.repository.organizers_repository import OrganizerRepository
-from app.repository.reviewers_repository import ReviewerRepository
 from app.repository.users_repository import UsersRepository
-from app.schemas.events.schemas import EventRole
+from app.schemas.events.roles import EventRole
 from app.schemas.members.member_schema import MemberRequestSchema, MemberResponseWithRolesSchema
 from app.schemas.members.member_schema import RolesRequestSchema
 from app.schemas.users.user import UserSchema
@@ -25,14 +24,12 @@ class EventMembersService(BaseService):
             event_id: UUID,
             organizer_repository: OrganizerRepository,
             chair_repository: ChairRepository,
-            reviewer_repository: ReviewerRepository,
             users_repository: UsersRepository,
     ):
         self.event_id = event_id
         self.users_repository = users_repository
         self.repositories = {
             EventRole.ORGANIZER: organizer_repository,
-            EventRole.REVIEWER: reviewer_repository,
             EventRole.CHAIR: chair_repository
         }
 
@@ -47,22 +44,19 @@ class EventMembersService(BaseService):
         members_response = []
         for k, v in groupby(result, key=attrgetter('user_id')):
             group = list(v)
+            roles = list(reduce(lambda x, y: x + y, map(lambda x: x.roles, group)))
             member = MemberResponseWithRolesSchema(
                 **({
                     **(group[0].model_dump(mode='json')),
-                    "roles": list(reduce(lambda x, y: x.roles + y.roles, group))
+                    "roles": roles
                 })
             )
             members_response.append(member)
         return members_response
 
-    async def is_member(self, user_id: UID) -> bool:
-        for role, repository in self.repositories.items():
-            if await repository.is_member(self.event_id, user_id):
-                return True
-        return False
-
-    async def invite_member(self, member: MemberRequestSchema) -> UID:
+    async def add_member(self, member: MemberRequestSchema) -> UID:
+        if member.role not in self.repositories.keys():
+            raise MemberRoleNotSupported(member.role)
         user_id = await self.users_repository.get_user_id_by_email(member.email)
         if user_id is None:
             raise UserNotFound(member.email)

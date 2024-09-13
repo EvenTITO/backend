@@ -3,16 +3,18 @@ from pydantic import (
     Field,
 )
 
+from app.schemas.events.dates import MandatoryDates
+from app.schemas.events.roles import EventRole
+
 
 class FeeSchema(BaseModel):
     name: str = Field(examples=['Students Only Fee']),
     description: str = Field(examples=['Only Students with certificate']),
     value: int = Field(examples=[50]),
     currency: str = Field(examples=['ARS'], default='ARS')
-    need_verification: bool = Field(
-        description='If it is set to True,'
-        ' a validation file must be added in the inscription form'
-    )
+    roles: list[EventRole] = Field(default_factory=list)
+    related_date: str | None = Field(examples=[MandatoryDates.START_DATE], default=None)
+    need_verification: bool = Field(description='If its True, a validation file must be added in the inscription form')
 
 
 class PricingSchema(BaseModel):
