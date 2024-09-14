@@ -1,4 +1,21 @@
 # flake8: noqa
+from app.database.database import engine
+from app.database.session_dep import get_db
+from app.database.models.base import Base
+from app.database.models.payment import PaymentModel
+from app.database.models.reviewer import ReviewerModel
+from app.database.models.work import WorkModel
+from app.database.models.submission import SubmissionModel
+from app.database.models.review import ReviewModel
+from app.database.models.organizer import OrganizerModel
+from app.database.models.inscription import InscriptionModel
+from app.database.models.event import EventModel
+from app.database.models.user import UserModel
+from app.database.models.chair import ChairModel
+import asyncio
+from app.schemas.users.user import UserReply
+from app.repository.users_repository import UsersRepository
+from app.database.models.user import UserRole
 import sys
 import os
 from dotenv import load_dotenv
@@ -7,24 +24,6 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
 sys.path.append(parent_dir)
 load_dotenv()
-
-from app.database.models.user import UserRole
-from app.repository.users_repository import UsersRepository
-from app.schemas.users.user import UserReply
-import asyncio
-
-from app.database.models.chair import ChairModel
-from app.database.models.user import UserModel
-from app.database.models.event import EventModel
-from app.database.models.inscription import InscriptionModel
-from app.database.models.organizer import OrganizerModel
-from app.database.models.review import ReviewModel
-from app.database.models.submission import SubmissionModel
-from app.database.models.work import WorkModel
-from app.database.models.reviewer import ReviewerModel
-from app.database.models.base import Base
-from app.database.session_dep import get_db
-from app.database.database import engine
 
 
 async def add_first_admin():
@@ -63,7 +62,6 @@ async def create_models():
         await add_first_admin()
     except Exception as e:
         print(f'An error occurred: {str(e)}')
-
 
 
 if __name__ == "__main__":
