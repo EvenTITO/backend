@@ -1,9 +1,9 @@
 from uuid import UUID
 
-from sqlalchemy import select, and_, update
+from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.models.inscription import InscriptionModel, InscriptionStatus
+from app.database.models.inscription import InscriptionModel
 from app.repository.crud_repository import Repository
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from app.schemas.users.utils import UID
@@ -60,14 +60,6 @@ class InscriptionsRepository(Repository):
         )
         result = await self.session.execute(query)
         return result.scalars().first()
-
-    async def pay(self, inscription_id: UUID) -> None:
-        update_query = (
-            update(InscriptionModel).where(InscriptionModel.id == inscription_id).values(
-                status=InscriptionStatus.PAYMENT_MADE.value())
-        )
-        await self.session.execute(update_query)
-        await self.session.commit()
 
     async def update_inscription(
             self,

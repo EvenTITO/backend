@@ -2,10 +2,11 @@ import pytest
 from fastapi.encoders import jsonable_encoder
 
 from app.database.models.user import UserRole
+from app.schemas.events.event_status import EventStatusSchema
 from app.schemas.users.user import UserSchema
 from app.schemas.users.user_role import UserRoleSchema
 from app.schemas.events.create_event import CreateEventSchema
-from app.database.models.event import EventType
+from app.database.models.event import EventType, EventStatus
 from .helper import complete_event_configuration
 
 from ...commontest import create_headers, get_user_method
@@ -58,4 +59,25 @@ async def create_event_from_event_creator(client, create_event_creator):
 
     await complete_event_configuration(client, event_id, create_event_creator["id"])
 
-    return response.json()
+    return event_id
+
+
+@pytest.fixture(scope="function")
+async def create_event_started_from_event_creator(
+        admin_data,
+        client,
+        create_event_creator,
+        create_event_from_event_creator
+):
+    status_update = EventStatusSchema(
+        status=EventStatus.STARTED
+    )
+
+    response = await client.patch(
+        f"/events/{create_event_from_event_creator}/status",
+        json=jsonable_encoder(status_update),
+        headers=create_headers(admin_data.id)
+    )
+
+    assert response.status_code == 204, response.json()
+    return create_event_from_event_creator

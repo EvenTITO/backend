@@ -1,13 +1,14 @@
 from uuid import UUID
 
 from app.database.models.event import EventStatus
-from app.database.models.inscription import InscriptionModel, InscriptionStatus
-from app.exceptions.inscriptions_exceptions import EventNotStarted, InscriptionAlreadyPaid, \
-    InscriptionNotFound
+from app.database.models.inscription import InscriptionModel
+from app.exceptions.inscriptions_exceptions import EventNotStarted, InscriptionNotFound
 from app.repository.inscriptions_repository import InscriptionsRepository
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema, InscriptionResponseSchema, \
     InscriptionUploadSchema, InscriptionDownloadSchema
+from app.schemas.payments.payment import PaymentRequestSchema, PaymentUploadSchema
 from app.schemas.users.utils import UID
+from app.services.event_payments.event_payments_service import EventPaymentsService
 from app.services.events.events_configuration_service import EventsConfigurationService
 from app.services.services import BaseService
 from app.services.storage.event_inscription_storage_service import EventInscriptionStorageService
@@ -17,12 +18,14 @@ class EventInscriptionsService(BaseService):
     def __init__(
             self,
             events_configuration_service: EventsConfigurationService,
+            events_payment_service: EventPaymentsService,
             storage_service: EventInscriptionStorageService,
             inscriptions_repository: InscriptionsRepository,
             event_id: UUID,
             user_id: UID
     ):
         self.events_configuration_service = events_configuration_service
+        self.events_payment_service = events_payment_service
         self.storage_service = storage_service
         self.inscriptions_repository = inscriptions_repository
         self.event_id = event_id
@@ -87,7 +90,7 @@ class EventInscriptionsService(BaseService):
         )
         return list(map(EventInscriptionsService.map_to_schema, inscriptions))
 
-    async def pay(self, inscription_id: UUID) -> InscriptionUploadSchema:
+    async def pay(self, inscription_id: UUID, payment_request: PaymentRequestSchema) -> PaymentUploadSchema:
         my_inscription = await self.inscriptions_repository.get_user_inscription_by_id(
             self.user_id,
             self.event_id,
@@ -95,11 +98,15 @@ class EventInscriptionsService(BaseService):
         )
         if my_inscription is None:
             raise InscriptionNotFound(self.event_id, inscription_id)
-        if my_inscription.status != InscriptionStatus.PENDING_PAYMENT:
-            raise InscriptionAlreadyPaid(inscription_id, self.user_id, self.event_id)
-        await self.inscriptions_repository.pay(inscription_id)
+
+        # TODO cosas que PODRIAMOS validar pero no se si vale la pena
+        # si me manda works que sean mios
+        # si me manda works que la inscripcion sea de speaker
+        # que exista la tarifa con el nombre de la que quiere pagar
+        # limite de works a pagar harcodeado o que lo elija el organizador
+        payment_id = await self.events_payment_service.pay_inscription(inscription_id, payment_request)
         upload_url = await self.storage_service.get_payment_upload_url(self.user_id, inscription_id)
-        return InscriptionUploadSchema(id=inscription_id, upload_url=upload_url)
+        return PaymentUploadSchema(id=payment_id, upload_url=upload_url)
 
     async def is_my_inscription(self, inscription_id: UUID) -> bool:
         my_inscription = await self.inscriptions_repository.get_user_inscription_by_id(

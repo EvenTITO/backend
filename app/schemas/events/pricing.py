@@ -7,7 +7,7 @@ from app.schemas.events.dates import MandatoryDates
 from app.schemas.events.roles import EventRole
 
 
-class FeeSchema(BaseModel):
+class FareSchema(BaseModel):
     name: str = Field(examples=['Students Only Fee']),
     description: str = Field(examples=['Only Students with certificate']),
     value: int = Field(examples=[50]),
@@ -18,4 +18,4 @@ class FeeSchema(BaseModel):
 
 
 class PricingSchema(BaseModel):
-    pricing: list[FeeSchema] = Field(default_factory=list)
+    pricing: list[FareSchema] = Field(default_factory=list)

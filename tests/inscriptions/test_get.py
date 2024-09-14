@@ -61,7 +61,7 @@ async def test_get_inscription(client, create_user, create_event_started, create
     assert inscription['id'] == inscription_id
     assert inscription['user_id'] == create_user["id"]
     assert inscription['event_id'] == create_event_started
-    assert inscription['status'] == InscriptionStatus.PENDING_PAYMENT
+    assert inscription['status'] == InscriptionStatus.PENDING_APPROVAL
     assert inscription['roles'][0] == "SPEAKER"
     assert inscription['affiliation'] == "Fiuba"
     assert inscription['upload_url'] is None
