@@ -10,7 +10,8 @@ from app.authorization.user_id_dep import verify_user_exists
 from app.authorization.util_dep import or_
 from app.schemas.inscriptions.inscription import InscriptionResponseSchema, InscriptionRequestSchema, \
     InscriptionUploadSchema, InscriptionDownloadSchema
-from app.schemas.payments.payment import PaymentRequestSchema, PaymentUploadSchema
+from app.schemas.payments.payment import PaymentRequestSchema, PaymentUploadSchema, PaymentsResponseSchema, \
+    PaymentDownloadSchema
 from app.services.event_inscriptions.event_inscriptions_service_dep import EventInscriptionsServiceDep
 
 inscriptions_events_router = APIRouter(
@@ -112,3 +113,32 @@ async def pay_inscription(
         inscription_service: EventInscriptionsServiceDep
 ) -> PaymentUploadSchema:
     return await inscription_service.pay(inscription_id, payment_request)
+
+
+@inscriptions_events_router.get(
+    path="/{inscription_id}/payments",
+    status_code=200,
+    response_model=List[PaymentsResponseSchema],
+    dependencies=[or_(IsOrganizerDep, IsRegisteredDep)]
+)
+async def read_inscription_payments(
+        inscription_id: UUID,
+        inscription_service: EventInscriptionsServiceDep,
+        offset: int = 0,
+        limit: int = Query(default=100, le=100)
+) -> List[PaymentsResponseSchema]:
+    return await inscription_service.get_inscription_payments(inscription_id, offset, limit)
+
+
+@inscriptions_events_router.get(
+    path="/{inscription_id}/payments/{payment_id}",
+    status_code=200,
+    response_model=PaymentDownloadSchema,
+    dependencies=[or_(IsOrganizerDep, IsRegisteredDep)]
+)
+async def read_inscription_payment(
+        payment_id: UUID,
+        inscription_id: UUID,
+        inscription_service: EventInscriptionsServiceDep
+) -> PaymentDownloadSchema:
+    return await inscription_service.get_inscription_payment(inscription_id, payment_id)

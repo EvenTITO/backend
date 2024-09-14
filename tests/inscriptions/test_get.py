@@ -1,7 +1,9 @@
 from fastapi.encoders import jsonable_encoder
 
 from app.database.models.inscription import InscriptionStatus
+from app.database.models.payment import PaymentStatus
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
+from app.schemas.payments.payment import PaymentRequestSchema
 from ..commontest import create_headers
 
 
@@ -78,3 +80,34 @@ async def test_get_affiliation(client, create_user, create_event_started, create
     inscription = response.json()
     assert inscription['id'] == inscription_id
     assert inscription['download_url']['download_url'] == 'mocked-url-download'
+
+
+async def test_get_payment_url(client, create_user, create_event_started, create_speaker_inscription):
+    inscription_id = create_speaker_inscription['id']
+    pay_inscription = PaymentRequestSchema(
+        fare_name="tarifa a pagar",
+        works=["work_id"],
+    )
+
+    response = await client.put(
+        f"/events/{create_event_started}/inscriptions/{inscription_id}/pay",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(pay_inscription)
+    )
+    assert response.status_code == 201
+    payment_id_1 = response.json()['id']
+
+    response = await client.get(
+        f"/events/{create_event_started}/inscriptions/{inscription_id}/payments/{payment_id_1}",
+        headers=create_headers(create_user['id'])
+    )
+
+    assert response.status_code == 200
+    payment = response.json()
+    assert payment['id'] == payment_id_1
+    assert payment['event_id'] == create_event_started
+    assert payment['inscription_id'] == inscription_id
+    assert payment['status'] == PaymentStatus.PENDING_APPROVAL
+    assert payment['works'] == ["work_id"]
+    assert payment['fare_name'] == "tarifa a pagar"
+    assert payment['download_url']['download_url'] == 'mocked-url-download'
