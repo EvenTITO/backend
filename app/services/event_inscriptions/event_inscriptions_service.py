@@ -6,7 +6,8 @@ from app.exceptions.inscriptions_exceptions import EventNotStarted, InscriptionN
 from app.repository.inscriptions_repository import InscriptionsRepository
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema, InscriptionResponseSchema, \
     InscriptionUploadSchema, InscriptionDownloadSchema
-from app.schemas.payments.payment import PaymentRequestSchema, PaymentUploadSchema
+from app.schemas.payments.payment import PaymentRequestSchema, PaymentUploadSchema, PaymentsResponseSchema, \
+    PaymentDownloadSchema
 from app.schemas.users.utils import UID
 from app.services.event_payments.event_payments_service import EventPaymentsService
 from app.services.events.events_configuration_service import EventsConfigurationService
@@ -105,7 +106,7 @@ class EventInscriptionsService(BaseService):
         # que exista la tarifa con el nombre de la que quiere pagar
         # limite de works a pagar harcodeado o que lo elija el organizador
         payment_id = await self.events_payment_service.pay_inscription(inscription_id, payment_request)
-        upload_url = await self.storage_service.get_payment_upload_url(self.user_id, inscription_id)
+        upload_url = await self.storage_service.get_payment_upload_url(self.user_id, payment_id)
         return PaymentUploadSchema(id=payment_id, upload_url=upload_url)
 
     async def is_my_inscription(self, inscription_id: UUID) -> bool:
@@ -115,6 +116,22 @@ class EventInscriptionsService(BaseService):
             inscription_id
         )
         return my_inscription is not None
+
+    async def get_inscription_payments(
+            self,
+            inscription_id: UUID,
+            offset: int,
+            limit: int
+    ) -> list[PaymentsResponseSchema]:
+        return await self.events_payment_service.get_inscription_payments(inscription_id, offset, limit)
+
+    async def get_inscription_payment(self, inscription_id: UUID, payment_id: UUID) -> PaymentDownloadSchema:
+        payment = await self.events_payment_service.get_inscription_payment(inscription_id, payment_id)
+        download_url = await self.storage_service.get_payment_read_url(self.user_id, payment_id)
+        return PaymentDownloadSchema(
+            **payment.model_dump(),
+            download_url=download_url,
+        )
 
     @staticmethod
     def map_to_schema(model: InscriptionModel) -> InscriptionResponseSchema:
