@@ -4,6 +4,7 @@ from fastapi.encoders import jsonable_encoder
 
 from app.database.models.inscription import InscriptionStatus
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
+from app.schemas.payments.payment import PaymentRequestSchema
 from ..commontest import create_headers
 
 
@@ -90,7 +91,30 @@ async def test_update_inscription(client, create_user, create_event_started, cre
     assert my_inscriptions[0]['id'] == inscription_id
     assert my_inscriptions[0]['user_id'] == create_user["id"]
     assert my_inscriptions[0]['event_id'] == create_event_started
-    assert my_inscriptions[0]['status'] == InscriptionStatus.PENDING_PAYMENT
+    assert my_inscriptions[0]['status'] == InscriptionStatus.PENDING_APPROVAL
     assert len(my_inscriptions[0]['roles']) == 1
     assert my_inscriptions[0]['roles'][0] == "ATTENDEE"
     assert my_inscriptions[0]['affiliation'] == "UTN"
+
+
+async def test_pay_inscription(
+        client,
+        create_user,
+        create_event_started,
+        create_work_from_user,
+        create_speaker_inscription
+):
+    pay_inscription = PaymentRequestSchema(
+        fare_name="tarifa a pagar",
+        works=[create_work_from_user],
+    )
+    inscription_id = create_speaker_inscription['id']
+
+    response = await client.put(
+        f"/events/{create_event_started}/inscriptions/{inscription_id}/pay",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(pay_inscription)
+    )
+    assert response.status_code == 201
+    assert response.json()['id'] is not None
+    assert response.json()['upload_url']['upload_url'] == 'mocked-url-upload'
