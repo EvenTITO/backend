@@ -11,6 +11,7 @@ from app.schemas.payments.payment import PaymentRequestSchema, PaymentUploadSche
 from app.schemas.users.utils import UID
 from app.services.event_payments.event_payments_service import EventPaymentsService
 from app.services.events.events_configuration_service import EventsConfigurationService
+from app.services.notifications.events_notifications_service import EventsNotificationsService
 from app.services.services import BaseService
 from app.services.storage.event_inscription_storage_service import EventInscriptionStorageService
 
@@ -22,6 +23,7 @@ class EventInscriptionsService(BaseService):
             events_payment_service: EventPaymentsService,
             storage_service: EventInscriptionStorageService,
             inscriptions_repository: InscriptionsRepository,
+            event_notification_service: EventsNotificationsService,
             event_id: UUID,
             user_id: UID
     ):
@@ -29,6 +31,7 @@ class EventInscriptionsService(BaseService):
         self.events_payment_service = events_payment_service
         self.storage_service = storage_service
         self.inscriptions_repository = inscriptions_repository
+        self.event_notification_service = event_notification_service
         self.event_id = event_id
         self.user_id = user_id
 
@@ -41,6 +44,9 @@ class EventInscriptionsService(BaseService):
         if saved_inscription.affiliation is not None:
             upload_url = await self.storage_service.get_affiliation_upload_url(self.user_id, saved_inscription.id)
             response.upload_url = upload_url
+        # Ending we send a notification email
+        # TODO: enviar email al inscriptor ?
+        await self.event_notification_service.notify_inscription(self.event_id, self.user_id)
         return response
 
     async def update_inscription(

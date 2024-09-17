@@ -1,20 +1,20 @@
 import smtplib
 import ssl
 from email.message import EmailMessage
-from app.settings.settings import NotificationsSettings
 
+from app.settings.settings import NotificationsSettings
 
 settings = NotificationsSettings()
 SLL_DEFAULT_CONTEXT = ssl.create_default_context()
 
 
 def load_file(file_path):
-    with open('./assets/'+file_path, 'r', encoding='utf-8') as file:
+    with open('./assets/' + file_path, 'r', encoding='utf-8') as file:
         return file.read()
 
 
 def load_html(file_path):
-    return load_file('email-templates/'+file_path)
+    return load_file('email-templates/' + file_path)
 
 
 def get_body_template():
@@ -43,9 +43,9 @@ class NotificationsService:
         message['From'] = settings.EMAIL
         try:
             with smtplib.SMTP_SSL(
-                "smtp.gmail.com",
-                settings.SMTPS_PORT,
-                context=SLL_DEFAULT_CONTEXT
+                    "smtp.gmail.com",
+                    settings.SMTPS_PORT,
+                    context=SLL_DEFAULT_CONTEXT
             ) as server:
                 server.login(settings.EMAIL, settings.EMAIL_PASSWORD)
                 server.send_message(message)
@@ -59,7 +59,7 @@ class NotificationsService:
         message['Subject'] = f'[EvenTITO] {subject}'
         return message
 
-    def _add_body(self, message: EmailMessage, body):
+    def _add_body(self, message: EmailMessage, body, extra_params):
         if message.get_content_type() != 'text/html':
             message.set_type('text/html')
 
@@ -76,3 +76,8 @@ class NotificationsService:
         body_filled = BODY_TEMPLATE.replace('{{ body }}', body)
         message.set_content('This is a HTML email. If you see this text, your client does not support HTML.')
         message.add_alternative(body_filled, subtype='html')
+
+    def _replace_params(self, params, body):
+        for i in range(0, len(params)):
+            body = body.replace(f"[${i+1}]", params[i])
+        return body

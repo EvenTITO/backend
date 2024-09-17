@@ -8,6 +8,13 @@ class UserNotFound(HTTPException):
         super().__init__(status_code=self.status_code, detail=self.detail)
 
 
+class UserWithEmailNotFound(HTTPException):
+    def __init__(self, email_user):
+        self.status_code = 404
+        self.detail = f"User with email {email_user} not found"
+        super().__init__(status_code=self.status_code, detail=self.detail)
+
+
 class EmailAlreadyExists(HTTPException):
     def __init__(self, email_str):
         self.status_code = 409

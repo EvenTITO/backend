@@ -12,6 +12,7 @@ from app.schemas.users.utils import UID
 from app.schemas.works.work import WorkWithState, WorkSchema, WorkStateSchema
 from app.services.event_inscriptions.event_inscriptions_service import EventInscriptionsService
 from app.services.events.events_configuration_service import EventsConfigurationService
+from app.services.notifications.events_notifications_service import EventsNotificationsService
 from app.services.services import BaseService
 
 
@@ -21,6 +22,7 @@ class WorksService(BaseService):
             user_id: UID,
             event_id: UUID,
             event_configuration_service: EventsConfigurationService,
+            event_notification_service: EventsNotificationsService,
             inscription_service: EventInscriptionsService,
             works_repository: WorksRepository
     ):
@@ -29,6 +31,7 @@ class WorksService(BaseService):
         self.event_configuration_service = event_configuration_service
         self.inscription_service = inscription_service
         self.works_repository = works_repository
+        self.event_notification_service = event_notification_service
 
     async def get_works(self, track: str, offset: int, limit: int) -> list[WorkWithState]:
         if track:
@@ -86,6 +89,12 @@ class WorksService(BaseService):
         if not await self.exist_work(work_id):
             raise WorkNotFound(event_id=self.event_id, work_id=work_id)
         await self.works_repository.update_work_status(self.event_id, work_id, status)
+        work = await self.works_repository.get_work(self.event_id, work_id)
+        await self.event_notification_service.notify_change_work_status(
+            self.event_id,
+            self.user_id,
+            {"id": work_id, "work": work},
+            status.state)
 
     async def validate_update_work(self, work_id: UUID) -> None:
         my_work = await self.__get_my_work(work_id)

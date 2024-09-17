@@ -1,4 +1,5 @@
 from app.database.models.user import UserModel, UserRole
+from app.exceptions.users_exceptions import UserWithEmailNotFound
 from app.schemas.users.user import UserSchema
 from app.repository.crud_repository import Repository
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,6 +22,13 @@ class UsersRepository(Repository):
         if user is None:
             return user
         return user.id
+
+    async def get_user_by_email(self, email):
+        conditions = [UserModel.email == email]
+        user = await self._get_with_conditions(conditions)
+        if user is None:
+            raise UserWithEmailNotFound(email)
+        return user
 
     async def create_user(self, id, user: UserSchema):
         db_user = UserModel(**user.model_dump(), id=id)
