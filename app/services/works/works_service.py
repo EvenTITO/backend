@@ -80,9 +80,10 @@ class WorksService(BaseService):
 
     async def update_work(self, work_id: UUID, work_update: WorkSchema) -> None:
         await self.validate_update_work(work_id)
-        repeated_title = await self.works_repository.work_with_title_exists(self.event_id, work_update.title)
-        if repeated_title:
-            raise TitleAlreadyExists(work_update.title, self.event_id)
+        # TODO: ok remove ?
+        # repeated_title = await self.works_repository.work_with_title_exists(self.event_id, work_update.title)
+        # if repeated_title:
+        #     raise TitleAlreadyExists(work_update.title, self.event_id)
         await self.works_repository.update_work(work_update, self.event_id, work_id)
 
     async def update_work_status(self, work_id: UUID, status: WorkStateSchema) -> None:
@@ -131,5 +132,6 @@ class WorksService(BaseService):
             track=model.track,
             abstract=model.abstract,
             keywords=model.keywords,
-            authors=model.authors
+            authors=model.authors,
+            talk=model.talk
         )

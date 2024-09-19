@@ -2,6 +2,7 @@ from app.schemas.events.dates import DateSchema, MandatoryDates
 from app.schemas.events.create_event import CreateEventSchema
 from app.database.models.event import EventType
 from app.schemas.works.author import AuthorInformation
+from app.schemas.works.talk import Talk
 from app.schemas.works.work import WorkSchema
 import datetime
 
@@ -121,7 +122,8 @@ WORKS = [
                 membership='fiuba',
                 mail='mail@mail.com'
             )
-        ]
+        ],
+        talk=Talk(date="2024-01-01 09:00:00", location='FIUBA, Av. Paseo Colon 850')
     ),
     WorkSchema(
         title=(
@@ -152,6 +154,7 @@ WORKS = [
                 membership='Exactas',
                 mail='julianaltocapo@mail.com'
             )
-        ]
+        ],
+        talk=Talk(date="2024-01-01 09:00:00", location='FIUBA, Av. Paseo Colon 850')
     )
 ]

@@ -5,6 +5,7 @@ from pydantic import BaseModel, ConfigDict
 
 from app.database.models.work import WorkStates
 from app.schemas.works.author import AuthorInformation
+from app.schemas.works.talk import Talk
 
 
 class WorkSchema(BaseModel):
@@ -14,6 +15,7 @@ class WorkSchema(BaseModel):
     abstract: str
     keywords: list[str]
     authors: list[AuthorInformation]
+    talk: Talk
 
 
 class WorkStateSchema(BaseModel):

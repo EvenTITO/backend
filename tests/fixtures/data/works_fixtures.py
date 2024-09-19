@@ -2,6 +2,7 @@ import pytest
 from fastapi.encoders import jsonable_encoder
 
 from app.schemas.works.author import AuthorInformation
+from app.schemas.works.talk import Talk
 from app.schemas.works.work import WorkSchema
 from ...commontest import create_headers, WORKS
 
@@ -36,7 +37,8 @@ async def create_work_from_user(client, create_user, create_event_started, creat
                 membership='fiuba',
                 mail='mail@mail.com'
             )
-        ]
+        ],
+        talk=Talk(date="2024-01-01 09:00:00", location='FIUBA, Av. Paseo Colon 850')
     )
     response = await client.post(
         f"/events/{create_event_started}/works",

@@ -4,6 +4,7 @@ from fastapi.encoders import jsonable_encoder
 from app.database.models.inscription import InscriptionRole
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from app.schemas.works.author import AuthorInformation
+from app.schemas.works.talk import Talk
 from app.schemas.works.work import WorkSchema
 from ..commontest import create_headers
 
@@ -20,9 +21,11 @@ USER_WORK = WorkSchema(
         AuthorInformation(
             full_name='Mateo Perez',
             membership='fiuba',
-            mail='mail@mail.com'
+            mail='mail@mail.com',
+            is_speaker=False
         )
-    ]
+    ],
+    talk=Talk(date="2024-01-01 09:00:00", location='FIUBA, Av. Paseo Colon 850')
 )
 
 
