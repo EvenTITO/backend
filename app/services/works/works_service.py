@@ -80,7 +80,7 @@ class WorksService(BaseService):
 
     async def update_work(self, work_id: UUID, work_update: WorkSchema) -> None:
         await self.validate_update_work(work_id)
-        # TODO: ok remove ?
+        # TODO: change de case where is it sent a same title work ?
         # repeated_title = await self.works_repository.work_with_title_exists(self.event_id, work_update.title)
         # if repeated_title:
         #     raise TitleAlreadyExists(work_update.title, self.event_id)
