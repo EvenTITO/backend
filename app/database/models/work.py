@@ -33,6 +33,7 @@ class WorkModel(ModelTemplate, Base):
     abstract = Column(String, nullable=False)
     keywords = Column(ARRAY(String), nullable=False)
     authors = Column(JSON, nullable=False)
+    talk = Column(JSON, nullable=True)
     state = Column(String, nullable=False, default=WorkStates.SUBMITTED)
     deadline_date = Column(DateTime, nullable=False)
 

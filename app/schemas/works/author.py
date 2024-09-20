@@ -11,3 +11,5 @@ class AuthorInformation(BaseModel):
     ),
         default=False
     )
+    is_speaker: bool = Field(description='If set to true, the author is speaker',
+                             default=False)

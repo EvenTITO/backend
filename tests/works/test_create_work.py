@@ -1,4 +1,3 @@
-# flake8: noqa
 from fastapi.encoders import jsonable_encoder
 
 from app.database.models.inscription import InscriptionRole
@@ -20,7 +19,8 @@ USER_WORK = WorkSchema(
         AuthorInformation(
             full_name='Mateo Perez',
             membership='fiuba',
-            mail='mail@mail.com'
+            mail='mail@mail.com',
+            is_speaker=False
         )
     ]
 )

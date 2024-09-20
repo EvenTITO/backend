@@ -6,11 +6,12 @@ from fastapi import APIRouter, Depends, Query
 from app.authorization.admin_user_dep import IsAdminUsrDep
 from app.authorization.author_dep import IsAuthorDep, verify_is_author
 from app.authorization.chair_dep import IsTrackChairDep
-from app.authorization.organizer_dep import IsOrganizerDep
+from app.authorization.organizer_dep import IsOrganizerDep, verify_is_organizer
 from app.authorization.reviewer_dep import IsWorkReviewerDep
 from app.authorization.user_id_dep import verify_user_exists
 from app.authorization.util_dep import or_
-from app.schemas.works.work import WorkSchema, WorkWithState, WorkStateSchema
+from app.schemas.works.work import WorkSchema, WorkWithState, \
+    WorkStateSchema, WorkUpdateSchema, WorkUpdateAdministrationSchema
 from app.services.works.works_service_dep import WorksServiceDep
 
 works_router = APIRouter(prefix="/{event_id}/works", tags=["Events: Works"])
@@ -61,8 +62,21 @@ async def create_work(work: WorkSchema, work_service: WorksServiceDep) -> UUID:
 
 
 @works_router.put(path="/{work_id}", status_code=204, dependencies=[Depends(verify_is_author)])
-async def update_work(work_id: UUID, work_update: WorkSchema, work_service: WorksServiceDep) -> None:
+async def update_work(work_id: UUID, work_update: WorkUpdateSchema, work_service: WorksServiceDep) -> None:
     await work_service.update_work(work_id, work_update)
+
+
+@works_router.put(
+    path="/{work_id}/administration",
+    status_code=204,
+    dependencies=[Depends(verify_is_organizer)]
+)
+async def update_work_administration(
+    work_id: UUID,
+    work_update: WorkUpdateAdministrationSchema,
+    work_service: WorksServiceDep
+) -> None:
+    await work_service.update_work_administration(work_id, work_update)
 
 
 @works_router.patch(
