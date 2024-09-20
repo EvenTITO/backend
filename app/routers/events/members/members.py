@@ -51,7 +51,7 @@ async def remove_member(
 
 @event_members_router.put(
     path="/{user_id}/roles",
-    status_code=201,
+    status_code=204,
     response_model=None,
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
@@ -61,4 +61,4 @@ async def update(
         user_id: UID,
         member_service: EventMembersServiceDep
 ) -> None:
-    await member_service.update_rol_member(event_id, user_id, roles)
+    await member_service.update_rol_member(user_id, roles)
