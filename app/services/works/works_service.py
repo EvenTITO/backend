@@ -9,7 +9,8 @@ from app.exceptions.works.works_exceptions import TitleAlreadyExists, StatusNotA
 from app.repository.works_repository import WorksRepository
 from app.schemas.events.dates import MandatoryDates
 from app.schemas.users.utils import UID
-from app.schemas.works.work import WorkWithState, WorkSchema, WorkStateSchema
+from app.schemas.works.work import WorkWithState, WorkSchema, WorkStateSchema, \
+    WorkUpdateSchema, WorkUpdateAdministrationSchema
 from app.services.event_inscriptions.event_inscriptions_service import EventInscriptionsService
 from app.services.events.events_configuration_service import EventsConfigurationService
 from app.services.notifications.events_notifications_service import EventsNotificationsService
@@ -78,12 +79,11 @@ class WorksService(BaseService):
         work = await self.__get_work(self.event_id, work_id)
         return WorksService.__map_to_schema(work)
 
-    async def update_work(self, work_id: UUID, work_update: WorkSchema) -> None:
-        await self.validate_update_work(work_id)
-        # TODO: change de case where is it sent a same title work ?
-        # repeated_title = await self.works_repository.work_with_title_exists(self.event_id, work_update.title)
-        # if repeated_title:
-        #     raise TitleAlreadyExists(work_update.title, self.event_id)
+    async def update_work(self, work_id: UUID, work_update: WorkUpdateSchema) -> None:
+        await self.validate_update_work(work_id, work_update)
+        await self.works_repository.update_work(work_update, self.event_id, work_id)
+
+    async def update_work_administration(self, work_id: UUID, work_update: WorkUpdateAdministrationSchema) -> None:
         await self.works_repository.update_work(work_update, self.event_id, work_id)
 
     async def update_work_status(self, work_id: UUID, status: WorkStateSchema) -> None:
@@ -97,12 +97,15 @@ class WorksService(BaseService):
             {"id": work_id, "work": work},
             status.state)
 
-    async def validate_update_work(self, work_id: UUID) -> None:
+    async def validate_update_work(self, work_id: UUID, work_update: WorkUpdateSchema | None = None) -> None:
         my_work = await self.__get_my_work(work_id)
         if my_work.state not in [WorkStates.SUBMITTED, WorkStates.RE_SUBMIT]:
             raise StatusNotAllowWorkUpdate(status=my_work.state, work_id=work_id)
         if datetime.today() > my_work.deadline_date:
             raise CannotUpdateWorkAfterDeadlineDate(deadline_date=my_work.deadline_date, work_id=work_id)
+        if work_update is not None and my_work.title != work_update.title and \
+                await self.works_repository.work_with_title_exists(self.event_id, work_update.title):
+            raise TitleAlreadyExists(work_update.title, self.event_id)
 
     async def __get_my_work(self, work_id: UUID) -> WorkModel:
         work = await self.__get_work(self.event_id, work_id)

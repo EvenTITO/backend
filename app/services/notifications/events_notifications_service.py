@@ -34,7 +34,6 @@ class EventsNotificationsService(NotificationsService):
     def __recipients_message(self):
         message = EmailMessage()
         message['To'] = ",".join(self.recipients_emails)
-        print(message['To'])
         return message
 
     def __is_valid_email(self, email):
@@ -103,7 +102,6 @@ class EventsNotificationsService(NotificationsService):
         self._add_body(message, body, params)
         self._add_body_extra(message, body)
 
-        self.__print_email(emails_to_send, message)
         return self._send_email(message)
 
     def __notify_event_started(self, event, emails_to_send):

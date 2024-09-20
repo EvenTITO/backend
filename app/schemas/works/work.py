@@ -8,14 +8,21 @@ from app.schemas.works.author import AuthorInformation
 from app.schemas.works.talk import Talk
 
 
-class WorkSchema(BaseModel):
+class WorkUpdateSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    title: str
-    track: str
     abstract: str
     keywords: list[str]
     authors: list[AuthorInformation]
-    talk: Talk
+    title: str
+
+
+class WorkUpdateAdministrationSchema(BaseModel):
+    talk: Talk | None = None
+    track: str
+
+
+class WorkSchema(WorkUpdateSchema, WorkUpdateAdministrationSchema):
+    pass
 
 
 class WorkStateSchema(BaseModel):
