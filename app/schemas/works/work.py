@@ -16,12 +16,15 @@ class WorkUpdateSchema(BaseModel):
     title: str
 
 
-class WorkUpdateAdministrationSchema(BaseModel):
-    talk: Talk | None = None
+class TrackSchema(BaseModel):
     track: str
 
 
-class WorkSchema(WorkUpdateSchema, WorkUpdateAdministrationSchema):
+class WorkUpdateAdministrationSchema(TrackSchema):
+    talk: Talk | None = None
+
+
+class CreateWorkSchema(WorkUpdateSchema, TrackSchema):
     pass
 
 
@@ -29,6 +32,8 @@ class WorkStateSchema(BaseModel):
     state: WorkStates
 
 
-class WorkWithState(WorkSchema, WorkStateSchema):
+class WorkWithState(CreateWorkSchema, WorkStateSchema, WorkUpdateAdministrationSchema):
     id: UUID
     deadline_date: datetime
+    creation_date: datetime
+    last_update: datetime
