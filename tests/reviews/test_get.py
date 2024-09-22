@@ -131,6 +131,10 @@ async def test_get_reviews_ok(
     assert reviews[0]["review"]["answers"][0]["question"] == "Comentarios"
     assert reviews[0]["review"]["answers"][0]["answer"] == "Muy buen trabajo."
     assert reviews[0]["review"]["answers"][0]["type_question"] == "simple_question"
+    reviewer = reviews[0]["reviewer"]
+    assert reviewer["name"] == create_user["name"]
+    assert reviewer["lastname"] == create_user["lastname"]
+    assert reviewer["email"] == create_user["email"]
 
     assert reviews[1]["event_id"] == create_event_from_event_creator
     assert reviews[1]["work_id"] == work_id
@@ -142,6 +146,10 @@ async def test_get_reviews_ok(
     assert (reviews[1]["review"]["answers"][0]["answer"] ==
             "Mejorar desarrollo, es demasiado técnico y difícil de leer. Revisar ortografía.")
     assert reviews[1]["review"]["answers"][0]["type_question"] == "simple_question"
+    reviewer = reviews[1]["reviewer"]
+    assert reviewer["name"] == other_create_user.name
+    assert reviewer["lastname"] == other_create_user.lastname
+    assert reviewer["email"] == other_create_user.email
 
 
 async def test_get_my_work_reviews_ok(

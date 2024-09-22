@@ -9,6 +9,7 @@ from app.database.models.work import WorkStates
 from app.schemas.events.review_skeleton.multiples_choice_question import MultipleChoiceAnswer
 from app.schemas.events.review_skeleton.simple_question import SimpleAnswer
 from app.schemas.storage.schemas import DownloadURLSchema, UploadURLSchema
+from app.schemas.users.user import PublicUserSchema
 from app.schemas.users.utils import UID
 
 
@@ -33,6 +34,7 @@ class ReviewResponseSchema(ReviewCreateRequestSchema):
     work_id: UUID = Field(examples=["work_id_01"])
     submission_id: UUID = Field(examples=["submission_id_01"])
     reviewer_id: UID = Field(examples=["user_id_01"])
+    reviewer: PublicUserSchema
 
 
 class ReviewDownloadSchema(ReviewResponseSchema):

@@ -1,6 +1,7 @@
 from enum import Enum
 
 from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
 
 from app.database.models.base import Base
 from app.database.models.utils import DateTemplate, UIDType
@@ -25,3 +26,5 @@ class UserModel(DateTemplate, Base):
     address = Column(String, nullable=True)
     city = Column(String, nullable=True)
     country = Column(String, nullable=True)
+
+    reviews = relationship("ReviewModel", back_populates='reviewer', lazy=True)
