@@ -2,7 +2,7 @@ import pytest
 from fastapi.encoders import jsonable_encoder
 
 from app.schemas.works.author import AuthorInformation
-from app.schemas.works.work import WorkSchema
+from app.schemas.works.work import CreateWorkSchema
 from ...commontest import create_headers, WORKS
 
 
@@ -21,7 +21,7 @@ async def create_many_works(client, create_user, create_event_started, create_sp
 
 @pytest.fixture(scope="function")
 async def create_work_from_user(client, create_user, create_event_started, create_speaker_inscription) -> str:
-    user_work = WorkSchema(
+    user_work = CreateWorkSchema(
         title=(
             'Comparación del Rendimiento de Curve25519, '
             'P-256 y Curvas de Edwards en Algoritmos '

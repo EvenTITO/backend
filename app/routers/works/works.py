@@ -10,7 +10,7 @@ from app.authorization.organizer_dep import IsOrganizerDep, verify_is_organizer
 from app.authorization.reviewer_dep import IsWorkReviewerDep
 from app.authorization.user_id_dep import verify_user_exists
 from app.authorization.util_dep import or_
-from app.schemas.works.work import WorkSchema, WorkWithState, \
+from app.schemas.works.work import CreateWorkSchema, WorkWithState, \
     WorkStateSchema, WorkUpdateSchema, WorkUpdateAdministrationSchema
 from app.services.works.works_service_dep import WorksServiceDep
 
@@ -57,7 +57,7 @@ async def get_work(work_id: UUID, work_service: WorksServiceDep) -> WorkWithStat
 
 
 @works_router.post(path="", status_code=201, dependencies=[Depends(verify_user_exists)])
-async def create_work(work: WorkSchema, work_service: WorksServiceDep) -> UUID:
+async def create_work(work: CreateWorkSchema, work_service: WorksServiceDep) -> UUID:
     return await work_service.create_work(work)
 
 

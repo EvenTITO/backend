@@ -2,7 +2,7 @@ from app.schemas.events.dates import DateSchema, MandatoryDates
 from app.schemas.events.create_event import CreateEventSchema
 from app.database.models.event import EventType
 from app.schemas.works.author import AuthorInformation
-from app.schemas.works.work import WorkSchema
+from app.schemas.works.work import CreateWorkSchema
 import datetime
 
 
@@ -106,7 +106,7 @@ EVENTS = [
 
 
 WORKS = [
-    WorkSchema(
+    CreateWorkSchema(
         title=(
             'Comparación del Rendimiento de Curve25519, '
             'P-256 y Curvas de Edwards en Algoritmos '
@@ -123,7 +123,7 @@ WORKS = [
             )
         ]
     ),
-    WorkSchema(
+    CreateWorkSchema(
         title=(
             'Aplicaciones de los Toros de Clifford en '
             'la Teoría de Códigos Correctores de Errores'

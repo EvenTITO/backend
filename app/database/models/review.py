@@ -7,6 +7,7 @@ from sqlalchemy import (
 
 from app.database.models.base import Base
 from app.database.models.utils import UIDType, ModelTemplate
+from sqlalchemy.orm import relationship
 
 
 class ReviewModel(ModelTemplate, Base):
@@ -19,3 +20,6 @@ class ReviewModel(ModelTemplate, Base):
     status = Column(String)
     review = Column(JSON)
     shared = Column(Boolean, default=False)
+
+    # Always fetch the usermodel, when fetching a review
+    reviewer = relationship("UserModel", back_populates='reviews', lazy=False)

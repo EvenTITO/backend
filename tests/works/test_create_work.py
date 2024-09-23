@@ -3,10 +3,10 @@ from fastapi.encoders import jsonable_encoder
 from app.database.models.inscription import InscriptionRole
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from app.schemas.works.author import AuthorInformation
-from app.schemas.works.work import WorkSchema
+from app.schemas.works.work import CreateWorkSchema
 from ..commontest import create_headers
 
-USER_WORK = WorkSchema(
+USER_WORK = CreateWorkSchema(
     title=(
         'Comparación del Rendimiento de Curve25519, '
         'P-256 y Curvas de Edwards en Algoritmos '

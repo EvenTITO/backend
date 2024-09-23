@@ -9,7 +9,7 @@ from app.exceptions.works.works_exceptions import TitleAlreadyExists, StatusNotA
 from app.repository.works_repository import WorksRepository
 from app.schemas.events.dates import MandatoryDates
 from app.schemas.users.utils import UID
-from app.schemas.works.work import WorkWithState, WorkSchema, WorkStateSchema, \
+from app.schemas.works.work import WorkWithState, CreateWorkSchema, WorkStateSchema, \
     WorkUpdateSchema, WorkUpdateAdministrationSchema
 from app.services.event_inscriptions.event_inscriptions_service import EventInscriptionsService
 from app.services.events.events_configuration_service import EventsConfigurationService
@@ -45,7 +45,7 @@ class WorksService(BaseService):
         works = await self.works_repository.get_all_works_for_user(self.user_id, offset, limit)
         return list(map(WorksService.__map_to_schema, works))
 
-    async def create_work(self, work: WorkSchema) -> UUID:
+    async def create_work(self, work: CreateWorkSchema) -> UUID:
         submission_deadline = await self._get_submission_deadline()
         if submission_deadline.date < datetime.now().date():
             raise CannotCreateWorkAfterDeadlineDate(submission_deadline)
@@ -136,5 +136,7 @@ class WorksService(BaseService):
             abstract=model.abstract,
             keywords=model.keywords,
             authors=model.authors,
-            talk=model.talk
+            talk=model.talk,
+            creation_date=model.creation_date,
+            last_update=model.last_update,
         )

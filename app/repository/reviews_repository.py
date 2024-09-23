@@ -7,6 +7,7 @@ from app.database.models.review import ReviewModel
 from app.database.models.submission import SubmissionModel
 from app.database.models.work import WorkModel
 from app.repository.crud_repository import Repository
+from app.schemas.users.user import PublicUserSchema
 from app.schemas.users.utils import UID
 from app.schemas.works.review import ReviewResponseSchema, ReviewCreateRequestSchema, ReviewPublishSchema
 
@@ -47,6 +48,7 @@ class ReviewsRepository(Repository):
             submission_id=submission_id
         )
         saved_review = (await self._create(new_review))
+        print(f"El saved review es {saved_review.__dict__}")
         return ReviewResponseSchema(
             id=saved_review.id,
             event_id=saved_review.event_id,
@@ -55,6 +57,11 @@ class ReviewsRepository(Repository):
             reviewer_id=saved_review.reviewer_id,
             review=saved_review.review,
             status=saved_review.status,
+            reviewer=PublicUserSchema(
+                email=saved_review.reviewer.email,
+                name=saved_review.reviewer.name,
+                lastname=saved_review.reviewer.lastname
+            )
         )
 
     async def update_review(self, review_id: UUID, review_update: ReviewCreateRequestSchema) -> bool:
@@ -112,6 +119,11 @@ class ReviewsRepository(Repository):
                 reviewer_id=row.reviewer_id,
                 status=row.status,
                 review=row.review,
-                shared=row.shared
+                shared=row.shared,
+                reviewer=PublicUserSchema(
+                    email=row.reviewer.email,
+                    name=row.reviewer.name,
+                    lastname=row.reviewer.lastname
+                ),
             ) for row in res
         ]

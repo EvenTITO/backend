@@ -6,10 +6,21 @@ from app.schemas.users.user_role import UserRoleSchema
 from app.schemas.users.utils import UID
 
 
-class UserModifySchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+class UserFullNameSchema(BaseModel):
     name: str = Field(min_length=2, max_length=100, examples=["Pepe"])
     lastname: str = Field(min_length=2, max_length=100, examples=["Argento"])
+
+
+class UserEmailSchema(BaseModel):
+    email: EmailStr = Field(examples=["pepe.argento@email.com"])
+
+
+class PublicUserSchema(UserFullNameSchema, UserEmailSchema):
+    pass
+
+
+class UserModifySchema(UserFullNameSchema):
+    model_config = ConfigDict(from_attributes=True)
     identification_number: str | None = Field(min_length=2, max_length=20, examples=["12345678"], default=None)
     phone: str | None = Field(min_length=8, max_length=13, examples=["5491165501111"], default=None)
     address: str | None = Field(min_length=2, max_length=100, examples=["Paseo Colon 850"], default=None)
@@ -25,8 +36,8 @@ class UserModifySchema(BaseModel):
         return self
 
 
-class UserSchema(UserModifySchema):
-    email: EmailStr = Field(examples=["pepe.argento@email.com"])
+class UserSchema(UserModifySchema, UserEmailSchema):
+    pass
 
 
 class UserReply(UserSchema, UserRoleSchema):

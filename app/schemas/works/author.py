@@ -13,3 +13,5 @@ class AuthorInformation(BaseModel):
     )
     is_speaker: bool = Field(description='If set to true, the author is speaker',
                              default=False)
+    is_main: bool = Field(description='If set to true, the author is who submitted the work',
+                          default=False)
