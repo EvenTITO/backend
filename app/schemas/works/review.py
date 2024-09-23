@@ -35,6 +35,8 @@ class ReviewResponseSchema(ReviewCreateRequestSchema):
     submission_id: UUID = Field(examples=["submission_id_01"])
     reviewer_id: UID = Field(examples=["user_id_01"])
     reviewer: PublicUserSchema
+    creation_date: datetime
+    last_update: datetime
 
 
 class ReviewDownloadSchema(ReviewResponseSchema):

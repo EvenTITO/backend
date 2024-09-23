@@ -48,7 +48,6 @@ class ReviewsRepository(Repository):
             submission_id=submission_id
         )
         saved_review = (await self._create(new_review))
-        print(f"El saved review es {saved_review.__dict__}")
         return ReviewResponseSchema(
             id=saved_review.id,
             event_id=saved_review.event_id,
@@ -57,6 +56,8 @@ class ReviewsRepository(Repository):
             reviewer_id=saved_review.reviewer_id,
             review=saved_review.review,
             status=saved_review.status,
+            creation_date=saved_review.creation_date,
+            last_update=saved_review.last_update,
             reviewer=PublicUserSchema(
                 email=saved_review.reviewer.email,
                 name=saved_review.reviewer.name,
@@ -120,6 +121,8 @@ class ReviewsRepository(Repository):
                 status=row.status,
                 review=row.review,
                 shared=row.shared,
+                creation_date=row.creation_date,
+                last_update=row.last_update,
                 reviewer=PublicUserSchema(
                     email=row.reviewer.email,
                     name=row.reviewer.name,
