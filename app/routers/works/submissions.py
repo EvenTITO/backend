@@ -5,6 +5,7 @@ from fastapi import Depends
 
 from app.authorization.admin_user_dep import IsAdminUsrDep
 from app.authorization.author_dep import IsAuthorDep, verify_is_author
+from app.authorization.chair_dep import IsWorkChairDep
 from app.authorization.organizer_dep import IsOrganizerDep
 from app.authorization.reviewer_dep import IsWorkReviewerDep
 from app.authorization.util_dep import or_
@@ -58,7 +59,7 @@ async def get_download_submission_file(
     path="",
     status_code=200,
     response_model=list[SubmissionResponseSchema],
-    dependencies=[or_(IsOrganizerDep, IsAdminUsrDep, IsAuthorDep, IsWorkReviewerDep)]
+    dependencies=[or_(IsOrganizerDep, IsAuthorDep, IsWorkChairDep, IsWorkReviewerDep)]
 )
 async def get_all_submissions(
         submission_service: SubmissionsServiceDep,

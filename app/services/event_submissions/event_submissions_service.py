@@ -69,7 +69,9 @@ class SubmissionsService(BaseService):
             event_id=submission.event_id,
             work_id=submission.work_id,
             state=submission.state,
-            download_url=download_url
+            download_url=download_url,
+            creation_date=submission.creation_date,
+            last_update=submission.last_update
         )
 
     @staticmethod
@@ -78,5 +80,7 @@ class SubmissionsService(BaseService):
             id=model.id,
             work_id=model.work_id,
             event_id=model.event_id,
-            state=model.state
+            state=model.state,
+            creation_date=model.creation_date,
+            last_update=model.last_update
         )

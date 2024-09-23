@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Query
 
 from app.authorization.admin_user_dep import IsAdminUsrDep
 from app.authorization.author_dep import IsAuthorDep, verify_is_author
-from app.authorization.chair_dep import IsTrackChairDep
+from app.authorization.chair_dep import IsTrackChairDep, IsWorkChairDep
 from app.authorization.organizer_dep import IsOrganizerDep, verify_is_organizer
 from app.authorization.reviewer_dep import IsWorkReviewerDep
 from app.authorization.user_id_dep import verify_user_exists
@@ -50,7 +50,7 @@ async def read_my_works(
     path="/{work_id}",
     status_code=200,
     response_model=WorkWithState,
-    dependencies=[or_(IsOrganizerDep, IsAuthorDep, IsWorkReviewerDep)]
+    dependencies=[or_(IsOrganizerDep, IsAuthorDep, IsWorkChairDep, IsWorkReviewerDep)]
 )
 async def get_work(work_id: UUID, work_service: WorksServiceDep) -> WorkWithState:
     return await work_service.get_work(work_id)
