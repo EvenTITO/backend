@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import desc, update, select
+from sqlalchemy import desc, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.submission import SubmissionModel
@@ -12,10 +12,15 @@ class SubmissionsRepository(Repository):
     def __init__(self, session: AsyncSession):
         super().__init__(session, SubmissionModel)
 
-    async def get_all_submissions_for_event(self, event_id: UUID, offset: int, limit: int) -> list[SubmissionModel]:
-        query = select(SubmissionModel).where(SubmissionModel.event_id is event_id).offset(offset).limit(limit)
-        result = await self.session.execute(query)
-        return result.scalars().all()
+    async def get_all_submissions_for_event(
+            self,
+            event_id: UUID,
+            work_id: UUID,
+            offset: int,
+            limit: int
+    ) -> list[SubmissionModel]:
+        conditions = [self.model.event_id == event_id, self.model.work_id == work_id]
+        return await self._get_many_with_conditions(conditions, offset, limit)
 
     async def get_last_submission(self, event_id, work_id) -> SubmissionModel:
         return await self._get_with_conditions(

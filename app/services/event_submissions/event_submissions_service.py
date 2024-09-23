@@ -29,7 +29,12 @@ class SubmissionsService(BaseService):
         self.work_id = work_id
 
     async def get_all_event_submissions(self, offset: int, limit: int) -> list[SubmissionResponseSchema]:
-        submissions = await self.submission_repository.get_all_submissions_for_event(self.event_id, offset, limit)
+        submissions = await self.submission_repository.get_all_submissions_for_event(
+            self.event_id,
+            self.work_id,
+            offset,
+            limit
+        )
         return list(map(SubmissionsService.__map_to_schema, submissions))
 
     async def do_submit(self) -> SubmissionUploadSchema:
