@@ -6,7 +6,8 @@ from app.exceptions.users_exceptions import UserNotFound
 from app.exceptions.works.works_exceptions import WorkNotFound
 from app.repository.reviewers_repository import ReviewerRepository
 from app.repository.users_repository import UsersRepository
-from app.schemas.members.reviewer_schema import ReviewerResponseSchema, ReviewerAssignmentSchema
+from app.schemas.members.reviewer_schema import ReviewerResponseSchema, ReviewerAssignmentSchema, \
+    ReviewerWithWorksDeadlineResponseSchema
 from app.schemas.members.reviewer_schema import ReviewerWithWorksResponseSchema, ReviewerCreateRequestSchema
 from app.schemas.users.utils import UID
 from app.services.events.events_service import EventsService
@@ -38,7 +39,7 @@ class EventReviewerService(BaseService):
     async def is_reviewer_of_work_in_event(self, user_id: UID, work_id: UUID) -> bool:
         return await self.reviewer_repository.is_reviewer_of_work_in_event(self.event_id, user_id, work_id)
 
-    async def get_reviewers(self, work_id: UUID | None) -> list[ReviewerWithWorksResponseSchema]:
+    async def get_reviewers(self, work_id: UUID | None) -> list[ReviewerWithWorksDeadlineResponseSchema]:
         return await self.reviewer_repository.get_all_reviewers(self.event_id, work_id)
 
     async def get_reviewer_by_user_id(self, user_id: UID) -> ReviewerWithWorksResponseSchema:
