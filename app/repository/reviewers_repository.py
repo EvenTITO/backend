@@ -37,7 +37,6 @@ class ReviewerRepository(MemberRepository):
             -> list[ReviewerWithWorksDeadlineResponseSchema]:
 
         filters = [ReviewerModel.event_id == event_id]
-
         if work_id is not None:
             filters.append(ReviewerModel.work_id == work_id)
         query = (
@@ -61,10 +60,10 @@ class ReviewerRepository(MemberRepository):
         res = result.fetchall()
         return [
             ReviewerWithWorksDeadlineResponseSchema(
-                event_id=row[0],
-                user_id=row[1],
-                user=row[2],
-                works=row[3]
+                event_id=row.event_id,
+                user_id=row.user_id,
+                user=row.UserModel,
+                works=row.works
             ) for row in res]
 
     async def get_reviewer_by_user_id(self, event_id: UUID, user_id: UID) -> ReviewerWithWorksResponseSchema:

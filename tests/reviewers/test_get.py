@@ -69,7 +69,6 @@ async def test_get_reviewers_ok(
     assert get_response.status_code == 200
 
     reviewers_list = get_response.json()
-    print(reviewers_list)
     assert len(reviewers_list) == 2
 
     assert work_id in reviewers_list[0]["works"][0]["work_id"]
