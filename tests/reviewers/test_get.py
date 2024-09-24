@@ -70,6 +70,7 @@ async def test_get_reviewers_ok(
     assert get_response.status_code == 200
 
     reviewers_list = get_response.json()
+    print(reviewers_list)
     assert len(reviewers_list) == 2
     assert work_id in reviewers_list[0]["work_ids"]
     assert work_id in reviewers_list[1]["work_ids"]
@@ -79,6 +80,9 @@ async def test_get_reviewers_ok(
     assert reviewers_list[1]["user_id"] == create_event_creator['id']
     assert reviewers_list[0]["user"]["email"] == create_user["email"]
     assert reviewers_list[1]["user"]["email"] == create_event_creator["email"]
+
+    assert reviewers_list[0]["review_deadline"] == new_reviewer_2.review_deadline.strftime('%Y-%m-%dT%H:%M:%S')
+    assert reviewers_list[1]["review_deadline"] == new_reviewer_2.review_deadline.strftime('%Y-%m-%dT%H:%M:%S')
 
 
 async def test_get_reviewers_without_permissions(

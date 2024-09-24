@@ -9,7 +9,7 @@ from app.authorization.organizer_dep import IsOrganizerDep
 from app.authorization.reviewer_dep import IsReviewerDep
 from app.authorization.util_dep import or_
 from app.schemas.members.reviewer_schema import ReviewerWithWorksResponseSchema, ReviewerCreateRequestSchema, \
-    ReviewerAssignmentSchema
+    ReviewerAssignmentSchema, ReviewerWithWorksDeadlineResponseSchema
 from app.schemas.users.utils import UID
 from app.services.event_reviewers.event_reviewers_service_dep import EventReviewerServiceDep
 
@@ -33,7 +33,7 @@ async def add_reviewers(
 
 @event_reviewers_router.get(
     path="",
-    response_model=List[ReviewerWithWorksResponseSchema],
+    response_model=List[ReviewerWithWorksDeadlineResponseSchema],
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
 async def read_event_reviewers(

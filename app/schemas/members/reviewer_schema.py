@@ -15,6 +15,10 @@ class ReviewerWithWorksResponseSchema(MemberResponseSchema):
     )
 
 
+class ReviewerWithWorksDeadlineResponseSchema(ReviewerWithWorksResponseSchema):
+    review_deadline: datetime = Field(examples=[datetime.now()])
+
+
 class ReviewerAssignmentSchema(BaseModel):
     review_deadline: datetime = Field(examples=[datetime.now()])
     work_id: UUID = Field(examples=["work_id_01"])
