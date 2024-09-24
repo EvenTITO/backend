@@ -35,43 +35,37 @@ class ReviewerRepository(MemberRepository):
 
     async def get_all_reviewers(self, event_id: UUID, work_id: UUID | None)\
             -> list[ReviewerWithWorksDeadlineResponseSchema]:
-        group_by_subquery = (
-            select(
-                ReviewerModel.event_id,
-                ReviewerModel.user_id,
-                ReviewerModel.review_deadline,
-                func.array_agg(ReviewerModel.work_id).label('work_ids'),
-            )
-            .where(ReviewerModel.event_id == event_id)
-            .group_by(ReviewerModel.event_id, ReviewerModel.user_id, ReviewerModel.review_deadline)
-        )
+
+        filters = [ReviewerModel.event_id == event_id]
 
         if work_id is not None:
-            group_by_subquery = group_by_subquery.where(ReviewerModel.work_id == work_id)
-
-        group_by_subquery = group_by_subquery.subquery()
-
+            filters.append(ReviewerModel.work_id == work_id)
         query = (
             select(
-                group_by_subquery.c.event_id.label('event_id'),
-                group_by_subquery.c.user_id.label('user_id'),
-                group_by_subquery.c.work_ids.label('work_ids'),
-                group_by_subquery.c.review_deadline.label('review_deadline'),
-                UserModel
+                ReviewerModel.event_id.label("event_id"),
+                ReviewerModel.user_id.label("user_id"),
+                UserModel,
+                func.json_agg(
+                    func.json_build_object(
+                        'work_id', ReviewerModel.work_id,
+                        'review_deadline', ReviewerModel.review_deadline
+                    )
+                ).label('works')
             )
-            .join(UserModel, group_by_subquery.c.user_id == UserModel.id)
+            .join(UserModel, ReviewerModel.user_id == UserModel.id)
+            .filter(and_(*filters))
+            .group_by(UserModel.id, ReviewerModel.user_id, ReviewerModel.event_id)
         )
+
         result = await self.session.execute(query)
         res = result.fetchall()
         return [
             ReviewerWithWorksDeadlineResponseSchema(
-                event_id=row.event_id,
-                work_ids=row.work_ids,
-                user_id=row.user_id,
-                review_deadline=row.review_deadline,
-                user=row.UserModel)
-            for row in res
-        ]
+                event_id=row[0],
+                user_id=row[1],
+                user=row[2],
+                works=row[3]
+            ) for row in res]
 
     async def get_reviewer_by_user_id(self, event_id: UUID, user_id: UID) -> ReviewerWithWorksResponseSchema:
         group_by_subquery = (

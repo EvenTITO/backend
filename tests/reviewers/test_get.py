@@ -1,5 +1,4 @@
 import datetime
-
 from fastapi.encoders import jsonable_encoder
 
 from app.schemas.members.reviewer_schema import ReviewerRequestSchema, ReviewerCreateRequestSchema
@@ -72,8 +71,9 @@ async def test_get_reviewers_ok(
     reviewers_list = get_response.json()
     print(reviewers_list)
     assert len(reviewers_list) == 2
-    assert work_id in reviewers_list[0]["work_ids"]
-    assert work_id in reviewers_list[1]["work_ids"]
+
+    assert work_id in reviewers_list[0]["works"][0]["work_id"]
+    assert work_id in reviewers_list[1]["works"][0]["work_id"]
     assert reviewers_list[0]["event_id"] == create_event_from_event_creator
     assert reviewers_list[1]["event_id"] == create_event_from_event_creator
     assert reviewers_list[0]["user_id"] == create_user['id']
@@ -81,8 +81,10 @@ async def test_get_reviewers_ok(
     assert reviewers_list[0]["user"]["email"] == create_user["email"]
     assert reviewers_list[1]["user"]["email"] == create_event_creator["email"]
 
-    assert reviewers_list[0]["review_deadline"] == new_reviewer_2.review_deadline.strftime('%Y-%m-%dT%H:%M:%S')
-    assert reviewers_list[1]["review_deadline"] == new_reviewer_2.review_deadline.strftime('%Y-%m-%dT%H:%M:%S')
+    assert reviewers_list[0]["works"][0]["review_deadline"]\
+        == new_reviewer_2.review_deadline.strftime('%Y-%m-%dT%H:%M:%S')
+    assert reviewers_list[1]["works"][0]["review_deadline"]\
+        == new_reviewer_2.review_deadline.strftime('%Y-%m-%dT%H:%M:%S')
 
 
 async def test_get_reviewers_without_permissions(
@@ -162,11 +164,13 @@ async def test_get_reviewers_by_work_id_ok(
 
     reviewers_list = get_response.json()
     assert len(reviewers_list) == 1
-    assert work_id_1 not in reviewers_list[0]["work_ids"]
-    assert work_id_2 in reviewers_list[0]["work_ids"]
+    assert work_id_1 not in reviewers_list[0]["works"][0]["work_id"]
+    assert work_id_2 in reviewers_list[0]["works"][0]["work_id"]
     assert reviewers_list[0]["event_id"] == create_event_from_event_creator
     assert reviewers_list[0]["user_id"] == create_user['id']
     assert reviewers_list[0]["user"]["email"] == create_user["email"]
+    assert reviewers_list[0]["user"]["name"] == create_user["name"]
+    assert reviewers_list[0]["user"]["lastname"] == create_user["lastname"]
 
 
 async def test_get_reviewers_by_work_id_invalid_return_empty_list(

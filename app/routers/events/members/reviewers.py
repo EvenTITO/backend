@@ -39,7 +39,7 @@ async def add_reviewers(
 async def read_event_reviewers(
         reviewer_service: EventReviewerServiceDep,
         work_id: UUID = Query(default=None),
-) -> List[ReviewerWithWorksResponseSchema]:
+) -> List[ReviewerWithWorksDeadlineResponseSchema]:
     return await reviewer_service.get_reviewers(work_id)
 
 
