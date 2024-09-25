@@ -5,6 +5,7 @@ from pydantic import Field, BaseModel, PrivateAttr
 
 from app.schemas.members.member_schema import MemberResponseSchema
 from app.schemas.users.utils import UID
+from app.schemas.works.work import WorkWithState
 
 
 class ReviewerWithWorksResponseSchema(MemberResponseSchema):
@@ -18,6 +19,10 @@ class ReviewerWithWorksResponseSchema(MemberResponseSchema):
 class ReviewerAssignmentSchema(BaseModel):
     review_deadline: datetime = Field(examples=[datetime.now()])
     work_id: UUID = Field(examples=["work_id_01"])
+
+
+class ReviewerAssignmentWithWorkSchema(ReviewerAssignmentSchema):
+    work: WorkWithState
 
 
 class ReviewerResponseSchema(MemberResponseSchema, ReviewerAssignmentSchema):

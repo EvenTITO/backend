@@ -10,6 +10,7 @@ from sqlalchemy import (
     ARRAY,
     JSON,
 )
+from sqlalchemy.orm import relationship
 
 from app.database.models.base import Base
 from app.database.models.utils import ModelTemplate, UIDType
@@ -40,3 +41,5 @@ class WorkModel(ModelTemplate, Base):
     __table_args__ = (
         UniqueConstraint('event_id', 'title', name='event_id_title_uc'),
     )
+
+    reviewers = relationship("ReviewerModel", back_populates='work', lazy=True)

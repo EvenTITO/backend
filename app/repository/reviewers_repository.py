@@ -2,13 +2,15 @@ from uuid import UUID
 
 from sqlalchemy import select, func, and_, exists
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from app.database.models.reviewer import ReviewerModel
 from app.database.models.user import UserModel
 from app.repository.members_repository import MemberRepository
 from app.schemas.members.reviewer_schema import ReviewerWithWorksResponseSchema, ReviewerResponseSchema, \
-    ReviewerAssignmentSchema, ReviewerWithWorksDeadlineResponseSchema
+    ReviewerWithWorksDeadlineResponseSchema, ReviewerAssignmentWithWorkSchema
 from app.schemas.users.utils import UID
+from app.schemas.works.work import WorkWithState
 
 
 class ReviewerRepository(MemberRepository):
@@ -33,7 +35,7 @@ class ReviewerRepository(MemberRepository):
         result = await self.session.execute(query)
         return result.scalar()
 
-    async def get_all_reviewers(self, event_id: UUID, work_id: UUID | None)\
+    async def get_all_reviewers(self, event_id: UUID, work_id: UUID | None) \
             -> list[ReviewerWithWorksDeadlineResponseSchema]:
 
         filters = [ReviewerModel.event_id == event_id]
@@ -124,9 +126,17 @@ class ReviewerRepository(MemberRepository):
         await self.session.commit()
 
     async def get_assignments(self, event_id: UUID, user_id: UID):
-        query = (select(ReviewerModel.work_id, ReviewerModel.review_deadline)
-                 .where(and_(ReviewerModel.event_id == event_id, ReviewerModel.user_id == user_id)))
+        query = select(ReviewerModel).options(joinedload(ReviewerModel.work)).where(
+            and_(
+                ReviewerModel.event_id == event_id,
+                ReviewerModel.user_id == user_id
+            )
+        )
 
         result = await self.session.execute(query)
-        res = result.fetchall()
-        return [ReviewerAssignmentSchema(work_id=row.work_id, review_deadline=row.review_deadline) for row in res]
+        res = result.scalars().all()
+        return [ReviewerAssignmentWithWorkSchema(
+            work_id=row.work_id,
+            review_deadline=row.review_deadline,
+            work=WorkWithState(**row.work.__dict__)
+        ) for row in res]

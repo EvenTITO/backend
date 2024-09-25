@@ -9,7 +9,7 @@ from app.authorization.organizer_dep import IsOrganizerDep
 from app.authorization.reviewer_dep import IsReviewerDep
 from app.authorization.util_dep import or_
 from app.schemas.members.reviewer_schema import ReviewerWithWorksResponseSchema, ReviewerCreateRequestSchema, \
-    ReviewerAssignmentSchema, ReviewerWithWorksDeadlineResponseSchema
+    ReviewerWithWorksDeadlineResponseSchema, ReviewerAssignmentWithWorkSchema
 from app.schemas.users.utils import UID
 from app.services.event_reviewers.event_reviewers_service_dep import EventReviewerServiceDep
 
@@ -45,13 +45,13 @@ async def read_event_reviewers(
 
 @event_reviewers_router.get(
     path="/my-assignments",
-    response_model=list[ReviewerAssignmentSchema],
+    response_model=list[ReviewerAssignmentWithWorkSchema],
     dependencies=[or_(IsOrganizerDep, IsReviewerDep, IsAdminUsrDep)]
 )
 async def get_my_assignments(
         user_id: CallerIdDep,
         reviewer_service: EventReviewerServiceDep,
-) -> list[ReviewerAssignmentSchema]:
+) -> list[ReviewerAssignmentWithWorkSchema]:
     return await reviewer_service.get_my_assignments(user_id)
 
 

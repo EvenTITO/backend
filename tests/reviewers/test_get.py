@@ -553,8 +553,14 @@ async def test_get_my_assignments_ok(
 
     assignments_list = get_response.json()
     assert len(assignments_list) == 1
-    assert work_id_1 == assignments_list[0]["work_id"]
-    assert new_reviewer_4.review_deadline.isoformat() == assignments_list[0]["review_deadline"]
+    assignment = assignments_list[0]
+    assert work_id_1 == assignment["work_id"]
+    assert new_reviewer_4.review_deadline.isoformat() == assignment["review_deadline"]
+    work = assignment["work"]
+    assert work["title"] == USER_WORK.title
+    assert work["track"] == USER_WORK.track
+    assert work["abstract"] == USER_WORK.abstract
+    assert len(work["authors"]) == 1
 
 
 async def test_get_my_assignments_without_permissions(
