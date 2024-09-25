@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field, ConfigDict, model_validator
 
 from app.database.models.work import WorkStates
 from app.schemas.events.review_skeleton.multiples_choice_question import MultipleChoiceAnswer
+from app.schemas.events.review_skeleton.rating_question import RatingAnswer
 from app.schemas.events.review_skeleton.simple_question import SimpleAnswer
 from app.schemas.storage.schemas import DownloadURLSchema, UploadURLSchema
 from app.schemas.users.user import PublicUserSchema
@@ -19,7 +20,7 @@ class ReviewDecision(str, Enum):
 
 
 class ReviewAnswer(BaseModel):
-    answers: list[Union[MultipleChoiceAnswer, SimpleAnswer]] = Field(default_factory=list)
+    answers: list[Union[MultipleChoiceAnswer, SimpleAnswer, RatingAnswer]] = Field(default_factory=list)
 
 
 class ReviewCreateRequestSchema(BaseModel):

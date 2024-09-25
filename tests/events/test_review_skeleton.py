@@ -1,3 +1,4 @@
+from app.schemas.events.review_skeleton.rating_question import RatingQuestion
 from app.schemas.events.review_skeleton.review_skeleton import ReviewSkeletonQuestions, ReviewSkeletonSchema
 from app.schemas.events.review_skeleton.simple_question import SimpleQuestion
 from app.schemas.events.review_skeleton.multiples_choice_question import (
@@ -21,6 +22,11 @@ async def test_put_review_skeleton(client, admin_data, create_event):
                     question='This is the question',
                     options=['first answer', 'second answer', 'third answer'],
                     more_than_one_answer_allowed=False
+                ),
+                RatingQuestion(
+                    type_question='rating',
+                    question='Max Points',
+                    max_value=10
                 )
             ]
         )
