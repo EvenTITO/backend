@@ -32,6 +32,15 @@ class ReviewsRepository(Repository):
             limit
         )
 
+    async def exists_review(self, event_id: UUID, work_id: UUID, reviewer_id: UID, submission_id: UUID) -> bool:
+        conditions = [
+            ReviewModel.event_id == event_id,
+            ReviewModel.work_id == work_id,
+            ReviewModel.submission_id == submission_id,
+            ReviewModel.reviewer_id == reviewer_id
+        ]
+        return await self._exists_with_conditions(conditions)
+
     async def create_review(
             self,
             event_id: UUID,

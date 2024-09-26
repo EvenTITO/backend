@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from app.exceptions.reviews_exceptions import IsNotWorkRevisionPeriod, CannotPublishReviews
+from app.exceptions.reviews_exceptions import IsNotWorkRevisionPeriod, CannotPublishReviews, AlreadyReviewExist
 from app.repository.reviews_repository import ReviewsRepository
 from app.schemas.users.utils import UID
 from app.schemas.works.review import ReviewUploadSchema, ReviewCreateRequestSchema, ReviewResponseSchema, \
@@ -43,6 +43,8 @@ class EventReviewsService(BaseService):
             raise IsNotWorkRevisionPeriod(self.event_id, self.work_id)
 
         last_submission = await self.submission_service.get_latest_submission()
+        if await self.reviews_repository.exists_review(self.event_id, self.work_id, self.caller_id, last_submission.id):
+            raise AlreadyReviewExist(self.event_id, self.work_id, last_submission.id)
 
         saved_review = await self.reviews_repository.create_review(
             self.event_id,
