@@ -7,7 +7,7 @@ from app.exceptions.works.works_exceptions import WorkNotFound
 from app.repository.reviewers_repository import ReviewerRepository
 from app.repository.users_repository import UsersRepository
 from app.schemas.members.reviewer_schema import ReviewerResponseSchema, ReviewerWithWorksDeadlineResponseSchema, \
-    ReviewerAssignmentWithWorkSchema
+    ReviewerAssignmentWithWorkSchema, ReviewerUpdateRequestSchema
 from app.schemas.members.reviewer_schema import ReviewerWithWorksResponseSchema, ReviewerCreateRequestSchema
 from app.schemas.users.utils import UID
 from app.services.events.events_service import EventsService
@@ -65,6 +65,13 @@ class EventReviewerService(BaseService):
         await self.reviewer_repository.create_reviewers(self.event_id, create_schema.reviewers)
         # Sending notification email
         await self.event_notification_service.notify_new_reviewers(self.event_id, create_schema)
+
+    async def update_reviewer(self, update_schema: ReviewerUpdateRequestSchema) -> None:
+        if not await self.work_service.exist_work(update_schema.work_id):
+            raise WorkNotFound(self.event_id, update_schema.work_id)
+        if not await self.is_reviewer_of_work_in_event(update_schema.user_id, update_schema.work_id):
+            raise UserNotIsReviewer(self.event_id, update_schema.user_id)
+        await self.reviewer_repository.update_reviewer(self.event_id, update_schema)
 
     async def get_my_assignments(self, user_id: UID) -> list[ReviewerAssignmentWithWorkSchema]:
         return await self.reviewer_repository.get_assignments(self.event_id, user_id)
