@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy import select, func, and_, exists
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -8,7 +9,7 @@ from app.database.models.reviewer import ReviewerModel
 from app.database.models.user import UserModel
 from app.repository.members_repository import MemberRepository
 from app.schemas.members.reviewer_schema import ReviewerWithWorksResponseSchema, ReviewerResponseSchema, \
-    ReviewerWithWorksDeadlineResponseSchema, ReviewerAssignmentWithWorkSchema
+    ReviewerWithWorksDeadlineResponseSchema, ReviewerAssignmentWithWorkSchema, ReviewerUpdateRequestSchema
 from app.schemas.users.utils import UID
 from app.schemas.works.work import WorkWithState
 
@@ -123,6 +124,16 @@ class ReviewerRepository(MemberRepository):
                 review_deadline=new_reviewer.review_deadline,
             )
             self.session.add(new_reviewer_model)
+        await self.session.commit()
+
+    async def update_reviewer(self, event_id: UUID, update_schema: ReviewerUpdateRequestSchema) -> None:
+        conditions = [
+            ReviewerModel.event_id == event_id,
+            ReviewerModel.user_id == update_schema.user_id,
+            ReviewerModel.work_id == update_schema.work_id
+        ]
+        query = update(self.model).where(and_(*conditions)).values(review_deadline=update_schema.review_deadline)
+        await self.session.execute(query)
         await self.session.commit()
 
     async def get_assignments(self, event_id: UUID, user_id: UID):

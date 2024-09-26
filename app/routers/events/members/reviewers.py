@@ -5,11 +5,12 @@ from fastapi import APIRouter, Query
 
 from app.authorization.admin_user_dep import IsAdminUsrDep
 from app.authorization.caller_id_dep import CallerIdDep
+from app.authorization.chair_dep import IsChairDep
 from app.authorization.organizer_dep import IsOrganizerDep
 from app.authorization.reviewer_dep import IsReviewerDep
 from app.authorization.util_dep import or_
 from app.schemas.members.reviewer_schema import ReviewerWithWorksResponseSchema, ReviewerCreateRequestSchema, \
-    ReviewerWithWorksDeadlineResponseSchema, ReviewerAssignmentWithWorkSchema
+    ReviewerWithWorksDeadlineResponseSchema, ReviewerAssignmentWithWorkSchema, ReviewerUpdateRequestSchema
 from app.schemas.users.utils import UID
 from app.services.event_reviewers.event_reviewers_service_dep import EventReviewerServiceDep
 
@@ -65,3 +66,15 @@ async def read_event_reviewer_by_user(
         reviewer_service: EventReviewerServiceDep,
 ) -> ReviewerWithWorksResponseSchema:
     return await reviewer_service.get_reviewer_by_user_id(user_id)
+
+
+@event_reviewers_router.put(
+    path="",
+    status_code=201,
+    dependencies=[or_(IsOrganizerDep, IsChairDep)]
+)
+async def update_reviewer(
+        updated_reviewer: ReviewerUpdateRequestSchema,
+        reviewer_service: EventReviewerServiceDep
+) -> None:
+    return await reviewer_service.update_reviewer(updated_reviewer)

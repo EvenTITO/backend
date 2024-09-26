@@ -38,5 +38,9 @@ class ReviewerCreateRequestSchema(BaseModel):
     reviewers: list[ReviewerRequestSchema] = Field(max_length=50, default_factory=list)
 
 
+class ReviewerUpdateRequestSchema(ReviewerAssignmentSchema):
+    user_id: UID
+
+
 class ReviewerWithWorksDeadlineResponseSchema(MemberResponseSchema):
     works: list[ReviewerAssignmentSchema] = Field(default_factory=list)
