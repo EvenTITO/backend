@@ -14,7 +14,7 @@ class MultipleChoiceQuestion(BaseModel):
 
 
 class MultipleChoiceAnswer(MultipleChoiceQuestion):
-    answers: list[str] = Field(examples=['first answer', 'second answer'])
+    answers: list[str] = Field(examples=[['first answer', 'second answer']])
 
     @model_validator(mode='after')
     def check_answers(self) -> Self:
