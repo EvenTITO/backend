@@ -5,6 +5,7 @@ from app.database.models.payment import PaymentStatus
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from app.schemas.payments.payment import PaymentRequestSchema
 from ..commontest import create_headers
+from ..works.test_create_work import USER_WORK
 
 
 async def test_get_inscriptions(client, create_inscription, admin_data):
@@ -82,11 +83,17 @@ async def test_get_affiliation(client, create_user, create_event_started, create
     assert inscription['download_url']['download_url'] == 'mocked-url-download'
 
 
-async def test_get_payment_url(client, create_user, create_event_started, create_speaker_inscription):
+async def test_get_payment_url(
+        client,
+        create_user,
+        create_event_started,
+        create_work_from_user,
+        create_speaker_inscription
+):
     inscription_id = create_speaker_inscription['id']
     pay_inscription = PaymentRequestSchema(
         fare_name="tarifa a pagar",
-        works=["work_id"],
+        works=[create_work_from_user],
     )
 
     response = await client.put(
@@ -108,6 +115,9 @@ async def test_get_payment_url(client, create_user, create_event_started, create
     assert payment['event_id'] == create_event_started
     assert payment['inscription_id'] == inscription_id
     assert payment['status'] == PaymentStatus.PENDING_APPROVAL
-    assert payment['works'] == ["work_id"]
+    assert len(payment['works']) == 1
+    assert payment['works'][0]['id'] == create_work_from_user
+    assert payment['works'][0]['track'] == "chemistry"
+    assert payment['works'][0]['title'] == USER_WORK.title
     assert payment['fare_name'] == "tarifa a pagar"
     assert payment['download_url']['download_url'] == 'mocked-url-download'

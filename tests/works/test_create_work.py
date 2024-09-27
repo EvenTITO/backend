@@ -53,7 +53,7 @@ async def test_create_work_without_inscription(client, create_user, create_event
         json=jsonable_encoder(USER_WORK),
         headers=create_headers(create_user["id"])
     )
-    assert response.status_code == 409, "The second response should fail given that the title is repeated"
+    assert response.status_code == 404, "Cannot create work if you dont have speaker inscription"
 
 
 async def test_create_two_works_same_title_same_event_fails(client, create_user, create_event_started):

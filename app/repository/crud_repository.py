@@ -58,6 +58,11 @@ class Repository:
         result = await self.session.execute(query)
         return result.scalars().all()
 
+    async def _get_many_with_values(self, conditions, values, offset: int, limit: int):
+        query = select(values).where(and_(*conditions)).offset(offset).limit(limit)
+        result = await self.session.execute(query)
+        return result.scalars().all()
+
     async def get_many(self, offset: int, limit: int):
         query = select(self.model).offset(offset).limit(limit)
         result = await self.session.execute(query)

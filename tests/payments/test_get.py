@@ -11,6 +11,7 @@ async def test_get_payments(
         create_user,
         create_event_creator,
         create_event_started_from_event_creator,
+        create_many_works
 ):
     new_inscription = InscriptionRequestSchema(
         roles=["SPEAKER"],
@@ -28,12 +29,12 @@ async def test_get_payments(
 
     pay_inscription_1 = PaymentRequestSchema(
         fare_name="tarifa a pagar 1",
-        works=["work_id_01", "work_id_02", "work_id_03"],
+        works=[create_many_works[0]['id']],
     )
 
     pay_inscription_2 = PaymentRequestSchema(
         fare_name="tarifa a pagar 2",
-        works=["work_id_04", "work_id_05", "work_id_06"],
+        works=[create_many_works[1]['id']],
     )
 
     response = await client.put(
@@ -67,14 +68,24 @@ async def test_get_payments(
     assert payments[0]['event_id'] == create_event_started_from_event_creator
     assert payments[0]['inscription_id'] == inscription_id
     assert payments[0]['status'] == PaymentStatus.PENDING_APPROVAL
-    assert payments[0]['works'] == ["work_id_01", "work_id_02", "work_id_03"]
+    assert len(payments[0]['works']) == 1
+    assert payments[0]['works'][0]['id'] == create_many_works[0]['id']
+    assert payments[0]['works'][0]['track'] == "chemistry"
+    assert (payments[0]['works'][0]['title'] ==
+            "Comparación del Rendimiento de Curve25519, P-256 y Curvas de Edwards en Algoritmos de Criptografía "
+            "Cuántica"
+            )
     assert payments[0]['fare_name'] == "tarifa a pagar 1"
 
     assert payments[1]['id'] == payment_id_2
     assert payments[1]['event_id'] == create_event_started_from_event_creator
     assert payments[1]['inscription_id'] == inscription_id
     assert payments[1]['status'] == PaymentStatus.PENDING_APPROVAL
-    assert payments[1]['works'] == ["work_id_04", "work_id_05", "work_id_06"]
+    assert len(payments[1]['works']) == 1
+    assert payments[1]['works'][0]['id'] == create_many_works[1]['id']
+    assert payments[1]['works'][0]['track'] == "math"
+    assert (payments[1]['works'][0]['title'] ==
+            "Aplicaciones de los Toros de Clifford en la Teoría de Códigos Correctores de Errores")
     assert payments[1]['fare_name'] == "tarifa a pagar 2"
 
 
@@ -83,6 +94,7 @@ async def test_patch_payments(
         create_user,
         create_event_creator,
         create_event_started_from_event_creator,
+        create_many_works
 ):
     new_inscription = InscriptionRequestSchema(
         roles=["SPEAKER"],
@@ -100,17 +112,17 @@ async def test_patch_payments(
 
     pay_inscription_1 = PaymentRequestSchema(
         fare_name="tarifa a pagar 1",
-        works=["work_id_01", "work_id_02", "work_id_03"],
+        works=[create_many_works[0]['id'], create_many_works[1]['id']],
     )
 
     pay_inscription_2 = PaymentRequestSchema(
         fare_name="tarifa a pagar 2",
-        works=["work_id_04", "work_id_05", "work_id_06"],
+        works=[create_many_works[0]['id'], create_many_works[1]['id']],
     )
 
     pay_inscription_3 = PaymentRequestSchema(
         fare_name="tarifa a pagar 3",
-        works=["work_id_07", "work_id_08", "work_id_09"],
+        works=[create_many_works[0]['id'], create_many_works[1]['id']],
     )
 
     response = await client.put(

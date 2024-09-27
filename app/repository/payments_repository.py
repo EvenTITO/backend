@@ -3,8 +3,10 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.payment import PaymentModel
+from app.database.models.work import WorkModel
 from app.repository.crud_repository import Repository
-from app.schemas.payments.payment import PaymentRequestSchema, PaymentsResponseSchema, PaymentStatusSchema
+from app.schemas.payments.payment import PaymentRequestSchema, PaymentsResponseSchema, PaymentStatusSchema, \
+    PaymentWorkSchema
 
 
 class PaymentsRepository(Repository):
@@ -21,14 +23,18 @@ class PaymentsRepository(Repository):
             PaymentModel.inscription_id == inscription_id,
             PaymentModel.id == payment_id
         ]
-        res = await self._get_with_conditions(conditions)
+        payment = await self._get_with_conditions(conditions)
+        work_conditions = [WorkModel.id.in_(payment.works)]
+        works = await self._get_many_with_values(work_conditions, WorkModel, 0, 100)
         return PaymentsResponseSchema(
-            id=res.id,
-            event_id=res.event_id,
-            inscription_id=res.inscription_id,
-            status=res.status,
-            works=res.works,
-            fare_name=res.fare_name
+            id=payment.id,
+            event_id=payment.event_id,
+            inscription_id=payment.inscription_id,
+            status=payment.status,
+            works=map(lambda work: PaymentWorkSchema(id=work.id, title=work.title, track=work.track), works or []),
+            fare_name=payment.fare_name,
+            creation_date=payment.creation_date,
+            last_update=payment.last_update
         )
 
     async def get_payments_for_inscription(
@@ -60,13 +66,21 @@ class PaymentsRepository(Repository):
             limit: int
     ) -> list[PaymentsResponseSchema]:
         res = await self._get_many_with_conditions(conditions, offset, limit)
-        return [
-            PaymentsResponseSchema(
-                id=row.id,
-                event_id=row.event_id,
-                inscription_id=row.inscription_id,
-                status=row.status,
-                works=row.works,
-                fare_name=row.fare_name
-            ) for row in res
-        ]
+        payments = []
+        for row in res:
+            work_conditions = [WorkModel.id.in_(row.works)]
+            works = await self._get_many_with_values(work_conditions, WorkModel, 0, 100)
+            payments.append(
+                PaymentsResponseSchema(
+                    id=row.id,
+                    event_id=row.event_id,
+                    inscription_id=row.inscription_id,
+                    status=row.status,
+                    works=map(lambda work: PaymentWorkSchema(id=work.id, title=work.title, track=work.track),
+                              works or []),
+                    fare_name=row.fare_name,
+                    creation_date=row.creation_date,
+                    last_update=row.last_update
+                )
+            )
+        return payments

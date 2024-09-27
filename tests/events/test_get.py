@@ -192,9 +192,7 @@ async def test_get_event_with_chair_role(
     assert len(response.json()["roles"]) == 1
 
 
-async def test_get_event_with_attendee_role(
-    client, create_inscription
-):
+async def test_get_event_with_attendee_role(client, create_inscription):
     response = await client.get(
         f"/events/{create_inscription['event_id']}/public",
         headers=create_headers(create_inscription['user_id'])

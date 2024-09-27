@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 
 from pydantic import ConfigDict, Field, BaseModel
@@ -10,21 +11,32 @@ class PaymentIdSchema(BaseModel):
     id: UUID
 
 
+class PaymentDatesResponseSchema(BaseModel):
+    creation_date: datetime
+    last_update: datetime
+
+
 class PaymentRequestSchema(BaseModel):
     fare_name: str = Field(examples=["tarifa de speaker"])
-    works: list[str] | None
+    works: list[UUID] | None
 
 
 class PaymentStatusSchema(BaseModel):
     status: PaymentStatus = Field(examples=[PaymentStatus.APPROVED])
 
 
-class PaymentsResponseSchema(PaymentIdSchema):
+class PaymentWorkSchema(BaseModel):
+    id: UUID
+    title: str = Field(examples=["Titulo"])
+    track: str = Field(examples=["Track"])
+
+
+class PaymentsResponseSchema(PaymentIdSchema, PaymentDatesResponseSchema):
     event_id: UUID
     inscription_id: UUID
     status: PaymentStatus
     fare_name: str = Field(examples=["tarifa de speaker"])
-    works: list[str] | None
+    works: list[PaymentWorkSchema] | None
 
 
 class PaymentDownloadSchema(PaymentsResponseSchema):

@@ -48,17 +48,15 @@ async def read_event_inscriptions(
 
 
 @inscriptions_events_router.get(
-    path="/my-inscriptions",
+    path="/my-inscription",
     status_code=200,
-    response_model=List[InscriptionResponseSchema],
+    response_model=InscriptionResponseSchema,
     dependencies=[Depends(verify_user_exists)]
 )
 async def read_my_inscriptions(
-        inscriptions_service: EventInscriptionsServiceDep,
-        offset: int = 0,
-        limit: int = Query(default=100, le=100)
-) -> list[InscriptionResponseSchema]:
-    return await inscriptions_service.get_my_event_inscriptions(offset, limit)
+        inscriptions_service: EventInscriptionsServiceDep
+) -> InscriptionResponseSchema:
+    return await inscriptions_service.get_my_event_inscription()
 
 
 @inscriptions_events_router.get(
