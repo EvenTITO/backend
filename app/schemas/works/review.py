@@ -17,6 +17,7 @@ from app.schemas.users.utils import UID
 class ReviewDecision(str, Enum):
     APPROVED = "APPROVED"
     NOT_APPROVED = "NOT_APPROVED"
+    RE_SUBMIT = "RE_SUBMIT"
 
 
 class ReviewAnswer(BaseModel):
