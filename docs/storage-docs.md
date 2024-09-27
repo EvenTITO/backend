@@ -39,3 +39,42 @@ Este script imprimirá tu json como un string. Este string es el que usamos en e
 ```
 
 4. Recuerda agregar en el .env los nombres de los buckets correspondientes. En el script `storage.py` veras los nombres de los buckets elegidos.
+
+
+## Buckets cors policy
+
+Para configurar la politica CORS a cada bucket seguiremos los siguientes pasos desde la consola de gcp:
+
+1) Crear un archivo de configuracion de cors en formato json:
+   ```touch cors_config.json```
+
+2) Editar dicho archivo con la configuración deseada:
+   ```edit cors_config.json```
+
+3) Verificar la configuración
+   ```cat cors_config.json```
+
+```
+[
+    {
+        "origin": ["http://localhost:5173"],
+        "method": ["PUT"],
+        "responseHeader": ["*"],
+        "maxAgeSeconds": 3600
+    }
+]
+```
+4) Actualizar cada uno de los buckets con la configuracion de cors
+
+   ```gcloud storage buckets update gs://eventito-payments_and_certificates --cors-file=cors_config.json```
+
+   ```gcloud storage buckets update gs://eventito-profile_images --cors-file=cors_config.json```
+   
+   ```gcloud storage buckets update gs://eventito-static_event_content --cors-file=cors_config.json```
+   
+   ```gcloud storage buckets update gs://eventito-submissions_and_reviews --cors-file=cors_config.json```
+
+
+5) Por último verificar que los buckets tenga aplicada la nueva configuracion de CORS
+   
+   ```gcloud storage buckets describe gs://eventito-payments_and_certificates```
