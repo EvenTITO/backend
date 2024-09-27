@@ -58,9 +58,8 @@ class WorksService(BaseService):
         if work.track not in event_tracks:
             raise TrackNotExistInEvent(self.event_id, work.track)
 
-        my_inscriptions = await self.inscription_service.get_my_event_inscriptions(0, 100)
-        has_inscription = True in (InscriptionRole.SPEAKER in inscription.roles for inscription in my_inscriptions)
-        if not has_inscription:
+        my_inscription = await self.inscription_service.get_my_event_inscription()
+        if InscriptionRole.SPEAKER not in my_inscription.roles:
             raise CannotCreateWorkIfNotSpeakerInscription(self.event_id)
 
         work = await self.works_repository.create_work(

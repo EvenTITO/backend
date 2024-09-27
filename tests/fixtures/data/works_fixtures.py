@@ -8,6 +8,7 @@ from ...commontest import create_headers, WORKS
 
 @pytest.fixture(scope="function")
 async def create_many_works(client, create_user, create_event_started, create_speaker_inscription):
+    created_works = []
     for work in WORKS:
         response = await client.post(
             f"/events/{create_event_started}/works",
@@ -15,8 +16,10 @@ async def create_many_works(client, create_user, create_event_started, create_sp
             headers=create_headers(create_user["id"])
         )
         work_id = response.json()
-        work['id'] = work_id
-    return WORKS
+        res = work.model_dump()
+        res['id'] = work_id
+        created_works.append(res)
+    return created_works
 
 
 @pytest.fixture(scope="function")

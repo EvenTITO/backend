@@ -24,6 +24,30 @@ async def test_post_inscription(client, create_user, create_event_started):
     assert response.json()['roles'][0] == "ATTENDEE"
 
 
+async def test_post_inscription_duplicated(client, create_user, create_event_started):
+    new_inscription = InscriptionRequestSchema(
+        roles=["ATTENDEE"],
+        affiliation="Fiuba",
+    )
+
+    response = await client.post(
+        f"/events/{create_event_started}/inscriptions",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201
+    assert response.json()['user_id'] == create_user['id']
+    assert response.json()['roles'][0] == "ATTENDEE"
+
+    response = await client.post(
+        f"/events/{create_event_started}/inscriptions",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(new_inscription)
+    )
+
+    assert response.status_code == 409
+
+
 async def test_post_inscription_without_event_fails(client, create_user):
     event_id_not_exists = uuid.uuid4()
     new_inscription = InscriptionRequestSchema(
@@ -81,20 +105,19 @@ async def test_update_inscription(client, create_user, create_event_started, cre
     assert response.json()['id'] == inscription_id
     assert response.json()['upload_url']['upload_url'] == 'mocked-url-upload'
 
-    my_inscriptions_response = await client.get(
-        f"/events/{create_event_started}/inscriptions/my-inscriptions",
+    my_inscription_response = await client.get(
+        f"/events/{create_event_started}/inscriptions/my-inscription",
         headers=create_headers(create_user["id"])
     )
-    assert my_inscriptions_response.status_code == 200
-    my_inscriptions = my_inscriptions_response.json()
-    assert len(my_inscriptions) == 1
-    assert my_inscriptions[0]['id'] == inscription_id
-    assert my_inscriptions[0]['user_id'] == create_user["id"]
-    assert my_inscriptions[0]['event_id'] == create_event_started
-    assert my_inscriptions[0]['status'] == InscriptionStatus.PENDING_APPROVAL
-    assert len(my_inscriptions[0]['roles']) == 1
-    assert my_inscriptions[0]['roles'][0] == "ATTENDEE"
-    assert my_inscriptions[0]['affiliation'] == "UTN"
+    assert my_inscription_response.status_code == 200
+    my_inscription = my_inscription_response.json()
+    assert my_inscription['id'] == inscription_id
+    assert my_inscription['user_id'] == create_user["id"]
+    assert my_inscription['event_id'] == create_event_started
+    assert my_inscription['status'] == InscriptionStatus.PENDING_APPROVAL
+    assert len(my_inscription['roles']) == 1
+    assert my_inscription['roles'][0] == "ATTENDEE"
+    assert my_inscription['affiliation'] == "UTN"
 
 
 async def test_pay_inscription(

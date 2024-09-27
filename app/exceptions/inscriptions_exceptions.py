@@ -2,7 +2,7 @@ from fastapi import HTTPException
 
 
 class InscriptionAlreadyExists(HTTPException):
-    def __init__(self, user_id, event_id):
+    def __init__(self, event_id, user_id):
         self.status_code = 409
         self.detail = f"Inscription from user: {user_id} "
         f"to event: {event_id} already exists."
@@ -24,4 +24,11 @@ class InscriptionNotFound(HTTPException):
     def __init__(self, event_id, inscription_id):
         self.status_code = 404
         self.detail = f"Inscription {inscription_id} in event {event_id} not found"
+        super().__init__(status_code=self.status_code, detail=self.detail)
+
+
+class MyInscriptionNotFound(HTTPException):
+    def __init__(self, event_id):
+        self.status_code = 404
+        self.detail = f"You dont have inscription  in event {event_id}"
         super().__init__(status_code=self.status_code, detail=self.detail)

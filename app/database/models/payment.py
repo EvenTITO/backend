@@ -20,7 +20,7 @@ class PaymentModel(ModelTemplate, Base):
     inscription_id = Column(UUID(as_uuid=True), ForeignKey("inscriptions.id"), nullable=False)
     fare_name = Column(String, nullable=False)
     status = Column(String, nullable=False, default=PaymentStatus.PENDING_APPROVAL)
-    works = Column(ARRAY(String), nullable=True)
+    works = Column(ARRAY(UUID(as_uuid=True)), nullable=True)
 
     __table_args__ = (
         Index('ix_payment_event_id', 'event_id'),

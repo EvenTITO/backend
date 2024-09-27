@@ -112,7 +112,7 @@ WORKS = [
             'P-256 y Curvas de Edwards en Algoritmos '
             'de Criptografía Cuántica'
         ),
-        track='cibersecurity',
+        track='chemistry',
         abstract='',
         keywords=['ciber', 'security'],
         authors=[
