@@ -59,6 +59,6 @@ class ReviewPublishSchema(BaseModel):
 
     @model_validator(mode='after')
     def check_answers(self) -> Self:
-        if self.new_work_status.RE_SUBMIT and self.resend_deadline is None:
+        if self.new_work_status == WorkStates.RE_SUBMIT and self.resend_deadline is None:
             raise ValueError("resend_deadline cannot be None if new work status is RE_SUBMIT")
         return self
