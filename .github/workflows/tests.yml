@@ -13,7 +13,7 @@ jobs:
     name: Test python API
     services:
       postgres:
-        image: postgres
+        image: postgres:16
         env:
           POSTGRES_PASSWORD: postgres
         options: >-
