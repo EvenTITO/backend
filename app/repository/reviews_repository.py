@@ -85,8 +85,11 @@ class ReviewsRepository(Repository):
         update_work_query = (
             update(WorkModel)
             .where(and_(WorkModel.event_id == event_id, WorkModel.id == work_id))
-            .values(state=reviews_to_publish.new_work_status, deadline_date=reviews_to_publish.resend_deadline)
+            .values(state=reviews_to_publish.new_work_status)
         )
+        if reviews_to_publish.resend_deadline is not None:
+            update_work_query.values(deadline_date=reviews_to_publish.resend_deadline)
+
         for review_id in reviews_ids:
             conditions = [
                 ReviewModel.event_id == event_id,
