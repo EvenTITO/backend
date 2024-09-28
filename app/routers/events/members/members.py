@@ -42,11 +42,10 @@ async def add_member(
     dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
 )
 async def remove_member(
-        event_id: UUID,
         user_id: UID,
         member_service: EventMembersServiceDep
 ) -> None:
-    await member_service.remove_member(event_id, user_id)
+    await member_service.remove_member(user_id)
 
 
 @event_members_router.put(
