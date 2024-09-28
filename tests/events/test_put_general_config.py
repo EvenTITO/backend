@@ -153,3 +153,24 @@ async def test_update_tracks_fails_if_event_started(client, admin_data, create_e
     )
 
     assert response.status_code == 409
+
+
+async def test_update_event_metadata(client, admin_data, create_event):
+    update_create_event = create_event.copy()
+
+    metadata_json = {"test": "test"}
+    update_create_event["mdata"] = metadata_json
+
+    event_id = update_create_event.pop('id')
+
+    _ = await client.put(
+        f"/events/{event_id}/configuration/general",
+        json=jsonable_encoder(update_create_event),
+        headers=create_headers(admin_data.id)
+    )
+    response = await client.get(
+        f"/events/{event_id}/configuration",
+        headers=create_headers(admin_data.id)
+    )
+    assert response.status_code == 200
+    assert response.json()['mdata'] == metadata_json

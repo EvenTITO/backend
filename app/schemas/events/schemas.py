@@ -1,3 +1,5 @@
+from typing import Any
+
 from pydantic import (
     BaseModel,
     Field,
@@ -39,6 +41,8 @@ class DynamicGeneralEventSchema(DatesCompleteSchema, DynamicTracksEventSchema):
         examples=["Pepe Argento"],
         default=''
     )
+
+    mdata: dict[str, Any] | None = Field(examples=[{"info": "info_extra"}], default=None)
 
 
 class DynamicEventSchema(DynamicGeneralEventSchema, DatesCompleteSchema, PricingSchema):

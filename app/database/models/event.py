@@ -43,3 +43,5 @@ class EventModel(ModelTemplate, Base):
     media = Column(ARRAY(JSON), default=None)
 
     organizers = relationship("OrganizerModel", back_populates="event")
+
+    mdata = Column(JSON, default=None)
