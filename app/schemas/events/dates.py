@@ -1,6 +1,7 @@
-from enum import Enum
 import datetime
+from enum import Enum
 from typing import Self
+
 from pydantic import (
     BaseModel,
     Field,
@@ -44,19 +45,25 @@ class DatesCompleteSchema(BaseModel):
                 name=MandatoryDates.START_DATE,
                 label='Fecha de Comienzo',
                 description='Fecha de comienzo del evento.',
-                is_mandatory=True
+                is_mandatory=True,
+                date="2024-10-01",
+                time="09:00:00"
             ),
             DateSchema(
                 name=MandatoryDates.END_DATE,
                 label='Fecha de Finalización',
                 description='Fecha de comienzo del evento.',
-                is_mandatory=True
+                is_mandatory=True,
+                date="2024-10-01",
+                time="09:00:00"
             ),
             DateSchema(
                 name=MandatoryDates.SUBMISSION_DEADLINE_DATE,
                 label='Fecha de envío de trabajos',
                 description='Fecha límite de envío de trabajos.',
-                is_mandatory=True
+                is_mandatory=True,
+                date="2024-10-01",
+                time="09:00:00"
             )
         ]
     )
