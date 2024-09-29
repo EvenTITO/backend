@@ -5,11 +5,11 @@ from fastapi import APIRouter, Depends, Query
 
 from app.authorization.admin_user_dep import IsAdminUsrDep
 from app.authorization.inscripted_dep import verify_is_registered, IsRegisteredDep
-from app.authorization.organizer_dep import IsOrganizerDep
+from app.authorization.organizer_dep import IsOrganizerDep, verify_is_organizer
 from app.authorization.user_id_dep import verify_user_exists
 from app.authorization.util_dep import or_
 from app.schemas.inscriptions.inscription import InscriptionResponseSchema, InscriptionRequestSchema, \
-    InscriptionUploadSchema, InscriptionDownloadSchema
+    InscriptionUploadSchema, InscriptionDownloadSchema, InscriptionStatusSchema
 from app.schemas.payments.payment import PaymentRequestSchema, PaymentUploadSchema, PaymentsResponseSchema, \
     PaymentDownloadSchema
 from app.services.event_inscriptions.event_inscriptions_service_dep import EventInscriptionsServiceDep
@@ -23,13 +23,13 @@ inscriptions_events_router = APIRouter(
 @inscriptions_events_router.post(
     path="",
     status_code=201,
-    response_model=InscriptionResponseSchema,
+    response_model=InscriptionUploadSchema,
     dependencies=[Depends(verify_user_exists)]
 )
 async def create_inscription(
         inscription: InscriptionRequestSchema,
         inscriptions_service: EventInscriptionsServiceDep
-) -> InscriptionResponseSchema:
+) -> InscriptionUploadSchema:
     return await inscriptions_service.inscribe_user_to_event(inscription)
 
 
@@ -140,3 +140,17 @@ async def read_inscription_payment(
         inscription_service: EventInscriptionsServiceDep
 ) -> PaymentDownloadSchema:
     return await inscription_service.get_inscription_payment(inscription_id, payment_id)
+
+
+@inscriptions_events_router.patch(
+    path="/{inscription_id}",
+    status_code=204,
+    response_model=None,
+    dependencies=[Depends(verify_is_organizer)]
+)
+async def change_inscription_status(
+        inscription_id: UUID,
+        inscription_service: EventInscriptionsServiceDep,
+        status_modification: InscriptionStatusSchema,
+):
+    await inscription_service.update_inscription_status(inscription_id, status_modification)

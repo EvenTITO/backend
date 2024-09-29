@@ -13,6 +13,10 @@ class InscriptionIdSchema(BaseModel):
     id: UUID
 
 
+class InscriptionStatusSchema(BaseModel):
+    status: InscriptionStatus = Field(examples=[InscriptionStatus.APPROVED])
+
+
 class InscriptionDownloadSchema(InscriptionIdSchema):
     model_config = ConfigDict(from_attributes=True)
     download_url: DownloadURLSchema | None = Field(default=None)
@@ -28,7 +32,12 @@ class InscriptionRequestSchema(BaseModel):
     affiliation: str | None = Field(default=None)
 
 
-class InscriptionResponseSchema(InscriptionRequestSchema, InscriptionUploadSchema):
-    user_id: UID
+class InscriptionUserResponseSchema(BaseModel):
+    fullname: str = Field(examples=["José Perez"])
+    email: str | None = Field(examples=["jose.perez@email.com"])
+
+
+class InscriptionResponseSchema(InscriptionRequestSchema, InscriptionIdSchema, InscriptionStatusSchema):
     event_id: UUID
-    status: InscriptionStatus
+    user_id: UID
+    user: InscriptionUserResponseSchema

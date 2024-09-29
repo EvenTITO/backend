@@ -1,6 +1,7 @@
 from enum import Enum
 
 from sqlalchemy import Column, String, ForeignKey, ARRAY, Index, UUID
+from sqlalchemy.orm import relationship
 
 from app.database.models.base import Base
 from app.database.models.utils import ModelTemplate, UIDType
@@ -25,6 +26,9 @@ class InscriptionModel(ModelTemplate, Base):
     status = Column(String, default=InscriptionStatus.PENDING_APPROVAL.value, nullable=False)
     roles = Column(ARRAY(String), default=[InscriptionRole.ATTENDEE.value], nullable=False)
     affiliation = Column(String, default=None, nullable=True)
+
+    # Always fetch the usermodel, when fetching a review
+    user = relationship("UserModel", back_populates='inscriptions', lazy=False)
 
     __table_args__ = (
         Index('ix_inscription_user_id', 'user_id'),

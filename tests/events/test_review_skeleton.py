@@ -1,5 +1,5 @@
 from app.schemas.events.review_skeleton.rating_question import RatingQuestion
-from app.schemas.events.review_skeleton.review_skeleton import ReviewSkeletonQuestions, ReviewSkeletonSchema
+from app.schemas.events.review_skeleton.review_skeleton import ReviewSkeletonQuestions, ReviewSkeletonRequestSchema
 from app.schemas.events.review_skeleton.simple_question import SimpleQuestion
 from app.schemas.events.review_skeleton.multiples_choice_question import (
     MultipleChoiceQuestion
@@ -10,7 +10,7 @@ from ..commontest import create_headers
 
 async def test_put_review_skeleton(client, admin_data, create_event):
     first_question = 'This is a simple question that has a str answer'
-    review_skeleton = ReviewSkeletonSchema(
+    review_skeleton = ReviewSkeletonRequestSchema(
         review_skeleton=ReviewSkeletonQuestions(
             questions=[
                 SimpleQuestion(
@@ -45,3 +45,7 @@ async def test_put_review_skeleton(client, admin_data, create_event):
 
     assert response.status_code == 200
     assert response.json()["review_skeleton"]["questions"][0]["question"] == first_question
+    assert response.json()["review_skeleton"]["recommendation"] is not None
+    assert response.json()["review_skeleton"]["recommendation"]["question"] == "Recomendación"
+    assert response.json()["review_skeleton"]["recommendation"]["type_question"] == "multiple_choice"
+    assert response.json()["review_skeleton"]["recommendation"]["more_than_one_answer_allowed"] is False

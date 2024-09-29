@@ -7,7 +7,7 @@ from app.schemas.events.configuration import EventConfigurationSchema
 from app.schemas.events.configuration_general import ConfigurationGeneralEventSchema
 from app.schemas.events.dates import DatesCompleteSchema
 from app.schemas.events.pricing import PricingSchema
-from app.schemas.events.review_skeleton.review_skeleton import ReviewSkeletonSchema
+from app.schemas.events.review_skeleton.review_skeleton import ReviewSkeletonRequestSchema
 from app.schemas.events.schemas import DynamicTracksEventSchema
 from app.services.services import BaseService
 
@@ -23,7 +23,7 @@ class EventsConfigurationService(BaseService):
     async def update_pricing(self, pricing: PricingSchema) -> None:
         await self.events_repository.update(self.event_id, pricing)
 
-    async def update_review_skeleton(self, review_skeleton: ReviewSkeletonSchema) -> None:
+    async def update_review_skeleton(self, review_skeleton: ReviewSkeletonRequestSchema) -> None:
         await self.events_repository.update(self.event_id, review_skeleton)
 
     async def update_dates(self, dates: DatesCompleteSchema) -> None:
@@ -41,9 +41,9 @@ class EventsConfigurationService(BaseService):
             raise CannotUpdateTracksAfterEventStarts(self.event_id)
         await self.events_repository.update(self.event_id, tracks_schema)
 
-    async def get_review_skeleton(self) -> ReviewSkeletonSchema:
+    async def get_review_skeleton(self) -> ReviewSkeletonRequestSchema:
         review_skeleton = await self.events_repository.get_review_skeleton(self.event_id)
-        return ReviewSkeletonSchema(review_skeleton=review_skeleton)
+        return ReviewSkeletonRequestSchema(review_skeleton=review_skeleton)
 
     async def get_dates(self) -> DatesCompleteSchema:
         dates = await self.events_repository.get_dates(self.event_id)

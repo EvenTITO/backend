@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.inscription import InscriptionModel
 from app.repository.crud_repository import Repository
-from app.schemas.inscriptions.inscription import InscriptionRequestSchema
+from app.schemas.inscriptions.inscription import InscriptionRequestSchema, InscriptionStatusSchema
 from app.schemas.users.utils import UID
 
 
@@ -53,3 +53,7 @@ class InscriptionsRepository(Repository):
     ) -> bool:
         conditions = [InscriptionModel.event_id == event_id, InscriptionModel.id == inscription_id]
         return await self._update_with_conditions(conditions, inscription_update)
+
+    async def update_status(self, event_id: UUID, inscription_id: UUID, status: InscriptionStatusSchema) -> bool:
+        conditions = [InscriptionModel.event_id == event_id, InscriptionModel.id == inscription_id]
+        return await self._update_with_conditions(conditions, status)

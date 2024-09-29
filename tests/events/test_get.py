@@ -14,8 +14,15 @@ async def test_get_event(client, create_event, create_user):
                                 headers=create_headers(create_user['id']))
 
     assert response.status_code == 200
-    assert response.json()["title"] == create_event["title"]
-    assert response.json()["status"] == EventStatus.CREATED  # The admin created it.
+    event = response.json()
+    assert event["title"] == create_event["title"]
+    assert event["status"] == EventStatus.CREATED  # The admin created it.
+    assert event["review_skeleton"]["questions"] is not None
+    assert event["review_skeleton"]["recommendation"] is not None
+    assert event["review_skeleton"]["recommendation"]["question"] == "Recomendación"
+    assert event["review_skeleton"]["recommendation"]["type_question"] == "multiple_choice"
+    assert event["review_skeleton"]["recommendation"]["more_than_one_answer_allowed"] is False
+    assert len(event["review_skeleton"]["recommendation"]["options"]) == 3
     assert len(response.json()["roles"]) == 0
 
 
@@ -44,8 +51,8 @@ async def test_get_all_events_not_admin_error(
     assert response.status_code == 409
     assert response.json()['detail'] == \
         InvalidQueryEventNotCreatedNotAdmin(
-            status=None,
-            role=UserRole.DEFAULT.value
+        status=None,
+        role=UserRole.DEFAULT.value
     ).detail
 
 
@@ -82,7 +89,6 @@ async def test_get_all_events_admin_status_waiting_approval_is_zero(
 async def test_get_all_events_non_admin_can_query_started(
         client, create_many_events, create_event_started, admin_data, create_user
 ):
-
     response = await client.get(
         "/events/",
         headers=create_headers(create_user['id']),
@@ -149,7 +155,6 @@ async def test_get_all_events_public_is_status_created(client, create_event_star
 async def test_get_all_events_public_is_status_created2(
         client, create_many_events_started, admin_data
 ):
-
     n_events = len(create_many_events_started)
 
     response = await client.get(
@@ -167,7 +172,7 @@ async def test_get_all_events_should_be_ordered_by_something():
 
 
 async def test_get_event_with_organizer_role(
-    client, create_event_from_event_creator, create_event_creator
+        client, create_event_from_event_creator, create_event_creator
 ):
     response = await client.get(
         f"/events/{create_event_from_event_creator}/public",
@@ -180,7 +185,7 @@ async def test_get_event_with_organizer_role(
 
 
 async def test_get_event_with_chair_role(
-    client, create_event_chair, create_event_from_event_creator
+        client, create_event_chair, create_event_from_event_creator
 ):
     response = await client.get(
         f"/events/{create_event_from_event_creator}/public",

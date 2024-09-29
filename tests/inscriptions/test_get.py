@@ -18,7 +18,15 @@ async def test_get_inscriptions(client, create_inscription, admin_data):
     assert response.status_code == 200
     inscriptions = response.json()
     assert len(inscriptions) == 1
-    assert (inscriptions[0]['user_id'] == create_inscription['user_id'])
+    inscription = inscriptions[0]
+    assert inscription['user_id'] == create_inscription['user_id']
+    assert inscription['id'] == create_inscription['id']
+    assert inscription['user']['fullname'] == "Lio Messi"
+    assert inscription['user']['email'] == "lio_messi@email.com"
+    assert inscription['event_id'] == event_id
+    assert inscription['status'] == InscriptionStatus.PENDING_APPROVAL
+    assert inscription['roles'][0] == "ATTENDEE"
+    assert inscription['affiliation'] == "Fiuba"
 
 
 async def test_user_inscribes_to_two_events(client, create_user, create_many_events_started):
@@ -63,11 +71,12 @@ async def test_get_inscription(client, create_user, create_event_started, create
     inscription = response.json()
     assert inscription['id'] == inscription_id
     assert inscription['user_id'] == create_user["id"]
+    assert inscription['user']['fullname'] == "Lio Messi"
+    assert inscription['user']['email'] == "lio_messi@email.com"
     assert inscription['event_id'] == create_event_started
     assert inscription['status'] == InscriptionStatus.PENDING_APPROVAL
     assert inscription['roles'][0] == "SPEAKER"
     assert inscription['affiliation'] == "Fiuba"
-    assert inscription['upload_url'] is None
 
 
 async def test_get_affiliation(client, create_user, create_event_started, create_speaker_inscription):

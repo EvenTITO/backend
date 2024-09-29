@@ -6,7 +6,7 @@ from app.exceptions.inscriptions_exceptions import EventNotStarted, InscriptionN
     MyInscriptionNotFound
 from app.repository.inscriptions_repository import InscriptionsRepository
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema, InscriptionResponseSchema, \
-    InscriptionUploadSchema, InscriptionDownloadSchema
+    InscriptionUploadSchema, InscriptionDownloadSchema, InscriptionStatusSchema, InscriptionUserResponseSchema
 from app.schemas.payments.payment import PaymentRequestSchema, PaymentUploadSchema, PaymentsResponseSchema, \
     PaymentDownloadSchema
 from app.schemas.users.utils import UID
@@ -36,7 +36,7 @@ class EventInscriptionsService(BaseService):
         self.event_id = event_id
         self.user_id = user_id
 
-    async def inscribe_user_to_event(self, inscription: InscriptionRequestSchema) -> InscriptionResponseSchema:
+    async def inscribe_user_to_event(self, inscription: InscriptionRequestSchema) -> InscriptionUploadSchema:
         event_status = await self.events_configuration_service.get_event_status()
         if event_status != EventStatus.STARTED:
             raise EventNotStarted(self.event_id, event_status)
@@ -45,11 +45,11 @@ class EventInscriptionsService(BaseService):
             raise InscriptionAlreadyExists(self.event_id, self.user_id)
 
         saved_inscription = await self.inscriptions_repository.inscribe(self.event_id, self.user_id, inscription)
-        response = EventInscriptionsService.map_to_schema(saved_inscription)
-
+        response = InscriptionUploadSchema(id=saved_inscription.id)
         if saved_inscription.affiliation is not None:
             upload_url = await self.storage_service.get_affiliation_upload_url(self.user_id, saved_inscription.id)
             response.upload_url = upload_url
+
         # Ending we send a notification email
         # TODO: enviar email al inscriptor ?
         await self.event_notification_service.notify_inscription(self.event_id, self.user_id)
@@ -142,6 +142,12 @@ class EventInscriptionsService(BaseService):
             download_url=download_url,
         )
 
+    async def update_inscription_status(self, inscription_id: UUID, new_status: InscriptionStatusSchema) -> None:
+        update_ok = await self.inscriptions_repository.update_status(self.event_id, inscription_id, new_status)
+        if not update_ok:
+            raise InscriptionNotFound(self.event_id, inscription_id)
+        return
+
     @staticmethod
     def map_to_schema(model: InscriptionModel) -> InscriptionResponseSchema:
         return InscriptionResponseSchema(
@@ -151,5 +157,8 @@ class EventInscriptionsService(BaseService):
             status=model.status,
             roles=model.roles,
             affiliation=model.affiliation,
-            upload_url=None
+            user=InscriptionUserResponseSchema(
+                fullname=model.user.name + " " + model.user.lastname,
+                email=model.user.email
+            )
         )
