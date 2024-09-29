@@ -3,7 +3,7 @@ import uuid
 from fastapi.encoders import jsonable_encoder
 
 from app.database.models.inscription import InscriptionStatus
-from app.schemas.inscriptions.inscription import InscriptionRequestSchema
+from app.schemas.inscriptions.inscription import InscriptionRequestSchema, InscriptionStatusSchema
 from app.schemas.payments.payment import PaymentRequestSchema
 from ..commontest import create_headers
 
@@ -20,8 +20,8 @@ async def test_post_inscription(client, create_user, create_event_started):
         json=jsonable_encoder(new_inscription)
     )
     assert response.status_code == 201
-    assert response.json()['user_id'] == create_user['id']
-    assert response.json()['roles'][0] == "ATTENDEE"
+    assert response.json()['id'] is not None
+    assert response.json()['upload_url']['upload_url'] == 'mocked-url-upload'
 
 
 async def test_post_inscription_duplicated(client, create_user, create_event_started):
@@ -36,8 +36,8 @@ async def test_post_inscription_duplicated(client, create_user, create_event_sta
         json=jsonable_encoder(new_inscription)
     )
     assert response.status_code == 201
-    assert response.json()['user_id'] == create_user['id']
-    assert response.json()['roles'][0] == "ATTENDEE"
+    assert response.json()['id'] is not None
+    assert response.json()['upload_url']['upload_url'] == 'mocked-url-upload'
 
     response = await client.post(
         f"/events/{create_event_started}/inscriptions",
@@ -141,3 +141,105 @@ async def test_pay_inscription(
     assert response.status_code == 201
     assert response.json()['id'] is not None
     assert response.json()['upload_url']['upload_url'] == 'mocked-url-upload'
+
+
+async def test_patch_inscription(
+        client,
+        create_user,
+        create_event_creator,
+        create_event_started_from_event_creator,
+        create_many_works
+):
+    new_inscription = InscriptionRequestSchema(
+        roles=["ATTENDEE"],
+        affiliation="Fiuba",
+    )
+
+    response = await client.post(
+        f"/events/{create_event_started_from_event_creator}/inscriptions",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201
+    assert response.json()['id'] is not None
+    assert response.json()['upload_url']['upload_url'] == 'mocked-url-upload'
+
+    inscription_id = response.json()["id"]
+
+    response = await client.get(
+        f"/events/{create_event_started_from_event_creator}/inscriptions/{inscription_id}",
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert response.status_code == 200
+    inscription = response.json()
+    assert inscription['id'] == inscription_id
+    assert inscription['user_id'] == create_user["id"]
+    assert inscription['user']['fullname'] == "Lio Messi"
+    assert inscription['user']['email'] == "lio_messi@email.com"
+    assert inscription['event_id'] == create_event_started_from_event_creator
+    assert inscription['status'] == InscriptionStatus.PENDING_APPROVAL
+    assert inscription['roles'][0] == "ATTENDEE"
+    assert inscription['affiliation'] == "Fiuba"
+
+    status_update = InscriptionStatusSchema(
+        status=InscriptionStatus.APPROVED
+    )
+
+    response = await client.patch(
+        f"/events/{create_event_started_from_event_creator}/inscriptions/{inscription_id}",
+        json=jsonable_encoder(status_update),
+        headers=create_headers(create_event_creator['id'])
+    )
+    assert response.status_code == 204
+
+    response = await client.get(
+        f"/events/{create_event_started_from_event_creator}/inscriptions/{inscription_id}",
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert response.status_code == 200
+    inscription = response.json()
+    assert inscription['id'] == inscription_id
+    assert inscription['user_id'] == create_user["id"]
+    assert inscription['user']['fullname'] == "Lio Messi"
+    assert inscription['user']['email'] == "lio_messi@email.com"
+    assert inscription['event_id'] == create_event_started_from_event_creator
+    assert inscription['status'] == InscriptionStatus.APPROVED
+    assert inscription['roles'][0] == "ATTENDEE"
+    assert inscription['affiliation'] == "Fiuba"
+
+
+async def test_patch_inscription_non_organizer(
+        client,
+        create_user,
+        create_event_creator,
+        create_event_started_from_event_creator,
+        create_many_works
+):
+    new_inscription = InscriptionRequestSchema(
+        roles=["ATTENDEE"],
+        affiliation="Fiuba",
+    )
+
+    response = await client.post(
+        f"/events/{create_event_started_from_event_creator}/inscriptions",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201
+    assert response.json()['id'] is not None
+    assert response.json()['upload_url']['upload_url'] == 'mocked-url-upload'
+
+    inscription_id = response.json()["id"]
+
+    status_update = InscriptionStatusSchema(
+        status=InscriptionStatus.APPROVED
+    )
+
+    response = await client.patch(
+        f"/events/{create_event_started_from_event_creator}/inscriptions/{inscription_id}",
+        json=jsonable_encoder(status_update),
+        headers=create_headers(create_user['id'])
+    )
+    assert response.status_code == 403
