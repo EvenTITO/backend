@@ -49,7 +49,7 @@ async def read_my_events(
         events_service: EventsServiceDep,
         offset: int = 0,
         limit: int = Query(default=100, le=100)
-):
+) -> List[PublicEventWithRolesSchema]:
     return await events_service.get_my_events(caller_id, offset=offset, limit=limit)
 
 
@@ -65,7 +65,7 @@ async def read_all_events(
     return await events_service.get_all_events(offset, limit, status, search, user_role)
 
 
-@events_router.post("", status_code=201, response_model=UUID, tags=["Events: General"])
+@events_router.post(path="", status_code=201, response_model=UUID, tags=["Events: General"])
 async def create_event(
         event: CreateEventSchema,
         user_role: UserDep,
