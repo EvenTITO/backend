@@ -19,7 +19,7 @@ from app.routers.works.reviews import event_reviews_router
 from app.routers.works.submissions import works_submissions_router
 from app.routers.works.works import works_router
 from app.schemas.events.create_event import CreateEventSchema
-from app.schemas.events.public_event import PublicEventSchema
+from app.schemas.events.public_event import PublicEventWithCreatorSchema
 from app.schemas.events.public_event_with_roles import PublicEventWithRolesSchema
 from app.services.events.events_service_dep import EventsServiceDep
 
@@ -53,7 +53,7 @@ async def read_my_events(
     return await events_service.get_my_events(caller_id, offset=offset, limit=limit)
 
 
-@events_router.get(path="/", response_model=List[PublicEventSchema], tags=["Events: General"])
+@events_router.get(path="/", response_model=List[PublicEventWithCreatorSchema], tags=["Events: General"])
 async def read_all_events(
         user_role: UserDep,
         events_service: EventsServiceDep,

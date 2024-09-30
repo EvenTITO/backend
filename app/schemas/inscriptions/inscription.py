@@ -34,7 +34,7 @@ class InscriptionRequestSchema(BaseModel):
 
 class InscriptionUserResponseSchema(BaseModel):
     fullname: str = Field(examples=["José Perez"])
-    email: str | None = Field(examples=["jose.perez@email.com"])
+    email: str = Field(examples=["jose.perez@email.com"])
 
 
 class InscriptionResponseSchema(InscriptionRequestSchema, InscriptionIdSchema, InscriptionStatusSchema):

@@ -1,12 +1,14 @@
 import uuid
-from app.database.models.user import UserRole
-from app.exceptions.events_exceptions import EventNotFound, InvalidQueryEventNotCreatedNotAdmin
+
 import pytest
 from fastapi.encoders import jsonable_encoder
+
 from app.database.models.event import EventStatus
+from app.database.models.user import UserRole
+from app.exceptions.events_exceptions import EventNotFound, InvalidQueryEventNotCreatedNotAdmin
 from app.schemas.events.event_status import EventStatusSchema
-from ..commontest import create_headers, EVENTS
 from app.schemas.events.roles import EventRole
+from ..commontest import create_headers, EVENTS
 
 
 async def test_get_event(client, create_event, create_user):
@@ -56,13 +58,20 @@ async def test_get_all_events_not_admin_error(
     ).detail
 
 
-async def test_get_all_events_admin_gets_all(
-        client, create_many_events, admin_data
-):
-    response = await client.get("/events/",
-                                headers=create_headers(admin_data.id))
+async def test_get_all_events_admin_gets_all(client, create_many_events, admin_data):
+    response = await client.get("/events/", headers=create_headers(admin_data.id))
     assert response.status_code == 200
-    assert len(response.json()) == 3
+    events = response.json()
+    assert len(events) == 3
+    assert events[0]['creator']['fullname'] == "Jorge Benitez"
+    assert events[0]['creator']['email'] == "jbenitez@email.com"
+    assert events[0]['creator']['id'] is not None
+    assert events[1]['creator']['fullname'] == "Jorge Benitez"
+    assert events[1]['creator']['email'] == "jbenitez@email.com"
+    assert events[1]['creator']['id'] is not None
+    assert events[2]['creator']['fullname'] == "Jorge Benitez"
+    assert events[2]['creator']['email'] == "jbenitez@email.com"
+    assert events[2]['creator']['id'] is not None
 
 
 async def test_get_all_events_admin_status_waiting_approval_is_zero(
@@ -96,6 +105,8 @@ async def test_get_all_events_non_admin_can_query_started(
     )
     assert response.status_code == 200
     assert len(response.json()) == 1
+    events = response.json()
+    assert events[0]['creator'] is None
 
 
 async def test_get_all_events_non_admin_can_not_query_created(

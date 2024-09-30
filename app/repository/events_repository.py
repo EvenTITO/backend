@@ -1,4 +1,5 @@
 from uuid import UUID
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -142,7 +143,7 @@ class EventsRepository(Repository):
             limit: int,
             status: EventStatus | None,
             title_search: str | None
-    ):
+    ) -> list[EventModel]:
         query = select(EventModel).offset(offset).limit(limit)
         if status is not None:
             query = query.where(EventModel.status == status)

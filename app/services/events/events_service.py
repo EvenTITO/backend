@@ -52,15 +52,19 @@ class EventsService(BaseService):
     async def get_all_events(
             self,
             offset: int,
+
             limit: int,
             status: EventStatus | None,
             title_search: str | None,
             user_role: UserRole
     ):
         if status != EventStatus.STARTED and user_role != UserRole.ADMIN:
-            raise InvalidQueryEventNotCreatedNotAdmin(status, user_role)  # TODO: change to custom exception.
-
-        return await self.events_repository.get_all_events(offset, limit, status, title_search)
+            raise InvalidQueryEventNotCreatedNotAdmin(status, user_role)
+        events = await self.events_repository.get_all_events(offset, limit, status, title_search)
+        if user_role != UserRole.ADMIN:
+            for event in events:
+                event.creator = None
+        return events
 
     async def get_public_event(self, caller_id: UID | None, event_id: UUID) -> PublicEventWithRolesSchema:
         event = await self.events_repository.get(event_id)

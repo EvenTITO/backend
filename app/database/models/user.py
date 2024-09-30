@@ -29,3 +29,4 @@ class UserModel(DateTemplate, Base):
 
     reviews = relationship("ReviewModel", back_populates='reviewer', lazy=True)
     inscriptions = relationship("InscriptionModel", back_populates='user', lazy=True)
+    events = relationship("EventModel", back_populates='creator', lazy=True)

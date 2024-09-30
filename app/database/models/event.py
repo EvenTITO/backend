@@ -41,7 +41,7 @@ class EventModel(ModelTemplate, Base):
     contact = Column(String, nullable=True)
     organized_by = Column(String, nullable=True)
     media = Column(ARRAY(JSON), default=None)
+    mdata = Column(JSON, default=None)
 
     organizers = relationship("OrganizerModel", back_populates="event")
-
-    mdata = Column(JSON, default=None)
+    creator = relationship("UserModel", back_populates='events', lazy=False)
