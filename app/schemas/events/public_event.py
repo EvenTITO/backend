@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic import computed_field, BaseModel, Field, ConfigDict, PrivateAttr
+from pydantic import computed_field, BaseModel, Field, ConfigDict
 
 from app.schemas.events.event_status import EventStatusSchema
 from app.schemas.events.review_skeleton.review_skeleton import ReviewSkeletonResponseSchema
