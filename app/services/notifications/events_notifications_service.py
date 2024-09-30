@@ -17,6 +17,7 @@ CREATE_EVENT_NOTIFICATION_HTML = load_html('create-event-notification.html')
 START_EVENT_NOTIFICATION_HTML = load_html('start-event-notification.html')
 WAITING_APPROVAL_EVENT_NOTIFICATION_HTML = load_html('waiting-event-notification.html')
 INSCRIPTION_EVENT_NOTIFICATION_HTML = load_html('inscription-event-notification.html')
+INSCRIPTION_USER_EVENT_NOTIFICATION_HTML = load_html('inscription-user-event-notification.html')
 REVIEWER_EVENT_NOTIFICATION_HTML = load_html('reviewer-event-notification.html')
 CHANGE_WORK_STATUS_NOTIFICATION_HTML = load_html('change-work-status-notification.html')
 
@@ -66,9 +67,12 @@ class EventsNotificationsService(NotificationsService):
 
     # Search organizer emails and extra notification emails(in event)
     async def __search_emails_to_send(self, event):
+        # Fin organizer event email
+        # TODO
+        # Find creator event email
         creator_id = await self.event_repository.get_creator_id(event.id)
         organizer_user = await self.users_repository.get(creator_id)
-
+        # Find email notification emails into event
         emails_to_send = []
         if event.notification_mails is not None:
             emails_to_send = emails_to_send + event.notification_mails
@@ -122,10 +126,13 @@ class EventsNotificationsService(NotificationsService):
                                             WAITING_APPROVAL_EVENT_NOTIFICATION_HTML,
                                             subject)
 
-    def __notify_inscription(self, event, user, emails_to_send):
-        user_fullname = user.name + " " + user.lastname
-        subject = f"El usuario {user_fullname} se ha inscripto al evento {event.title}"
+    def __notify_inscription_user(self, event, subject, emails_to_send, params):
+        self.__config_common_and_send_email(event, emails_to_send,
+                                            INSCRIPTION_USER_EVENT_NOTIFICATION_HTML,
+                                            subject,
+                                            params)
 
+    def __notify_inscription_gral(self, event, subject, emails_to_send):
         self.__config_common_and_send_email(event, emails_to_send,
                                             INSCRIPTION_EVENT_NOTIFICATION_HTML,
                                             subject)
@@ -150,7 +157,6 @@ class EventsNotificationsService(NotificationsService):
 
     async def notify_event_waiting_approval(self, event):
         emails_to_send = await self.__search_emails_to_send(event)
-        print(f"emails_to_send: {emails_to_send}")
         self.background_tasks.add_task(self.__notify_event_waiting_approval, event, emails_to_send)
         return True
 
@@ -166,14 +172,19 @@ class EventsNotificationsService(NotificationsService):
         self.background_tasks.add_task(self.__notify_event_started, event, emails_to_send)
         return True
 
-    async def notify_inscription(self, event_id, user_id):
+    async def notify_inscription(self, event_id, user_inscripted_id):
         event = await self.event_repository.get(event_id)
-        emails_to_send = await self.__search_emails_to_send(event)
-        user = await self.users_repository.get(user_id)
-        email_user = user.email
-        emails_to_send.append(email_user)
+        user_inscripted = await self.users_repository.get(user_inscripted_id)
+        emails_to_send_gral = await self.__search_emails_to_send(event)
+        user_fullname = user_inscripted.name + " " + user_inscripted.lastname
 
-        self.background_tasks.add_task(self.__notify_inscription, event, user, emails_to_send)
+        subject = f"El usuario {user_fullname} se ha inscripto al evento {event.title}"
+        self.background_tasks.add_task(self.__notify_inscription_gral, event, subject, emails_to_send_gral)
+
+        user_inscripted_emails = user_inscripted.email
+        params = [user_fullname]
+        subject = f"Bienvenido a EvenTITO {user_fullname}!"
+        self.background_tasks.add_task(self.__notify_inscription_user, event, subject, user_inscripted_emails, params)
 
         return True
 
