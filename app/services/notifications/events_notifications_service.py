@@ -4,6 +4,7 @@ from email.message import EmailMessage
 
 from app.database.models.work import WorkStates
 from app.repository.events_repository import EventsRepository
+from app.repository.organizers_repository import OrganizerRepository
 from app.repository.users_repository import UsersRepository
 from app.schemas.members.reviewer_schema import ReviewerCreateRequestSchema
 from app.services.notifications.notifications_service import NotificationsService, load_html
@@ -26,9 +27,11 @@ class EventsNotificationsService(NotificationsService):
     def __init__(self,
                  event_repository: EventsRepository,
                  users_repository: UsersRepository,
+                 organizer_repository: OrganizerRepository,
                  background_tasks: BackgroundTasks):
         self.event_repository = event_repository
         self.users_repository = users_repository
+        self.organizer_repository = organizer_repository
         self.recipients_emails = []
         self.background_tasks = background_tasks
 
@@ -65,15 +68,19 @@ class EventsNotificationsService(NotificationsService):
 
         return body
 
-    # Search organizer emails and extra notification emails(in event)
+    # Search organizer,creator and extra notification emails
     async def __search_emails_to_send(self, event):
+        emails_to_send = []
         # Fin organizer event email
-        # TODO
+        users_organizers = await self.organizer_repository.get_all(event.id)
+        for (user, organizer) in users_organizers:
+            if user.email is not None:
+                emails_to_send.append(user.email)
+
         # Find creator event email
         creator_id = await self.event_repository.get_creator_id(event.id)
         organizer_user = await self.users_repository.get(creator_id)
-        # Find email notification emails into event
-        emails_to_send = []
+        # Find email notification emails into event definition
         if event.notification_mails is not None:
             emails_to_send = emails_to_send + event.notification_mails
         if organizer_user is not None:
