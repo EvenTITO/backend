@@ -11,6 +11,11 @@ class UsersRepository(Repository):
     def __init__(self, session: AsyncSession):
         super().__init__(session, UserModel)
 
+    async def get_admin_users(self) -> list[UserModel]:
+        conditions = [UserModel.role == UserRole.ADMIN.value]
+
+        return await self._get_many_with_conditions(conditions, 0, 100)
+
     async def get_amount_admins(self):
         admin_role = UserRole.ADMIN.value
         conditions = [UserModel.role == admin_role]

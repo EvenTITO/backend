@@ -17,6 +17,7 @@ email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 CREATE_EVENT_NOTIFICATION_HTML = load_html('create-event-notification.html')
 START_EVENT_NOTIFICATION_HTML = load_html('start-event-notification.html')
 WAITING_APPROVAL_EVENT_NOTIFICATION_HTML = load_html('waiting-event-notification.html')
+WAITING_APPROVAL_ADMIN_EVENT_NOTIFICATION_HTML = load_html('waiting-admin-event-notification.html')
 INSCRIPTION_EVENT_NOTIFICATION_HTML = load_html('inscription-event-notification.html')
 INSCRIPTION_USER_EVENT_NOTIFICATION_HTML = load_html('inscription-user-event-notification.html')
 REVIEWER_EVENT_NOTIFICATION_HTML = load_html('reviewer-event-notification.html')
@@ -67,6 +68,13 @@ class EventsNotificationsService(NotificationsService):
         body = body.replace("[url_rejected]", "https://eventito-frontend.vercel.app/")
 
         return body
+
+    async def __search_emails_admin(self):
+        emails_to_send = []
+        users_admin = await self.users_repository.get_admin_users()
+        for user_admin in users_admin:
+            emails_to_send.append(user_admin.email)
+        return emails_to_send
 
     # Search organizer,creator and extra notification emails
     async def __search_emails_to_send(self, event):
@@ -127,11 +135,19 @@ class EventsNotificationsService(NotificationsService):
                                             CREATE_EVENT_NOTIFICATION_HTML,
                                             subject)
 
-    def __notify_event_waiting_approval(self, event, emails_to_send):
-        subject = f"El evento {event.title} ha sido enviado para su aprobación"
+    def __notify_event_waiting_approval(self, event, subject, emails_to_send):
+
         self.__config_common_and_send_email(event, emails_to_send,
                                             WAITING_APPROVAL_EVENT_NOTIFICATION_HTML,
                                             subject)
+
+    def __notify_event_waiting_approval_admin(self, event, subject, emails_to_send, params):
+
+        self.__config_common_and_send_email(event,
+                                            emails_to_send,
+                                            WAITING_APPROVAL_ADMIN_EVENT_NOTIFICATION_HTML,
+                                            subject,
+                                            params)
 
     def __notify_inscription_user(self, event, subject, emails_to_send, params):
         self.__config_common_and_send_email(event, emails_to_send,
@@ -162,9 +178,23 @@ class EventsNotificationsService(NotificationsService):
             subject,
             params)
 
-    async def notify_event_waiting_approval(self, event):
+    async def notify_event_waiting_approval(self, event, creator_id):
         emails_to_send = await self.__search_emails_to_send(event)
-        self.background_tasks.add_task(self.__notify_event_waiting_approval, event, emails_to_send)
+        subject = f"El evento {event.title} ha sido enviado para su aprobación"
+        self.background_tasks.add_task(self.__notify_event_waiting_approval, event, subject, emails_to_send)
+
+        admin_emails_to_send = await self.__search_emails_admin()
+        user_creator = await self.users_repository.get(creator_id)
+        user_fullname = f"{user_creator.name} {user_creator.lastname}"
+        params = [user_fullname, creator_id]
+
+        subject = f"El evento {event.title} ha espera aprobación"
+        self.background_tasks.add_task(self.__notify_event_waiting_approval_admin,
+                                       event,
+                                       subject,
+                                       admin_emails_to_send,
+                                       params)
+
         return True
 
     async def notify_event_created(self, event):
