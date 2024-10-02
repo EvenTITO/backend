@@ -37,8 +37,14 @@ class EventsNotificationsService(NotificationsService):
         self.background_tasks = background_tasks
 
     def __recipients_message(self):
+
         message = EmailMessage()
-        message['To'] = ",".join(self.recipients_emails)
+        print(f"recipients_emails: {self.recipients_emails}")
+        if len(self.recipients_emails) > 0:
+            message['Bcc'] = ",".join(self.recipients_emails)
+        else:
+            message['Bcc'] = ''
+
         return message
 
     def __is_valid_email(self, email):
@@ -92,8 +98,7 @@ class EventsNotificationsService(NotificationsService):
 
         # Find email notification emails into event definition
         if event.notification_mails is not None:
-            print(f"notification_mails: {event.notification_mails}")
-            emails_to_send.append(event.notification_mails)
+            emails_to_send = emails_to_send + event.notification_mails
         if organizer_user is not None:
             if organizer_user.email is not None:
                 emails_to_send.append(organizer_user.email)
