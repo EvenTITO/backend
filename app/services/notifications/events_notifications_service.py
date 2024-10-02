@@ -79,6 +79,7 @@ class EventsNotificationsService(NotificationsService):
     # Search organizer,creator and extra notification emails
     async def __search_emails_to_send(self, event):
         emails_to_send = []
+
         # Fin organizer event email
         users_organizers = await self.organizer_repository.get_all(event.id)
         for (user, organizer) in users_organizers:
@@ -88,9 +89,11 @@ class EventsNotificationsService(NotificationsService):
         # Find creator event email
         creator_id = await self.event_repository.get_creator_id(event.id)
         organizer_user = await self.users_repository.get(creator_id)
+
         # Find email notification emails into event definition
         if event.notification_mails is not None:
-            emails_to_send = emails_to_send + event.notification_mails
+            print(f"notification_mails: {event.notification_mails}")
+            emails_to_send.append(event.notification_mails)
         if organizer_user is not None:
             if organizer_user.email is not None:
                 emails_to_send.append(organizer_user.email)
