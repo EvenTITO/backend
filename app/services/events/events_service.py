@@ -42,7 +42,7 @@ class EventsService(BaseService):
 
         # Notify waiting approval event to creator event
         if status.value == EventStatus.WAITING_APPROVAL.value:
-            await self.event_notification_service.notify_event_waiting_approval(event_created, creator_id)
+            await self.event_notification_service.notify_event_waiting_approval(event_created)
 
         return event_created.id
 

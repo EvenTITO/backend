@@ -178,7 +178,8 @@ class EventsNotificationsService(NotificationsService):
             subject,
             params)
 
-    async def notify_event_waiting_approval(self, event, creator_id):
+    async def notify_event_waiting_approval(self, event):
+        creator_id = event.creator_id
         emails_to_send = await self.__search_emails_to_send(event)
         subject = f"El evento {event.title} ha sido enviado para su aprobación"
         self.background_tasks.add_task(self.__notify_event_waiting_approval, event, subject, emails_to_send)
@@ -188,7 +189,7 @@ class EventsNotificationsService(NotificationsService):
         user_fullname = f"{user_creator.name} {user_creator.lastname}"
         params = [user_fullname, creator_id]
 
-        subject = f"El evento {event.title} ha espera aprobación"
+        subject = f"El evento {event.title} espera aprobación"
         self.background_tasks.add_task(self.__notify_event_waiting_approval_admin,
                                        event,
                                        subject,
@@ -220,7 +221,7 @@ class EventsNotificationsService(NotificationsService):
 
         user_inscripted_emails = user_inscripted.email
         params = [user_fullname]
-        subject = f"Bienvenido a EvenTITO {user_fullname}!"
+        subject = f"Su inscripción fue registrada con exito"
         self.background_tasks.add_task(self.__notify_inscription_user, event, subject, user_inscripted_emails, params)
 
         return True
