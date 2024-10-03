@@ -14,9 +14,9 @@ from fastapi import BackgroundTasks
 import re
 
 email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-CREATE_EVENT_NOTIFICATION_HTML = load_html('create-event-notification.html')
-START_EVENT_NOTIFICATION_HTML = load_html('start-event-notification.html')
-WAITING_APPROVAL_EVENT_NOTIFICATION_HTML = load_html('waiting-event-notification.html')
+CREATE_EVENT_NOTIFICATION_HTML = load_html('created-event-notification.html')
+START_ORGS_EVENT_NOTIFICATION_HTML = load_html('started-orgs-event-notification.html')
+WAITING_APPROVAL_USER_EVENT_NOTIFICATION_HTML = load_html('waiting-user-event-notification.html')
 WAITING_APPROVAL_ADMIN_EVENT_NOTIFICATION_HTML = load_html('waiting-admin-event-notification.html')
 INSCRIPTION_EVENT_NOTIFICATION_HTML = load_html('inscription-event-notification.html')
 INSCRIPTION_USER_EVENT_NOTIFICATION_HTML = load_html('inscription-user-event-notification.html')
@@ -39,11 +39,12 @@ class EventsNotificationsService(NotificationsService):
     def __recipients_message(self):
 
         message = EmailMessage()
-        print(f"recipients_emails: {self.recipients_emails}")
         if len(self.recipients_emails) > 0:
             message['Bcc'] = ",".join(self.recipients_emails)
         else:
             message['Bcc'] = ''
+
+        self.__print_email_to_send(self.recipients_emails, message)
 
         return message
 
@@ -54,18 +55,21 @@ class EventsNotificationsService(NotificationsService):
         start_date = "Sin definir"
         start_time = "Sin definir"
         organized_by = "Sin definir"
+        contact = "Sin definir"
         if event.dates[0]['date'] is not None:
             start_date = event.dates[0]['date']
         if event.dates[0]['date'] is not None:
             start_time = event.dates[0]['time']
         if event.organized_by is not None:
             organized_by = event.organized_by
+        if event.contact is not None or len(event.contact) > 0:
+            contact = event.contact
 
-        body = body.replace("[contact]", event.contact)
         body = body.replace("[title]", event.title)
         body = body.replace("[START_DATE]", start_date)
         body = body.replace("[START_TIME]", start_time)
         body = body.replace("[organized_by]", organized_by)
+        body = body.replace("[contact]", contact)
 
         return body
 
@@ -82,39 +86,33 @@ class EventsNotificationsService(NotificationsService):
             emails_to_send.append(user_admin.email)
         return emails_to_send
 
-    # Search organizer,creator and extra notification emails
-    async def __search_emails_to_send(self, event):
+    # Search organizer and extra notification emails
+    async def __search_emails_organizers(self, event):
         emails_to_send = []
-
-        # Fin organizer event email
         users_organizers = await self.organizer_repository.get_all(event.id)
         for (user, organizer) in users_organizers:
             if user.email is not None:
                 emails_to_send.append(user.email)
 
-        # Find creator event email
-        creator_id = await self.event_repository.get_creator_id(event.id)
-        organizer_user = await self.users_repository.get(creator_id)
-
-        # Find email notification emails into event definition
         if event.notification_mails is not None:
-            emails_to_send = emails_to_send + event.notification_mails
-        if organizer_user is not None:
-            if organizer_user.email is not None:
-                emails_to_send.append(organizer_user.email)
+            emails_to_send = list(set(emails_to_send + event.notification_mails))
         return emails_to_send
 
-    def __print_email(self, emails, message):
-        print(f"Sending emails to {emails}")
-        print("email message:")
-        print(f"{message}")
+    # Search creator email
+    async def __search_emails_creator(self, event):
+        creator_id = event.creator_id
+        creator_user = await self.users_repository.get(creator_id)
+        return [creator_user.email]
 
-    def __config_common_and_send_email(self,
-                                       event,
-                                       emails_to_send,
-                                       body_common,
-                                       subject,
-                                       params=None):
+    def __print_email_to_send(self, emails, message):
+        print(f"Sending emails to {emails} | email message: {message}")
+
+    def __config_common_and_send_specific_email(self,
+                                                event,
+                                                emails_to_send,
+                                                body_common,
+                                                subject,
+                                                params=None):
 
         self.recipients_emails = emails_to_send
 
@@ -131,55 +129,54 @@ class EventsNotificationsService(NotificationsService):
 
         return self._send_email(message)
 
-    def __notify_event_started(self, event, emails_to_send):
-        subject = f"El evento {event.title} ha sido publicado"
-        self.__config_common_and_send_email(event, emails_to_send,
-                                            START_EVENT_NOTIFICATION_HTML,
-                                            subject)
+    def __notify_event_waiting_approval(self, event, subject, emails_to_send, params):
 
-    def __notify_event_created(self, event, emails_to_send):
-        subject = "Su solicitud de creación de evento fue aprobada"
-        self.__config_common_and_send_email(event, emails_to_send,
-                                            CREATE_EVENT_NOTIFICATION_HTML,
-                                            subject)
-
-    def __notify_event_waiting_approval(self, event, subject, emails_to_send):
-
-        self.__config_common_and_send_email(event, emails_to_send,
-                                            WAITING_APPROVAL_EVENT_NOTIFICATION_HTML,
-                                            subject)
+        self.__config_common_and_send_specific_email(event,
+                                                     emails_to_send,
+                                                     WAITING_APPROVAL_USER_EVENT_NOTIFICATION_HTML,
+                                                     subject,
+                                                     params)
 
     def __notify_event_waiting_approval_admin(self, event, subject, emails_to_send, params):
 
-        self.__config_common_and_send_email(event,
-                                            emails_to_send,
-                                            WAITING_APPROVAL_ADMIN_EVENT_NOTIFICATION_HTML,
-                                            subject,
-                                            params)
+        self.__config_common_and_send_specific_email(event,
+                                                     emails_to_send,
+                                                     WAITING_APPROVAL_ADMIN_EVENT_NOTIFICATION_HTML,
+                                                     subject,
+                                                     params)
+
+    def __notify_event_created(self, event, subject, emails_to_send):
+        self.__config_common_and_send_specific_email(event, emails_to_send,
+                                                     CREATE_EVENT_NOTIFICATION_HTML,
+                                                     subject)
+
+    def __notify_event_started_user(self, event, subject, emails_to_send):
+        self.__config_common_and_send_specific_email(event, emails_to_send,
+                                                     START_ORGS_EVENT_NOTIFICATION_HTML,
+                                                     subject)
 
     def __notify_inscription_user(self, event, subject, emails_to_send, params):
-        self.__config_common_and_send_email(event, emails_to_send,
-                                            INSCRIPTION_USER_EVENT_NOTIFICATION_HTML,
-                                            subject,
-                                            params)
+        self.__config_common_and_send_specific_email(event, emails_to_send,
+                                                     INSCRIPTION_USER_EVENT_NOTIFICATION_HTML,
+                                                     subject,
+                                                     params)
 
-    def __notify_inscription_gral(self, event, subject, emails_to_send):
-        self.__config_common_and_send_email(event, emails_to_send,
-                                            INSCRIPTION_EVENT_NOTIFICATION_HTML,
-                                            subject)
+    def __notify_inscription_gral(self, event, subject, emails_to_send, params):
+        self.__config_common_and_send_specific_email(event,
+                                                     emails_to_send,
+                                                     INSCRIPTION_EVENT_NOTIFICATION_HTML,
+                                                     subject,
+                                                     params)
 
-    def __notify_new_reviewers(self, event, user_reviewer, emails_to_send, params):
-        fullname = f"{user_reviewer.name} {user_reviewer.lastname}"
-        subject = f"{fullname} fue asignado como reviewer"
-        self.__config_common_and_send_email(event,
-                                            emails_to_send,
-                                            REVIEWER_EVENT_NOTIFICATION_HTML,
-                                            subject,
-                                            params)
+    def __notify_new_reviewers(self, event, subject, emails_to_send, params):
+        self.__config_common_and_send_specific_email(event,
+                                                     emails_to_send,
+                                                     REVIEWER_EVENT_NOTIFICATION_HTML,
+                                                     subject,
+                                                     params)
 
-    def __notify_change_work_status(self, event, emails_to_send, params):
-        subject = "Su trabajo a cambiado de estado"
-        self.__config_common_and_send_email(
+    def __notify_change_work_status(self, event, subject, emails_to_send, params):
+        self.__config_common_and_send_specific_email(
             event,
             emails_to_send,
             CHANGE_WORK_STATUS_NOTIFICATION_HTML,
@@ -187,97 +184,124 @@ class EventsNotificationsService(NotificationsService):
             params)
 
     async def notify_event_waiting_approval(self, event):
+        org_emails_to_send = await self.__search_emails_organizers(event)
         creator_id = event.creator_id
-        emails_to_send = await self.__search_emails_to_send(event)
-        subject = f"El evento {event.title} ha sido enviado para su aprobación"
-        self.background_tasks.add_task(self.__notify_event_waiting_approval, event, subject, emails_to_send)
-
-        admin_emails_to_send = await self.__search_emails_admin()
         user_creator = await self.users_repository.get(creator_id)
-        user_fullname = f"{user_creator.name} {user_creator.lastname}"
-        params = [user_fullname, creator_id]
+        user_creator_fullname = f"{user_creator.name} {user_creator.lastname}"
+        params_org = [user_creator_fullname]
+        subject = f"El evento {event.title} ha sido enviado para su aprobación"
 
+        self.background_tasks.add_task(self.__notify_event_waiting_approval,
+                                       event,
+                                       subject,
+                                       org_emails_to_send,
+                                       params_org)
+
+        params_creator = [user_creator_fullname, creator_id]
+        admin_emails_to_send = await self.__search_emails_admin()
         subject = f"El evento {event.title} espera aprobación"
         self.background_tasks.add_task(self.__notify_event_waiting_approval_admin,
                                        event,
                                        subject,
                                        admin_emails_to_send,
-                                       params)
+                                       params_creator)
 
         return True
 
     async def notify_event_created(self, event):
-        emails_to_send = await self.__search_emails_to_send(event)
+        org_emails_to_send = await self.__search_emails_organizers(event)
 
-        self.background_tasks.add_task(self.__notify_event_created, event, emails_to_send)
+        subject = "Su solicitud de creación de evento fue aprobada"
+        self.background_tasks.add_task(self.__notify_event_created,
+                                       event,
+                                       subject,
+                                       org_emails_to_send)
+
         return True
 
     async def notify_event_started(self, event):
-        emails_to_send = await self.__search_emails_to_send(event)
+        org_emails_to_send = await self.__search_emails_organizers(event)
 
-        self.background_tasks.add_task(self.__notify_event_started, event, emails_to_send)
+        subject = f"El evento {event.title} ha sido publicado"
+
+        self.background_tasks.add_task(self.__notify_event_started_user,
+                                       event,
+                                       subject,
+                                       org_emails_to_send)
+
         return True
 
     async def notify_inscription(self, event_id, user_inscripted_id):
+
         event = await self.event_repository.get(event_id)
         user_inscripted = await self.users_repository.get(user_inscripted_id)
-        emails_to_send_gral = await self.__search_emails_to_send(event)
         user_fullname = user_inscripted.name + " " + user_inscripted.lastname
 
+        org_emails_to_send = await self.__search_emails_organizers(event)
+        params = [user_fullname, user_inscripted.id]
         subject = f"El usuario {user_fullname} se ha inscripto al evento {event.title}"
-        self.background_tasks.add_task(self.__notify_inscription_gral, event, subject, emails_to_send_gral)
+        self.background_tasks.add_task(self.__notify_inscription_gral,
+                                       event,
+                                       subject,
+                                       org_emails_to_send,
+                                       params)
 
         user_inscripted_emails = user_inscripted.email
         params = [user_fullname]
-        subject = f"Su inscripción fue registrada con exito"
-        self.background_tasks.add_task(self.__notify_inscription_user, event, subject, user_inscripted_emails, params)
+        subject = "Su inscripción fue registrada con exito"
+        self.background_tasks.add_task(self.__notify_inscription_user,
+                                       event,
+                                       subject,
+                                       user_inscripted_emails,
+                                       params)
 
         return True
 
     async def notify_new_reviewers(self, event_id, reviewers: ReviewerCreateRequestSchema):
         event = await self.event_repository.get(event_id)
-        emails_to_send = await self.__search_emails_to_send(event)
+
         for reviewer in reviewers.reviewers:
             if reviewer.email is not None:
-                emails_to_send.append(reviewer.email)
+                emails_to_send = [reviewer.email]
                 user_reviewer = await self.users_repository.get_user_by_email(reviewer.email)
 
                 fullname = f"{user_reviewer.name} {user_reviewer.lastname}"
                 params = [fullname, str(reviewer.work_id), str(reviewer.review_deadline)]
 
+                subject = f"{fullname} fue asignado como reviewer"
+
                 self.background_tasks.add_task(
                     self.__notify_new_reviewers,
                     event,
-                    user_reviewer,
+                    subject,
                     emails_to_send,
                     params)
 
         return True
 
-    async def notify_change_work_status(self, event_id, user_id, obj, status):
+    async def notify_change_work_status(self, event_id, obj_work):
         event = await self.event_repository.get(event_id)
-        emails_to_send = await self.__search_emails_to_send(event)
+        emails_to_send = []
 
-        print(f"user_id: {user_id}")
-        # TODO: sending email?
-        # user = await self.users_repository.get(user_id)
-        for author in obj['work'].authors:
+        for author in obj_work['work'].authors:
             notify_update = author['notify_updates']
             if notify_update:
                 author_email = author['mail']
                 emails_to_send.append(author_email)
-                print(f"email2: {author_email}")
 
-        status_msg = ""
-        if status == WorkStates.APPROVED:
+        if obj_work["status"] == WorkStates.APPROVED:
             status_msg = "APROBADO"
         else:
             status_msg = "RECHAZADO"
-        params = [str(obj['id']), status_msg]
+        subject = "Su trabajo a cambiado de estado"
+        params = [str(obj_work['work'].title), status_msg]
+
         self.background_tasks.add_task(
             self.__notify_change_work_status,
             event,
+            subject,
             emails_to_send,
             params
         )
+
         return True
