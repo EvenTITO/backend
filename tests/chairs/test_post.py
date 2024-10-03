@@ -26,6 +26,52 @@ async def test_creator_can_add_user_as_chair(
     assert response.json() == create_user["id"]
 
 
+async def test_creator_cant_add_not_user(
+        client,
+        create_event_creator,
+        create_event_from_event_creator,
+        create_user
+):
+    request = MemberRequestSchema(
+        email='notexistsmail@mail.com',
+        role=EventRole.CHAIR
+    )
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/members",
+        json=jsonable_encoder(request),
+        headers=create_headers(create_event_creator["id"])
+    )
+    assert response.status_code == 404
+    assert response.json()['detail']['errorcode'] == 'USER_NOT_FOUND'
+
+
+async def test_creator_can_not_add_user_as_chair_twice_member_already_exists(
+        client,
+        create_event_creator,
+        create_event_from_event_creator,
+        create_user
+):
+    request = MemberRequestSchema(
+        email=create_user["email"],
+        role=EventRole.CHAIR
+    )
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/members",
+        json=jsonable_encoder(request),
+        headers=create_headers(create_event_creator["id"])
+    )
+    assert response.status_code == 201
+    assert response.json() == create_user["id"]
+
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/members",
+        json=jsonable_encoder(request),
+        headers=create_headers(create_event_creator["id"])
+    )
+    assert response.status_code == 409
+    assert response.json()['detail']['errorcode'] == 'ALREADY_MEMBER_EXIST'
+
+
 async def test_organizer_can_add_user_as_chair(client, create_organizer, create_event_from_event_creator, create_user):
     request = MemberRequestSchema(
         email=create_user["email"],
