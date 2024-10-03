@@ -1,8 +1,11 @@
-from fastapi import HTTPException
+from fastapi import status
+from app.exceptions.base_exception import BaseHTTPException
 
 
-class ExpirationDateException(HTTPException):
+class ExpirationDateException(BaseHTTPException):
     def __init__(self):
-        self.status_code = 409
-        self.detail = "Application expired"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            status.HTTP_409_CONFLICT,
+            'EXPIRATION_DATE_EXCEPTION',
+            "Application expired",
+        )
