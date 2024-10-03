@@ -1,11 +1,16 @@
 from fastapi import HTTPException
 
+from app.exceptions.base_exception import BaseHTTPException
 
-class UserNotFound(HTTPException):
+
+class UserNotFound(BaseHTTPException):
     def __init__(self, user_id):
-        self.status_code = 404
-        self.detail = f"User {user_id} not found"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            404,
+            'USER_NOT_FOUND',
+            f"User {user_id} not found",
+            {'user_id': user_id}
+        )
 
 
 class UserWithEmailNotFound(HTTPException):
