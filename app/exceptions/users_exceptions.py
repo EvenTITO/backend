@@ -1,41 +1,51 @@
-from fastapi import HTTPException
-
+from fastapi import status
 from app.exceptions.base_exception import BaseHTTPException
 
 
 class UserNotFound(BaseHTTPException):
-    def __init__(self, user_id):
+    def __init__(self, user_id: str):
         super().__init__(
-            404,
+            status.HTTP_404_NOT_FOUND,
             'USER_NOT_FOUND',
             f"User {user_id} not found",
             {'user_id': user_id}
         )
 
 
-class UserWithEmailNotFound(HTTPException):
-    def __init__(self, email_user):
-        self.status_code = 404
-        self.detail = f"User with email {email_user} not found"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+class UserWithEmailNotFound(BaseHTTPException):
+    def __init__(self, email_user: str):
+        super().__init__(
+            status.HTTP_404_NOT_FOUND,
+            'USER_WITH_EMAIL_NOT_FOUND',
+            f"User with email {email_user} not found",
+            {'email': email_user}
+        )
 
 
-class EmailAlreadyExists(HTTPException):
-    def __init__(self, email_str):
-        self.status_code = 409
-        self.detail = f"Email {email_str} already exists"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+class EmailAlreadyExists(BaseHTTPException):
+    def __init__(self, email_str: str):
+        super().__init__(
+            status.HTTP_409_CONFLICT,
+            'EMAIL_ALREADY_EXISTS',
+            f"Email {email_str} already exists",
+            {'email': email_str}
+        )
 
 
-class IdAlreadyExists(HTTPException):
+class IdAlreadyExists(BaseHTTPException):
     def __init__(self, id_str):
-        self.status_code = 409
-        self.detail = f"Id {id_str} already exists"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            status.HTTP_409_CONFLICT,
+            'ID_ALREADY_EXISTS',
+            f"Id {id_str} already exists",
+            {'id': id_str}
+        )
 
 
-class CantRemoveLastAdmin(HTTPException):
+class CantRemoveLastAdmin(BaseHTTPException):
     def __init__(self):
-        self.status_code = 409
-        self.detail = "System must have at least 1 admin"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            status.HTTP_409_CONFLICT,
+            'CANT_REMOVE_LAST_ADMIN',
+            "System must have at least 1 admin"
+        )
