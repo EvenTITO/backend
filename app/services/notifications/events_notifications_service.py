@@ -56,9 +56,10 @@ class EventsNotificationsService(NotificationsService):
         start_time = "Sin definir"
         organized_by = "Sin definir"
         contact = "Sin definir"
+
         if event.dates[0]['date'] is not None:
             start_date = event.dates[0]['date']
-        if event.dates[0]['date'] is not None:
+        if event.dates[0]['time'] is not None:
             start_time = event.dates[0]['time']
         if event.organized_by is not None:
             organized_by = event.organized_by
