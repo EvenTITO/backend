@@ -247,7 +247,7 @@ class EventsNotificationsService(NotificationsService):
                                        org_emails_to_send,
                                        params)
 
-        user_inscripted_emails = user_inscripted.email
+        user_inscripted_emails = [user_inscripted.email]
         params = [user_fullname]
         subject = "Su inscripción fue registrada con exito"
         self.background_tasks.add_task(self.__notify_inscription_user,
