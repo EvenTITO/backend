@@ -92,9 +92,7 @@ class WorksService(BaseService):
         work = await self.works_repository.get_work(self.event_id, work_id)
         await self.event_notification_service.notify_change_work_status(
             self.event_id,
-            self.user_id,
-            {"id": work_id, "work": work},
-            status.state)
+            {"work": work, "status": status.state})
 
     async def validate_update_work(self, work_id: UUID, work_update: WorkUpdateSchema | None = None) -> None:
         my_work = await self.__get_my_work(work_id)
