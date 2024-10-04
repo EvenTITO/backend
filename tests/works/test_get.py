@@ -11,7 +11,7 @@ from app.schemas.events.schemas import DynamicTracksEventSchema
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from app.schemas.members.member_schema import MemberRequestSchema
 from app.schemas.users.user import UserSchema
-from .test_create_work import USER_WORK
+from .test_create_work import USER_WORK, USER_WORK_WITH_TALK
 from ..commontest import create_headers
 
 
@@ -485,3 +485,41 @@ async def test_get_all_works_chair_non_authorized(
     )
 
     assert works_by_track_response.status_code == 403
+
+
+async def test_get_works_with_talk_not_null(client, create_user, create_event_started):
+    new_inscription = InscriptionRequestSchema(
+        roles=[InscriptionRole.SPEAKER]
+    )
+
+    response = await client.post(
+        f"/events/{create_event_started}/inscriptions",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201
+
+    response = await client.post(
+        f"/events/{create_event_started}/works",
+        json=jsonable_encoder(USER_WORK_WITH_TALK),
+        headers=create_headers(create_user["id"])
+    )
+    assert response.status_code == 201
+
+    work_id = response.json()
+    work_response = await client.get(
+        f"/events/{create_event_started}/works/{work_id}",
+        headers=create_headers(create_user["id"])
+    )
+    work_get = work_response.json()
+    assert work_response.status_code == 200
+    assert work_get["talk"] is not None
+
+    # work_with_talk_response = await client.get(
+    #     f"/events/{create_event_started}/works/talks",
+    #     headers=create_headers(create_user["id"])
+    # )
+    # work_get2 = work_with_talk_response.json()
+    #
+    # assert work_with_talk_response.status_code == 200
+    # assert work_get2["talk"] is not None

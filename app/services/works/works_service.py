@@ -122,6 +122,13 @@ class WorksService(BaseService):
         dates_schema = await self.event_configuration_service.get_dates()
         return next((x for x in dates_schema.dates if x.name == MandatoryDates.SUBMISSION_DEADLINE_DATE), None)
 
+    async def get_works_with_talk_not_null(self, offset, limit):
+        works = await self.works_repository.get_all_works_with_talk_not_null(self.event_id, offset, limit)
+        print(f"w1: {works}")
+        w2 = list(map(WorksService.__map_to_schema, works))
+        print(f"w2: {w2}")
+        return w2
+
     @staticmethod
     def __map_to_schema(model: WorkModel) -> WorkWithState:
         return WorkWithState(

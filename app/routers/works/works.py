@@ -86,3 +86,17 @@ async def update_work_administration(
 )
 async def update_work_status(work_id: UUID, status: WorkStateSchema, work_service: WorksServiceDep) -> None:
     await work_service.update_work_status(work_id, status)
+
+
+@works_router.get(
+    path="/talks",
+    status_code=200,
+    response_model=List[WorkWithState],
+    dependencies=[Depends(verify_user_exists)]
+)
+async def get_works_with_talk_not_null(
+        work_service: WorksServiceDep,
+        offset: int = 0,
+        limit: int = Query(default=100, le=100)
+) -> list[WorkWithState]:
+    return await work_service.get_works_with_talk_not_null(offset, limit)

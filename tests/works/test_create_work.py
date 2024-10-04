@@ -3,6 +3,7 @@ from fastapi.encoders import jsonable_encoder
 from app.database.models.inscription import InscriptionRole
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from app.schemas.works.author import AuthorInformation
+from app.schemas.works.talk import Talk
 from app.schemas.works.work import CreateWorkSchema
 from ..commontest import create_headers
 
@@ -23,6 +24,26 @@ USER_WORK = CreateWorkSchema(
             is_speaker=False
         )
     ]
+)
+
+USER_WORK_WITH_TALK = CreateWorkSchema(
+    title=(
+        'Comparación del Rendimiento de Curve25519, '
+        'P-256 y Curvas de Edwards en Algoritmos '
+        'de Criptografía Cuántica'
+    ),
+    track='chemistry',
+    abstract='',
+    keywords=['ciber', 'security'],
+    authors=[
+        AuthorInformation(
+            full_name='Mateo Perez',
+            membership='fiuba',
+            mail='mail@mail.com',
+            is_speaker=False
+        )
+    ],
+    talk=Talk()
 )
 
 
