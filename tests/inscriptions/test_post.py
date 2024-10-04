@@ -84,8 +84,7 @@ async def test_post_inscription_in_event_not_started(client, create_user, create
         json=jsonable_encoder(new_inscription)
     )
     assert response.status_code == 409
-    assert response.json()["detail"] == "The event " + event_id + (" has not started."
-                                                                   " The current event status is CREATED")
+    assert response.json()["detail"]['errorcode'] == 'EVENT_NOT_STARTED'
 
 
 async def test_update_inscription(client, create_user, create_event_started, create_speaker_inscription):
