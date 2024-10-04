@@ -19,7 +19,7 @@ class AlreadyReviewerExist(BaseHTTPException):
     def __init__(self, event_id, user_id, work_id):
         super().__init__(
             status.HTTP_409_CONFLICT,
-            'USER_NOT_IS_REVIEWER',
+            'ALREADY_REVIEWER_EXIST',
             f"Already reviewer user_id: {user_id} for work_id: {work_id} in event: {event_id}",
             {
                 'user_id': user_id,

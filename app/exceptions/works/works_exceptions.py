@@ -95,7 +95,7 @@ class TrackNotExistInEvent(BaseHTTPException):
     def __init__(self, event_id, track):
         super().__init__(
             status.HTTP_409_CONFLICT,
-            'CANNOT_CREATE_WORK_IF_NOT_SPEAKER_INSCRIPTION',
+            'TRACK_NOT_EXIST_IN_EVENT',
             f"Track: {track} not exist in event: {event_id}",
             {
                 'event_id': event_id,
