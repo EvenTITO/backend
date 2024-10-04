@@ -9,8 +9,8 @@ class TitleAlreadyExists(BaseHTTPException):
             'TITLE_ALREADY_EXISTS',
             f"Work title {title} already exists for the event {event_id}",
             {
-                title: title,
-                event_id: event_id
+                'title': title,
+                'event_id': event_id
             }
         )
 
@@ -22,8 +22,8 @@ class WorkNotFound(BaseHTTPException):
             'WORK_NOT_FOUND',
             f"Work {work_id} in event {event_id} not found",
             {
-                work_id: work_id,
-                event_id: event_id
+                'work_id': work_id,
+                'event_id': event_id
             }
         )
 
@@ -35,8 +35,8 @@ class NotIsMyWork(BaseHTTPException):
             'NOT_IS_MY_WORK',
             f"Work {work_id} in event {event_id} not is yours",
             {
-                work_id: work_id,
-                event_id: event_id
+                'work_id': work_id,
+                'event_id': event_id
             }
         )
 
@@ -48,8 +48,8 @@ class StatusNotAllowWorkUpdate(BaseHTTPException):
             'STATUS_NOT_ALLOW_WORK_UPDATE',
             f"Status {work_status} on work {work_id} does not allow work update",
             {
-                work_id: work_id,
-                work_status: work_status
+                'work_id': work_id,
+                'work_status': work_status
             }
         )
 
@@ -61,8 +61,8 @@ class CannotUpdateWorkAfterDeadlineDate(BaseHTTPException):
             'CANNOT_UPDATE_WORK_AFTER_DEADLINE_DATE',
             f"Submission deadline {deadline_date} for work {work_id} already passed",
             {
-                work_id: work_id,
-                deadline_date: deadline_date
+                'work_id': work_id,
+                'deadline_date': deadline_date
             }
         )
 
@@ -74,7 +74,7 @@ class CannotCreateWorkAfterDeadlineDate(BaseHTTPException):
             'CANNOT_CREATE_WORK_AFTER_DEADLINE_DATE',
             f"Event submission deadline {deadline_date} for create work already passed",
             {
-                deadline_date: deadline_date
+                'deadline_date': deadline_date
             }
         )
 
@@ -86,7 +86,7 @@ class CannotCreateWorkIfNotSpeakerInscription(BaseHTTPException):
             'CANNOT_CREATE_WORK_IF_NOT_SPEAKER_INSCRIPTION',
             f"You cannot upload a work if you are not inscripted as a speaker in event {event_id}",
             {
-                event_id: event_id
+                'event_id': event_id
             }
         )
 
@@ -98,7 +98,7 @@ class TrackNotExistInEvent(BaseHTTPException):
             'CANNOT_CREATE_WORK_IF_NOT_SPEAKER_INSCRIPTION',
             f"Track: {track} not exist in event: {event_id}",
             {
-                event_id: event_id,
-                track: track
+                'event_id': event_id,
+                'track': track
             }
         )

@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 from app.exceptions.base_exception import BaseHTTPException
 
 
@@ -16,8 +15,13 @@ class AlreadyMemberExist(BaseHTTPException):
         )
 
 
-class MemberRoleNotSupported(HTTPException):
+class MemberRoleNotSupported(BaseHTTPException):
     def __init__(self, role):
-        self.status_code = 409
-        self.detail = f"Member Role {role} not supported."
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            409,
+            'MEMBER_ROLE_NOT_SUPPORTED',
+            f"Member Role {role} not supported.",
+            {
+                "role": role
+            }
+        )

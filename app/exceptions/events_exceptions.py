@@ -13,7 +13,7 @@ class InvalidEventSameTitle(BaseHTTPException):
             'INVALID_EVENT_SAME_TITLE',
             f"Title {title} already in use",
             {
-                title: title
+                'title': title
             }
         )
 
@@ -25,7 +25,7 @@ class EventNotFound(BaseHTTPException):
             'EVENT_NOT_FOUND',
             f"Event {event_id} not found",
             {
-                event_id: event_id
+                'event_id': event_id
             }
         )
 
@@ -37,8 +37,8 @@ class InvalidQueryEventNotCreatedNotAdmin(BaseHTTPException):
             'INVALID_QUERY_EVENT_NOT_CREATED_NOT_ADMIN',
             f"Invalid query for status: {event_status} while having the role: {role}",
             {
-                event_status: event_status,
-                role: role
+                'event_status': event_status,
+                'role': role
             }
         )
 
@@ -68,6 +68,6 @@ class CannotUpdateTracksAfterEventStarts(BaseHTTPException):
             'CANNOT_UPDATE_TRACKS_AFTER_EVENT_STARTS',
             f"Cannot update tracks in event:{event_id} after its started.",
             {
-                event_id: event_id,
+                'event_id': event_id,
             }
         )
