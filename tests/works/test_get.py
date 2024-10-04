@@ -11,6 +11,8 @@ from app.schemas.events.schemas import DynamicTracksEventSchema
 from app.schemas.inscriptions.inscription import InscriptionRequestSchema
 from app.schemas.members.member_schema import MemberRequestSchema
 from app.schemas.users.user import UserSchema
+from app.schemas.works.talk import Talk
+from app.schemas.works.work import WorkUpdateAdministrationSchema
 from .test_create_work import USER_WORK
 from ..commontest import create_headers
 
@@ -485,3 +487,64 @@ async def test_get_all_works_chair_non_authorized(
     )
 
     assert works_by_track_response.status_code == 403
+
+
+async def test_get_works_with_talk_not_null(client, admin_data, create_user, create_event_started):
+    new_inscription = InscriptionRequestSchema(
+        roles=[InscriptionRole.SPEAKER]
+    )
+
+    response = await client.post(
+        f"/events/{create_event_started}/inscriptions",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201
+
+    response = await client.post(
+        f"/events/{create_event_started}/works",
+        json=jsonable_encoder(USER_WORK),
+        headers=create_headers(create_user["id"])
+    )
+    assert response.status_code == 201
+
+    work_id = response.json()
+    work_response = await client.get(
+        f"/events/{create_event_started}/works/{work_id}",
+        headers=create_headers(create_user["id"])
+    )
+    work_get = work_response.json()
+    assert work_response.status_code == 200
+    assert work_get["talk"] is None
+
+    work_with_talk_response = await client.get(
+        f"/events/{create_event_started}/works/talks",
+        headers=create_headers(create_user["id"])
+    )
+    work_get2 = work_with_talk_response.json()
+
+    assert work_with_talk_response.status_code == 200
+    assert len(work_get2) == 1
+    assert work_get2[0]["talk"] is None
+
+    update = WorkUpdateAdministrationSchema(
+        talk=Talk(date="2024-01-01 09:00:00", location='FIUBA, Av. Paseo Colon 850'),
+        track="math"
+    )
+    work2_id = work_get2[0]['id']
+    response = await client.put(
+        f"/events/{create_event_started}/works/{work2_id}/administration",
+        json=jsonable_encoder(update),
+        headers=create_headers(admin_data.id)
+    )
+    assert response.status_code == 204
+
+    work_with_talk_response = await client.get(
+        f"/events/{create_event_started}/works/talks",
+        headers=create_headers(create_user["id"])
+    )
+    work_get3 = work_with_talk_response.json()
+
+    assert work_with_talk_response.status_code == 200
+    assert len(work_get3) == 1
+    assert work_get3[0]["talk"] is not None

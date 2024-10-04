@@ -17,6 +17,10 @@ class WorksRepository(Repository):
         conditions = [WorkModel.event_id == event_id, WorkModel.id == work_id]
         return await self._get_with_conditions(conditions)
 
+    async def get_all_works_with_talk_not_null(self, event_id: UUID, offset: int, limit: int) -> list[WorkModel]:
+        conditions = [WorkModel.event_id == event_id, WorkModel.talk is not None]
+        return await self._get_many_with_conditions(conditions, offset, limit)
+
     async def get_all_works_for_event(self, event_id: UUID, offset: int, limit: int) -> list[WorkModel]:
         conditions = [WorkModel.event_id == event_id]
         return await self._get_many_with_conditions(conditions, offset, limit)

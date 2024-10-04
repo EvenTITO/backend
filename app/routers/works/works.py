@@ -33,6 +33,20 @@ async def get_works(
 
 
 @works_router.get(
+    path="/talks",
+    status_code=200,
+    response_model=List[WorkWithState],
+    dependencies=[Depends(verify_user_exists)]
+)
+async def get_works_with_talk_not_null(
+        work_service: WorksServiceDep,
+        offset: int = 0,
+        limit: int = Query(default=100, le=100)
+) -> list[WorkWithState]:
+    return await work_service.get_works_with_talk_not_null(offset, limit)
+
+
+@works_router.get(
     path="/my-works",
     status_code=200,
     response_model=List[WorkWithState],
@@ -72,9 +86,9 @@ async def update_work(work_id: UUID, work_update: WorkUpdateSchema, work_service
     dependencies=[Depends(verify_is_organizer)]
 )
 async def update_work_administration(
-    work_id: UUID,
-    work_update: WorkUpdateAdministrationSchema,
-    work_service: WorksServiceDep
+        work_id: UUID,
+        work_update: WorkUpdateAdministrationSchema,
+        work_service: WorksServiceDep
 ) -> None:
     await work_service.update_work_administration(work_id, work_update)
 
