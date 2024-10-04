@@ -124,10 +124,7 @@ class WorksService(BaseService):
 
     async def get_works_with_talk_not_null(self, offset, limit):
         works = await self.works_repository.get_all_works_with_talk_not_null(self.event_id, offset, limit)
-        print(f"w1: {works}")
-        w2 = list(map(WorksService.__map_to_schema, works))
-        print(f"w2: {w2}")
-        return w2
+        return list(map(WorksService.__map_to_schema, works))
 
     @staticmethod
     def __map_to_schema(model: WorkModel) -> WorkWithState:
