@@ -97,7 +97,7 @@ class WorksService(BaseService):
     async def validate_update_work(self, work_id: UUID, work_update: WorkUpdateSchema | None = None) -> None:
         my_work = await self.__get_my_work(work_id)
         if my_work.state not in [WorkStates.SUBMITTED, WorkStates.RE_SUBMIT]:
-            raise StatusNotAllowWorkUpdate(status=my_work.state, work_id=work_id)
+            raise StatusNotAllowWorkUpdate(work_status=my_work.state, work_id=work_id)
         if datetime.today() > my_work.deadline_date:
             raise CannotUpdateWorkAfterDeadlineDate(deadline_date=my_work.deadline_date, work_id=work_id)
         if work_update is not None and my_work.title != work_update.title and \

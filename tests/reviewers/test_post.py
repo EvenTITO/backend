@@ -84,7 +84,7 @@ async def test_create_reviewers_already_exist_reviewer(
         headers=create_headers(create_event_creator["id"])
     )
 
-    assert response.status_code == 403
+    assert response.status_code == 409
 
 
 async def test_create_reviewers_by_work_id_invalid(

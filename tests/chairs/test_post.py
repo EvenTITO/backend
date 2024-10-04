@@ -117,7 +117,7 @@ async def test_add_tracks_that_dont_exists_in_event_raises_error(
         json=jsonable_encoder(add_tracks_request),
         headers=create_headers(create_event_creator["id"])
     )
-    assert response.status_code == 400
+    assert response.status_code == 409
 
 
 async def test_add_tracks_to_member_that_is_not_chair_fails(

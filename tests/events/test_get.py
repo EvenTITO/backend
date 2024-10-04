@@ -4,8 +4,7 @@ import pytest
 from fastapi.encoders import jsonable_encoder
 
 from app.database.models.event import EventStatus
-from app.database.models.user import UserRole
-from app.exceptions.events_exceptions import EventNotFound, InvalidQueryEventNotCreatedNotAdmin
+from app.exceptions.events_exceptions import EventNotFound
 from app.schemas.events.event_status import EventStatusSchema
 from app.schemas.events.roles import EventRole
 from ..commontest import create_headers, EVENTS
@@ -51,11 +50,7 @@ async def test_get_all_events_not_admin_error(
     response = await client.get("/events/",
                                 headers=create_headers(create_user['id']))
     assert response.status_code == 409
-    assert response.json()['detail'] == \
-        InvalidQueryEventNotCreatedNotAdmin(
-        status=None,
-        role=UserRole.DEFAULT.value
-    ).detail
+    assert response.json()['detail']['errorcode'] == 'INVALID_QUERY_EVENT_NOT_CREATED_NOT_ADMIN'
 
 
 async def test_get_all_events_admin_gets_all(client, create_many_events, admin_data):

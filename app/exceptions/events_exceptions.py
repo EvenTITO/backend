@@ -1,47 +1,73 @@
+from fastapi import status
+from app.exceptions.base_exception import BaseHTTPException
 from uuid import UUID
-from fastapi import HTTPException
 
 from app.database.models.event import EventStatus
 from app.database.models.user import UserRole
 
 
-class InvalidEventSameTitle(HTTPException):
+class InvalidEventSameTitle(BaseHTTPException):
     def __init__(self, title):
-        self.status_code = 409
-        self.detail = f"Title {title} already in use"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            status.HTTP_409_CONFLICT,
+            'INVALID_EVENT_SAME_TITLE',
+            f"Title {title} already in use",
+            {
+                'title': title
+            }
+        )
 
 
-class EventNotFound(HTTPException):
+class EventNotFound(BaseHTTPException):
     def __init__(self, event_id):
-        self.status_code = 404
-        self.detail = f"Event {event_id} not found"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            status.HTTP_404_NOT_FOUND,
+            'EVENT_NOT_FOUND',
+            f"Event {event_id} not found",
+            {
+                'event_id': event_id
+            }
+        )
 
 
-class InvalidQueryEventNotCreatedNotAdmin(HTTPException):
-    def __init__(self, status: EventStatus | None, role: UserRole):
-        self.status_code = 409
-        self.detail = f"Invalid query for status: {status} while having the role: {role}"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+class InvalidQueryEventNotCreatedNotAdmin(BaseHTTPException):
+    def __init__(self, event_status: EventStatus | None, role: UserRole):
+        super().__init__(
+            status.HTTP_409_CONFLICT,
+            'INVALID_QUERY_EVENT_NOT_CREATED_NOT_ADMIN',
+            f"Invalid query for status: {event_status} while having the role: {role}",
+            {
+                'event_status': event_status,
+                'role': role
+            }
+        )
 
 
-class InvalidEventConfiguration(HTTPException):
+class InvalidEventConfiguration(BaseHTTPException):
     def __init__(self):
-        self.status_code = 409
-        self.detail = "Invalid event configuration for published"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            status.HTTP_409_CONFLICT,
+            'INVALID_EVENT_CONFIGURATION',
+            "Invalid event configuration for published"
+        )
 
 
-class InvalidCaller(HTTPException):
+class InvalidCaller(BaseHTTPException):
     def __init__(self):
-        self.status_code = 400
-        self.detail = "Invalid caller for operation"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            status.HTTP_409_CONFLICT,
+            'INVALID_CALLER',
+            "Invalid caller for operation"
+        )
 
 
-class CannotUpdateTracksAfterEventStarts(HTTPException):
+class CannotUpdateTracksAfterEventStarts(BaseHTTPException):
     def __init__(self, event_id: UUID):
-        self.status_code = 409
-        self.detail = f"Cannot update tracks in event:{event_id} after its started."
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            status.HTTP_409_CONFLICT,
+            'CANNOT_UPDATE_TRACKS_AFTER_EVENT_STARTS',
+            f"Cannot update tracks in event:{event_id} after its started.",
+            {
+                'event_id': event_id,
+            }
+        )

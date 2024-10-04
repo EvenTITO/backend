@@ -1,8 +1,13 @@
-from fastapi import HTTPException
+from fastapi import status
+from app.exceptions.base_exception import BaseHTTPException
 
 
-class PaymentNotFound(HTTPException):
+class PaymentNotFound(BaseHTTPException):
     def __init__(self, event_id, payment_id):
-        self.status_code = 404
-        self.detail = f"Payment {payment_id} in event {event_id} not found"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            status.HTTP_404_NOT_FOUND,
+            'PAYMENT_NOT_FOUND',
+            f"Payment {payment_id} in event {event_id} not found",
+            {'payment_id': payment_id,
+             'event_id': event_id}
+        )
