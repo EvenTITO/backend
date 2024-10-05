@@ -521,19 +521,17 @@ async def test_get_works_with_talk_not_null(client, admin_data, create_user, cre
         f"/events/{create_event_started}/works/talks",
         headers=create_headers(create_user["id"])
     )
-    work_get2 = work_with_talk_response.json()
+    works_with_talks = work_with_talk_response.json()
 
     assert work_with_talk_response.status_code == 200
-    assert len(work_get2) == 1
-    assert work_get2[0]["talk"] is None
+    assert len(works_with_talks) == 0
 
     update = WorkUpdateAdministrationSchema(
         talk=Talk(date="2024-01-01 09:00:00", location='FIUBA, Av. Paseo Colon 850'),
         track="math"
     )
-    work2_id = work_get2[0]['id']
     response = await client.put(
-        f"/events/{create_event_started}/works/{work2_id}/administration",
+        f"/events/{create_event_started}/works/{work_id}/administration",
         json=jsonable_encoder(update),
         headers=create_headers(admin_data.id)
     )
@@ -543,8 +541,8 @@ async def test_get_works_with_talk_not_null(client, admin_data, create_user, cre
         f"/events/{create_event_started}/works/talks",
         headers=create_headers(create_user["id"])
     )
-    work_get3 = work_with_talk_response.json()
+    works_with_talks = work_with_talk_response.json()
 
     assert work_with_talk_response.status_code == 200
-    assert len(work_get3) == 1
-    assert work_get3[0]["talk"] is not None
+    assert len(works_with_talks) == 1
+    assert works_with_talks[0]["talk"] is not None
