@@ -86,3 +86,36 @@ async def test_create_two_works_same_title_same_event_fails(client, create_user,
 
     assert response.status_code == 201
     assert second_response.status_code == 409, "The second response should fail given that the title is repeated"
+
+
+async def test_create_work_without_membership(client, create_user, create_event_started):
+    new_inscription = InscriptionRequestSchema(
+        roles=[InscriptionRole.SPEAKER]
+    )
+
+    response = await client.post(
+        f"/events/{create_event_started}/inscriptions",
+        headers=create_headers(create_user["id"]),
+        json=jsonable_encoder(new_inscription)
+    )
+    assert response.status_code == 201
+
+    new_work = CreateWorkSchema(
+        title='titulo',
+        track='chemistry',
+        abstract='lalalala',
+        keywords=['ciber', 'security'],
+        authors=[
+            AuthorInformation(
+                full_name='Mateo Perez',
+                mail='mail@mail.com',
+                is_speaker=False
+            )
+        ]
+    )
+    response = await client.post(
+        f"/events/{create_event_started}/works",
+        json=jsonable_encoder(new_work),
+        headers=create_headers(create_user["id"])
+    )
+    assert response.status_code == 201

@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 class AuthorInformation(BaseModel):
     full_name: str = Field(examples=['Juan Sanchez'])
-    membership: str = Field(examples=['FIUBA'])
+    membership: str | None = Field(examples=['FIUBA'], default=None)
     mail: str = Field(examples=['juansanchez@mail.com'])
     notify_updates: bool = Field(description=(
         'If set to true, the author will receive emails '
