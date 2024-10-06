@@ -1,6 +1,9 @@
 import datetime
 from fastapi.encoders import jsonable_encoder
 
+from app.schemas.events.roles import EventRole
+from app.schemas.events.schemas import DynamicTracksEventSchema
+from app.schemas.members.member_schema import MemberRequestSchema
 from app.schemas.members.reviewer_schema import ReviewerRequestSchema, ReviewerCreateRequestSchema
 from ..commontest import create_headers
 from ..works.test_create_work import USER_WORK
@@ -172,6 +175,101 @@ async def test_get_reviewers_by_work_id_ok(
     assert reviewers_list[0]["user"]["lastname"] == create_user["lastname"]
 
 
+async def test_get_reviewers_by_work_id_by_chair_ok(
+        client,
+        create_user,
+        create_event_creator,
+        create_event_from_event_creator,
+        create_event_started_with_inscription_from_event_creator
+):
+    create_work_1_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works",
+        json=jsonable_encoder(USER_WORK),
+        headers=create_headers(create_event_creator['id'])
+    )
+    assert create_work_1_response.status_code == 201
+    work_id_1 = create_work_1_response.json()
+
+    new_work = USER_WORK.model_copy()
+    new_work.title = 'new work title'
+
+    create_work_2_response = await client.post(
+        f"/events/{create_event_from_event_creator}/works",
+        json=jsonable_encoder(new_work),
+        headers=create_headers(create_event_creator['id'])
+    )
+    assert create_work_2_response.status_code == 201
+    work_id_2 = create_work_2_response.json()
+
+    new_reviewer_1 = ReviewerRequestSchema(
+        work_id=work_id_1,
+        email=create_user["email"],
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
+    )
+    new_reviewer_2 = ReviewerRequestSchema(
+        work_id=work_id_1,
+        email=create_event_creator["email"],
+        review_deadline=datetime.date.today() + datetime.timedelta(days=10)
+    )
+
+    new_reviewer_3 = ReviewerRequestSchema(
+        work_id=work_id_2,
+        email=create_user["email"],
+        review_deadline="2024-06-14"
+    )
+
+    request = ReviewerCreateRequestSchema(
+        reviewers=[new_reviewer_1, new_reviewer_2, new_reviewer_3]
+    )
+
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/reviewers",
+        json=jsonable_encoder(request),
+        headers=create_headers(create_event_creator['id'])
+    )
+
+    assert response.status_code == 201
+
+    request = MemberRequestSchema(
+        email=create_user["email"],
+        role=EventRole.CHAIR
+    )
+    response = await client.post(
+        f"/events/{create_event_from_event_creator}/members",
+        json=jsonable_encoder(request),
+        headers=create_headers(create_event_creator["id"])
+    )
+    assert response.status_code == 201
+    chair_ir = response.json()
+    add_tracks_request = DynamicTracksEventSchema(
+        tracks=["chemistry"],
+    )
+    response = await client.put(
+        f"/events/{create_event_from_event_creator}/chairs/{chair_ir}/tracks",
+        json=jsonable_encoder(add_tracks_request),
+        headers=create_headers(create_event_creator["id"])
+    )
+
+    assert response.status_code == 204
+
+    get_response = await client.get(
+        f"/events/{create_event_from_event_creator}/reviewers?work_id={work_id_2}",
+        headers=create_headers(create_user['id'])
+    )
+
+    assert get_response.status_code == 200
+
+    reviewers_list = get_response.json()
+    assert len(reviewers_list) == 1
+    assert work_id_1 not in reviewers_list[0]["works"][0]["work_id"]
+    assert work_id_2 in reviewers_list[0]["works"][0]["work_id"]
+    assert reviewers_list[0]["event_id"] == create_event_from_event_creator
+    assert reviewers_list[0]["user_id"] == create_user['id']
+    assert reviewers_list[0]["user"]["email"] == create_user["email"]
+    assert reviewers_list[0]["user"]["name"] == create_user["name"]
+    assert reviewers_list[0]["user"]["lastname"] == create_user["lastname"]
+
+
 async def test_get_reviewers_by_work_id_invalid_return_empty_list(
         client,
         create_user,
@@ -243,7 +341,7 @@ async def test_get_reviewers_by_work_id_without_permissions(
         create_event_from_event_creator
 ):
     response = await client.get(
-        f"/events/{create_event_from_event_creator}/reviewers?work_id=4",
+        f"/events/{create_event_from_event_creator}/reviewers?work_id=a1111111-180c-4ab7-8eea-35c41bb71111",
         headers=create_headers(create_user['id'])
     )
 

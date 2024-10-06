@@ -5,7 +5,7 @@ from fastapi import APIRouter, Query
 
 from app.authorization.admin_user_dep import IsAdminUsrDep
 from app.authorization.caller_id_dep import CallerIdDep
-from app.authorization.chair_dep import IsChairDep
+from app.authorization.chair_dep import IsChairDep, IsWorkChairDep
 from app.authorization.organizer_dep import IsOrganizerDep
 from app.authorization.reviewer_dep import IsReviewerDep
 from app.authorization.util_dep import or_
@@ -35,7 +35,7 @@ async def add_reviewers(
 @event_reviewers_router.get(
     path="",
     response_model=List[ReviewerWithWorksDeadlineResponseSchema],
-    dependencies=[or_(IsOrganizerDep, IsAdminUsrDep)]
+    dependencies=[or_(IsOrganizerDep, IsWorkChairDep, IsAdminUsrDep)]
 )
 async def read_event_reviewers(
         reviewer_service: EventReviewerServiceDep,

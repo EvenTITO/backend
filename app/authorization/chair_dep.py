@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional
 from uuid import UUID
 
 from fastapi import Depends, HTTPException, Query
@@ -55,11 +55,11 @@ class IsWorkChair:
     async def __call__(
             self,
             caller_id: CallerIdDep,
-            work_id: UUID,
             chair_service: EventChairServiceDep,
-            work_service: WorksServiceDep
+            work_service: WorksServiceDep,
+            work_id: UUID | Optional[UUID] | None = None
     ) -> bool:
-        if await chair_service.is_chair(caller_id):
+        if (work_id is not None) and (await chair_service.is_chair(caller_id)):
             chair = await chair_service.get_chair(caller_id)
             work = await work_service.get_work(work_id)
             return work.track in chair.tracks
