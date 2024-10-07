@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.models.work import WorkModel
 from app.repository.crud_repository import Repository
 from app.schemas.users.utils import UID
-from app.schemas.works.work import CreateWorkSchema, WorkStateSchema
+from app.schemas.works.work import CreateWorkSchema, WorkStateSchema, WorkUpdateSchema, WorkUpdateAdministrationSchema
 
 
 class WorksRepository(Repository):
@@ -52,7 +52,16 @@ class WorksRepository(Repository):
         )
         return await self._create(work_model)
 
-    async def update_work(self, work_update: CreateWorkSchema, event_id: UUID, work_id: UUID) -> bool:
+    async def update_work(self, work_update: WorkUpdateSchema, event_id: UUID, work_id: UUID) -> bool:
+        conditions = [WorkModel.event_id == event_id, WorkModel.id == work_id]
+        return await self._update_with_conditions(conditions, work_update)
+
+    async def update_work_administration(
+            self,
+            work_update: WorkUpdateAdministrationSchema,
+            event_id: UUID,
+            work_id: UUID
+    ) -> bool:
         conditions = [WorkModel.event_id == event_id, WorkModel.id == work_id]
         return await self._update_with_conditions(conditions, work_update)
 

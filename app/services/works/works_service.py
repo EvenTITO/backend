@@ -83,7 +83,7 @@ class WorksService(BaseService):
         await self.works_repository.update_work(work_update, self.event_id, work_id)
 
     async def update_work_administration(self, work_id: UUID, work_update: WorkUpdateAdministrationSchema) -> None:
-        await self.works_repository.update_work(work_update, self.event_id, work_id)
+        await self.works_repository.update_work_administration(work_update, self.event_id, work_id)
 
     async def update_work_status(self, work_id: UUID, status: WorkStateSchema) -> None:
         if not await self.exist_work(work_id):

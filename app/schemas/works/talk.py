@@ -9,3 +9,4 @@ class Talk(BaseModel):
         examples=["FIUBA, Av. Paseo Colon 850"],
         default=""
     )
+    duration: int | None = Field(examples=[60], default=None)
