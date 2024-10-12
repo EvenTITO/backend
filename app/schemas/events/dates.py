@@ -16,7 +16,7 @@ class MandatoryDates(str, Enum):
 
 
 class DateSchema(BaseModel):
-    name: MandatoryDates | None = Field(
+    name: str | None = Field(
         min_length=2,
         max_length=100,
         examples=[MandatoryDates.START_DATE],
