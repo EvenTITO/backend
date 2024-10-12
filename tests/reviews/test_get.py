@@ -225,7 +225,12 @@ async def test_get_my_work_reviews_ok(
     assert reviewer_response.status_code == 201
 
     answer_1 = ReviewAnswer(
-        answers=[SimpleAnswer(question="Comentarios", answer="Muy buen trabajo.", type_question='simple_question')]
+        answers=[SimpleAnswer(
+            question="Comentarios",
+            answer="Muy buen trabajo.",
+            type_question='simple_question',
+            is_public=True
+        )]
     )
     review_1 = ReviewCreateRequestSchema(
         status=ReviewDecision.APPROVED,
@@ -242,11 +247,19 @@ async def test_get_my_work_reviews_ok(
         assert create_review_1_response.status_code == 201, create_review_1_response.json()
 
         answer_2 = ReviewAnswer(
-            answers=[SimpleAnswer(
-                question="Comentarios",
-                answer="Mejorar desarrollo, es demasiado técnico y difícil de leer. Revisar ortografía.",
-                type_question='simple_question'
-            )]
+            answers=[
+                SimpleAnswer(
+                    question="Comentarios",
+                    answer="Mejorar desarrollo, es demasiado técnico y difícil de leer. Revisar ortografía.",
+                    type_question='simple_question',
+                ),
+                SimpleAnswer(
+                    question="Comentarios 2",
+                    answer="Mejorar",
+                    type_question='simple_question',
+                    is_public=True
+                )
+            ]
         )
 
         review_2 = ReviewCreateRequestSchema(
@@ -300,9 +313,8 @@ async def test_get_my_work_reviews_ok(
     assert my_work_reviews[0]["status"] == ReviewDecision.NOT_APPROVED
     assert my_work_reviews[0]["reviewer_id"] == create_event_creator['id']
     assert len(my_work_reviews[0]["review"]["answers"]) == 1
-    assert my_work_reviews[0]["review"]["answers"][0]["question"] == "Comentarios"
-    assert (my_work_reviews[0]["review"]["answers"][0]["answer"] ==
-            "Mejorar desarrollo, es demasiado técnico y difícil de leer. Revisar ortografía.")
+    assert my_work_reviews[0]["review"]["answers"][0]["question"] == "Comentarios 2"
+    assert (my_work_reviews[0]["review"]["answers"][0]["answer"] == "Mejorar")
     assert my_work_reviews[0]["review"]["answers"][0]["type_question"] == "simple_question"
 
 

@@ -1,9 +1,9 @@
 from typing import Literal
 
-from pydantic import BaseModel
+from app.schemas.events.review_skeleton.base_question import BaseQuestion
 
 
-class SimpleQuestion(BaseModel):
+class SimpleQuestion(BaseQuestion):
     type_question: Literal['simple_question']
     question: str
 

@@ -35,7 +35,11 @@ class EventReviewsService(BaseService):
         return await self.reviews_repository.get_all_work_reviews_for_event(self.event_id, self.work_id, offset, limit)
 
     async def get_my_work_reviews(self, offset: int, limit: int) -> list[ReviewResponseSchema]:
-        return await self.reviews_repository.get_shared_work_reviews(self.event_id, self.work_id, offset, limit)
+        reviews = await self.reviews_repository.get_shared_work_reviews(self.event_id, self.work_id, offset, limit)
+        for r in reviews:
+            public_answers = [answer for answer in r.review.answers if answer.is_public]
+            r.review.answers = public_answers
+        return reviews
 
     async def add_review(self, review_schema: ReviewCreateRequestSchema) -> ReviewUploadSchema:
         my_work = await self.work_service.get_work(self.work_id)

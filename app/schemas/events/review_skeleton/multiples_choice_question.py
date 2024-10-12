@@ -1,10 +1,11 @@
 from typing import Literal
+from app.schemas.events.review_skeleton.base_question import BaseQuestion
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import Field, model_validator
 from typing_extensions import Self
 
 
-class MultipleChoiceQuestion(BaseModel):
+class MultipleChoiceQuestion(BaseQuestion):
     type_question: Literal['multiple_choice']
     question: str
     options: list[str] = Field(examples=[
