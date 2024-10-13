@@ -42,7 +42,7 @@ class WorksService(BaseService):
         return list(map(WorksService.__map_to_schema, works))
 
     async def get_my_works(self, offset: int, limit: int) -> list[WorkWithState]:
-        works = await self.works_repository.get_all_works_for_user(self.user_id, offset, limit)
+        works = await self.works_repository.get_all_works_for_user_in_event(self.event_id, self.user_id, offset, limit)
         return list(map(WorksService.__map_to_schema, works))
 
     async def create_work(self, work: CreateWorkSchema) -> UUID:

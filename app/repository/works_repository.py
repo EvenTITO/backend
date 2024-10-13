@@ -25,8 +25,14 @@ class WorksRepository(Repository):
         conditions = [WorkModel.event_id == event_id]
         return await self._get_many_with_conditions(conditions, offset, limit)
 
-    async def get_all_works_for_user(self, user_id: UID, offset: int, limit: int) -> list[WorkModel]:
-        conditions = [WorkModel.author_id == user_id]
+    async def get_all_works_for_user_in_event(
+            self,
+            event_id: UUID,
+            user_id: UID,
+            offset: int,
+            limit: int
+    ) -> list[WorkModel]:
+        conditions = [WorkModel.author_id == user_id, WorkModel.event_id == event_id]
         return await self._get_many_with_conditions(conditions, offset, limit)
 
     async def get_works_in_tracks(self, event_id: UUID, tracks: list[str], offset: int, limit: int) -> list[WorkModel]:
