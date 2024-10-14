@@ -1,3 +1,4 @@
+import pendulum
 from datetime import datetime
 from uuid import UUID
 
@@ -47,7 +48,12 @@ class WorksService(BaseService):
 
     async def create_work(self, work: CreateWorkSchema) -> UUID:
         submission_deadline = await self._get_submission_deadline()
-        if submission_deadline.date < datetime.now().date():
+        buenos_aires_tz = pendulum.timezone('America/Argentina/Buenos_Aires')
+
+        now = datetime.now(buenos_aires_tz)
+
+        if submission_deadline.date <= now.date()\
+                and submission_deadline.time < now.time():
             raise CannotCreateWorkAfterDeadlineDate(submission_deadline)
 
         repeated_title = await self.works_repository.work_with_title_exists(self.event_id, work.title)

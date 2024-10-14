@@ -8,3 +8,4 @@ apscheduler
 google-cloud-storage
 pydantic-settings
 pydantic[email]
+pendulum
