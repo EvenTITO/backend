@@ -1,4 +1,3 @@
-from datetime import datetime
 from uuid import UUID
 
 from app.exceptions.reviews_exceptions import IsNotWorkRevisionPeriod, CannotPublishReviews, AlreadyReviewExist
@@ -10,6 +9,7 @@ from app.services.event_submissions.event_submissions_service import Submissions
 from app.services.services import BaseService
 from app.services.storage.work_storage_service import WorkStorageService
 from app.services.works.works_service import WorksService
+from app.utils.utils import is_valid_datetime
 
 
 class EventReviewsService(BaseService):
@@ -43,7 +43,7 @@ class EventReviewsService(BaseService):
 
     async def add_review(self, review_schema: ReviewCreateRequestSchema) -> ReviewUploadSchema:
         my_work = await self.work_service.get_work(self.work_id)
-        if my_work.deadline_date > datetime.now():
+        if not is_valid_datetime(my_work.deadline_date):
             raise IsNotWorkRevisionPeriod(self.event_id, self.work_id)
 
         last_submission = await self.submission_service.get_latest_submission()
@@ -62,7 +62,7 @@ class EventReviewsService(BaseService):
 
     async def update_review(self, review_id: UUID, review_schema: ReviewCreateRequestSchema) -> None:
         my_work = await self.work_service.get_work(self.work_id)
-        if my_work.deadline_date > datetime.now():
+        if not is_valid_datetime(my_work.deadline_date):
             raise IsNotWorkRevisionPeriod(self.event_id, self.work_id)
 
         await self.reviews_repository.update_review(review_id, review_schema)

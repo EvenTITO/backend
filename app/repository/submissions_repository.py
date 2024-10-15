@@ -1,4 +1,3 @@
-from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy import desc, update
@@ -6,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.submission import SubmissionModel
 from app.repository.crud_repository import Repository
+from app.utils.utils import now_datetime
 
 
 class SubmissionsRepository(Repository):
@@ -36,8 +36,9 @@ class SubmissionsRepository(Repository):
         return (await self._create(new_submission)).id
 
     async def update_submit(self, submission_id: UUID) -> UUID:
+        now = now_datetime()
         update_query = (
-            update(self.model).where(self.model.id == submission_id).values(last_update=datetime.now())
+            update(self.model).where(self.model.id == submission_id).values(last_update=now)
         )
         await self.session.execute(update_query)
         await self.session.commit()
