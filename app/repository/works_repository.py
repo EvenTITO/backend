@@ -1,6 +1,6 @@
 from datetime import datetime
 from uuid import UUID
-
+import time
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models.work import WorkModel
@@ -14,8 +14,12 @@ class WorksRepository(Repository):
         super().__init__(session, WorkModel)
 
     async def get_work(self, event_id: UUID, work_id: UUID) -> WorkModel:
-        conditions = [WorkModel.event_id == event_id, WorkModel.id == work_id]
-        return await self._get_with_conditions(conditions)
+        conditions = [WorkModel.event_id == event_id, WorkModel.id == work_id]\
+        start_time = time.time()
+        work = await self._get_with_conditions(conditions)
+        elapsed_time = time.time() - start_time
+        print('El tiempo transcurrido es', elapsed_time)
+        return work
 
     async def get_all_works_with_talk_not_null(self, event_id: UUID, offset: int, limit: int) -> list[WorkModel]:
         conditions = [WorkModel.event_id == event_id, WorkModel.talk.is_not(None)]
