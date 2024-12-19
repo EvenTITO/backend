@@ -14,7 +14,7 @@ class WorksRepository(Repository):
         super().__init__(session, WorkModel)
 
     async def get_work(self, event_id: UUID, work_id: UUID) -> WorkModel:
-        conditions = [WorkModel.event_id == event_id, WorkModel.id == work_id]\
+        conditions = [WorkModel.event_id == event_id, WorkModel.id == work_id]
         start_time = time.time()
         work = await self._get_with_conditions(conditions)
         elapsed_time = time.time() - start_time
