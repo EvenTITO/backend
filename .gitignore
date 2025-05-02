@@ -174,3 +174,6 @@ pyvenv.cfg
 
 #bin
 /bin
+
+# GCS emulator
+gcs_data

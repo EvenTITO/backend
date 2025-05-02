@@ -21,6 +21,32 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      init-gcs:
+        condition: service_completed_successfully
+    environment:
+      - GCP_EMULATOR_HOST=http://fake-gcs:4443
+      - GCP_EMULATOR_PUBLIC_HOST=http://localhost:4443
+
+  fake-gcs:
+    image: fsouza/fake-gcs-server:latest
+    command: ["-scheme", "http", "-public-host", "localhost:4443"]
+    ports:
+      - "4443:4443"
+    volumes:
+      - ./gcs_data:/storage
+    networks:
+      - eventito-dev-network
+
+  init-gcs:
+    image: curlimages/curl:latest
+    depends_on:
+      fake-gcs:
+        condition: service_started
+    volumes:
+      - ./scripts:/scripts
+    entrypoint: ["/bin/sh", "/scripts/init_gcs_emulator.sh"]
+    networks:
+      - eventito-dev-network
 
   postgres:
     image: postgres:14

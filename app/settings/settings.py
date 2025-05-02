@@ -16,6 +16,9 @@ class StorageSettings(BaseSettings):
     PUBLIC_BASE_URL: str
     TYPE_STORAGE: StorageTypes
     GCP_CREDENTIALS: str | None = None
+    # Emulator settings
+    GCP_EMULATOR_HOST: str | None = None
+    GCP_EMULATOR_PUBLIC_HOST: str | None = None
 
 
 # TODO: Validar que si ENABLE_SEND_EMAILS==True, entonces lo otro este setteado.
